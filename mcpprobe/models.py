@@ -11,11 +11,56 @@ would let a server change semantics without breaking a pin.
 
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Iterable, Iterator
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 DEFAULT_INPUT_SCHEMA: dict[str, Any] = {"type": "object"}
+
+Severity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+
+#: Ordered from most to least severe; ``--fail-on`` comparisons use the ranks.
+SEVERITY_LEVELS: tuple[Severity, ...] = ("CRITICAL", "HIGH", "MEDIUM", "LOW")
+
+SEVERITY_RANK: dict[str, int] = {"LOW": 1, "MEDIUM": 2, "HIGH": 3, "CRITICAL": 4}
+
+
+def severity_rank(severity: str) -> int:
+    """Return the numeric rank of ``severity`` (higher is more severe)."""
+    try:
+        return SEVERITY_RANK[severity]
+    except KeyError as exc:  # pragma: no cover - guarded by callers
+        raise ProbeError(f"unknown severity: {severity!r}") from exc
+
+
+def highest_severity(severities: Iterable[Severity]) -> Severity:
+    """Return the most severe entry, or ``LOW`` for an empty input."""
+
+    best: Severity = "LOW"
+    for severity in severities:
+        if SEVERITY_RANK[severity] > SEVERITY_RANK[best]:
+            best = severity
+    return best
+
+
+def iter_strings(value: Any, path: str = "") -> Iterator[tuple[str, str]]:
+    """Yield ``(path, text)`` for every string inside a JSON-like value.
+
+    Dict keys are joined with ``.`` and list items are addressed with ``[i]``,
+    which keeps audit and diff paths readable, e.g.
+    ``inputSchema.properties.query.description``.
+    """
+
+    if isinstance(value, str):
+        yield path, value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            child = f"{path}.{key}" if path else str(key)
+            yield from iter_strings(item, child)
+    elif isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            yield from iter_strings(item, f"{path}[{index}]")
 
 
 class ProbeError(ValueError):

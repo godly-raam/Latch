@@ -9,10 +9,13 @@ from typing import Any
 
 from pydantic import BaseModel, Field, ValidationError
 
+from .auditor import audit_tool
+from .diff import FieldChange, diff_tool_definitions
 from .models import (
     Lockfile,
     PinnedToolEntry,
     ProbeError,
+    Severity,
     ToolDefinition,
     parse_tools_payload,
 )
@@ -40,6 +43,8 @@ class DriftItem(BaseModel):
     tool_name: str
     expected_sha256: str | None = None
     actual_sha256: str | None = None
+    severity: Severity = "MEDIUM"
+    changes: list[FieldChange] = Field(default_factory=list)
 
 
 class VerificationReport(BaseModel):
@@ -116,10 +121,19 @@ def load_lockfile(path: Path) -> Lockfile:
         raise LockfileError(f"invalid lockfile {path}: {exc}") from exc
 
 
+def _added_tool_severity(tool: ToolDefinition) -> Severity:
+    """A newly exposed tool is HIGH, or CRITICAL if it already audits critical."""
+
+    if any(finding.severity == "CRITICAL" for finding in audit_tool(tool)):
+        return "CRITICAL"
+    return "HIGH"
+
+
 def verify_manifest(manifest_data: dict[str, Any], lockfile: Lockfile) -> VerificationReport:
     """Compare a live manifest against a lockfile and categorize drift."""
 
     tools = parse_tools_payload(manifest_data)
+    by_name = {tool.name: tool for tool in tools}
     actual = {tool.name: hash_tool(tool) for tool in tools}
     expected = lockfile.tools
 
@@ -132,15 +146,19 @@ def verify_manifest(manifest_data: dict[str, Any], lockfile: Lockfile) -> Verifi
                     kind=DriftKind.ADDED_TOOL,
                     tool_name=name,
                     actual_sha256=actual_sha,
+                    severity=_added_tool_severity(by_name[name]),
                 )
             )
         elif pinned.sha256 != actual_sha:
+            changes, severity = diff_tool_definitions(pinned.canonical_json, by_name[name])
             drift.append(
                 DriftItem(
                     kind=DriftKind.MODIFIED_TOOL,
                     tool_name=name,
                     expected_sha256=pinned.sha256,
                     actual_sha256=actual_sha,
+                    severity=severity,
+                    changes=changes,
                 )
             )
 
@@ -151,6 +169,7 @@ def verify_manifest(manifest_data: dict[str, Any], lockfile: Lockfile) -> Verifi
                     kind=DriftKind.REMOVED_TOOL,
                     tool_name=name,
                     expected_sha256=pinned.sha256,
+                    severity="LOW",
                 )
             )
 

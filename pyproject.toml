@@ -21,6 +21,7 @@ dev = [
 
 [project.scripts]
 mcpprobe = "mcpprobe.cli:main"
+latch = "mcpprobe.cli:main"
 
 [tool.setuptools]
 packages = ["mcpprobe"]

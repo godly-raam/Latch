@@ -19,6 +19,8 @@ python -m venv .venv
 `pydantic` and `click` are the only runtime dependencies; `pytest` lives in the
 `dev` extra.
 
+Both console names — `mcpprobe` and `latch` — invoke the same entrypoint.
+
 ## Usage
 
 Capture the server's tool list and pin it:
@@ -44,6 +46,52 @@ accepted:
   "result": {"tools": [{"name": "echo", "description": "Echo text back."}], "ttlMs": 60000}
 }
 ```
+
+### Field-level drift explanations
+
+`MODIFIED_TOOL` reports carry a severity and per-field changes, so a rug pull is
+explained rather than just flagged:
+
+```text
+  ~ MODIFIED_TOOL echo [HIGH]
+      expected sha256 8f1c…
+      actual   sha256 2b7a…
+      MODIFIED description [HIGH]
+          "Echo text back." -> "Echo text back!\u200b"
+          reason: Tool description modified after approval (tool poisoning: instructions the model trusts changed)
+```
+
+| Severity | Meaning |
+| -------- | ------- |
+| `CRITICAL` | `x-mcp-header` binding added/modified, or Unicode concealment characters introduced. |
+| `HIGH` | Tool/parameter `description` modified, parameter added, `required` relaxed, safety hint flipped (`readOnlyHint` true→false, `destructiveHint`/`openWorldHint` false→true). `ADDED_TOOL` defaults here (or `CRITICAL` if the new tool audits critical). |
+| `MEDIUM` | `outputSchema`, parameter constraints (`type`, `enum`, `pattern`), other annotations, or extension fields (`_meta`) changed. `REMOVED_TOOL` reports at `LOW`. |
+| `LOW` | Display-only `title` / `icons` changed. |
+
+## Static metadata & protocol audit
+
+`mcpprobe audit` never contacts the server. It walks every string in the
+manifest and applies fixed rules:
+
+```bash
+mcpprobe audit --input tools-list.json
+mcpprobe audit --input tools-list.json --fail-on CRITICAL --json
+mcpprobe verify --input tools-list.json --lockfile mcpprobe.lock.json --audit
+```
+
+| Rule | Severity | Detects |
+| ---- | -------- | ------- |
+| `UNICODE_TAG_BLOCK` | CRITICAL | Codepoints `U+E0000`–`U+E007F`; the hidden ASCII payload is decoded into `evidence`. |
+| `UNICODE_BIDI_OVERRIDE` | HIGH | `U+202A`–`U+202E`, `U+2066`–`U+2069`, `U+200E`, `U+200F`, `U+061C`. |
+| `UNICODE_ZERO_WIDTH` | MEDIUM | `U+200B`, `U+200C`, `U+200D`, `U+2060`, `U+FEFF`. |
+| `HEADER_PRIVILEGED_INJECTION` | CRITICAL | `x-mcp-header` bound to `Authorization`, `Cookie`, `Host`, `X-API-Key`, `X-Forwarded-For` and friends. |
+| `HEADER_CRLF_CONTROL` | CRITICAL | CR/LF/NUL or any ASCII control character in an `x-mcp-header` value. |
+| `HEADER_SPEC_VIOLATION` | HIGH | Non-string/empty header name, duplicate case-insensitive header name, or a parameter type other than `string`/`integer`/`boolean`. |
+| `TOOL_NAME_SPEC_VIOLATION` | MEDIUM | Names outside `^[A-Za-z0-9_.-]{1,128}$`. |
+| `ANNOTATION_CONTRADICTION` | MEDIUM | `readOnlyHint: true` with `destructiveHint: true` or with `x-mcp-header` bindings. |
+
+`--fail-on` defaults to `MEDIUM`: the audit passes only when no finding is at or
+above that severity (`CRITICAL > HIGH > MEDIUM > LOW`).
 
 ### Exit codes
 
