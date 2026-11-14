@@ -19,6 +19,13 @@ from typing import Any
 import click
 
 from .auditor import AuditReport, audit_manifest
+from .config_loader import (
+    ServerSpec,
+    load_mcp_config,
+    parse_server_manifest_arg,
+    resolve_server_manifests,
+)
+from .graph import GraphReport, analyze_capability_graph, render_mermaid
 from .lockfile import (
     DriftKind,
     VerificationReport,
@@ -346,6 +353,96 @@ def audit(
 
 @cli.command()
 @click.option(
+    "--config",
+    "config_paths",
+    multiple=True,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    help="MCP agent config (claude_desktop_config.json, .cursor/mcp.json, .vscode/mcp.json). Repeatable.",
+)
+@click.option(
+    "--server-manifest",
+    "server_manifests",
+    multiple=True,
+    help="Static snapshot as <server_id>=path.json. Repeatable.",
+)
+@click.option(
+    "--live",
+    "live",
+    is_flag=True,
+    help="Harvest stdio/url servers declared in the config instead of failing.",
+)
+@click.option(
+    "--trust-server",
+    "trusted_servers",
+    multiple=True,
+    help="Server id barred from acting as an untrusted source or egress sink. Repeatable.",
+)
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "json", "mermaid"]),
+    default="text",
+    show_default=True,
+    help="Report rendering.",
+)
+@click.option(
+    "--warn-only",
+    is_flag=True,
+    help="Exit 0 even when lethal-trifecta paths are found.",
+)
+@click.option(
+    "--timeout",
+    "timeout",
+    type=float,
+    default=DEFAULT_TIMEOUT,
+    show_default=True,
+    help="Transport timeout in seconds when harvesting live servers.",
+)
+def graph(
+    config_paths: tuple[Path, ...],
+    server_manifests: tuple[str, ...],
+    live: bool,
+    trusted_servers: tuple[str, ...],
+    output_format: str,
+    warn_only: bool,
+    timeout: float,
+) -> None:
+    """Analyze multi-server configs for lethal-trifecta exfiltration chains."""
+    if not config_paths and not server_manifests:
+        _fail("provide at least one --config or --server-manifest")
+
+    try:
+        specs: list[ServerSpec] = []
+        for path in config_paths:
+            specs.extend(load_mcp_config(path))
+        for raw in server_manifests:
+            specs.append(parse_server_manifest_arg(raw))
+        servers = resolve_server_manifests(specs, live=live, timeout=timeout)
+        report = analyze_capability_graph(
+            servers, trusted_servers=set(trusted_servers) or None
+        )
+    except ProbeError as exc:
+        _fail(str(exc))
+
+    if output_format == "json":
+        click.echo(
+            json.dumps(
+                report.model_dump(mode="json"),
+                indent=2,
+                sort_keys=True,
+                ensure_ascii=False,
+            )
+        )
+    elif output_format == "mermaid":
+        click.echo(render_mermaid(report), nl=False)
+    else:
+        _print_graph_report(report)
+
+    raise SystemExit(EXIT_OK if (report.passed or warn_only) else EXIT_DRIFT)
+
+
+@cli.command()
+@click.option(
     "--stdio", "stdio_command", default=None, help="Command that starts a local MCP server."
 )
 @click.option("--url", "url", default=None, help="Streamable HTTP MCP endpoint URL.")
@@ -503,6 +600,49 @@ def _print_audit_report(report: AuditReport, fail_on: str) -> None:
         click.echo(f"      {finding.message}")
         if finding.evidence is not None:
             click.echo(f"      evidence: {finding.evidence}")
+
+
+def _print_graph_report(report: GraphReport) -> None:
+    click.echo("Latch capability graph")
+    click.echo(
+        f"  servers: {report.server_count}   tools: {report.tool_count}"
+        f"   lethal trifecta paths: {len(report.trifecta_paths)}"
+    )
+    if report.trusted_servers_excluded:
+        click.echo(
+            "  trusted servers barred as sources/sinks:"
+            f" {', '.join(report.trusted_servers_excluded)}"
+        )
+
+    click.echo("")
+    for node in report.nodes:
+        label = ", ".join(node.capabilities) if node.capabilities else "no capability"
+        click.echo(f"  {node.qualified_name}  [{label}]")
+        for evidence in node.evidence:
+            click.echo(
+                f"      - {evidence.tag}: {evidence.detail}"
+                f" (signal {evidence.signal}, weight {evidence.weight:g})"
+            )
+
+    click.echo("")
+    if report.trifecta_paths:
+        click.echo(f"Lethal Trifecta paths ({len(report.trifecta_paths)}):")
+        for index, path in enumerate(report.trifecta_paths, start=1):
+            scope = "cross-server" if path.cross_server else "single-server"
+            click.echo(
+                f"  {index}. [{path.severity}] {scope} ({', '.join(path.servers)})"
+                f"  {path.path_id}"
+            )
+            click.echo(
+                f"     {path.ingest_tool} -> {path.read_tool} -> {path.egress_tool}"
+            )
+            click.echo(f"     {path.attack_narrative}")
+        click.echo("")
+        click.echo(
+            f"RESULT: {len(report.trifecta_paths)} Lethal Trifecta path(s) detected"
+        )
+    else:
+        click.echo("RESULT: no Lethal Trifecta path detected")
 
 
 def _print_watch_report(report: WatchReport) -> None:

@@ -155,6 +155,63 @@ above that severity (`CRITICAL > HIGH > MEDIUM > LOW`).
 }
 ```
 
+## Capability graph & lethal-trifecta analysis
+
+`latch graph` ingests a multi-server agent configuration and looks for the
+exfiltration pattern that matters: **untrusted input → private data read →
+external egress** inside one agent's blast radius.
+
+```bash
+latch graph --config ~/Library/Application\ Support/Claude/claude_desktop_config.json
+latch graph --config .vscode/mcp.json --live --format mermaid
+latch graph --server-manifest github=gh.json --server-manifest db=pg.json --server-manifest slack=sl.json
+latch graph --config .cursor/mcp.json --trust-server local-db --warn-only
+```
+
+Accepted configs: Claude Desktop / Cursor / Windsurf (`mcpServers`), VS Code
+(`servers`), and Latch bundles where an entry carries `{"tools": [...]}`. An
+entry with `command` is a stdio server and one with `url` is Streamable HTTP;
+those are only harvested with `--live`, otherwise Latch exits `2` telling you to
+pass `--live` or supply a static snapshot. At least one `--config` or
+`--server-manifest` is required.
+
+Each tool is tagged with zero, one, or several capabilities, using annotation
+hints, JSON Schema parameter signatures, and **identifier tokenization**
+(`readFile` → `read` + `file`) — never substring matching, so `asset_manager`
+cannot masquerade as `ssh` access.
+
+| Capability | Signal |
+| ---------- | ------ |
+| `UNTRUSTED_INPUT` | Ingestion verb (`get`, `read`, `fetch`, `list`, `search` …) with an external content noun (`issue`, `comment`, `email`, `web`, `log` …), or `openWorldHint: true` on a non-destructive tool. |
+| `PRIVATE_DATA_READ` | Read/query verb with a sensitive resource token (`file`, `env`, `secret`, `ssh`, `wallet`, `account`, `sql`, `vault` …), or a read-only closed-world tool taking a `path`/`query`/`sql`/`id` parameter. |
+| `EXTERNAL_EGRESS` | Outbound verb (`send`, `post`, `upload`, `reply`, `webhook` …) with an external target (`url`, `endpoint`, `channel`, `repo` …), an outbound sink parameter (`webhook_url`, `recipient`, `to` …), an `x-mcp-header` binding, or `openWorldHint: true` without `readOnlyHint`. |
+
+Every `ingest → read → egress` chain becomes a ranked path:
+
+* `CRITICAL` — spans two or more servers, or the egress tool accepts a
+  caller-chosen URL/webhook/recipient (or binds `x-mcp-header`).
+* `HIGH` — single server, no caller-controlled destination.
+
+`--trust-server <id>` bars a server from acting as an untrusted source or an
+egress sink (a trusted local database is still a legitimate read source). Exit
+`1` when any path exists, `0` when clean, `2` on config/manifest errors;
+`--warn-only` reports without failing. `--format mermaid` emits a diagram:
+
+```mermaid
+flowchart LR
+  subgraph srv_github["github"]
+    n0["github:get_issue<br/>UNTRUSTED_INPUT"]
+  end
+  subgraph srv_postgres["postgres"]
+    n1["postgres:query_ledger<br/>PRIVATE_DATA_READ"]
+  end
+  subgraph srv_slack["slack"]
+    n2["slack:post_message<br/>UNTRUSTED_INPUT<br/>EXTERNAL_EGRESS"]
+  end
+  n0 -->|INGEST_TO_READ| n1
+  n1 -.->|EXFIL| n2
+```
+
 ## How digests are computed
 
 **Canonical JSON.** A tool is serialized with `sort_keys=True`,

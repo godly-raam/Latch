@@ -721,3 +721,269 @@ def test_watch_audit_flag(runner: CliRunner) -> None:
 
     assert result.exit_code == 1, result.output
     assert "AUDIT PASSED" in result.output
+
+
+TRIFECTA_CONFIG = {
+    "mcpServers": {
+        "github": {
+            "tools": [
+                {
+                    "name": "get_issue",
+                    "description": "Fetch an issue.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {"issue_number": {"type": "integer"}},
+                    },
+                }
+            ]
+        },
+        "postgres": {
+            "tools": [
+                {
+                    "name": "query_ledger",
+                    "description": "Query the ledger.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {"sql": {"type": "string"}},
+                    },
+                }
+            ]
+        },
+        "slack": {
+            "tools": [
+                {
+                    "name": "post_message",
+                    "description": "Post a Slack message.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "channel": {"type": "string"},
+                            "text": {"type": "string"},
+                        },
+                    },
+                    "annotations": {
+                        "readOnlyHint": False,
+                        "openWorldHint": True,
+                        "destructiveHint": False,
+                    },
+                }
+            ]
+        },
+    }
+}
+
+BENIGN_CONFIG = {
+    "mcpServers": {
+        "math-calc": {
+            "tools": [
+                {
+                    "name": "add",
+                    "description": "Add two numbers.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "a": {"type": "number"},
+                            "b": {"type": "number"},
+                        },
+                    },
+                }
+            ]
+        },
+        "local-formatter": {
+            "tools": [
+                {
+                    "name": "format_text",
+                    "description": "Format text.",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {"text": {"type": "string"}},
+                    },
+                }
+            ]
+        },
+    }
+}
+
+
+def write_config(tmp_path: Path, payload: dict, name: str = "config.json") -> Path:
+    path = tmp_path / name
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def test_graph_text_mode_detects_trifecta(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(tmp_path, TRIFECTA_CONFIG)
+
+    result = runner.invoke(cli, ["graph", "--config", str(config)])
+
+    assert result.exit_code == 1, result.output
+    assert "Lethal Trifecta paths" in result.output
+    assert "CRITICAL" in result.output
+    assert "github:get_issue" in result.output
+    assert "postgres:query_ledger" in result.output
+    assert "cross-server" in result.output
+
+
+def test_graph_benign_config_exits_zero(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(tmp_path, BENIGN_CONFIG)
+
+    result = runner.invoke(cli, ["graph", "--config", str(config)])
+
+    assert result.exit_code == 0, result.output
+    assert "no Lethal Trifecta" in result.output
+    assert "no capability" in result.output
+
+
+def test_graph_trust_server_suppresses_paths(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(tmp_path, TRIFECTA_CONFIG)
+
+    result = runner.invoke(
+        cli, ["graph", "--config", str(config), "--trust-server", "slack"]
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "slack" in result.output
+    assert "no Lethal Trifecta" in result.output
+
+
+def test_graph_warn_only_exits_zero(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(tmp_path, TRIFECTA_CONFIG)
+
+    result = runner.invoke(cli, ["graph", "--config", str(config), "--warn-only"])
+
+    assert result.exit_code == 0, result.output
+    assert "Lethal Trifecta paths" in result.output
+
+
+def test_graph_json_format(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(tmp_path, TRIFECTA_CONFIG)
+
+    result = runner.invoke(cli, ["graph", "--config", str(config), "--format", "json"])
+
+    assert result.exit_code == 1, result.output
+    report = json.loads(result.output)
+    assert report["passed"] is False
+    assert report["server_count"] == 3
+    assert report["tool_count"] == 3
+    assert report["trifecta_paths"][0]["severity"] == "CRITICAL"
+    assert report["trifecta_paths"][0]["cross_server"] is True
+
+
+def test_graph_mermaid_format(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(tmp_path, TRIFECTA_CONFIG)
+
+    result = runner.invoke(cli, ["graph", "--config", str(config), "--format", "mermaid"])
+
+    assert result.exit_code == 1, result.output
+    assert result.output.startswith("flowchart LR")
+    assert "subgraph" in result.output
+    assert "-.->|EXFIL|" in result.output
+
+
+def test_graph_server_manifest_flags(runner: CliRunner, tmp_path: Path) -> None:
+    github = write_manifest(
+        tmp_path / "github.json",
+        {
+            "name": "get_issue",
+            "description": "Fetch an issue.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {"issue_number": {"type": "integer"}},
+            },
+        },
+    )
+    postgres = write_manifest(
+        tmp_path / "postgres.json",
+        {
+            "name": "query_ledger",
+            "description": "Query the ledger.",
+            "inputSchema": {"type": "object", "properties": {"sql": {"type": "string"}}},
+        },
+    )
+    slack = write_manifest(
+        tmp_path / "slack.json",
+        {
+            "name": "send_email",
+            "description": "Send email.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "to": {"type": "string"},
+                    "body": {"type": "string"},
+                },
+            },
+        },
+    )
+
+    result = runner.invoke(
+        cli,
+        [
+            "graph",
+            "--server-manifest",
+            f"github={github}",
+            "--server-manifest",
+            f"postgres={postgres}",
+            "--server-manifest",
+            f"slack={slack}",
+        ],
+    )
+
+    assert result.exit_code == 1, result.output
+    assert "github:get_issue" in result.output
+    assert "postgres:query_ledger" in result.output
+    assert "slack:send_email" in result.output
+
+
+def test_graph_requires_config_or_manifest(runner: CliRunner) -> None:
+    result = runner.invoke(cli, ["graph"])
+
+    assert result.exit_code == 2, result.output
+
+
+def test_graph_stdio_config_without_live_exits_two(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(
+        tmp_path,
+        {"mcpServers": {"mock": {"command": sys.executable, "args": [str(FIXTURE_MCP)]}}},
+    )
+
+    result = runner.invoke(cli, ["graph", "--config", str(config)])
+
+    assert result.exit_code == 2, result.output
+    combined = result.output + getattr(result, "stderr", "")
+    assert "--live" in combined
+
+
+def test_graph_live_stdio_config(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(
+        tmp_path,
+        {"mcpServers": {"mock": {"command": sys.executable, "args": [str(FIXTURE_MCP)]}}},
+    )
+
+    result = runner.invoke(cli, ["graph", "--config", str(config), "--live"])
+
+    assert result.exit_code == 0, result.output
+    assert "no Lethal Trifecta" in result.output
+    assert "mock:echo" in result.output
+
+
+def test_graph_duplicate_server_ids_exit_two(runner: CliRunner, tmp_path: Path) -> None:
+    manifest_path = write_manifest(tmp_path / "one.json", tool_payload("alpha"))
+
+    result = runner.invoke(
+        cli,
+        [
+            "graph",
+            "--server-manifest",
+            f"dup={manifest_path}",
+            "--server-manifest",
+            f"dup={manifest_path}",
+        ],
+    )
+
+    assert result.exit_code == 2, result.output
+
+
+def test_graph_malformed_server_manifest_exit_two(runner: CliRunner) -> None:
+    result = runner.invoke(cli, ["graph", "--server-manifest", "missing-equals"])
+
+    assert result.exit_code == 2, result.output
