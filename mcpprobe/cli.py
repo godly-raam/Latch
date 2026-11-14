@@ -1,14 +1,18 @@
-"""Command line interface: ``mcpprobe pin|verify|audit`` (alias: ``latch``).
+"""Command line interface: ``pin`` / ``verify`` / ``audit`` / ``watch``.
+
+Invoked as either ``mcpprobe`` or ``latch`` (same entrypoint).
 
 Exit codes:
     0 -- verification (and audit, when requested) passed
-    1 -- drift detected, or audit findings at/above ``--fail-on``
-    2 -- invalid input: bad JSON, missing files, malformed tool schemas
+    1 -- drift detected, audit findings at/above ``--fail-on``, or a rug pull
+    2 -- invalid input: bad JSON, missing files, malformed schemas, transport errors
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +28,13 @@ from .lockfile import (
     verify_manifest,
 )
 from .models import SEVERITY_LEVELS, ProbeError
+from .transport import (
+    DEFAULT_TIMEOUT,
+    HarvestResult,
+    harvest_http,
+    harvest_stdio,
+)
+from .watcher import WatchReport, watch_http, watch_stdio
 
 EXIT_OK = 0
 EXIT_DRIFT = 1
@@ -63,6 +74,135 @@ def _render(value: Any, limit: int = 160) -> str:
     return text
 
 
+def _parse_headers(raw_headers: tuple[str, ...]) -> dict[str, str]:
+    headers: dict[str, str] = {}
+    for raw in raw_headers:
+        name, separator, value = raw.partition(":")
+        name = name.strip()
+        if not separator or not name:
+            raise ProbeError(f'invalid --header {raw!r}: expected "Name: Value"')
+        headers[name] = value.strip()
+    return headers
+
+
+def _require_single_target(
+    input_path: Path | None, stdio_command: str | None, url: str | None
+) -> str:
+    provided = [
+        flag
+        for flag, value in (
+            ("--input", input_path),
+            ("--stdio", stdio_command),
+            ("--url", url),
+        )
+        if value is not None
+    ]
+    if len(provided) != 1:
+        got = f" (got {', '.join(provided)})" if provided else ""
+        raise ProbeError(
+            f"provide exactly one of --input, --stdio, or --url{got}"
+        )
+    return provided[0]
+
+
+def _require_http_url(url: str) -> str:
+    if not url.startswith(("http://", "https://")):
+        raise ProbeError(f"invalid --url {url!r}: expected an http(s) URL")
+    return url
+
+
+def _harvest(
+    input_path: Path | None,
+    stdio_command: str | None,
+    url: str | None,
+    headers: tuple[str, ...],
+    timeout: float,
+) -> HarvestResult | None:
+    target = _require_single_target(input_path, stdio_command, url)
+    custom_headers = _parse_headers(headers)
+    if target == "--input":
+        return None
+    if target == "--stdio":
+        assert stdio_command is not None
+        return asyncio.run(harvest_stdio(stdio_command, timeout=timeout))
+    assert url is not None
+    return asyncio.run(
+        harvest_http(
+            _require_http_url(url),
+            headers=custom_headers or None,
+            timeout=timeout,
+        )
+    )
+
+
+def _load_manifest(
+    input_path: Path | None,
+    stdio_command: str | None,
+    url: str | None,
+    headers: tuple[str, ...],
+    timeout: float,
+) -> tuple[dict[str, Any], HarvestResult | None]:
+    harvest = _harvest(input_path, stdio_command, url, headers, timeout)
+    if harvest is not None:
+        return harvest.tools_payload, harvest
+    assert input_path is not None
+    return _load_object(input_path, "manifest"), None
+
+
+def _echo_harvest(harvest: HarvestResult | None) -> None:
+    if harvest is None:
+        return
+    click.echo(
+        f"harvested:       {harvest.transport} (protocol {harvest.protocol_version})"
+    )
+
+
+def target_options(*, input_help: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    """Attach the mutually-exclusive live/local target options."""
+
+    def decorator(command: Callable[..., Any]) -> Callable[..., Any]:
+        options = [
+            click.option(
+                "--url",
+                "url",
+                default=None,
+                help="Streamable HTTP MCP endpoint URL.",
+            ),
+            click.option(
+                "--stdio",
+                "stdio_command",
+                default=None,
+                help="Command that starts a local MCP server over stdio.",
+            ),
+            click.option(
+                "--input",
+                "input_path",
+                type=click.Path(exists=True, dir_okay=False, path_type=Path),
+                default=None,
+                help=input_help,
+            ),
+            click.option(
+                "--header",
+                "headers",
+                multiple=True,
+                help='HTTP header as "Name: Value". Repeatable.',
+            ),
+            click.option(
+                "--timeout",
+                "timeout",
+                type=float,
+                default=DEFAULT_TIMEOUT,
+                show_default=True,
+                help="Transport timeout in seconds.",
+            ),
+        ]
+        for option in options:
+            command = option(command)
+        return command
+
+    return decorator
+
+
 @click.group()
 @click.version_option(package_name="mcpprobe", prog_name="mcpprobe")
 def cli() -> None:
@@ -70,13 +210,7 @@ def cli() -> None:
 
 
 @cli.command()
-@click.option(
-    "--input",
-    "input_path",
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
-    required=True,
-    help="Path to a captured tools/list manifest JSON file.",
-)
+@target_options(input_help="Path to a captured tools/list manifest JSON file.")
 @click.option("--server-id", required=True, help="Stable identifier for the MCP server.")
 @click.option(
     "--output",
@@ -85,15 +219,24 @@ def cli() -> None:
     required=True,
     help="Path of the lockfile to write.",
 )
-def pin(input_path: Path, server_id: str, output_path: Path) -> None:
-    """Pin a tools/list manifest into a cryptographic lockfile."""
+def pin(
+    input_path: Path | None,
+    stdio_command: str | None,
+    url: str | None,
+    headers: tuple[str, ...],
+    timeout: float,
+    server_id: str,
+    output_path: Path,
+) -> None:
+    """Pin a tools/list manifest (or a live server) into a lockfile."""
     try:
-        manifest = _load_object(input_path, "manifest")
+        manifest, harvest = _load_manifest(input_path, stdio_command, url, headers, timeout)
         lockfile = create_lockfile(manifest, server_id)
         save_lockfile(lockfile, output_path)
     except (ProbeError, OSError) as exc:
         _fail(str(exc))
 
+    _echo_harvest(harvest)
     click.echo(f"server id:       {lockfile.server_id}")
     click.echo(f"tools pinned:    {len(lockfile.tools)}")
     click.echo(f"manifest sha256: {lockfile.manifest_sha256}")
@@ -101,13 +244,7 @@ def pin(input_path: Path, server_id: str, output_path: Path) -> None:
 
 
 @cli.command()
-@click.option(
-    "--input",
-    "input_path",
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
-    required=True,
-    help="Path to the tools/list manifest JSON to verify.",
-)
+@target_options(input_help="Path to the tools/list manifest JSON to verify.")
 @click.option(
     "--lockfile",
     "lockfile_path",
@@ -122,10 +259,19 @@ def pin(input_path: Path, server_id: str, output_path: Path) -> None:
     is_flag=True,
     help="Also run the static protocol/Unicode audit in the same check.",
 )
-def verify(input_path: Path, lockfile_path: Path, as_json: bool, run_audit: bool) -> None:
-    """Verify a live manifest against a pinned lockfile."""
+def verify(
+    input_path: Path | None,
+    stdio_command: str | None,
+    url: str | None,
+    headers: tuple[str, ...],
+    timeout: float,
+    lockfile_path: Path,
+    as_json: bool,
+    run_audit: bool,
+) -> None:
+    """Verify a manifest or live server against a pinned lockfile."""
     try:
-        manifest = _load_object(input_path, "manifest")
+        manifest, harvest = _load_manifest(input_path, stdio_command, url, headers, timeout)
         lockfile = load_lockfile(lockfile_path)
         report = verify_manifest(manifest, lockfile)
         audit_report = audit_manifest(manifest, fail_on=AUDIT_FAIL_ON_DEFAULT) if run_audit else None
@@ -140,6 +286,7 @@ def verify(input_path: Path, lockfile_path: Path, as_json: bool, run_audit: bool
             payload["audit"] = audit_report.model_dump(mode="json")
         click.echo(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False))
     else:
+        _echo_harvest(harvest)
         if report.passed:
             click.echo(
                 f"OK: {len(lockfile.tools)} tool(s) match lockfile for server '{report.server_id}'"
@@ -155,13 +302,7 @@ def verify(input_path: Path, lockfile_path: Path, as_json: bool, run_audit: bool
 
 
 @cli.command()
-@click.option(
-    "--input",
-    "input_path",
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
-    required=True,
-    help="Path to the tools/list manifest JSON to audit.",
-)
+@target_options(input_help="Path to the tools/list manifest JSON to audit.")
 @click.option(
     "--fail-on",
     "fail_on",
@@ -171,10 +312,18 @@ def verify(input_path: Path, lockfile_path: Path, as_json: bool, run_audit: bool
     help="Minimum severity that fails the audit. Use CRITICAL to ignore HIGH and below.",
 )
 @click.option("--json", "as_json", is_flag=True, help="Emit a machine-readable JSON report.")
-def audit(input_path: Path, fail_on: str, as_json: bool) -> None:
-    """Statically audit MCP metadata and protocol hygiene (no server call)."""
+def audit(
+    input_path: Path | None,
+    stdio_command: str | None,
+    url: str | None,
+    headers: tuple[str, ...],
+    timeout: float,
+    fail_on: str,
+    as_json: bool,
+) -> None:
+    """Audit MCP metadata and protocol hygiene, statically or from a live server."""
     try:
-        manifest = _load_object(input_path, "manifest")
+        manifest, harvest = _load_manifest(input_path, stdio_command, url, headers, timeout)
         report = audit_manifest(manifest, fail_on=fail_on)
     except ProbeError as exc:
         _fail(str(exc))
@@ -189,15 +338,122 @@ def audit(input_path: Path, fail_on: str, as_json: bool) -> None:
             )
         )
     else:
+        _echo_harvest(harvest)
         _print_audit_report(report, fail_on)
 
     raise SystemExit(EXIT_OK if report.passed else EXIT_DRIFT)
 
 
-def _print_human_report(report: VerificationReport) -> None:
-    click.echo(f"FAILED: {len(report.drift)} drift item(s) for server '{report.server_id}'")
-    click.echo(f"  expected manifest sha256: {report.expected_manifest_sha256}")
-    click.echo(f"  actual   manifest sha256: {report.actual_manifest_sha256}")
+@cli.command()
+@click.option(
+    "--stdio", "stdio_command", default=None, help="Command that starts a local MCP server."
+)
+@click.option("--url", "url", default=None, help="Streamable HTTP MCP endpoint URL.")
+@click.option(
+    "--lockfile",
+    "lockfile_path",
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    default=None,
+    help="Pin to compare every snapshot against. An in-memory baseline is used otherwise.",
+)
+@click.option(
+    "--duration",
+    type=float,
+    default=15.0,
+    show_default=True,
+    help="Seconds to listen for notifications/tools/list_changed.",
+)
+@click.option(
+    "--max-events",
+    type=int,
+    default=1,
+    show_default=True,
+    help="Stop after this many change notifications.",
+)
+@click.option(
+    "--audit",
+    "run_audit",
+    is_flag=True,
+    help="Also run the static protocol/Unicode audit on every snapshot.",
+)
+@click.option(
+    "--header", "headers", multiple=True, help='HTTP header as "Name: Value". Repeatable.'
+)
+@click.option(
+    "--timeout",
+    "timeout",
+    type=float,
+    default=DEFAULT_TIMEOUT,
+    show_default=True,
+    help="Transport timeout in seconds.",
+)
+@click.option("--json", "as_json", is_flag=True, help="Emit a machine-readable JSON report.")
+def watch(
+    stdio_command: str | None,
+    url: str | None,
+    lockfile_path: Path | None,
+    duration: float,
+    max_events: int,
+    run_audit: bool,
+    headers: tuple[str, ...],
+    timeout: float,
+    as_json: bool,
+) -> None:
+    """Watch a live MCP server for mid-session tool mutations."""
+    try:
+        _require_single_target(None, stdio_command, url)
+        custom_headers = _parse_headers(headers)
+        lockfile = load_lockfile(lockfile_path) if lockfile_path is not None else None
+        server_id = lockfile.server_id if lockfile is not None else None
+
+        if stdio_command is not None:
+            report = asyncio.run(
+                watch_stdio(
+                    stdio_command,
+                    server_id=server_id,
+                    lockfile=lockfile,
+                    duration=duration,
+                    max_events=max_events,
+                    run_audit=run_audit,
+                    timeout=timeout,
+                )
+            )
+        else:
+            assert url is not None
+            report = asyncio.run(
+                watch_http(
+                    _require_http_url(url),
+                    server_id=server_id,
+                    headers=custom_headers or None,
+                    lockfile=lockfile,
+                    duration=duration,
+                    max_events=max_events,
+                    run_audit=run_audit,
+                    timeout=timeout,
+                )
+            )
+    except ProbeError as exc:
+        _fail(str(exc))
+
+    if as_json:
+        click.echo(
+            json.dumps(
+                report.model_dump(mode="json"),
+                indent=2,
+                sort_keys=True,
+                ensure_ascii=False,
+            )
+        )
+    else:
+        _print_watch_report(report)
+
+    audit_failed = any(
+        event.audit is not None and not event.audit.passed for event in report.events
+    )
+    raise SystemExit(EXIT_DRIFT if (report.rug_pull_detected or audit_failed) else EXIT_OK)
+
+
+def _print_drift_items(report: VerificationReport) -> None:
     for item in report.drift:
         if item.kind is DriftKind.ADDED_TOOL:
             click.echo(
@@ -214,13 +470,18 @@ def _print_human_report(report: VerificationReport) -> None:
             click.echo(f"      expected sha256 {item.expected_sha256}")
             click.echo(f"      actual   sha256 {item.actual_sha256}")
             for change in item.changes:
-                click.echo(
-                    f"      {change.change_type} {change.path} [{change.severity}]"
-                )
+                click.echo(f"      {change.change_type} {change.path} [{change.severity}]")
                 click.echo(
                     f"          {_render(change.old_value)} -> {_render(change.new_value)}"
                 )
                 click.echo(f"          reason: {change.risk_reason}")
+
+
+def _print_human_report(report: VerificationReport) -> None:
+    click.echo(f"FAILED: {len(report.drift)} drift item(s) for server '{report.server_id}'")
+    click.echo(f"  expected manifest sha256: {report.expected_manifest_sha256}")
+    click.echo(f"  actual   manifest sha256: {report.actual_manifest_sha256}")
+    _print_drift_items(report)
 
 
 def _print_audit_report(report: AuditReport, fail_on: str) -> None:
@@ -242,6 +503,31 @@ def _print_audit_report(report: AuditReport, fail_on: str) -> None:
         click.echo(f"      {finding.message}")
         if finding.evidence is not None:
             click.echo(f"      evidence: {finding.evidence}")
+
+
+def _print_watch_report(report: WatchReport) -> None:
+    click.echo(
+        f"watching '{report.server_id}' over {report.transport}"
+        f" (protocol {report.protocol_version})"
+    )
+    for event in report.events:
+        if event.verification.passed:
+            click.echo(
+                f"[event {event.sequence}] {event.trigger} at {event.timestamp}: no drift"
+            )
+        else:
+            click.echo(
+                f"[event {event.sequence}] {event.trigger} at {event.timestamp}:"
+                f" {len(event.verification.drift)} drift item(s)"
+            )
+            _print_drift_items(event.verification)
+        if event.audit is not None:
+            _print_audit_report(event.audit, AUDIT_FAIL_ON_DEFAULT)
+
+    if report.rug_pull_detected:
+        click.echo("RESULT: RUG PULL DETECTED - the live tool surface diverged from the pin")
+    else:
+        click.echo("RESULT: no mid-session tool mutation detected")
 
 
 def main() -> None:

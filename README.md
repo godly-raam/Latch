@@ -47,6 +47,45 @@ accepted:
 }
 ```
 
+### Harvesting a live MCP server
+
+`pin`, `verify`, and `audit` accept a live target instead of a captured file:
+
+```bash
+latch pin --stdio "npx -y @modelcontextprotocol/server-github" --server-id github --output latch.lock.json
+latch verify --url https://mcp.example.com/mcp --header "Authorization: Bearer $TOKEN" --lockfile latch.lock.json
+latch audit --stdio "python -m my_mcp_server"
+```
+
+Exactly one of `--input`, `--stdio`, or `--url` is required — passing none or
+several exits `2`. `--header "Name: Value"` is repeatable and `--timeout`
+defaults to 10 seconds.
+
+Negotiation starts with MCP `2026-07-28` `server/discover` (protocol version and
+client info in `params._meta`). If the server answers JSON-RPC `-32601` or HTTP
+`400`/`404`, Latch automatically falls back to the `2025-11-25` `initialize`
+handshake, keeps any `Mcp-Session-Id` it is issued, and sends
+`notifications/initialized`. `tools/list` then follows `nextCursor` until the
+server stops returning one, aggregating every page into a single snapshot.
+
+### Watching for a mid-session rug pull
+
+```bash
+latch watch --stdio "npx -y some-mcp-server" --lockfile latch.lock.json --duration 60 --audit
+latch watch --url https://mcp.example.com/mcp --header "Authorization: Bearer $TOKEN" --json
+```
+
+`watch` keeps one session open and waits for
+`notifications/tools/list_changed`. Every mutation immediately re-runs
+field-level differential verification — and the protocol audit with `--audit` —
+against the pin, and prints exactly what changed. Without `--lockfile`, the
+initial snapshot becomes an in-memory baseline. Exit `1` on a rug pull (or an
+audit failure), `0` when clean, `2` on transport or protocol errors.
+
+Over Streamable HTTP, change notification is delivered through
+`subscriptions/listen` SSE; a server that does not implement push subscriptions
+produces an explicit error rather than a silent no-op.
+
 ### Field-level drift explanations
 
 `MODIFIED_TOOL` reports carry a severity and per-field changes, so a rug pull is

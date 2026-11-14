@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import shlex
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -496,3 +498,226 @@ def test_verify_reports_read_only_hint_flip(
     assert result.exit_code == 1, result.output
     assert "annotations.readOnlyHint" in result.output
     assert "[HIGH]" in result.output
+
+
+FIXTURE_MCP = Path(__file__).parent / "fixtures" / "mock_mcp_stdio.py"
+
+
+def mock_stdio(*args: str) -> str:
+    return " ".join([shlex.quote(sys.executable), shlex.quote(str(FIXTURE_MCP)), *args])
+
+
+def test_pin_from_live_stdio(runner: CliRunner, tmp_path: Path) -> None:
+    lockfile_path = tmp_path / "live.lock.json"
+
+    result = runner.invoke(
+        cli,
+        ["pin", "--stdio", mock_stdio(), "--server-id", "mock", "--output", str(lockfile_path)],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "harvested:" in result.output
+    assert "2026-07-28" in result.output
+    data = json.loads(lockfile_path.read_text(encoding="utf-8"))
+    assert set(data["tools"]) == {"echo", "add"}
+
+
+def test_pin_from_stdio_legacy_fallback(runner: CliRunner, tmp_path: Path) -> None:
+    lockfile_path = tmp_path / "legacy.lock.json"
+
+    result = runner.invoke(
+        cli,
+        [
+            "pin",
+            "--stdio",
+            mock_stdio("--mode", "2025"),
+            "--server-id",
+            "mock",
+            "--output",
+            str(lockfile_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "2025-11-25" in result.output
+
+
+def test_pin_from_paginated_stdio(runner: CliRunner, tmp_path: Path) -> None:
+    lockfile_path = tmp_path / "paged.lock.json"
+
+    result = runner.invoke(
+        cli,
+        [
+            "pin",
+            "--stdio",
+            mock_stdio("--paginate"),
+            "--server-id",
+            "mock",
+            "--output",
+            str(lockfile_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(lockfile_path.read_text(encoding="utf-8"))["tools"].keys() == {
+        "echo",
+        "add",
+    }
+
+
+def test_verify_from_live_stdio(runner: CliRunner, tmp_path: Path) -> None:
+    lockfile_path = tmp_path / "live.lock.json"
+    pinned = runner.invoke(
+        cli,
+        ["pin", "--stdio", mock_stdio(), "--server-id", "mock", "--output", str(lockfile_path)],
+    )
+    assert pinned.exit_code == 0, pinned.output
+
+    result = runner.invoke(
+        cli, ["verify", "--stdio", mock_stdio(), "--lockfile", str(lockfile_path)]
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "OK" in result.output
+
+
+def test_audit_from_live_stdio(runner: CliRunner, tmp_path: Path) -> None:
+    result = runner.invoke(cli, ["audit", "--stdio", mock_stdio()])
+
+    assert result.exit_code == 0, result.output
+    assert "AUDIT PASSED" in result.output
+
+
+def test_target_group_requires_exactly_one(runner: CliRunner, tmp_path: Path) -> None:
+    missing = runner.invoke(
+        cli, ["pin", "--server-id", "mock", "--output", str(tmp_path / "out.json")]
+    )
+    assert missing.exit_code == 2, missing.output
+    assert not (tmp_path / "out.json").exists()
+
+    manifest_path = write_manifest(tmp_path / "manifest.json", tool_payload("alpha"))
+    both = runner.invoke(
+        cli,
+        [
+            "pin",
+            "--input",
+            str(manifest_path),
+            "--url",
+            "http://127.0.0.1:1/mcp",
+            "--server-id",
+            "mock",
+            "--output",
+            str(tmp_path / "out.json"),
+        ],
+    )
+    assert both.exit_code == 2, both.output
+
+
+def test_invalid_header_exits_two(runner: CliRunner) -> None:
+    result = runner.invoke(
+        cli, ["audit", "--url", "http://127.0.0.1:1/mcp", "--header", "nope"]
+    )
+
+    assert result.exit_code == 2, result.output
+
+
+def test_unreachable_url_exits_two(runner: CliRunner) -> None:
+    result = runner.invoke(
+        cli, ["audit", "--url", "http://127.0.0.1:1/mcp", "--timeout", "1"]
+    )
+
+    assert result.exit_code == 2, result.output
+
+
+def test_watch_requires_stdio_or_url(runner: CliRunner) -> None:
+    result = runner.invoke(cli, ["watch", "--duration", "0.1"])
+
+    assert result.exit_code == 2, result.output
+
+
+def test_watch_stdio_clean_exits_zero(runner: CliRunner) -> None:
+    result = runner.invoke(
+        cli, ["watch", "--stdio", mock_stdio(), "--duration", "0.3"]
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "no mid-session tool mutation" in result.output
+
+
+def test_watch_stdio_detects_rug_pull(runner: CliRunner) -> None:
+    result = runner.invoke(
+        cli,
+        ["watch", "--stdio", mock_stdio("--rug-pull"), "--duration", "5", "--max-events", "1"],
+    )
+
+    assert result.exit_code == 1, result.output
+    assert "RUG PULL DETECTED" in result.output
+    assert "list_changed" in result.output
+    assert "MODIFIED_TOOL" in result.output
+    assert "description" in result.output
+
+
+def test_watch_with_lockfile_detects_rug_pull(runner: CliRunner, tmp_path: Path) -> None:
+    lockfile_path = tmp_path / "watch.lock.json"
+    pinned = runner.invoke(
+        cli,
+        ["pin", "--stdio", mock_stdio(), "--server-id", "mock", "--output", str(lockfile_path)],
+    )
+    assert pinned.exit_code == 0, pinned.output
+
+    result = runner.invoke(
+        cli,
+        [
+            "watch",
+            "--stdio",
+            mock_stdio("--rug-pull"),
+            "--lockfile",
+            str(lockfile_path),
+            "--duration",
+            "5",
+        ],
+    )
+
+    assert result.exit_code == 1, result.output
+    assert "watching 'mock'" in result.output
+    assert "RUG PULL DETECTED" in result.output
+
+
+def test_watch_json_mode(runner: CliRunner) -> None:
+    result = runner.invoke(
+        cli,
+        [
+            "watch",
+            "--stdio",
+            mock_stdio("--rug-pull"),
+            "--duration",
+            "5",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 1, result.output
+    report = json.loads(result.output)
+    assert report["transport"] == "stdio"
+    assert report["rug_pull_detected"] is True
+    assert [event["trigger"] for event in report["events"]] == ["initial", "list_changed"]
+    drift = report["events"][1]["verification"]["drift"][0]
+    assert drift["kind"] == "MODIFIED_TOOL"
+    assert drift["changes"][0]["path"] == "description"
+
+
+def test_watch_audit_flag(runner: CliRunner) -> None:
+    result = runner.invoke(
+        cli,
+        [
+            "watch",
+            "--stdio",
+            mock_stdio("--rug-pull"),
+            "--duration",
+            "5",
+            "--audit",
+        ],
+    )
+
+    assert result.exit_code == 1, result.output
+    assert "AUDIT PASSED" in result.output
