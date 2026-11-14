@@ -1,13 +1,21 @@
-# MCPProbe
+# Latch
 
-Deterministic security verification and schema pinning for
-[Model Context Protocol](https://modelcontextprotocol.io) servers.
+`latch` (Python package `mcpprobe`) is a deterministic security tool for
+[Model Context Protocol](https://modelcontextprotocol.io) servers. Three
+engines, no LLM in the loop:
 
-MCPProbe captures a server's `tools/list` response, pins every tool definition
-into a reviewable lockfile with a SHA-256 digest, and later proves that the live
-tool surface still matches what you reviewed. Any added, removed or edited tool
-fails verification — including a single invisible Unicode character sneaked
-into a tool description.
+| Engine | Question it answers | Commands |
+| ------ | ------------------- | -------- |
+| **Deterministic schema pinning** | "Is the tool surface I approved still the tool surface I am running?" | `pin`, `verify`, `watch` |
+| **Protocol hygiene auditor** | "Does this manifest carry hidden instructions, spoofing or unsafe header bindings?" | `audit` |
+| **Lethal-trifecta capability graph** | "Can one agent combine untrusted input, private data and external egress?" | `graph` |
+
+Latch captures a server's `tools/list` response, pins every tool definition into
+a reviewable lockfile with a SHA-256 digest, and later proves that the live tool
+surface still matches what you reviewed. Any added, removed or edited tool fails
+verification — including a single invisible Unicode character sneaked into a
+tool description. Every finding is emitted as stable JSON and as SARIF 2.1.0, so
+the same check runs on a laptop and in CI.
 
 ## Install
 
@@ -20,6 +28,24 @@ python -m venv .venv
 `dev` extra.
 
 Both console names — `mcpprobe` and `latch` — invoke the same entrypoint.
+
+## Quickstart
+
+```bash
+# Pin the approved surface, then prove it later (drift + hygiene in one pass).
+latch pin    --stdio "npx -y @modelcontextprotocol/server-github" --server-id github --output latch.lock.json
+latch verify --stdio "npx -y @modelcontextprotocol/server-github" --lockfile latch.lock.json --audit
+
+# Watch a live session for a mid-flight rug pull.
+latch watch  --stdio "npx -y @modelcontextprotocol/server-github" --lockfile latch.lock.json --duration 60
+
+# Audit a captured manifest and draw the capability graph.
+latch audit  --input tools-list.json --fail-on HIGH
+latch graph  --config .cursor/mcp.json --format mermaid
+
+# Write SARIF 2.1.0 for GitHub code scanning (exit codes unchanged).
+latch graph  --config .cursor/mcp.json --sarif latch.sarif
+```
 
 ## Usage
 
@@ -212,6 +238,132 @@ flowchart LR
   n1 -.->|EXFIL| n2
 ```
 
+Two refinements keep the graph honest. A chain is only built when the ingest
+tool and the egress tool are different, so a write-only sink such as
+`slack:post_message` with `openWorldHint: true` cannot manufacture a degenerate
+`post_message → read → post_message` self-loop that no attacker can exploit.
+And `ledger`/`ledgers` are sensitive resource tokens, so `read_ledger` and
+`get_ledger` classify as `PRIVATE_DATA_READ` without any naming ceremony.
+
+## SARIF 2.1.0 output
+
+`verify`, `audit`, `watch` and `graph` all take `--sarif <path>`. It writes a
+SARIF 2.1.0 log *alongside* the normal terminal or `--json` output — never
+instead of it — and never changes the exit code (`0`, `1`, `2`).
+
+| Producer | Rule IDs |
+| -------- | -------- |
+| `verify`, `watch` | `LATCH-DRIFT-ADDED`, `LATCH-DRIFT-REMOVED`, `LATCH-DRIFT-MODIFIED` |
+| `audit` | `LATCH-AUDIT-<RULE_ID>` (e.g. `LATCH-AUDIT-UNICODE_TAG_BLOCK`) |
+| `graph` | `LATCH-GRAPH-TRIFECTA` |
+
+Severity maps to SARIF `level`: `CRITICAL` and `HIGH` → `error`, `MEDIUM` →
+`warning`, `LOW` → `note`. Rules carry CWE tags (`CWE-345`, `CWE-74`,
+`CWE-116`, `CWE-284`) in `properties.tags`, and `artifactLocation.uri` is the
+manifest or config path that was scanned — or `mcp://live-target` for
+`--stdio`/`--url` scans. Each result carries a stable `partialFingerprints`
+value so code scanning de-duplicates alerts across runs, and `tool.driver`
+contains only the rules actually referenced by the log.
+
+```bash
+latch verify --input tools-list.json --lockfile latch.lock.json --sarif drift.sarif
+latch audit  --input tools-list.json --sarif audit.sarif --json
+latch graph  --config .cursor/mcp.json --sarif trifecta.sarif
+latch watch  --stdio "npx -y some-mcp-server" --lockfile latch.lock.json --sarif watch.sarif
+```
+
+## Benchmark: precision and recall
+
+`benchmark/` is a deterministic ground-truth harness: 12 hostile cases and 12
+benign hard lookalikes, scored against the naive keyword/substring scanner that
+Latch replaces — the `ssh`/`secret`/`token`/`pass`/`curl`/`sql`/`webhook`
+`x-mcp-header` grep that YARA-style rules tend to become. No network, no
+timestamps, no randomness.
+
+```bash
+python -m benchmark.run_benchmark
+```
+
+| Scanner | TP | FP | TN | FN | Precision | Recall | F1 | FPR |
+| ------- | -- | -- | -- | -- | --------- | ------ | -- | --- |
+| Naive keyword/substring baseline | 7 | 8 | 4 | 5 | 0.47 | 0.58 | 0.52 | 0.67 |
+| **Latch** | 12 | 0 | 12 | 0 | 1.00 | 1.00 | 1.00 | 0.00 |
+
+The baseline misses every attack that avoids a magic word — an annotation flip,
+a hidden `bcc` parameter, tag-block and BiDi concealment — and fires on
+`passhash_verifier`, `secret_santa_matcher` and a legitimate
+`X-Correlation-ID` telemetry header. Latch separates intent from vocabulary by
+tokenizing identifiers, hashing canonical definitions, allowlisting header
+bindings and analyzing capability chains. Per-case detail, including which
+engine fired and which keywords the baseline matched, is in
+[`benchmark/RESULTS.md`](benchmark/RESULTS.md); raw numbers are in
+[`benchmark/results.json`](benchmark/results.json).
+
+## GitHub Actions
+
+`action.yml` is a composite action: it installs Latch, runs one engine, and
+produces a SARIF file for code scanning. Pin the action to a commit SHA in
+production.
+
+```yaml
+name: MCP security
+on: [pull_request]
+
+jobs:
+  latch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Schema drift
+        id: drift
+        uses: ./.github/actions/latch
+        with:
+          mode: verify
+          input: fixtures/tools-list.json
+          lockfile: latch.lock.json
+          sarif-file: latch-drift.sarif
+
+      - name: Protocol audit
+        if: always()
+        uses: ./.github/actions/latch
+        with:
+          mode: audit
+          input: fixtures/tools-list.json
+          fail-on: MEDIUM
+          sarif-file: latch-audit.sarif
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.drift.outputs.sarif-file }}
+```
+
+| Input | Default | Meaning |
+| ----- | ------- | ------- |
+| `mode` | `audit` | `verify`, `audit` or `graph` |
+| `input` | — | captured `tools/list` manifest (`verify`, `audit`) |
+| `lockfile` | — | pinned lockfile (`verify`) |
+| `config` | — | MCP agent config (`graph`) |
+| `fail-on` | `MEDIUM` | minimum failing audit severity |
+| `sarif-file` | `latch.sarif` | SARIF output path, also the `sarif-file` output |
+
+## Demo
+
+```bash
+bash demo.sh
+```
+
+Runs the whole story end-to-end in a throwaway temp directory: pin a clean tool
+surface → catch a post-approval rug pull → audit a manifest carrying tag-block
+concealment and a privileged header → render a three-server lethal trifecta as
+Mermaid and as SARIF. Every step asserts its expected exit code (`0`, `1`,
+`2`), and the temporary fixtures are removed on exit.
+
 ## How digests are computed
 
 **Canonical JSON.** A tool is serialized with `sort_keys=True`,
@@ -247,4 +399,6 @@ print(report.passed, [item.kind for item in report.drift])
 
 ```bash
 .venv/bin/pytest -v
+python -m benchmark.run_benchmark
+bash demo.sh
 ```

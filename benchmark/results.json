@@ -1,0 +1,359 @@
+{
+  "benign_count": 12,
+  "case_count": 24,
+  "cases": [
+    {
+      "case_id": "h01-description-rug-pull",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": false,
+        "lockfile": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "ssh"
+      ],
+      "title": "Post-approval description rug pull exfiltrating ~/.ssh/id_rsa"
+    },
+    {
+      "case_id": "h02-annotation-flip",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": false,
+        "lockfile": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "Silent readOnlyHint/destructiveHint flip"
+    },
+    {
+      "case_id": "h03-hidden-parameter",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": false,
+        "lockfile": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "Hidden bcc parameter injected into send_email"
+    },
+    {
+      "case_id": "h04-tag-block-description",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "Unicode tag-block prompt injection in tool description"
+    },
+    {
+      "case_id": "h05-tag-block-nested-schema",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "Unicode tag-block instruction nested in a schema description"
+    },
+    {
+      "case_id": "h06-bidi-override",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "BiDi override spoofing description text"
+    },
+    {
+      "case_id": "h07-privileged-header",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "x-mcp-header"
+      ],
+      "title": "x-mcp-header bound to Authorization"
+    },
+    {
+      "case_id": "h08-spoofed-forwarded-for",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "x-mcp-header"
+      ],
+      "title": "x-mcp-header bound to X-Forwarded-For"
+    },
+    {
+      "case_id": "h09-crlf-header",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "x-mcp-header"
+      ],
+      "title": "CRLF injection in x-mcp-header value"
+    },
+    {
+      "case_id": "h10-cross-server-trifecta",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": false,
+        "graph": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "sql"
+      ],
+      "title": "Cross-server lethal trifecta github -> postgres -> slack"
+    },
+    {
+      "case_id": "h11-fintech-trifecta",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": false,
+        "graph": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "webhook"
+      ],
+      "title": "Fintech trifecta gmail -> wallet -> webhook"
+    },
+    {
+      "case_id": "h12-single-server-chain",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": false,
+        "graph": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "webhook"
+      ],
+      "title": "Single-server read+exfil chain"
+    },
+    {
+      "case_id": "b01-asset-manager",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "asset_manager: local asset tagging"
+    },
+    {
+      "case_id": "b02-passhash-verifier",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "ssh",
+        "pass"
+      ],
+      "title": "passhash_verifier: local password hash check"
+    },
+    {
+      "case_id": "b03-tokenizer-stats",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token"
+      ],
+      "title": "tokenizer_stats: string token counting"
+    },
+    {
+      "case_id": "b04-secret-santa",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "secret"
+      ],
+      "title": "secret_santa_matcher: local event pairing"
+    },
+    {
+      "case_id": "b05-webhook-signature-validator",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "webhook"
+      ],
+      "title": "webhook_signature_validator: local HMAC validation"
+    },
+    {
+      "case_id": "b06-curl-syntax-linter",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "curl"
+      ],
+      "title": "curl_syntax_linter: offline command linter"
+    },
+    {
+      "case_id": "b07-sql-query-formatter",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "sql"
+      ],
+      "title": "sql_query_formatter: offline SQL formatting"
+    },
+    {
+      "case_id": "b08-correlation-header",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "x-mcp-header"
+      ],
+      "title": "Legit x-mcp-header X-Correlation-ID on a string parameter"
+    },
+    {
+      "case_id": "b09-json-reorder",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false,
+        "lockfile": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "Benign JSON key reordering and whitespace against a pin"
+    },
+    {
+      "case_id": "b10-math-and-markdown",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false,
+        "graph": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "calc:add_numbers + fmt:render_table"
+    },
+    {
+      "case_id": "b11-docs-and-units",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false,
+        "graph": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "docs:search_public_api + units:convert_currency"
+    },
+    {
+      "case_id": "b12-trusted-egress",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false,
+        "graph": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "sql",
+        "webhook"
+      ],
+      "title": "Egress server explicitly trusted (internal-audit-sink)"
+    }
+  ],
+  "hostile_count": 12,
+  "latch": {
+    "f1": 1.0,
+    "fn": 0,
+    "fp": 0,
+    "fpr": 0.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tn": 12,
+    "tp": 12
+  },
+  "naive": {
+    "f1": 0.5185,
+    "fn": 5,
+    "fp": 8,
+    "fpr": 0.6667,
+    "precision": 0.4667,
+    "recall": 0.5833,
+    "tn": 4,
+    "tp": 7
+  },
+  "tool_version": "0.1.0"
+}

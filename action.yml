@@ -1,0 +1,80 @@
+name: "Latch MCP Security"
+description: >-
+  Deterministic MCP schema pinning, protocol hygiene auditing and
+  lethal-trifecta capability analysis, with SARIF output.
+author: "Latch"
+
+branding:
+  icon: "shield"
+  color: "purple"
+
+inputs:
+  mode:
+    description: "Which check to run: verify, audit, or graph."
+    required: false
+    default: "audit"
+  input:
+    description: "Path to a captured tools/list manifest (verify, audit)."
+    required: false
+    default: ""
+  lockfile:
+    description: "Path to the pinned lockfile (verify)."
+    required: false
+    default: ""
+  config:
+    description: "MCP agent config to analyze (graph)."
+    required: false
+    default: ""
+  fail-on:
+    description: "Minimum audit severity that fails the job (audit)."
+    required: false
+    default: "MEDIUM"
+  sarif-file:
+    description: "Path where the SARIF 2.1.0 report is written."
+    required: false
+    default: "latch.sarif"
+
+outputs:
+  sarif-file:
+    description: "Path of the generated SARIF report."
+    value: ${{ steps.latch.outputs.sarif-file }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Latch
+      shell: bash
+      run: |
+        set -euo pipefail
+        python -m pip install --upgrade pip >/dev/null
+        python -m pip install . >/dev/null
+
+    - name: Run Latch
+      id: latch
+      shell: bash
+      env:
+        LATCH_MODE: ${{ inputs.mode }}
+        LATCH_INPUT: ${{ inputs.input }}
+        LATCH_LOCKFILE: ${{ inputs.lockfile }}
+        LATCH_CONFIG: ${{ inputs.config }}
+        LATCH_FAIL_ON: ${{ inputs.fail-on }}
+        LATCH_SARIF: ${{ inputs.sarif-file }}
+      run: |
+        set -euo pipefail
+        echo "sarif-file=$LATCH_SARIF" >> "$GITHUB_OUTPUT"
+
+        case "$LATCH_MODE" in
+          verify)
+            latch verify --input "$LATCH_INPUT" --lockfile "$LATCH_LOCKFILE" --sarif "$LATCH_SARIF"
+            ;;
+          audit)
+            latch audit --input "$LATCH_INPUT" --fail-on "$LATCH_FAIL_ON" --sarif "$LATCH_SARIF"
+            ;;
+          graph)
+            latch graph --config "$LATCH_CONFIG" --sarif "$LATCH_SARIF"
+            ;;
+          *)
+            echo "::error::latch: unknown mode '$LATCH_MODE' (expected verify, audit or graph)"
+            exit 2
+            ;;
+        esac

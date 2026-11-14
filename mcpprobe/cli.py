@@ -35,6 +35,7 @@ from .lockfile import (
     verify_manifest,
 )
 from .models import SEVERITY_LEVELS, ProbeError
+from .sarif import LIVE_TARGET_URI, to_sarif
 from .transport import (
     DEFAULT_TIMEOUT,
     HarvestResult,
@@ -164,6 +165,48 @@ def _echo_harvest(harvest: HarvestResult | None) -> None:
     )
 
 
+def _artifact_uri(input_path: Path | None) -> str:
+    return str(input_path) if input_path is not None else LIVE_TARGET_URI
+
+
+def _graph_artifact_uri(
+    config_paths: tuple[Path, ...], server_manifests: tuple[str, ...], live: bool
+) -> str:
+    if live:
+        return LIVE_TARGET_URI
+    if config_paths:
+        return str(config_paths[0])
+    for raw in server_manifests:
+        _server_id, separator, raw_path = raw.partition("=")
+        if separator and raw_path.strip():
+            return raw_path.strip()
+    return LIVE_TARGET_URI
+
+
+def _emit_sarif(
+    path: Path,
+    *,
+    verifications: Any = (),
+    audits: Any = (),
+    graphs: Any = (),
+    artifact_uri: str = LIVE_TARGET_URI,
+) -> None:
+    payload = to_sarif(
+        verifications=verifications,
+        audits=audits,
+        graphs=graphs,
+        artifact_uri=artifact_uri,
+    )
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+    except OSError as exc:
+        _fail(f"cannot write SARIF report to {path}: {exc}")
+
+
 def target_options(*, input_help: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Attach the mutually-exclusive live/local target options."""
 
@@ -261,6 +304,13 @@ def pin(
 )
 @click.option("--json", "as_json", is_flag=True, help="Emit a machine-readable JSON report.")
 @click.option(
+    "--sarif",
+    "sarif_path",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Also write a SARIF 2.1.0 report to this path.",
+)
+@click.option(
     "--audit",
     "run_audit",
     is_flag=True,
@@ -275,6 +325,7 @@ def verify(
     lockfile_path: Path,
     as_json: bool,
     run_audit: bool,
+    sarif_path: Path | None,
 ) -> None:
     """Verify a manifest or live server against a pinned lockfile."""
     try:
@@ -286,6 +337,14 @@ def verify(
         _fail(str(exc))
 
     passed = report.passed and (audit_report.passed if audit_report is not None else True)
+
+    if sarif_path is not None:
+        _emit_sarif(
+            sarif_path,
+            verifications=[report],
+            audits=[audit_report] if audit_report is not None else [],
+            artifact_uri=_artifact_uri(input_path),
+        )
 
     if as_json:
         payload = report.model_dump(mode="json")
@@ -319,6 +378,13 @@ def verify(
     help="Minimum severity that fails the audit. Use CRITICAL to ignore HIGH and below.",
 )
 @click.option("--json", "as_json", is_flag=True, help="Emit a machine-readable JSON report.")
+@click.option(
+    "--sarif",
+    "sarif_path",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Also write a SARIF 2.1.0 report to this path.",
+)
 def audit(
     input_path: Path | None,
     stdio_command: str | None,
@@ -327,6 +393,7 @@ def audit(
     timeout: float,
     fail_on: str,
     as_json: bool,
+    sarif_path: Path | None,
 ) -> None:
     """Audit MCP metadata and protocol hygiene, statically or from a live server."""
     try:
@@ -334,6 +401,9 @@ def audit(
         report = audit_manifest(manifest, fail_on=fail_on)
     except ProbeError as exc:
         _fail(str(exc))
+
+    if sarif_path is not None:
+        _emit_sarif(sarif_path, audits=[report], artifact_uri=_artifact_uri(input_path))
 
     if as_json:
         click.echo(
@@ -398,6 +468,13 @@ def audit(
     show_default=True,
     help="Transport timeout in seconds when harvesting live servers.",
 )
+@click.option(
+    "--sarif",
+    "sarif_path",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Also write a SARIF 2.1.0 report to this path.",
+)
 def graph(
     config_paths: tuple[Path, ...],
     server_manifests: tuple[str, ...],
@@ -406,6 +483,7 @@ def graph(
     output_format: str,
     warn_only: bool,
     timeout: float,
+    sarif_path: Path | None,
 ) -> None:
     """Analyze multi-server configs for lethal-trifecta exfiltration chains."""
     if not config_paths and not server_manifests:
@@ -423,6 +501,13 @@ def graph(
         )
     except ProbeError as exc:
         _fail(str(exc))
+
+    if sarif_path is not None:
+        _emit_sarif(
+            sarif_path,
+            graphs=[report],
+            artifact_uri=_graph_artifact_uri(config_paths, server_manifests, live),
+        )
 
     if output_format == "json":
         click.echo(
@@ -485,6 +570,13 @@ def graph(
     help="Transport timeout in seconds.",
 )
 @click.option("--json", "as_json", is_flag=True, help="Emit a machine-readable JSON report.")
+@click.option(
+    "--sarif",
+    "sarif_path",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Also write a SARIF 2.1.0 report to this path.",
+)
 def watch(
     stdio_command: str | None,
     url: str | None,
@@ -495,6 +587,7 @@ def watch(
     headers: tuple[str, ...],
     timeout: float,
     as_json: bool,
+    sarif_path: Path | None,
 ) -> None:
     """Watch a live MCP server for mid-session tool mutations."""
     try:
@@ -531,6 +624,13 @@ def watch(
             )
     except ProbeError as exc:
         _fail(str(exc))
+
+    if sarif_path is not None:
+        _emit_sarif(
+            sarif_path,
+            verifications=[event.verification for event in report.events],
+            audits=[event.audit for event in report.events if event.audit is not None],
+        )
 
     if as_json:
         click.echo(

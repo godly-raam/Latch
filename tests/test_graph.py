@@ -200,7 +200,7 @@ def test_cross_server_trifecta_is_critical() -> None:
     assert report.server_count == 3
     assert report.tool_count == 3
     assert report.passed is False
-    assert report.trifecta_paths
+    assert len(report.trifecta_paths) == 1
 
     path = report.trifecta_paths[0]
     assert path.path_id == "trifecta-001"
@@ -276,14 +276,65 @@ def test_trusted_server_is_not_an_untrusted_source() -> None:
     report = analyze_capability_graph(trifecta_servers(), trusted_servers={"github"})
 
     assert report.trusted_servers_excluded == ["github"]
-    # github may no longer start a chain, but slack's own openWorld ingest still can.
+    assert report.trifecta_paths == []
     assert all(
         not edge.source.startswith("github:")
         for edge in report.edges
         if edge.stage == "INGEST_TO_READ"
     )
-    assert all("github" not in path.servers for path in report.trifecta_paths)
-    assert report.trifecta_paths
+
+
+def test_self_loop_trifecta_is_suppressed() -> None:
+    servers = {
+        "slack": [
+            tool(
+                "post_message",
+                {"channel": {"type": "string"}},
+                annotations={"readOnlyHint": False, "openWorldHint": True},
+            )
+        ],
+        "db": [tool("query_ledger", {"sql": {"type": "string"}})],
+    }
+
+    report = analyze_capability_graph(servers)
+
+    assert report.trifecta_paths == []
+    assert report.passed is True
+    # The capability graph itself still exists; only the degenerate chain is dropped.
+    assert any(edge.stage == "INGEST_TO_READ" for edge in report.edges)
+    assert any(edge.stage == "READ_TO_EGRESS" for edge in report.edges)
+
+
+def test_ledger_is_a_sensitive_resource_token() -> None:
+    read_ledger = classify_tool(
+        "wallet", tool("read_ledger", {"ledger": {"type": "string"}})
+    )
+    get_ledger = classify_tool(
+        "wallet", tool("get_ledger", {"ledgers": {"type": "string"}})
+    )
+
+    assert read_ledger.capabilities == ["PRIVATE_DATA_READ"]
+    assert get_ledger.capabilities == ["PRIVATE_DATA_READ"]
+
+
+def test_fintech_chain_uses_ledger_token() -> None:
+    servers = {
+        "gmail": [tool("list_messages", {"max_results": {"type": "integer"}})],
+        "wallet": [tool("read_ledger", {"ledger": {"type": "string"}})],
+        "webhook": [
+            tool(
+                "send_payload",
+                {"payload": {"type": "string"}},
+                annotations={"readOnlyHint": False, "openWorldHint": True},
+            )
+        ],
+    }
+
+    report = analyze_capability_graph(servers)
+
+    assert len(report.trifecta_paths) == 1
+    assert report.trifecta_paths[0].read_tool == "wallet:read_ledger"
+    assert report.trifecta_paths[0].severity == "CRITICAL"
 
 
 def test_unknown_trusted_server_is_not_recorded() -> None:

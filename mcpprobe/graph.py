@@ -113,7 +113,7 @@ READ_VERBS = frozenset(
     }
 )
 
-SENSITIVE_TOKENS = frozenset(
+SENSITIVE_RESOURCE_TOKENS = frozenset(
     {
         "file",
         "files",
@@ -158,6 +158,8 @@ SENSITIVE_TOKENS = frozenset(
         "internal",
         "memory",
         "config",
+        "ledger",
+        "ledgers",
     }
 )
 
@@ -423,7 +425,7 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
 
     # -- PRIVATE_DATA_READ -------------------------------------------------
     read_verbs = sorted(tokens & READ_VERBS)
-    sensitive = sorted(tokens & SENSITIVE_TOKENS)
+    sensitive = sorted(tokens & SENSITIVE_RESOURCE_TOKENS)
     if read_verbs and sensitive:
         _add(
             capabilities,
@@ -617,6 +619,11 @@ def analyze_capability_graph(
     for first in ingest_edges:
         for second in read_edges:
             if second.source != first.target:
+                continue
+            # A tool cannot be both where untrusted input enters and where it
+            # leaves: `post_message -> read -> post_message` is an artifact of
+            # one node holding two roles, not an exfiltration chain.
+            if first.source == second.target:
                 continue
             key = (first.source, first.target, second.target)
             if key in candidates:
