@@ -20,6 +20,7 @@ from . import __version__
 from .auditor import AuditReport
 from .graph import GraphReport
 from .lockfile import VerificationReport
+from .shadow import ShadowReport
 
 SARIF_SCHEMA = "https://json.schemastore.org/sarif-2.1.0.json"
 SARIF_VERSION = "2.1.0"
@@ -148,6 +149,46 @@ _RULES: dict[str, dict[str, Any]] = {
         "tags": ["CWE-284", "CWE-200"],
         "level": "error",
     },
+    "LATCH-SHADOW-EXACT_TOOL_SHADOW": {
+        "name": "ExactToolShadow",
+        "short": "Two servers mount the same tool name",
+        "full": (
+            "Duplicate tool names across servers make routing ambiguous: a"
+            " shadowing server can intercept calls meant for another server."
+        ),
+        "tags": ["security", "CWE-284"],
+        "level": "error",
+    },
+    "LATCH-SHADOW-NORMALIZED_TOOL_SHADOW": {
+        "name": "NormalizedToolShadow",
+        "short": "Tool names collide after normalization",
+        "full": (
+            "Names differing only in casing or separators (read_file vs readFile)"
+            " collapse to one identifier, so the model cannot tell them apart."
+        ),
+        "tags": ["security", "CWE-284"],
+        "level": "error",
+    },
+    "LATCH-SHADOW-CONFUSABLE_UNICODE_SHADOW": {
+        "name": "ConfusableUnicodeShadow",
+        "short": "Homoglyph tool name impersonation",
+        "full": (
+            "NFKC compatibility characters or Cyrillic/Greek homoglyphs render"
+            " like another tool's name while tokenizing differently."
+        ),
+        "tags": ["security", "CWE-1007", "CWE-116"],
+        "level": "error",
+    },
+    "LATCH-SHADOW-CROSS_TOOL_HIJACK": {
+        "name": "CrossToolHijack",
+        "short": "Description redirects tool selection to another server",
+        "full": (
+            "A tool description names another server's tool alongside a routing"
+            " directive, hijacking which tool the model chooses."
+        ),
+        "tags": ["security", "CWE-74", "CWE-284"],
+        "level": "error",
+    },
 }
 
 _FALLBACK_META: dict[str, Any] = {
@@ -226,6 +267,7 @@ def to_sarif(
     verifications: Sequence[VerificationReport] = (),
     audits: Sequence[AuditReport] = (),
     graphs: Sequence[GraphReport] = (),
+    shadow: ShadowReport | None = None,
     artifact_uri: str = LIVE_TARGET_URI,
 ) -> dict[str, Any]:
     """Build a SARIF 2.1.0 log from any combination of Latch reports."""
@@ -277,6 +319,32 @@ def to_sarif(
                         "ingestTool": path.ingest_tool,
                         "readTool": path.read_tool,
                         "egressTool": path.egress_tool,
+                    },
+                )
+            )
+
+    if shadow is not None:
+        for finding in shadow.findings:
+            rule_id = f"LATCH-SHADOW-{finding.rule_id}"
+            message = f"{finding.rule_id}: {finding.message}"
+            if finding.evidence:
+                message += f" (evidence: {finding.evidence})"
+            results.append(
+                _result(
+                    rule_id,
+                    finding.severity,
+                    message,
+                    artifact_uri,
+                    {
+                        "toolName": (
+                            finding.involved_tools[0]
+                            if finding.involved_tools
+                            else finding.canonical_key
+                        ),
+                        "pathId": finding.canonical_key,
+                        "shadowRule": finding.rule_id,
+                        "servers": finding.servers,
+                        "involvedTools": finding.involved_tools,
                     },
                 )
             )

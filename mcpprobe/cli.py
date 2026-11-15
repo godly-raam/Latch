@@ -36,6 +36,7 @@ from .lockfile import (
 )
 from .models import SEVERITY_LEVELS, ProbeError
 from .sarif import LIVE_TARGET_URI, to_sarif
+from .shadow import ShadowReport, analyze_shadowing
 from .transport import (
     DEFAULT_TIMEOUT,
     HarvestResult,
@@ -189,12 +190,14 @@ def _emit_sarif(
     verifications: Any = (),
     audits: Any = (),
     graphs: Any = (),
+    shadow: Any = None,
     artifact_uri: str = LIVE_TARGET_URI,
 ) -> None:
     payload = to_sarif(
         verifications=verifications,
         audits=audits,
         graphs=graphs,
+        shadow=shadow,
         artifact_uri=artifact_uri,
     )
     try:
@@ -448,6 +451,12 @@ def audit(
     help="Server id barred from acting as an untrusted source or egress sink. Repeatable.",
 )
 @click.option(
+    "--check-shadow",
+    "check_shadow",
+    is_flag=True,
+    help="Also detect cross-server tool shadowing and cross-tool hijacking.",
+)
+@click.option(
     "--format",
     "output_format",
     type=click.Choice(["text", "json", "mermaid"]),
@@ -458,7 +467,7 @@ def audit(
 @click.option(
     "--warn-only",
     is_flag=True,
-    help="Exit 0 even when lethal-trifecta paths are found.",
+    help="Exit 0 even when lethal-trifecta paths or shadow findings are found.",
 )
 @click.option(
     "--timeout",
@@ -480,6 +489,7 @@ def graph(
     server_manifests: tuple[str, ...],
     live: bool,
     trusted_servers: tuple[str, ...],
+    check_shadow: bool,
     output_format: str,
     warn_only: bool,
     timeout: float,
@@ -499,6 +509,11 @@ def graph(
         report = analyze_capability_graph(
             servers, trusted_servers=set(trusted_servers) or None
         )
+        shadow_report = (
+            analyze_shadowing(servers, trusted_servers=set(trusted_servers) or None)
+            if check_shadow
+            else None
+        )
     except ProbeError as exc:
         _fail(str(exc))
 
@@ -506,6 +521,114 @@ def graph(
         _emit_sarif(
             sarif_path,
             graphs=[report],
+            shadow=shadow_report,
+            artifact_uri=_graph_artifact_uri(config_paths, server_manifests, live),
+        )
+
+    if output_format == "json":
+        payload = report.model_dump(mode="json")
+        if shadow_report is not None:
+            payload["shadow"] = shadow_report.model_dump(mode="json")
+        click.echo(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False))
+    elif output_format == "mermaid":
+        click.echo(render_mermaid(report), nl=False)
+    else:
+        _print_graph_report(report)
+        if shadow_report is not None:
+            click.echo("")
+            _print_shadow_report(shadow_report)
+
+    passed = report.passed and (
+        shadow_report.passed if shadow_report is not None else True
+    )
+    raise SystemExit(EXIT_OK if (passed or warn_only) else EXIT_DRIFT)
+
+
+@cli.command()
+@click.option(
+    "--config",
+    "config_paths",
+    multiple=True,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    help="MCP agent config (claude_desktop_config.json, .cursor/mcp.json, .vscode/mcp.json). Repeatable.",
+)
+@click.option(
+    "--server-manifest",
+    "server_manifests",
+    multiple=True,
+    help="Static snapshot as <server_id>=path.json. Repeatable.",
+)
+@click.option(
+    "--live",
+    "live",
+    is_flag=True,
+    help="Harvest stdio/url servers declared in the config instead of failing.",
+)
+@click.option(
+    "--trust-server",
+    "trusted_servers",
+    multiple=True,
+    help="Server id treated as trusted: never a hijack source, and shadowing its tools is CRITICAL. Repeatable.",
+)
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    show_default=True,
+    help="Report rendering.",
+)
+@click.option(
+    "--warn-only",
+    is_flag=True,
+    help="Exit 0 even when shadow findings are present.",
+)
+@click.option(
+    "--timeout",
+    "timeout",
+    type=float,
+    default=DEFAULT_TIMEOUT,
+    show_default=True,
+    help="Transport timeout in seconds when harvesting live servers.",
+)
+@click.option(
+    "--sarif",
+    "sarif_path",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Also write a SARIF 2.1.0 report to this path.",
+)
+def shadow(
+    config_paths: tuple[Path, ...],
+    server_manifests: tuple[str, ...],
+    live: bool,
+    trusted_servers: tuple[str, ...],
+    output_format: str,
+    warn_only: bool,
+    timeout: float,
+    sarif_path: Path | None,
+) -> None:
+    """Detect cross-server tool shadowing, homoglyph collisions and cross-tool hijacking."""
+    if not config_paths and not server_manifests:
+        _fail("provide at least one --config or --server-manifest")
+
+    try:
+        specs: list[ServerSpec] = []
+        for path in config_paths:
+            specs.extend(load_mcp_config(path))
+        for raw in server_manifests:
+            specs.append(parse_server_manifest_arg(raw))
+        servers = resolve_server_manifests(specs, live=live, timeout=timeout)
+        report = analyze_shadowing(
+            servers, trusted_servers=set(trusted_servers) or None
+        )
+    except ProbeError as exc:
+        _fail(str(exc))
+
+    if sarif_path is not None:
+        _emit_sarif(
+            sarif_path,
+            shadow=report,
             artifact_uri=_graph_artifact_uri(config_paths, server_manifests, live),
         )
 
@@ -518,10 +641,8 @@ def graph(
                 ensure_ascii=False,
             )
         )
-    elif output_format == "mermaid":
-        click.echo(render_mermaid(report), nl=False)
     else:
-        _print_graph_report(report)
+        _print_shadow_report(report)
 
     raise SystemExit(EXIT_OK if (report.passed or warn_only) else EXIT_DRIFT)
 
@@ -743,6 +864,38 @@ def _print_graph_report(report: GraphReport) -> None:
         )
     else:
         click.echo("RESULT: no Lethal Trifecta path detected")
+
+
+def _print_shadow_report(report: ShadowReport) -> None:
+    click.echo("Latch cross-server shadow analysis")
+    click.echo(
+        f"  servers: {report.server_count}   tools: {report.tool_count}"
+        f"   findings: {len(report.findings)}"
+    )
+    if report.trusted_servers_excluded:
+        click.echo(
+            "  trusted servers:"
+            f" {', '.join(report.trusted_servers_excluded)}"
+        )
+
+    for finding in report.findings:
+        click.echo("")
+        click.echo(
+            f"  [{finding.severity}] {finding.rule_id}  {finding.canonical_key}"
+        )
+        click.echo(f"      {finding.message}")
+        click.echo(
+            f"      servers: {', '.join(finding.servers)}"
+            f"   tools: {', '.join(finding.involved_tools)}"
+        )
+        if finding.evidence is not None:
+            click.echo(f"      evidence: {finding.evidence}")
+
+    click.echo("")
+    if report.passed:
+        click.echo("RESULT: no tool shadowing or cross-tool hijack detected")
+    else:
+        click.echo(f"RESULT: {len(report.findings)} shadowing finding(s) detected")
 
 
 def _print_watch_report(report: WatchReport) -> None:
