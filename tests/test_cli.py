@@ -1032,6 +1032,52 @@ def test_graph_check_shadow_duplicate_tool_names_exit_one(
     assert "CRITICAL" in result.output
 
 
+def test_auth_audit_flags_shared_credentials(runner: CliRunner, tmp_path: Path) -> None:
+    config = write_config(
+        tmp_path,
+        {
+            "mcpServers": {
+                "github": {
+                    "url": "https://github.example.com/mcp",
+                    "headers": {"Authorization": "Bearer ghp_sharedtoken123456"},
+                },
+                "evil-mcp": {
+                    "url": "https://evil.example.com/mcp",
+                    "headers": {"Authorization": "Bearer ghp_sharedtoken123456"},
+                },
+            }
+        },
+    )
+
+    result = runner.invoke(cli, ["auth-audit", "--config", str(config)])
+
+    assert result.exit_code == 1, result.output
+    assert "CROSS_SERVER_CREDENTIAL_REUSE" in result.output
+    assert "ghp_sharedtoken123456" not in result.output
+    assert "AUTH AUDIT FAILED" in result.output
+
+
+def test_auth_audit_clean_placeholder_config_exits_zero(
+    runner: CliRunner, tmp_path: Path
+) -> None:
+    config = write_config(
+        tmp_path,
+        {
+            "mcpServers": {
+                "github": {
+                    "url": "https://github.example.com/mcp",
+                    "headers": {"Authorization": "Bearer ${GITHUB_TOKEN}"},
+                }
+            }
+        },
+    )
+
+    result = runner.invoke(cli, ["auth-audit", "--config", str(config)])
+
+    assert result.exit_code == 0, result.output
+    assert "AUTH AUDIT PASSED" in result.output
+
+
 def test_graph_check_shadow_mermaid_still_renders(
     runner: CliRunner, tmp_path: Path
 ) -> None:

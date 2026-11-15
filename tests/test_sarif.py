@@ -22,6 +22,7 @@ from mcpprobe.lockfile import (
     verify_manifest,
 )
 from mcpprobe.models import ToolDefinition, parse_tools_payload
+from mcpprobe.oauth_audit import audit_auth_specs, run_auth_audit
 from mcpprobe.shadow import analyze_shadowing
 from mcpprobe.sarif import (
     LIVE_TARGET_URI,
@@ -661,3 +662,162 @@ def test_cli_graph_check_shadow_writes_sarif(tmp_path: Path) -> None:
     [entry] = results(sarif)
     assert entry["ruleId"] == "LATCH-SHADOW-NORMALIZED_TOOL_SHADOW"
     assert entry["properties"]["involvedTools"] == ["fs:read_file", "helper:readFile"]
+
+
+# -- authorization ---------------------------------------------------------
+
+AUTH_SECRET = "ghp_supersecretvalue123456"
+
+
+def auth_report():
+    from mcpprobe.config_loader import ServerSpec
+
+    specs = [
+        ServerSpec(
+            server_id="github",
+            transport="http",
+            url="https://github.example.com/mcp",
+            headers={"Authorization": f"Bearer {AUTH_SECRET}"},
+        ),
+        ServerSpec(
+            server_id="evil-mcp",
+            transport="http",
+            url="http://evil.example.com/mcp",
+            headers={"Authorization": f"Bearer {AUTH_SECRET}"},
+        ),
+        ServerSpec(
+            server_id="passthrough",
+            transport="static",
+            manifest_payload={"tools": []},
+        ),
+    ]
+    manifests = {
+        "passthrough": [
+            ToolDefinition.model_validate(
+                {
+                    "name": "forward",
+                    "description": "",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {"access_token": {"type": "string"}},
+                    },
+                }
+            )
+        ]
+    }
+    return run_auth_audit(specs, manifests)
+
+
+def test_auth_results_use_prefixed_rule_ids() -> None:
+    sarif = to_sarif(auth=auth_report())
+    rule_ids = {result["ruleId"] for result in results(sarif)}
+
+    assert rule_ids == {
+        "LATCH-AUTH-HARDCODED_STATIC_CREDENTIAL",
+        "LATCH-AUTH-CROSS_SERVER_CREDENTIAL_REUSE",
+        "LATCH-AUTH-INSECURE_HTTP_AUTH_TRANSPORT",
+        "LATCH-AUTH-TOKEN_PASSTHROUGH_RISK",
+    }
+    assert all(rule_id.startswith("LATCH-AUTH-") for rule_id in rule_ids)
+
+
+def test_auth_rule_tags() -> None:
+    rules = rules_by_id(to_sarif(auth=auth_report()))
+
+    assert rules["LATCH-AUTH-HARDCODED_STATIC_CREDENTIAL"]["properties"]["tags"] == [
+        "security",
+        "CWE-798",
+    ]
+    assert rules["LATCH-AUTH-CROSS_SERVER_CREDENTIAL_REUSE"]["properties"]["tags"] == [
+        "security",
+        "CWE-284",
+        "CWE-441",
+    ]
+    assert rules["LATCH-AUTH-INSECURE_HTTP_AUTH_TRANSPORT"]["properties"]["tags"] == [
+        "security",
+        "CWE-319",
+    ]
+    assert rules["LATCH-AUTH-TOKEN_PASSTHROUGH_RISK"]["properties"]["tags"] == [
+        "security",
+        "CWE-441",
+        "CWE-287",
+    ]
+
+
+def test_all_auth_catalog_rules_keep_their_tags() -> None:
+    from mcpprobe.sarif import _RULES
+
+    expected = {
+        "LATCH-AUTH-OPEN_UNAUTHENTICATED_REMOTE_MCP": ["security", "CWE-306"],
+        "LATCH-AUTH-MISSING_WWW_AUTHENTICATE_PRM": ["security", "CWE-287"],
+        "LATCH-AUTH-MISSING_PROTECTED_RESOURCE_METADATA": ["security", "CWE-287"],
+        "LATCH-AUTH-PRM_RESOURCE_MISMATCH": ["security", "CWE-290", "CWE-441"],
+    }
+    for rule_id, tags in expected.items():
+        assert _RULES[rule_id]["tags"] == tags
+
+
+def test_auth_results_are_errors_and_never_leak_the_secret() -> None:
+    sarif = to_sarif(auth=auth_report(), artifact_uri="agent.json")
+    rendered = json.dumps(sarif)
+
+    assert AUTH_SECRET not in rendered
+    assert "[sha256:" in rendered
+    for result in results(sarif):
+        assert result["level"] == "error"
+        assert result["locations"][0]["physicalLocation"]["artifactLocation"]["uri"] == (
+            "agent.json"
+        )
+        assert result["properties"]["servers"]
+
+
+def test_auth_combines_with_every_other_report() -> None:
+    sarif = to_sarif(
+        verifications=[drift_report()],
+        audits=[audit_report()],
+        graphs=[graph_report()],
+        shadow=shadow_report(),
+        auth=auth_report(),
+    )
+    rule_ids = {result["ruleId"] for result in results(sarif)}
+
+    assert "LATCH-DRIFT-MODIFIED" in rule_ids
+    assert "LATCH-GRAPH-TRIFECTA" in rule_ids
+    assert "LATCH-SHADOW-EXACT_TOOL_SHADOW" in rule_ids
+    assert "LATCH-AUTH-CROSS_SERVER_CREDENTIAL_REUSE" in rule_ids
+
+
+def test_cli_auth_audit_writes_sarif(tmp_path: Path) -> None:
+    runner = CliRunner()
+    config_path = write_json(
+        tmp_path / "agent.json",
+        {
+            "mcpServers": {
+                "github": {
+                    "url": "https://github.example.com/mcp",
+                    "headers": {"Authorization": f"Bearer {AUTH_SECRET}"},
+                }
+            }
+        },
+    )
+    sarif_path = tmp_path / "auth.sarif"
+
+    result = runner.invoke(
+        cli,
+        ["auth-audit", "--config", str(config_path), "--sarif", str(sarif_path)],
+    )
+
+    assert result.exit_code == 1, result.output
+    text = sarif_path.read_text(encoding="utf-8")
+    assert AUTH_SECRET not in text
+    sarif = json.loads(text)
+    [entry] = results(sarif)
+    assert entry["ruleId"] == "LATCH-AUTH-HARDCODED_STATIC_CREDENTIAL"
+
+
+def test_auth_audit_specs_returns_findings_list() -> None:
+    from mcpprobe.config_loader import ServerSpec
+
+    spec = ServerSpec(server_id="solo", transport="http", url="https://mcp.example.com/mcp")
+
+    assert audit_auth_specs([spec]) == []

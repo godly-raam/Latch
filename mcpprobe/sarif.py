@@ -20,6 +20,7 @@ from . import __version__
 from .auditor import AuditReport
 from .graph import GraphReport
 from .lockfile import VerificationReport
+from .oauth_audit import AuthAuditReport
 from .shadow import ShadowReport
 
 SARIF_SCHEMA = "https://json.schemastore.org/sarif-2.1.0.json"
@@ -189,6 +190,86 @@ _RULES: dict[str, dict[str, Any]] = {
         "tags": ["security", "CWE-74", "CWE-284"],
         "level": "error",
     },
+    "LATCH-AUTH-HARDCODED_STATIC_CREDENTIAL": {
+        "name": "HardcodedStaticCredential",
+        "short": "Literal credential committed to configuration",
+        "full": (
+            "A header or environment entry carries a real credential instead of"
+            " an environment reference, so the secret lives in the repository."
+        ),
+        "tags": ["security", "CWE-798"],
+        "level": "error",
+    },
+    "LATCH-AUTH-CROSS_SERVER_CREDENTIAL_REUSE": {
+        "name": "CrossServerCredentialReuse",
+        "short": "Same credential shared by multiple servers",
+        "full": (
+            "Two or more servers present the same credential, so one compromised"
+            " server can replay it against the others (confused deputy)."
+        ),
+        "tags": ["security", "CWE-284", "CWE-441"],
+        "level": "error",
+    },
+    "LATCH-AUTH-INSECURE_HTTP_AUTH_TRANSPORT": {
+        "name": "InsecureHttpAuthTransport",
+        "short": "Credentials sent over cleartext HTTP",
+        "full": (
+            "A non-loopback MCP server is reached over http:// while credentials"
+            " are configured or probed, exposing them to anyone on the path."
+        ),
+        "tags": ["security", "CWE-319"],
+        "level": "error",
+    },
+    "LATCH-AUTH-TOKEN_PASSTHROUGH_RISK": {
+        "name": "TokenPassthroughRisk",
+        "short": "OAuth token accepted as a tool argument",
+        "full": (
+            "A tool takes an access/refresh token as a parameter or header"
+            " binding, allowing user tokens to be forwarded upstream."
+        ),
+        "tags": ["security", "CWE-441", "CWE-287"],
+        "level": "error",
+    },
+    "LATCH-AUTH-OPEN_UNAUTHENTICATED_REMOTE_MCP": {
+        "name": "OpenUnauthenticatedRemoteMcp",
+        "short": "Remote MCP server accepts unauthenticated calls",
+        "full": (
+            "A non-loopback MCP endpoint answers requests without any"
+            " authentication challenge."
+        ),
+        "tags": ["security", "CWE-306"],
+        "level": "error",
+    },
+    "LATCH-AUTH-MISSING_WWW_AUTHENTICATE_PRM": {
+        "name": "MissingWwwAuthenticatePrm",
+        "short": "401 challenge omits resource_metadata",
+        "full": (
+            "The server rejects unauthenticated calls but does not point clients"
+            " at its protected-resource metadata, so audiences cannot be bound."
+        ),
+        "tags": ["security", "CWE-287"],
+        "level": "error",
+    },
+    "LATCH-AUTH-MISSING_PROTECTED_RESOURCE_METADATA": {
+        "name": "MissingProtectedResourceMetadata",
+        "short": "No RFC 9728 protected-resource metadata",
+        "full": (
+            "The server publishes no usable /.well-known/oauth-protected-resource"
+            " document, so clients cannot discover the canonical resource."
+        ),
+        "tags": ["security", "CWE-287"],
+        "level": "warning",
+    },
+    "LATCH-AUTH-PRM_RESOURCE_MISMATCH": {
+        "name": "PrmResourceMismatch",
+        "short": "Metadata resource does not match the endpoint",
+        "full": (
+            "The advertised resource points at a different scheme, host or path"
+            " than the server actually reached, enabling token substitution."
+        ),
+        "tags": ["security", "CWE-290", "CWE-441"],
+        "level": "error",
+    },
 }
 
 _FALLBACK_META: dict[str, Any] = {
@@ -268,6 +349,7 @@ def to_sarif(
     audits: Sequence[AuditReport] = (),
     graphs: Sequence[GraphReport] = (),
     shadow: ShadowReport | None = None,
+    auth: AuthAuditReport | None = None,
     artifact_uri: str = LIVE_TARGET_URI,
 ) -> dict[str, Any]:
     """Build a SARIF 2.1.0 log from any combination of Latch reports."""
@@ -345,6 +427,30 @@ def to_sarif(
                         "shadowRule": finding.rule_id,
                         "servers": finding.servers,
                         "involvedTools": finding.involved_tools,
+                    },
+                )
+            )
+
+    if auth is not None:
+        for finding in auth.findings:
+            rule_id = f"LATCH-AUTH-{finding.rule_id}"
+            message = f"{finding.rule_id}: {finding.message}"
+            if finding.evidence:
+                message += f" (evidence: {finding.evidence})"
+            results.append(
+                _result(
+                    rule_id,
+                    finding.severity,
+                    message,
+                    artifact_uri,
+                    {
+                        "toolName": (
+                            finding.servers[0] if finding.servers else ""
+                        ),
+                        "pathId": finding.field_path,
+                        "authRule": finding.rule_id,
+                        "servers": finding.servers,
+                        "fieldPath": finding.field_path,
                     },
                 )
             )

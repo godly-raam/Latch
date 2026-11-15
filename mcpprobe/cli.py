@@ -35,6 +35,7 @@ from .lockfile import (
     verify_manifest,
 )
 from .models import SEVERITY_LEVELS, ProbeError
+from .oauth_audit import AuthAuditReport, run_auth_audit
 from .sarif import LIVE_TARGET_URI, to_sarif
 from .shadow import ShadowReport, analyze_shadowing
 from .transport import (
@@ -191,6 +192,7 @@ def _emit_sarif(
     audits: Any = (),
     graphs: Any = (),
     shadow: Any = None,
+    auth: Any = None,
     artifact_uri: str = LIVE_TARGET_URI,
 ) -> None:
     payload = to_sarif(
@@ -198,6 +200,7 @@ def _emit_sarif(
         audits=audits,
         graphs=graphs,
         shadow=shadow,
+        auth=auth,
         artifact_uri=artifact_uri,
     )
     try:
@@ -647,6 +650,109 @@ def shadow(
     raise SystemExit(EXIT_OK if (report.passed or warn_only) else EXIT_DRIFT)
 
 
+@cli.command("auth-audit")
+@click.option(
+    "--config",
+    "config_paths",
+    multiple=True,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    help="MCP agent config (claude_desktop_config.json, .cursor/mcp.json, .vscode/mcp.json). Repeatable.",
+)
+@click.option(
+    "--server-manifest",
+    "server_manifests",
+    multiple=True,
+    help="Static snapshot as <server_id>=path.json. Repeatable.",
+)
+@click.option(
+    "--live",
+    "live",
+    is_flag=True,
+    help="Probe HTTP servers for RFC 9728 metadata and challenge compliance.",
+)
+@click.option(
+    "--fail-on",
+    "fail_on",
+    type=click.Choice(list(SEVERITY_LEVELS)),
+    default=AUDIT_FAIL_ON_DEFAULT,
+    show_default=True,
+    help="Minimum severity that fails the audit.",
+)
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    show_default=True,
+    help="Report rendering.",
+)
+@click.option(
+    "--timeout",
+    "timeout",
+    type=float,
+    default=DEFAULT_TIMEOUT,
+    show_default=True,
+    help="Transport timeout in seconds.",
+)
+@click.option(
+    "--sarif",
+    "sarif_path",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Also write a SARIF 2.1.0 report to this path.",
+)
+def auth_audit(
+    config_paths: tuple[Path, ...],
+    server_manifests: tuple[str, ...],
+    live: bool,
+    fail_on: str,
+    output_format: str,
+    timeout: float,
+    sarif_path: Path | None,
+) -> None:
+    """Audit OAuth 2.1 / RFC 9728 authorization hygiene across MCP servers."""
+    if not config_paths and not server_manifests:
+        _fail("provide at least one --config or --server-manifest")
+
+    try:
+        specs: list[ServerSpec] = []
+        for path in config_paths:
+            specs.extend(load_mcp_config(path))
+        for raw in server_manifests:
+            specs.append(parse_server_manifest_arg(raw))
+
+        # Static snapshots are always auditable; live transports only when asked,
+        # so a config that merely declares `url`/`command` does not fail here.
+        resolvable = specs if live else [s for s in specs if s.transport == "static"]
+        manifests = resolve_server_manifests(resolvable, live=live, timeout=timeout)
+        report = run_auth_audit(
+            specs, manifests, live=live, timeout=timeout, fail_on=fail_on
+        )
+    except ProbeError as exc:
+        _fail(str(exc))
+
+    if sarif_path is not None:
+        _emit_sarif(
+            sarif_path,
+            auth=report,
+            artifact_uri=_graph_artifact_uri(config_paths, server_manifests, live),
+        )
+
+    if output_format == "json":
+        click.echo(
+            json.dumps(
+                report.model_dump(mode="json"),
+                indent=2,
+                sort_keys=True,
+                ensure_ascii=False,
+            )
+        )
+    else:
+        _print_auth_report(report, fail_on)
+
+    raise SystemExit(EXIT_OK if report.passed else EXIT_DRIFT)
+
+
 @cli.command()
 @click.option(
     "--stdio", "stdio_command", default=None, help="Command that starts a local MCP server."
@@ -896,6 +1002,34 @@ def _print_shadow_report(report: ShadowReport) -> None:
         click.echo("RESULT: no tool shadowing or cross-tool hijack detected")
     else:
         click.echo(f"RESULT: {len(report.findings)} shadowing finding(s) detected")
+
+
+def _print_auth_report(report: AuthAuditReport, fail_on: str) -> None:
+    click.echo("Latch authorization audit")
+    click.echo(
+        f"  servers: {report.server_count}"
+        f"   live probed: {len(report.live_probed_servers)}"
+        f"   findings: {len(report.findings)}"
+    )
+    if report.live_probed_servers:
+        click.echo(f"  live servers: {', '.join(report.live_probed_servers)}")
+
+    for finding in report.findings:
+        click.echo("")
+        click.echo(f"  [{finding.severity}] {finding.rule_id}  {finding.field_path}")
+        click.echo(f"      servers: {', '.join(finding.servers)}")
+        click.echo(f"      {finding.message}")
+        if finding.evidence is not None:
+            click.echo(f"      evidence: {finding.evidence}")
+
+    click.echo("")
+    if report.passed:
+        click.echo(f"AUTH AUDIT PASSED: no findings at or above {fail_on}")
+    else:
+        click.echo(
+            f"AUTH AUDIT FAILED: {len(report.findings)} finding(s)"
+            f" (fail-on: {fail_on})"
+        )
 
 
 def _print_watch_report(report: WatchReport) -> None:
