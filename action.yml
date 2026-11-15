@@ -10,7 +10,7 @@ branding:
 
 inputs:
   mode:
-    description: "Which check to run: verify, audit, or graph."
+    description: "Which check to run: verify, audit, graph, shadow, or auth-audit."
     required: false
     default: "audit"
   input:
@@ -25,8 +25,14 @@ inputs:
     description: "MCP agent config to analyze (graph)."
     required: false
     default: ""
+  trust-servers:
+    description: >-
+      Optional server ids treated as trusted, whitespace- or comma-separated;
+      passed as repeatable --trust-server flags in graph and shadow modes.
+    required: false
+    default: ""
   fail-on:
-    description: "Minimum audit severity that fails the job (audit)."
+    description: "Minimum audit severity that fails the job (audit, auth-audit)."
     required: false
     default: "MEDIUM"
   sarif-file:
@@ -57,11 +63,23 @@ runs:
         LATCH_INPUT: ${{ inputs.input }}
         LATCH_LOCKFILE: ${{ inputs.lockfile }}
         LATCH_CONFIG: ${{ inputs.config }}
+        LATCH_TRUST_SERVERS: ${{ inputs.trust-servers }}
         LATCH_FAIL_ON: ${{ inputs.fail-on }}
         LATCH_SARIF: ${{ inputs.sarif-file }}
       run: |
         set -euo pipefail
         echo "sarif-file=$LATCH_SARIF" >> "$GITHUB_OUTPUT"
+
+        # Accept comma- or whitespace-separated ids; skip empty fields.
+        TRUST_ARGS=()
+        if [[ -n "${LATCH_TRUST_SERVERS//[[:space:]]/}" ]]; then
+          IFS=', ' read -r -a TRUST_IDS <<< "$LATCH_TRUST_SERVERS"
+          for id in "${TRUST_IDS[@]}"; do
+            if [[ -n "$id" ]]; then
+              TRUST_ARGS+=("--trust-server" "$id")
+            fi
+          done
+        fi
 
         case "$LATCH_MODE" in
           verify)
@@ -71,10 +89,19 @@ runs:
             latch audit --input "$LATCH_INPUT" --fail-on "$LATCH_FAIL_ON" --sarif "$LATCH_SARIF"
             ;;
           graph)
-            latch graph --config "$LATCH_CONFIG" --sarif "$LATCH_SARIF"
+            latch graph --config "$LATCH_CONFIG" --sarif "$LATCH_SARIF" \
+              ${TRUST_ARGS[@]+"${TRUST_ARGS[@]}"}
+            ;;
+          shadow)
+            latch shadow --config "$LATCH_CONFIG" --sarif "$LATCH_SARIF" \
+              ${TRUST_ARGS[@]+"${TRUST_ARGS[@]}"}
+            ;;
+          auth-audit)
+            latch auth-audit --config "$LATCH_CONFIG" --fail-on "$LATCH_FAIL_ON" \
+              --sarif "$LATCH_SARIF"
             ;;
           *)
-            echo "::error::latch: unknown mode '$LATCH_MODE' (expected verify, audit or graph)"
+            echo "::error::latch: unknown mode '$LATCH_MODE' (expected verify, audit, graph, shadow or auth-audit)"
             exit 2
             ;;
         esac

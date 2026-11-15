@@ -18,10 +18,12 @@ from mcpprobe.models import ToolDefinition
 
 
 def test_corpus_shape() -> None:
-    assert len(CASES) == 24
-    assert len(HOSTILE_CASES) == 12
-    assert len(BENIGN_CASES) == 12
-    assert len({case.case_id for case in CASES}) == 24
+    assert len(CASES) == 36
+    assert len(HOSTILE_CASES) == 18
+    assert len(BENIGN_CASES) == 18
+    assert len({case.case_id for case in CASES}) == 36
+    assert len({case.case_id for case in HOSTILE_CASES}) == 18
+    assert len({case.case_id for case in BENIGN_CASES}) == 18
     for case in HOSTILE_CASES:
         assert case.expectation == "hostile"
         assert case.expected_positive is True
@@ -44,9 +46,9 @@ def test_latch_metrics_are_perfect() -> None:
     results = compute_results()
     latch = results["latch"]
 
-    assert latch["tp"] == 12
+    assert latch["tp"] == 18
     assert latch["fp"] == 0
-    assert latch["tn"] == 12
+    assert latch["tn"] == 18
     assert latch["fn"] == 0
     assert latch["precision"] == 1.0
     assert latch["recall"] == 1.0
@@ -78,6 +80,10 @@ def test_naive_baseline_false_positives_are_the_expected_lookalikes() -> None:
         "b07-sql-query-formatter",
         "b08-correlation-header",
         "b12-trusted-egress",
+        "benign_directive_words_without_cross_tool",
+        "benign_env_placeholder_bearer",
+        "benign_dedicated_oauth_broker",
+        "benign_loopback_http_dev",
     ):
         assert naive_flags(by_id[case_id]) is True, case_id
 
@@ -91,6 +97,8 @@ def test_naive_baseline_misses_keyword_free_attacks() -> None:
         "h04-tag-block-description",
         "h05-tag-block-nested-schema",
         "h06-bidi-override",
+        "shadow_exact_trusted_collision",
+        "shadow_cyrillic_homoglyph",
     ):
         assert naive_flags(by_id[case_id]) is False, case_id
 
@@ -116,12 +124,57 @@ def test_results_markdown_contains_the_summary_table() -> None:
     text = RESULTS_MD.read_text(encoding="utf-8")
 
     assert "| Scanner | TP | FP | TN | FN | Precision | Recall | F1 | FPR |" in text
-    assert "| **Latch** | 12 | 0 | 12 | 0 | 1.00 | 1.00 | 1.00 | 0.00 |" in text
-    assert "| Naive keyword/substring baseline | 7 | 8 | 4 | 5 | 0.47 | 0.58 | 0.52 | 0.67 |" in text
+    assert "| **Latch** | 18 | 0 | 18 | 0 | 1.00 | 1.00 | 1.00 | 0.00 |" in text
+    assert "| Naive keyword/substring baseline | 11 | 12 | 6 | 7 | 0.48 | 0.61 | 0.54 | 0.67 |" in text
+    assert "36 cases" in text
 
 
 def test_benchmark_is_reproducible() -> None:
     assert compute_results() == compute_results()
+
+
+def test_v2_cases_route_through_their_engines() -> None:
+    by_id = {case.case_id: case for case in CASES}
+
+    assert latch_verdict(by_id["shadow_cyrillic_homoglyph"])["signals"] == {
+        "shadow": True
+    }
+    assert latch_verdict(by_id["auth_token_passthrough_param"])["signals"] == {
+        "auth": True
+    }
+    assert latch_verdict(by_id["benign_trusted_mirror_servers"])["signals"] == {
+        "shadow": False
+    }
+    assert latch_verdict(by_id["benign_loopback_http_dev"])["signals"] == {
+        "auth": False
+    }
+
+
+def test_v2_findings_carry_their_expected_severity() -> None:
+    from mcpprobe.shadow import analyze_shadowing
+    from mcpprobe.models import ToolDefinition
+    from benchmark.run_benchmark import _auth_inputs
+    from mcpprobe.oauth_audit import run_auth_audit
+
+    shadow_case = next(c for c in CASES if c.case_id == "shadow_exact_trusted_collision")
+    parsed = {
+        server_id: [ToolDefinition.model_validate(tool) for tool in tools]
+        for server_id, tools in (shadow_case.shadow or {}).items()
+    }
+    shadow_report = analyze_shadowing(
+        parsed, trusted_servers=set(shadow_case.trusted_servers)
+    )
+    assert [(f.rule_id, f.severity) for f in shadow_report.findings] == [
+        ("EXACT_TOOL_SHADOW", "CRITICAL")
+    ]
+
+    reuse_case = next(c for c in CASES if c.case_id == "auth_cross_server_token_reuse")
+    specs, manifests = _auth_inputs(reuse_case.auth or [])
+    auth_report = run_auth_audit(specs, manifests)
+    assert ("CROSS_SERVER_CREDENTIAL_REUSE", "CRITICAL") in [
+        (f.rule_id, f.severity) for f in auth_report.findings
+    ]
+    assert "[sha256:" in (auth_report.findings[0].evidence or "")
 
 
 # -- graph refinements covered by the benchmark corpus ---------------------

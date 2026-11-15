@@ -1,7 +1,7 @@
 # Latch
 
 `latch` (Python package `mcpprobe`) is a deterministic security tool for
-[Model Context Protocol](https://modelcontextprotocol.io) servers. Three
+[Model Context Protocol](https://modelcontextprotocol.io) servers. Five
 engines, no LLM in the loop:
 
 | Engine | Question it answers | Commands |
@@ -9,6 +9,8 @@ engines, no LLM in the loop:
 | **Deterministic schema pinning** | "Is the tool surface I approved still the tool surface I am running?" | `pin`, `verify`, `watch` |
 | **Protocol hygiene auditor** | "Does this manifest carry hidden instructions, spoofing or unsafe header bindings?" | `audit` |
 | **Lethal-trifecta capability graph** | "Can one agent combine untrusted input, private data and external egress?" | `graph` |
+| **Cross-server shadowing detector** | "Is another server impersonating a trusted tool, or steering the model away from it?" | `shadow`, `graph --check-shadow` |
+| **OAuth authorization auditor** | "Are credentials reused, hardcoded, cleartext or passed through as tool arguments?" | `auth-audit` |
 
 Latch captures a server's `tools/list` response, pins every tool definition into
 a reviewable lockfile with a SHA-256 digest, and later proves that the live tool
@@ -42,6 +44,13 @@ latch watch  --stdio "npx -y @modelcontextprotocol/server-github" --lockfile lat
 # Audit a captured manifest and draw the capability graph.
 latch audit  --input tools-list.json --fail-on HIGH
 latch graph  --config .cursor/mcp.json --format mermaid
+
+# Catch tool-name impersonation and cross-tool routing hijacks.
+latch shadow --config .cursor/mcp.json --trust-server github
+latch graph  --config .cursor/mcp.json --check-shadow
+
+# Audit OAuth credentials, audience binding and RFC 9728 metadata.
+latch auth-audit --config .cursor/mcp.json --live --sarif auth.sarif
 
 # Write SARIF 2.1.0 for GitHub code scanning (exit codes unchanged).
 latch graph  --config .cursor/mcp.json --sarif latch.sarif
@@ -245,6 +254,60 @@ tool and the egress tool are different, so a write-only sink such as
 And `ledger`/`ledgers` are sensitive resource tokens, so `read_ledger` and
 `get_ledger` classify as `PRIVATE_DATA_READ` without any naming ceremony.
 
+## Cross-server tool shadowing & hijacking
+
+Several MCP servers share one flat tool namespace, so a hostile server can
+impersonate a trusted tool's name or steer the model away from it. `latch
+shadow` reads the same configuration `graph` does:
+
+```bash
+latch shadow --config .cursor/mcp.json
+latch shadow --config .cursor/mcp.json --trust-server github --format json
+latch shadow --config .cursor/mcp.json --sarif shadow.sarif
+latch graph  --config .cursor/mcp.json --check-shadow
+```
+
+| Rule | Severity | Detects |
+| ---- | -------- | ------- |
+| `EXACT_TOOL_SHADOW` | CRITICAL / HIGH | Two servers expose the same `tool.name`; CRITICAL when a trusted server is shadowed by an untrusted one. |
+| `NORMALIZED_TOOL_SHADOW` | HIGH | Names differing only in casing or separators (`read_file` / `readFile` / `read-file`). |
+| `CONFUSABLE_UNICODE_SHADOW` | CRITICAL | NFKC compatibility characters or Cyrillic/Greek homoglyphs (`r\u0435ad_file`) that fold onto another tool's name; evidence lists the exact codepoints. |
+| `CROSS_TOOL_HIJACK` | CRITICAL | A description names another server's tool beside a routing directive (`instead`, `first`, `override`, `route`, …). |
+
+Names are folded with NFKC plus a fixed homoglyph map and compared on a
+canonical key, so `read_file` and `rеad_file` collide while `read_file` and
+`read_file_metadata` do not. Directive words alone are not enough: the text must
+also name a tool owned by another server. `--trust-server` bars a server from
+being a hijack source and makes shadowing it CRITICAL.
+
+## OAuth 2.1 / RFC 9728 authorization audit
+
+An agent holds every server's credentials at once, which makes confused-deputy
+replay the default failure mode. `latch auth-audit` checks the configuration
+statically, and with `--live` probes each HTTP server's challenge and RFC 9728
+protected-resource metadata:
+
+```bash
+latch auth-audit --config .cursor/mcp.json
+latch auth-audit --config .cursor/mcp.json --fail-on CRITICAL --format json
+latch auth-audit --config .cursor/mcp.json --live --sarif auth.sarif
+```
+
+| Rule | Severity | Detects |
+| ---- | -------- | ------- |
+| `CROSS_SERVER_CREDENTIAL_REUSE` | CRITICAL | Two or more servers send the same credential, literal or the same `${ENV}` reference. |
+| `HARDCODED_STATIC_CREDENTIAL` | HIGH | A sensitive header/env value that is neither an interpolation nor a dummy. |
+| `INSECURE_HTTP_AUTH_TRANSPORT` | CRITICAL | A non-loopback `http://` server with credentials configured, or probed live. |
+| `TOKEN_PASSTHROUGH_RISK` | HIGH | A non-identity server accepts `access_token`/`refresh_token`/… as a parameter or header binding. |
+| `OPEN_UNAUTHENTICATED_REMOTE_MCP` | HIGH | A public HTTP endpoint answers `server/discover` with a 200 result and no auth. |
+| `MISSING_WWW_AUTHENTICATE_PRM` | HIGH | A 401 whose `WWW-Authenticate` omits `resource_metadata`. |
+| `MISSING_PROTECTED_RESOURCE_METADATA` | MEDIUM | No usable `/.well-known/oauth-protected-resource` document. |
+| `PRM_RESOURCE_MISMATCH` | CRITICAL | The advertised `resource` uses a different scheme, host, port or unrelated path. |
+
+Credentials are never echoed: every value is redacted to
+`prefix...suffix [sha256:<8hex>]`, so identical shared tokens correlate across
+servers and SARIF runs without exposing the secret.
+
 ## SARIF 2.1.0 output
 
 `verify`, `audit`, `watch` and `graph` all take `--sarif <path>`. It writes a
@@ -274,11 +337,11 @@ latch watch  --stdio "npx -y some-mcp-server" --lockfile latch.lock.json --sarif
 
 ## Benchmark: precision and recall
 
-`benchmark/` is a deterministic ground-truth harness: 12 hostile cases and 12
-benign hard lookalikes, scored against the naive keyword/substring scanner that
-Latch replaces — the `ssh`/`secret`/`token`/`pass`/`curl`/`sql`/`webhook`
-`x-mcp-header` grep that YARA-style rules tend to become. No network, no
-timestamps, no randomness.
+`benchmark/` is a deterministic ground-truth harness: 18 hostile cases and 18
+benign hard lookalikes spanning every engine, scored against the naive
+keyword/substring scanner that Latch replaces — the
+`ssh`/`secret`/`token`/`bearer`/`http://`/`instead`/`before`/`x-mcp-header` grep
+that YARA-style rules tend to become. No network, no timestamps, no randomness.
 
 ```bash
 python -m benchmark.run_benchmark
@@ -286,16 +349,18 @@ python -m benchmark.run_benchmark
 
 | Scanner | TP | FP | TN | FN | Precision | Recall | F1 | FPR |
 | ------- | -- | -- | -- | -- | --------- | ------ | -- | --- |
-| Naive keyword/substring baseline | 7 | 8 | 4 | 5 | 0.47 | 0.58 | 0.52 | 0.67 |
-| **Latch** | 12 | 0 | 12 | 0 | 1.00 | 1.00 | 1.00 | 0.00 |
+| Naive keyword/substring baseline | 11 | 12 | 6 | 7 | 0.48 | 0.61 | 0.54 | 0.67 |
+| **Latch** | 18 | 0 | 18 | 0 | 1.00 | 1.00 | 1.00 | 0.00 |
 
 The baseline misses every attack that avoids a magic word — an annotation flip,
-a hidden `bcc` parameter, tag-block and BiDi concealment — and fires on
-`passhash_verifier`, `secret_santa_matcher` and a legitimate
-`X-Correlation-ID` telemetry header. Latch separates intent from vocabulary by
-tokenizing identifiers, hashing canonical definitions, allowlisting header
-bindings and analyzing capability chains. Per-case detail, including which
-engine fired and which keywords the baseline matched, is in
+a hidden `bcc` parameter, tag-block and BiDi concealment, a trusted tool being
+shadowed, and a Cyrillic homoglyph — and fires on `passhash_verifier`,
+`secret_santa_matcher`, a legitimate `X-Correlation-ID` telemetry header, an
+`${ENV}` placeholder, an OAuth broker and a loopback dev server. Latch separates
+intent from vocabulary by tokenizing identifiers, hashing canonical
+definitions, allowlisting header bindings, folding Unicode confusables,
+normalizing credentials and analyzing capability chains. Per-case detail,
+including which engine fired and which keywords the baseline matched, is in
 [`benchmark/RESULTS.md`](benchmark/RESULTS.md); raw numbers are in
 [`benchmark/results.json`](benchmark/results.json).
 
@@ -345,11 +410,12 @@ jobs:
 
 | Input | Default | Meaning |
 | ----- | ------- | ------- |
-| `mode` | `audit` | `verify`, `audit` or `graph` |
+| `mode` | `audit` | `verify`, `audit`, `graph`, `shadow` or `auth-audit` |
 | `input` | — | captured `tools/list` manifest (`verify`, `audit`) |
 | `lockfile` | — | pinned lockfile (`verify`) |
-| `config` | — | MCP agent config (`graph`) |
-| `fail-on` | `MEDIUM` | minimum failing audit severity |
+| `config` | — | MCP agent config (`graph`, `shadow`, `auth-audit`) |
+| `trust-servers` | — | comma- or space-separated ids passed as `--trust-server` (`graph`, `shadow`) |
+| `fail-on` | `MEDIUM` | minimum failing severity (`audit`, `auth-audit`) |
 | `sarif-file` | `latch.sarif` | SARIF output path, also the `sarif-file` output |
 
 ## Demo
@@ -361,8 +427,10 @@ bash demo.sh
 Runs the whole story end-to-end in a throwaway temp directory: pin a clean tool
 surface → catch a post-approval rug pull → audit a manifest carrying tag-block
 concealment and a privileged header → render a three-server lethal trifecta as
-Mermaid and as SARIF. Every step asserts its expected exit code (`0`, `1`,
-`2`), and the temporary fixtures are removed on exit.
+Mermaid and as SARIF → catch Cyrillic tool shadowing and a cross-tool hijack →
+audit shared OAuth credentials and token passthrough, asserting the raw token
+never reaches the SARIF report. Every step asserts its expected exit code (`0`,
+`1`, `2`), and the temporary fixtures are removed on exit.
 
 ## How digests are computed
 

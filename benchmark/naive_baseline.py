@@ -19,12 +19,16 @@ NAIVE_KEYWORDS: tuple[str, ...] = (
     "ssh",
     "secret",
     "token",
+    "bearer",
     "pass",
     "curl",
     "sql",
     "webhook",
     "ignore",
     "override",
+    "instead",
+    "before",
+    "http://",
     "x-mcp-header",
 )
 
@@ -46,6 +50,11 @@ def searchable_text(case: Case) -> str:
     if case.servers:
         parts.append(json.dumps(case.servers, ensure_ascii=False, sort_keys=True))
         parts.append(" ".join(sorted(case.servers)))
+    if case.shadow:
+        parts.append(json.dumps(case.shadow, ensure_ascii=False, sort_keys=True))
+        parts.append(" ".join(sorted(case.shadow)))
+    if case.auth:
+        parts.append(json.dumps(case.auth, ensure_ascii=False, sort_keys=True))
     return "\n".join(parts)
 
 

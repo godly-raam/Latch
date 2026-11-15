@@ -1,6 +1,6 @@
 {
-  "benign_count": 12,
-  "case_count": 24,
+  "benign_count": 18,
+  "case_count": 36,
   "cases": [
     {
       "case_id": "h01-description-rug-pull",
@@ -168,6 +168,88 @@
       "title": "Single-server read+exfil chain"
     },
     {
+      "case_id": "shadow_exact_trusted_collision",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "shadow": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "Untrusted server shadows a trusted tool name"
+    },
+    {
+      "case_id": "shadow_cyrillic_homoglyph",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "shadow": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "Cyrillic homoglyph spoofs read_file"
+    },
+    {
+      "case_id": "shadow_cross_tool_hijack",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "shadow": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "instead"
+      ],
+      "title": "Description redirects selection to another server's tool"
+    },
+    {
+      "case_id": "auth_cross_server_token_reuse",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "auth": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "bearer"
+      ],
+      "title": "Two servers share one Bearer credential"
+    },
+    {
+      "case_id": "auth_token_passthrough_param",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "auth": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token"
+      ],
+      "title": "Billing tool accepts an OAuth access token"
+    },
+    {
+      "case_id": "auth_cleartext_http_remote",
+      "expectation": "hostile",
+      "expected_positive": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "auth": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "bearer",
+        "http://"
+      ],
+      "title": "Remote MCP server reached over cleartext HTTP with credentials"
+    },
+    {
       "case_id": "b01-asset-manager",
       "expectation": "benign",
       "expected_positive": false,
@@ -332,9 +414,90 @@
         "webhook"
       ],
       "title": "Egress server explicitly trusted (internal-audit-sink)"
+    },
+    {
+      "case_id": "benign_same_server_prefix_tools",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "shadow": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "One server owns read_file and read_file_metadata"
+    },
+    {
+      "case_id": "benign_directive_words_without_cross_tool",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "shadow": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "before"
+      ],
+      "title": "Formatting description uses first/before without naming another tool"
+    },
+    {
+      "case_id": "benign_trusted_mirror_servers",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "shadow": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "title": "Trusted github and github-mirror both expose get_issue"
+    },
+    {
+      "case_id": "benign_env_placeholder_bearer",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "auth": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "bearer"
+      ],
+      "title": "Bearer token supplied as an environment placeholder"
+    },
+    {
+      "case_id": "benign_dedicated_oauth_broker",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "auth": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token"
+      ],
+      "title": "Dedicated OAuth broker exchanges refresh tokens"
+    },
+    {
+      "case_id": "benign_loopback_http_dev",
+      "expectation": "benign",
+      "expected_positive": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "auth": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "http://"
+      ],
+      "title": "Loopback development server with a local key placeholder"
     }
   ],
-  "hostile_count": 12,
+  "hostile_count": 18,
   "latch": {
     "f1": 1.0,
     "fn": 0,
@@ -342,18 +505,18 @@
     "fpr": 0.0,
     "precision": 1.0,
     "recall": 1.0,
-    "tn": 12,
-    "tp": 12
+    "tn": 18,
+    "tp": 18
   },
   "naive": {
-    "f1": 0.5185,
-    "fn": 5,
-    "fp": 8,
+    "f1": 0.5366,
+    "fn": 7,
+    "fp": 12,
     "fpr": 0.6667,
-    "precision": 0.4667,
-    "recall": 0.5833,
-    "tn": 4,
-    "tp": 7
+    "precision": 0.4783,
+    "recall": 0.6111,
+    "tn": 6,
+    "tp": 11
   },
   "tool_version": "0.1.0"
 }

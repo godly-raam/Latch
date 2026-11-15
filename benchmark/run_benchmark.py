@@ -14,9 +14,12 @@ from typing import Any
 
 from mcpprobe import __version__
 from mcpprobe.auditor import audit_manifest
+from mcpprobe.config_loader import ServerSpec
 from mcpprobe.graph import analyze_capability_graph
 from mcpprobe.lockfile import create_lockfile, verify_manifest
-from mcpprobe.models import parse_tools_payload
+from mcpprobe.models import ToolDefinition, parse_tools_payload
+from mcpprobe.oauth_audit import run_auth_audit
+from mcpprobe.shadow import analyze_shadowing
 
 from .corpus import BENIGN_CASES, CASES, HOSTILE_CASES, Case
 from .naive_baseline import naive_verdict
@@ -24,6 +27,23 @@ from .naive_baseline import naive_verdict
 BENCHMARK_DIR = Path(__file__).resolve().parent
 RESULTS_JSON = BENCHMARK_DIR / "results.json"
 RESULTS_MD = BENCHMARK_DIR / "RESULTS.md"
+
+
+def _auth_inputs(
+    raw_specs: list[dict[str, Any]],
+) -> tuple[list[ServerSpec], dict[str, list[ToolDefinition]] | None]:
+    specs: list[ServerSpec] = []
+    manifests: dict[str, list[ToolDefinition]] = {}
+    for raw in raw_specs:
+        payload = dict(raw)
+        tools = payload.pop("tools", None)
+        spec = ServerSpec.model_validate(payload)
+        specs.append(spec)
+        if tools is not None:
+            manifests[spec.server_id] = [
+                ToolDefinition.model_validate(tool) for tool in tools
+            ]
+    return specs, (manifests or None)
 
 
 def latch_verdict(case: Case) -> dict[str, Any]:
@@ -56,6 +76,21 @@ def latch_verdict(case: Case) -> dict[str, Any]:
             parsed, trusted_servers=set(case.trusted_servers) or None
         )
         signals["graph"] = not graph.passed
+
+    if case.shadow:
+        shadow_servers = {
+            server_id: [ToolDefinition.model_validate(tool) for tool in tools]
+            for server_id, tools in case.shadow.items()
+        }
+        shadow = analyze_shadowing(
+            shadow_servers, trusted_servers=set(case.trusted_servers) or None
+        )
+        signals["shadow"] = not shadow.passed
+
+    if case.auth:
+        specs, manifests = _auth_inputs(case.auth)
+        auth = run_auth_audit(specs, manifests)
+        signals["auth"] = not auth.passed
 
     return {"flagged": any(signals.values()), "signals": signals}
 
@@ -133,9 +168,10 @@ def render_markdown(results: dict[str, Any]) -> str:
         "# Latch benchmark results",
         "",
         "Deterministic ground-truth evaluation of Latch against a naive",
-        "keyword/substring scanner over 24 cases: 12 hostile/vulnerable cases",
-        "(expected positive) and 12 benign hard lookalikes built to punish keyword",
-        "matching. There are no timestamps or random values, so re-running",
+        f"keyword/substring scanner over {results['case_count']} cases:"
+        f" {results['hostile_count']} hostile/vulnerable cases (expected positive)"
+        f" and {results['benign_count']} benign hard lookalikes built to punish",
+        "keyword matching. There are no timestamps or random values, so re-running",
         "`python -m benchmark.run_benchmark` reproduces this file byte for byte.",
         "",
         f"- Tool version: `{results['tool_version']}`",
@@ -188,7 +224,8 @@ def render_markdown(results: dict[str, Any]) -> str:
     lines.append(
         "- Latch misses 0 hostile cases and flags 0 benign cases, because it hashes"
         " canonical tool definitions, tokenizes identifiers, allowlists header"
-        " bindings and analyzes cross-server capability chains."
+        " bindings, folds Unicode confusables, normalizes credentials and analyzes"
+        " cross-server capability chains."
     )
     lines.append("")
 
