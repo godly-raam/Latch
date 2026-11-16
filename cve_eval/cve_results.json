@@ -1,0 +1,569 @@
+{
+  "case_count": 24,
+  "cases": [
+    {
+      "advisory_ref": "CVE-2026-30623",
+      "case_id": "CVE-2026-30623-pre",
+      "engines_used": [
+        "auth-audit"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "auth-audit": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "bearer"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "pre_patch_vulnerable",
+      "title": "LiteLLM MCP gateway forwards user tokens and reuses one gateway credential"
+    },
+    {
+      "advisory_ref": "CVE-2026-27825",
+      "case_id": "CVE-2026-27825-pre",
+      "engines_used": [
+        "auth-audit",
+        "graph"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "auth-audit": true,
+        "graph": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "bearer",
+        "http://"
+      ],
+      "probe": null,
+      "static_graph_flagged": true,
+      "status": "pre_patch_vulnerable",
+      "title": "mcp-atlassian cleartext transport and unrestricted issue-to-webhook exfiltration"
+    },
+    {
+      "advisory_ref": "GHSA-MCP-2025-WHATSAPP",
+      "case_id": "GHSA-MCP-2025-WHATSAPP-pre",
+      "engines_used": [
+        "verify",
+        "graph"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "graph": true,
+        "verify": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": true,
+      "status": "pre_patch_vulnerable",
+      "title": "WhatsApp MCP post-approval rug pull enabling message exfiltration"
+    },
+    {
+      "advisory_ref": "GHSA-MCP-2025-GITHUB-TRIFECTA",
+      "case_id": "GHSA-MCP-2025-GITHUB-TRIFECTA-pre",
+      "engines_used": [
+        "graph"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "graph": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": true,
+      "status": "pre_patch_vulnerable",
+      "title": "GitHub MCP private-repo-to-public-issue prompt injection trifecta"
+    },
+    {
+      "advisory_ref": "MCP-2026-07-28-HEADER",
+      "case_id": "MCP-2026-07-28-HEADER-pre",
+      "engines_used": [
+        "audit"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "x-mcp-header"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "pre_patch_vulnerable",
+      "title": "Privileged x-mcp-header binding plus Unicode tag-block concealment"
+    },
+    {
+      "advisory_ref": "MCP-REGISTRY-HOMOGLYPH",
+      "case_id": "MCP-REGISTRY-HOMOGLYPH-pre",
+      "engines_used": [
+        "shadow"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "shadow": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "instead"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "pre_patch_vulnerable",
+      "title": "Malicious registry entry spoofs a trusted tool name and hijacks routing"
+    },
+    {
+      "advisory_ref": "MCP-RUNTIME-ALLOWLIST",
+      "case_id": "MCP-RUNTIME-ALLOWLIST-pre",
+      "engines_used": [
+        "graph",
+        "probe-chain"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "graph": true,
+        "probe-chain": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "webhook"
+      ],
+      "probe": {
+        "block_reason": null,
+        "confirmed_exploitable": 1,
+        "paths_tested": 1,
+        "sink_request_summary": "POST /exfil (matched body)",
+        "status": "CONFIRMED_EXPLOITABLE"
+      },
+      "static_graph_flagged": true,
+      "status": "pre_patch_vulnerable",
+      "title": "Read-and-exfiltrate chain with no runtime egress guard"
+    },
+    {
+      "advisory_ref": "CVE-2025-FILESYSTEM-TRAVERSAL",
+      "case_id": "CVE-2025-FILESYSTEM-TRAVERSAL-pre",
+      "engines_used": [
+        "audit"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "pre_patch_vulnerable",
+      "title": "Filesystem server symlink/path-canonicalization traversal (out of scope)"
+    },
+    {
+      "advisory_ref": "MCP-2026-07-28-PRM-401",
+      "case_id": "MCP-2026-07-28-PRM-401-pre",
+      "engines_used": [
+        "auth-audit"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "auth-audit": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "pre_patch_vulnerable",
+      "title": "Remote MCP endpoint returns 401 without RFC 9728 resource_metadata"
+    },
+    {
+      "advisory_ref": "MCP-2026-07-28-HEADER-CRLF",
+      "case_id": "MCP-2026-07-28-HEADER-CRLF-pre",
+      "engines_used": [
+        "audit"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "audit": true
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "x-mcp-header"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "pre_patch_vulnerable",
+      "title": "CRLF injection through an x-mcp-header binding"
+    },
+    {
+      "advisory_ref": "MCP-DUPLICATE-TOOL-SHADOW",
+      "case_id": "MCP-DUPLICATE-TOOL-SHADOW-pre",
+      "engines_used": [
+        "shadow"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "latch_signals": {
+        "shadow": true
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "pre_patch_vulnerable",
+      "title": "Duplicate tool name across two mounted servers"
+    },
+    {
+      "advisory_ref": "CVE-2025-POSTGRES-SQLI",
+      "case_id": "CVE-2025-POSTGRES-SQLI-pre",
+      "engines_used": [
+        "audit"
+      ],
+      "expected_positive": true,
+      "in_latch_threat_model": false,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "sql"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "pre_patch_vulnerable",
+      "title": "Postgres server query handler string concatenation SQL injection (out of scope)"
+    },
+    {
+      "advisory_ref": "CVE-2026-30623",
+      "case_id": "CVE-2026-30623-post",
+      "engines_used": [
+        "auth-audit"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "auth-audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "bearer"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "post_patch_fixed",
+      "title": "Gateway patch: per-server environment credentials, no token parameters"
+    },
+    {
+      "advisory_ref": "CVE-2026-27825",
+      "case_id": "CVE-2026-27825-post",
+      "engines_used": [
+        "auth-audit",
+        "graph"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "auth-audit": false,
+        "graph": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "bearer",
+        "http://"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "post_patch_fixed",
+      "title": "Atlassian patch: loopback/TLS endpoint and read-only mode"
+    },
+    {
+      "advisory_ref": "GHSA-MCP-2025-WHATSAPP",
+      "case_id": "GHSA-MCP-2025-WHATSAPP-post",
+      "engines_used": [
+        "verify",
+        "graph"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "graph": false,
+        "verify": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "post_patch_fixed",
+      "title": "WhatsApp patch: pinned surface with a trusted internal sink"
+    },
+    {
+      "advisory_ref": "GHSA-MCP-2025-GITHUB-TRIFECTA",
+      "case_id": "GHSA-MCP-2025-GITHUB-TRIFECTA-post",
+      "engines_used": [
+        "graph"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "graph": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "post_patch_fixed",
+      "title": "GitHub patch: read-only scoped server without write tools"
+    },
+    {
+      "advisory_ref": "MCP-2026-07-28-HEADER",
+      "case_id": "MCP-2026-07-28-HEADER-post",
+      "engines_used": [
+        "audit"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "x-mcp-header"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "post_patch_fixed",
+      "title": "Header patch: ASCII description and a telemetry-only header binding"
+    },
+    {
+      "advisory_ref": "MCP-REGISTRY-HOMOGLYPH",
+      "case_id": "MCP-REGISTRY-HOMOGLYPH-post",
+      "engines_used": [
+        "shadow"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "shadow": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "post_patch_fixed",
+      "title": "Registry patch: official filesystem server mounted alone"
+    },
+    {
+      "advisory_ref": "MCP-RUNTIME-ALLOWLIST",
+      "case_id": "MCP-RUNTIME-ALLOWLIST-post",
+      "engines_used": [
+        "graph",
+        "probe-chain"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "graph": true,
+        "probe-chain": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "webhook"
+      ],
+      "probe": {
+        "block_reason": "blocked: destination '127.0.0.1' is not in the *.corp.internal allowlist",
+        "confirmed_exploitable": 0,
+        "paths_tested": 1,
+        "sink_request_summary": null,
+        "status": "BLOCKED_AT_EGRESS"
+      },
+      "static_graph_flagged": true,
+      "status": "post_patch_fixed",
+      "title": "Runtime allowlist patch: identical schema, egress blocked at execution"
+    },
+    {
+      "advisory_ref": "CVE-2025-FILESYSTEM-TRAVERSAL",
+      "case_id": "CVE-2025-FILESYSTEM-TRAVERSAL-post",
+      "engines_used": [
+        "audit"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "post_patch_fixed",
+      "title": "Filesystem patch: canonical path resolution inside the handler"
+    },
+    {
+      "advisory_ref": "UPSTREAM-FS",
+      "case_id": "UPSTREAM-FS",
+      "engines_used": [
+        "audit",
+        "graph"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false,
+        "graph": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "ignore"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "upstream_reference",
+      "title": "@modelcontextprotocol/server-filesystem official manifest"
+    },
+    {
+      "advisory_ref": "UPSTREAM-GIT",
+      "case_id": "UPSTREAM-GIT",
+      "engines_used": [
+        "audit",
+        "graph"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false,
+        "graph": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "ignore"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "upstream_reference",
+      "title": "@modelcontextprotocol/server-git official manifest"
+    },
+    {
+      "advisory_ref": "UPSTREAM-MEMORY",
+      "case_id": "UPSTREAM-MEMORY",
+      "engines_used": [
+        "audit",
+        "graph"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false,
+        "graph": false
+      },
+      "naive_flagged": false,
+      "naive_hits": [],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "upstream_reference",
+      "title": "@modelcontextprotocol/server-memory official manifest"
+    },
+    {
+      "advisory_ref": "UPSTREAM-POSTGRES",
+      "case_id": "UPSTREAM-POSTGRES",
+      "engines_used": [
+        "audit",
+        "graph"
+      ],
+      "expected_positive": false,
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "latch_signals": {
+        "audit": false,
+        "graph": false
+      },
+      "naive_flagged": true,
+      "naive_hits": [
+        "sql"
+      ],
+      "probe": null,
+      "static_graph_flagged": false,
+      "status": "upstream_reference",
+      "title": "@modelcontextprotocol/server-postgres official read-only manifest"
+    }
+  ],
+  "execution_aware_comparison": {
+    "case_id": "MCP-RUNTIME-ALLOWLIST-post",
+    "probe_block_reason": "blocked: destination '127.0.0.1' is not in the *.corp.internal allowlist",
+    "probe_confirmed": false,
+    "probe_status": "BLOCKED_AT_EGRESS",
+    "static_graph_flagged": true
+  },
+  "in_scope": {
+    "f1": 1.0,
+    "fn": 0,
+    "fp": 0,
+    "fpr": 0.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tn": 12,
+    "tp": 10
+  },
+  "in_scope_case_count": 22,
+  "naive": {
+    "f1": 0.5385,
+    "fn": 5,
+    "fp": 7,
+    "fpr": 0.5833,
+    "precision": 0.5,
+    "recall": 0.5833,
+    "tn": 5,
+    "tp": 7
+  },
+  "overall": {
+    "f1": 0.9091,
+    "fn": 2,
+    "fp": 0,
+    "fpr": 0.0,
+    "precision": 1.0,
+    "recall": 0.8333,
+    "tn": 12,
+    "tp": 10
+  },
+  "post_patch_count": 8,
+  "pre_patch_count": 12,
+  "upstream_reference_count": 4
+}
