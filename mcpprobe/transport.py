@@ -11,23 +11,30 @@ Both transports implement the same two-step dance:
 ``tools/list`` is then fetched page by page until ``nextCursor`` stops being
 returned.
 
-Security posture: this module only ever *reads* from the server it is pointed
-at. It never executes a tool.
+Security posture: harvesting only ever *reads* from the server it is pointed at.
+Executing a tool is opt-in and lives in ``call_tool``, which the chain prober uses
+for non-destructive canary probes; a JSON-RPC error is normalized into an
+``isError`` tool result so one blocked tool cannot abort a batch.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import os
 import shlex
 from collections.abc import AsyncIterator, Awaitable, Callable
-from typing import Any, Literal
+from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING, Any, Literal
 
 import httpx
 from pydantic import BaseModel
 
 from . import __version__
-from .models import ProbeError
+from .models import ProbeError, ToolDefinition, parse_tools_payload
+
+if TYPE_CHECKING:  # pragma: no cover - annotation only
+    from .config_loader import ServerSpec
 
 PROTOCOL_2026 = "2026-07-28"
 PROTOCOL_2025 = "2025-11-25"
@@ -98,6 +105,16 @@ def initialize_params() -> dict[str, Any]:
 
 def _require_dict(value: Any) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
+
+
+def normalize_tool_error(error: Any) -> dict[str, Any]:
+    """Turn a JSON-RPC error into a tool result the prober can reason about."""
+
+    return {
+        "isError": True,
+        "error": error,
+        "content": [{"type": "text", "text": str(error)}],
+    }
 
 
 def _apply_handshake(target: Any, result: dict[str, Any]) -> None:
@@ -384,6 +401,23 @@ class StdioSession:
             session_id=None,
         )
 
+    async def list_tools(self) -> list[ToolDefinition]:
+        """Return every tool the server currently advertises."""
+
+        return parse_tools_payload(await self.fetch_tools())
+
+    async def call_tool(
+        self, name: str, arguments: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Invoke ``tools/call``; JSON-RPC errors become ``isError`` results."""
+
+        try:
+            return await self.request(
+                "tools/call", {"name": name, "arguments": arguments or {}}
+            )
+        except JsonRpcError as exc:
+            return normalize_tool_error({"code": exc.code, "message": exc.rpc_message})
+
 
 def _sse_messages(text: str) -> list[dict[str, Any]]:
     """Extract JSON-RPC messages from the ``data:`` lines of an SSE body."""
@@ -608,6 +642,23 @@ class HttpHarvester:
             session_id=self.session_id,
         )
 
+    async def list_tools(self) -> list[ToolDefinition]:
+        """Return every tool the server currently advertises."""
+
+        return parse_tools_payload(await self.fetch_tools())
+
+    async def call_tool(
+        self, name: str, arguments: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Invoke ``tools/call``; JSON-RPC errors become ``isError`` results."""
+
+        try:
+            return await self.call(
+                "tools/call", {"name": name, "arguments": arguments or {}}
+            )
+        except JsonRpcError as exc:
+            return normalize_tool_error({"code": exc.code, "message": exc.rpc_message})
+
     async def listen_stream(
         self, params: dict[str, Any] | None = None, *, timeout: float | None = None
     ) -> AsyncIterator[dict[str, Any]]:
@@ -658,6 +709,54 @@ class HttpHarvester:
                         yield parsed
         except httpx.HTTPError as exc:
             raise ProbeError(f"HTTP transport error while listening on {self.url}: {exc}") from exc
+
+
+@asynccontextmanager
+async def open_mcp_session(
+    spec: "ServerSpec",
+    *,
+    timeout: float = DEFAULT_TIMEOUT,
+    http_transport: httpx.AsyncBaseTransport | None = None,
+) -> AsyncIterator[Any]:
+    """Negotiate a live MCP session for a stdio or HTTP server spec.
+
+    Yields a session exposing ``list_tools()`` and ``call_tool(name, arguments)``.
+    """
+
+    if spec.transport == "stdio":
+        command = shlex.join(spec.command or [])
+        if not command:
+            raise ProbeError(f"server {spec.server_id!r} has no command to launch")
+        env = {**os.environ, **(spec.env or {})}
+        session = StdioSession(command, timeout=timeout, env=env)
+        await session.start()
+        try:
+            await session.negotiate()
+            yield session
+        finally:
+            await session.close()
+        return
+
+    if spec.transport == "http":
+        if not spec.url:
+            raise ProbeError(f"server {spec.server_id!r} has no url to connect to")
+        harvester = HttpHarvester(
+            spec.url,
+            headers=spec.headers or None,
+            timeout=timeout,
+            transport=http_transport,
+        )
+        try:
+            await harvester.negotiate()
+            yield harvester
+        finally:
+            await harvester.close()
+        return
+
+    raise ProbeError(
+        f"server {spec.server_id!r} is a static snapshot; live execution requires a"
+        " stdio or http server"
+    )
 
 
 async def harvest_stdio(command: str, *, timeout: float = DEFAULT_TIMEOUT) -> HarvestResult:

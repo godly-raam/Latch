@@ -19,6 +19,7 @@ from typing import Any
 import click
 
 from .auditor import AuditReport, audit_manifest
+from .chain_prober import ChainVerificationReport, verify_trifecta_chains
 from .config_loader import (
     ServerSpec,
     load_mcp_config,
@@ -193,6 +194,7 @@ def _emit_sarif(
     graphs: Any = (),
     shadow: Any = None,
     auth: Any = None,
+    chain: Any = None,
     artifact_uri: str = LIVE_TARGET_URI,
 ) -> None:
     payload = to_sarif(
@@ -201,6 +203,7 @@ def _emit_sarif(
         graphs=graphs,
         shadow=shadow,
         auth=auth,
+        chain=chain,
         artifact_uri=artifact_uri,
     )
     try:
@@ -753,6 +756,117 @@ def auth_audit(
     raise SystemExit(EXIT_OK if report.passed else EXIT_DRIFT)
 
 
+@cli.command("probe-chain")
+@click.option(
+    "--config",
+    "config_paths",
+    multiple=True,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    help="MCP agent config with live stdio/url servers. Repeatable.",
+)
+@click.option(
+    "--server-manifest",
+    "server_manifests",
+    multiple=True,
+    help="Static snapshot as <server_id>=path.json (not executable on its own). Repeatable.",
+)
+@click.option(
+    "--trust-server",
+    "trusted_servers",
+    multiple=True,
+    help="Server id barred from acting as an untrusted source or egress sink. Repeatable.",
+)
+@click.option(
+    "--no-seed-canary",
+    "no_seed_canary",
+    is_flag=True,
+    help="Do not append the canary to read output before invoking egress.",
+)
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    show_default=True,
+    help="Report rendering.",
+)
+@click.option(
+    "--sarif",
+    "sarif_path",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Also write a SARIF 2.1.0 report to this path.",
+)
+@click.option(
+    "--timeout",
+    "timeout",
+    type=float,
+    default=DEFAULT_TIMEOUT,
+    show_default=True,
+    help="Transport timeout in seconds.",
+)
+def probe_chain(
+    config_paths: tuple[Path, ...],
+    server_manifests: tuple[str, ...],
+    trusted_servers: tuple[str, ...],
+    no_seed_canary: bool,
+    output_format: str,
+    sarif_path: Path | None,
+    timeout: float,
+) -> None:
+    """Execute static lethal-trifecta paths against live servers with a canary."""
+    if not config_paths and not server_manifests:
+        _fail("provide at least one --config or --server-manifest")
+
+    try:
+        specs: list[ServerSpec] = []
+        for path in config_paths:
+            specs.extend(load_mcp_config(path))
+        for raw in server_manifests:
+            specs.append(parse_server_manifest_arg(raw))
+
+        live_specs = [spec for spec in specs if spec.transport in ("stdio", "http")]
+        if not live_specs:
+            _fail(
+                "probe-chain requires live stdio or http servers, but every supplied"
+                " server is a static snapshot and cannot be executed. Point --config at"
+                " entries with 'command' or 'url', or capture a live server with"
+                " 'latch pin --stdio/--url' first."
+            )
+
+        report = asyncio.run(
+            verify_trifecta_chains(
+                live_specs,
+                trusted_servers=set(trusted_servers) or None,
+                seed_canary=not no_seed_canary,
+                timeout=timeout,
+            )
+        )
+    except ProbeError as exc:
+        _fail(str(exc))
+
+    if sarif_path is not None:
+        _emit_sarif(
+            sarif_path,
+            chain=report,
+            artifact_uri=_graph_artifact_uri(config_paths, server_manifests, False),
+        )
+
+    if output_format == "json":
+        click.echo(
+            json.dumps(
+                report.model_dump(mode="json"),
+                indent=2,
+                sort_keys=True,
+                ensure_ascii=False,
+            )
+        )
+    else:
+        _print_chain_report(report)
+
+    raise SystemExit(EXIT_DRIFT if not report.passed else EXIT_OK)
+
+
 @cli.command()
 @click.option(
     "--stdio", "stdio_command", default=None, help="Command that starts a local MCP server."
@@ -1029,6 +1143,48 @@ def _print_auth_report(report: AuthAuditReport, fail_on: str) -> None:
         click.echo(
             f"AUTH AUDIT FAILED: {len(report.findings)} finding(s)"
             f" (fail-on: {fail_on})"
+        )
+
+
+def _print_chain_report(report: ChainVerificationReport) -> None:
+    click.echo("Latch execution-aware chain verification")
+    click.echo(
+        f"  servers: {report.server_count}"
+        f"   static paths: {report.static_paths_found}"
+        f"   tested: {report.paths_tested}"
+    )
+    click.echo(
+        f"  confirmed: {report.confirmed_exploitable}"
+        f"   blocked: {report.blocked_count}"
+        f"   inconclusive: {report.inconclusive_count}"
+    )
+
+    for result in report.results:
+        click.echo("")
+        click.echo(f"  [{result.status}] {result.path_id}")
+        click.echo(
+            f"      static severity: {result.static_severity}"
+            f"   verified severity: {result.verified_severity}"
+        )
+        click.echo(
+            f"      {result.ingest_tool} -> {result.read_tool} -> {result.egress_tool}"
+        )
+        click.echo(
+            f"      canary: {result.canary_token}"
+            f"   read observed: {result.read_observed}"
+            f"   egress invoked: {result.egress_invoked}"
+        )
+        if result.sink_request_summary is not None:
+            click.echo(f"      sink: {result.sink_request_summary}")
+        if result.block_reason is not None:
+            click.echo(f"      block: {result.block_reason}")
+
+    click.echo("")
+    if report.passed:
+        click.echo("RESULT: no static chain could be reproduced at runtime")
+    else:
+        click.echo(
+            f"RESULT: {report.confirmed_exploitable} confirmed exploitable chain(s)"
         )
 
 

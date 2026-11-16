@@ -18,6 +18,7 @@ from typing import Any
 
 from . import __version__
 from .auditor import AuditReport
+from .chain_prober import ChainVerificationReport
 from .graph import GraphReport
 from .lockfile import VerificationReport
 from .oauth_audit import AuthAuditReport
@@ -260,6 +261,16 @@ _RULES: dict[str, dict[str, Any]] = {
         "tags": ["security", "CWE-287"],
         "level": "warning",
     },
+    "LATCH-CHAIN-CONFIRMED": {
+        "name": "ConfirmedExploitableChain",
+        "short": "Lethal-trifecta chain confirmed at runtime",
+        "full": (
+            "A read tool returned data and an egress tool forwarded the canary"
+            " payload to a loopback sink, so the static chain is exploitable."
+        ),
+        "tags": ["security", "CWE-200", "CWE-284"],
+        "level": "error",
+    },
     "LATCH-AUTH-PRM_RESOURCE_MISMATCH": {
         "name": "PrmResourceMismatch",
         "short": "Metadata resource does not match the endpoint",
@@ -350,6 +361,7 @@ def to_sarif(
     graphs: Sequence[GraphReport] = (),
     shadow: ShadowReport | None = None,
     auth: AuthAuditReport | None = None,
+    chain: ChainVerificationReport | None = None,
     artifact_uri: str = LIVE_TARGET_URI,
 ) -> dict[str, Any]:
     """Build a SARIF 2.1.0 log from any combination of Latch reports."""
@@ -451,6 +463,33 @@ def to_sarif(
                         "authRule": finding.rule_id,
                         "servers": finding.servers,
                         "fieldPath": finding.field_path,
+                    },
+                )
+            )
+
+    if chain is not None:
+        for probe in chain.results:
+            if probe.status != "CONFIRMED_EXPLOITABLE":
+                continue
+            message = (
+                f"Confirmed exploitable chain {probe.path_id}:"
+                f" {probe.ingest_tool} -> {probe.read_tool} -> {probe.egress_tool}"
+                f" reached {probe.sink_request_summary or 'the canary sink'}"
+                " with a live canary token."
+            )
+            results.append(
+                _result(
+                    "LATCH-CHAIN-CONFIRMED",
+                    probe.verified_severity,
+                    message,
+                    artifact_uri,
+                    {
+                        "pathId": probe.path_id,
+                        "toolName": probe.ingest_tool,
+                        "servers": [],
+                        "chainStatus": probe.status,
+                        "canaryToken": probe.canary_token,
+                        "sink": probe.sink_request_summary,
                     },
                 )
             )

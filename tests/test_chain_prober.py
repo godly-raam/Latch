@@ -1,0 +1,458 @@
+"""Tests for the execution-aware lethal-trifecta canary prober."""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import sys
+from pathlib import Path
+from typing import Any
+
+import httpx
+from click.testing import CliRunner
+
+from mcpprobe.chain_prober import (
+    CanarySinkServer,
+    synthesize_egress_args,
+    synthesize_read_args,
+)
+from mcpprobe.cli import cli
+from mcpprobe.graph import analyze_capability_graph
+from mcpprobe.models import ToolDefinition
+from mcpprobe.sarif import to_sarif
+from mcpprobe.transport import HttpHarvester
+
+FIXTURE = Path(__file__).parent / "fixtures" / "mock_chain_stdio.py"
+
+
+def tool(
+    name: str,
+    properties: dict[str, Any] | None = None,
+    required: list[str] | None = None,
+) -> ToolDefinition:
+    schema: dict[str, Any] = {"type": "object", "properties": properties or {}}
+    if required:
+        schema["required"] = required
+    return ToolDefinition.model_validate(
+        {"name": name, "description": "", "inputSchema": schema}
+    )
+
+
+def write_chain_config(tmp_path: Path, *roles: str) -> Path:
+    args = [str(FIXTURE)]
+    for role in roles:
+        args.extend(["--role", role])
+    payload = {
+        "mcpServers": {"chain": {"command": sys.executable, "args": args}}
+    }
+    path = tmp_path / "chain.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def run_probe(config: Path, *extra: str) -> Any:
+    return CliRunner().invoke(
+        cli,
+        ["probe-chain", "--config", str(config), "--format", "json", *extra],
+    )
+
+
+# -- loopback sink ----------------------------------------------------------
+
+
+def test_canary_sink_binds_loopback_and_captures_requests() -> None:
+    async def scenario() -> tuple[str, int, dict[str, str], int]:
+        async with CanarySinkServer() as sink:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{sink.base_url}/exfil?marker=LATCH-CANARY-abc123",
+                    headers={"X-Trace": "1"},
+                    json={"payload": "LATCH-CANARY-abc123"},
+                )
+            return (
+                sink.base_url,
+                response.status_code,
+                response.json(),
+                len(sink.captured_requests),
+            )
+
+    base_url, status, body, captured = asyncio.run(scenario())
+
+    assert base_url.startswith("http://127.0.0.1:")
+    assert status == 200
+    assert body == {"ok": True}
+    assert captured == 1
+
+
+def test_canary_sink_records_method_path_headers_and_body() -> None:
+    async def scenario() -> Any:
+        async with CanarySinkServer() as sink:
+            async with httpx.AsyncClient() as client:
+                await client.post(
+                    f"{sink.base_url}/exfil",
+                    headers={"X-Canary": "LATCH-CANARY-abc123"},
+                    content=b"hello",
+                )
+            return sink, sink.find_canary("LATCH-CANARY-abc123")
+
+    sink, match = asyncio.run(scenario())
+
+    record = sink.captured_requests[0]
+    assert record["method"] == "POST"
+    assert record["path"] == "/exfil"
+    assert record["headers"]["X-Canary"] == "LATCH-CANARY-abc123"
+    assert record["body"] == "hello"
+    assert match is not None
+    assert match[0] == "POST /exfil"
+    assert match[1] == "header:X-Canary"
+
+
+def test_canary_sink_reports_misses() -> None:
+    async def scenario() -> bool:
+        async with CanarySinkServer() as sink:
+            async with httpx.AsyncClient() as client:
+                await client.post(f"{sink.base_url}/exfil", content=b"nope")
+            return sink.find_canary("LATCH-CANARY-missing") is None
+
+    assert asyncio.run(scenario()) is True
+
+
+# -- argument synthesis -----------------------------------------------------
+
+
+def test_synthesize_read_args_maps_common_parameters() -> None:
+    tool_definition = tool(
+        "query_everything",
+        {
+            "query": {"type": "string"},
+            "path": {"type": "string"},
+            "account_id": {"type": "string"},
+            "limit": {"type": "integer"},
+            "verbose": {"type": "boolean"},
+            "label": {"type": "string"},
+        },
+        required=["query", "limit", "verbose"],
+    )
+
+    args = synthesize_read_args(tool_definition, "LATCH-CANARY-deadbeef")
+
+    assert args["query"] == "SELECT * FROM records LIMIT 1"
+    assert args["path"] == "canary.txt"
+    assert args["account_id"] == "canary-1"
+    assert args["limit"] == 1
+    assert args["verbose"] is True
+    # Optional parameters outside the read vocabulary are left untouched.
+    assert "label" not in args
+
+
+def test_synthesize_egress_args_wires_sink_and_payload() -> None:
+    tool_definition = tool(
+        "post_webhook",
+        {
+            "webhook_url": {"type": "string"},
+            "payload": {"type": "string"},
+            "recipient": {"type": "string"},
+            "retries": {"type": "integer"},
+        },
+        required=["webhook_url", "payload", "retries"],
+    )
+
+    args, has_channel = synthesize_egress_args(
+        tool_definition, "http://127.0.0.1:9000", "LATCH-CANARY-deadbeef"
+    )
+
+    assert has_channel is True
+    assert args["webhook_url"] == "http://127.0.0.1:9000/exfil"
+    assert args["payload"] == "LATCH-CANARY-deadbeef"
+    assert args["recipient"] == "canary@127.0.0.1.invalid"
+    assert args["retries"] == 1
+
+
+def test_synthesize_egress_args_without_channel_is_inconclusive() -> None:
+    tool_definition = tool(
+        "delete_record", {"record_id": {"type": "string"}}, required=["record_id"]
+    )
+
+    args, has_channel = synthesize_egress_args(
+        tool_definition, "http://127.0.0.1:9000", "LATCH-CANARY-deadbeef"
+    )
+
+    assert has_channel is False
+    assert args == {"record_id": "canary"}
+
+
+# -- transport call_tool ----------------------------------------------------
+
+
+def test_http_call_tool_returns_result() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        return httpx.Response(
+            200,
+            json={
+                "jsonrpc": "2.0",
+                "id": body["id"],
+                "result": {"content": [{"type": "text", "text": "ok"}]},
+            },
+        )
+
+    async def scenario() -> dict[str, Any]:
+        harvester = HttpHarvester(
+            "https://mcp.example.com/mcp", transport=httpx.MockTransport(handler)
+        )
+        try:
+            return await harvester.call_tool("read_ledger", {"query": "x"})
+        finally:
+            await harvester.close()
+
+    result = asyncio.run(scenario())
+
+    assert result == {"content": [{"type": "text", "text": "ok"}]}
+
+
+def test_http_call_tool_normalizes_jsonrpc_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        return httpx.Response(
+            200,
+            json={
+                "jsonrpc": "2.0",
+                "id": body["id"],
+                "error": {"code": -32602, "message": "invalid params"},
+            },
+        )
+
+    async def scenario() -> dict[str, Any]:
+        harvester = HttpHarvester(
+            "https://mcp.example.com/mcp", transport=httpx.MockTransport(handler)
+        )
+        try:
+            return await harvester.call_tool("read_ledger", {})
+        finally:
+            await harvester.close()
+
+    result = asyncio.run(scenario())
+
+    assert result["isError"] is True
+    assert result["error"]["code"] == -32602
+    assert "invalid params" in result["content"][0]["text"]
+
+
+# -- static context ---------------------------------------------------------
+
+
+def static_chain_manifests() -> dict[str, list[ToolDefinition]]:
+    return {
+        "chain": [
+            tool(
+                "fetch_issue",
+                {"issue_number": {"type": "integer"}},
+                required=["issue_number"],
+            ),
+            tool("read_ledger", {"query": {"type": "string"}}, required=["query"]),
+            tool(
+                "post_webhook",
+                {
+                    "webhook_url": {"type": "string"},
+                    "payload": {"type": "string"},
+                },
+                required=["webhook_url", "payload"],
+            ),
+        ]
+    }
+
+
+def test_static_graph_flags_the_fixture_chain_as_critical() -> None:
+    graph = analyze_capability_graph(static_chain_manifests())
+
+    assert len(graph.trifecta_paths) == 1
+    assert graph.trifecta_paths[0].severity == "CRITICAL"
+
+
+# -- end-to-end probing -----------------------------------------------------
+
+
+def test_confirmed_exploitable_chain(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(config)
+
+    assert result.exit_code == 1, result.output
+    payload = json.loads(result.output)
+    assert payload["static_paths_found"] == 1
+    assert payload["confirmed_exploitable"] == 1
+    assert payload["passed"] is False
+    [probe] = payload["results"]
+    assert probe["status"] == "CONFIRMED_EXPLOITABLE"
+    assert probe["verified_severity"] == "CRITICAL"
+    assert probe["canary_captured_at_sink"] is True
+    assert probe["read_observed"] is True
+    assert probe["egress_invoked"] is True
+    assert probe["canary_token"].startswith("LATCH-CANARY-")
+    assert "POST /exfil" in probe["sink_request_summary"]
+
+
+def test_blocked_at_egress_eliminates_static_false_positive(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-allowlisted")
+
+    result = run_probe(config)
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["static_paths_found"] == 1
+    assert payload["confirmed_exploitable"] == 0
+    assert payload["blocked_count"] == 1
+    assert payload["passed"] is True
+    [probe] = payload["results"]
+    assert probe["status"] == "BLOCKED_AT_EGRESS"
+    assert probe["verified_severity"] == "LOW"
+    assert probe["canary_captured_at_sink"] is False
+    assert "allowlist" in probe["block_reason"]
+
+
+def test_blocked_at_read_eliminates_static_false_positive(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-denied", "egress-open")
+
+    result = run_probe(config)
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["confirmed_exploitable"] == 0
+    [probe] = payload["results"]
+    assert probe["status"] == "BLOCKED_AT_READ"
+    assert probe["read_observed"] is False
+    assert probe["egress_invoked"] is False
+    assert "RBAC denied" in probe["block_reason"]
+
+
+def test_no_seed_canary_cannot_confirm_propagation(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(config, "--no-seed-canary")
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["confirmed_exploitable"] == 0
+    [probe] = payload["results"]
+    assert probe["status"] == "BLOCKED_AT_EGRESS"
+    assert "without forwarding canary payload" in probe["block_reason"]
+
+
+def test_trusted_servers_remove_the_chain(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(config, "--trust-server", "chain")
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["static_paths_found"] == 0
+    assert payload["results"] == []
+
+
+def test_probe_chain_requires_live_servers(tmp_path: Path) -> None:
+    manifest = tmp_path / "static.json"
+    manifest.write_text(json.dumps({"tools": []}), encoding="utf-8")
+
+    result = CliRunner().invoke(
+        cli, ["probe-chain", "--server-manifest", f"static={manifest}"]
+    )
+
+    assert result.exit_code == 2, result.output
+    combined = result.output + getattr(result, "stderr", "")
+    assert "live stdio or http" in combined
+
+
+def test_probe_chain_requires_a_target() -> None:
+    result = CliRunner().invoke(cli, ["probe-chain"])
+
+    assert result.exit_code == 2, result.output
+
+
+def test_probe_chain_malformed_manifest_exits_two() -> None:
+    result = CliRunner().invoke(cli, ["probe-chain", "--server-manifest", "nope"])
+
+    assert result.exit_code == 2, result.output
+
+
+def test_cli_text_output_prints_status_and_evidence(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = CliRunner().invoke(cli, ["probe-chain", "--config", str(config)])
+
+    assert result.exit_code == 1, result.output
+    assert "CONFIRMED_EXPLOITABLE" in result.output
+    assert "sink: POST /exfil" in result.output
+    assert "RESULT: 1 confirmed exploitable chain(s)" in result.output
+
+
+# -- SARIF ------------------------------------------------------------------
+
+
+def test_sarif_emits_confirmed_chain_only(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+    sarif_path = tmp_path / "chain.sarif"
+
+    result = CliRunner().invoke(
+        cli, ["probe-chain", "--config", str(config), "--sarif", str(sarif_path)]
+    )
+
+    assert result.exit_code == 1, result.output
+    sarif = json.loads(sarif_path.read_text(encoding="utf-8"))
+    [entry] = sarif["runs"][0]["results"]
+    assert entry["ruleId"] == "LATCH-CHAIN-CONFIRMED"
+    assert entry["level"] == "error"
+    assert entry["properties"]["chainStatus"] == "CONFIRMED_EXPLOITABLE"
+    rule = sarif["runs"][0]["tool"]["driver"]["rules"][0]
+    assert rule["properties"]["tags"] == ["security", "CWE-200", "CWE-284"]
+
+
+def test_sarif_has_no_error_for_blocked_chains(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-allowlisted")
+    sarif_path = tmp_path / "chain.sarif"
+
+    result = CliRunner().invoke(
+        cli, ["probe-chain", "--config", str(config), "--sarif", str(sarif_path)]
+    )
+
+    assert result.exit_code == 0, result.output
+    sarif = json.loads(sarif_path.read_text(encoding="utf-8"))
+    assert sarif["runs"][0]["results"] == []
+
+
+def test_to_sarif_chain_report_round_trip(tmp_path: Path) -> None:
+    from mcpprobe.chain_prober import ChainProbeResult, ChainVerificationReport
+
+    report = ChainVerificationReport(
+        server_count=1,
+        static_paths_found=1,
+        paths_tested=1,
+        confirmed_exploitable=1,
+        blocked_count=0,
+        inconclusive_count=0,
+        results=[
+            ChainProbeResult(
+                path_id="trifecta-001",
+                ingest_tool="chain:fetch_issue",
+                read_tool="chain:read_ledger",
+                egress_tool="chain:post_webhook",
+                static_severity="CRITICAL",
+                verified_severity="CRITICAL",
+                status="CONFIRMED_EXPLOITABLE",
+                canary_token="LATCH-CANARY-0123456789abcdef",
+                read_observed=True,
+                egress_invoked=True,
+                canary_captured_at_sink=True,
+                sink_request_summary="POST /exfil (matched body)",
+            )
+        ],
+        passed=False,
+    )
+
+    sarif = to_sarif(chain=report, artifact_uri="chain.json")
+
+    [entry] = sarif["runs"][0]["results"]
+    assert entry["ruleId"] == "LATCH-CHAIN-CONFIRMED"
+    assert "POST /exfil" in entry["message"]["text"]
+    assert entry["locations"][0]["physicalLocation"]["artifactLocation"]["uri"] == (
+        "chain.json"
+    )
