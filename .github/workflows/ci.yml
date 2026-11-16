@@ -34,5 +34,11 @@ jobs:
       - name: Run benchmark
         run: python -m benchmark.run_benchmark
 
+      - name: Run CVE and upstream reference evaluation
+        run: python -m cve_eval.run_cve_eval
+
+      - name: Run adversarial self-red-team
+        run: python -m adversarial.run_evasion
+
       - name: Run demo
         run: bash demo.sh

@@ -20,6 +20,12 @@ Implemented rules:
     Zero-width and BOM codepoints can split keywords or smuggle hidden markers
     without changing how the metadata looks.
 
+``UNICODE_VARIATION_SELECTOR`` (HIGH)
+    Variation selectors (``U+FE00``-``U+FE0F``, ``U+E0100``-``U+E01EF``) select
+    an alternate glyph for the preceding character. They are invisible when the
+    font ignores them, so they can carry a hidden marker or make an approved
+    string render differently from the bytes the model reads.
+
 ``HEADER_PRIVILEGED_INJECTION`` (CRITICAL)
     ``x-mcp-header`` tells an MCP transport to place LLM-supplied parameter
     values into an HTTP header. Binding a privileged header (``Authorization``,
@@ -94,6 +100,8 @@ ZERO_WIDTH_CODEPOINTS = frozenset(
     }
 )
 
+VARIATION_SELECTOR_RANGES = ((0xFE00, 0xFE0F), (0xE0100, 0xE01EF))
+
 PRIVILEGED_HEADERS = frozenset(
     {
         "authorization",
@@ -105,6 +113,8 @@ PRIVILEGED_HEADERS = frozenset(
         "x-auth-token",
         "x-forwarded-for",
         "x-forwarded-host",
+        "x-forwarded-proto",
+        "forwarded",
         "x-real-ip",
         "x-original-url",
         "x-rewrite-url",
@@ -169,6 +179,16 @@ def zero_width_codepoints(text: str) -> list[int]:
     """Return codepoints of every zero-width / BOM character in ``text``."""
 
     return [ord(char) for char in text if ord(char) in ZERO_WIDTH_CODEPOINTS]
+
+
+def variation_selector_codepoints(text: str) -> list[int]:
+    """Return codepoints of every Unicode variation selector in ``text``."""
+
+    return [
+        ord(char)
+        for char in text
+        if any(low <= ord(char) <= high for low, high in VARIATION_SELECTOR_RANGES)
+    ]
 
 
 def concealment_codepoints(text: str) -> list[int]:
@@ -241,6 +261,23 @@ def _unicode_findings(tool: ToolDefinition) -> list[AuditFinding]:
                     field_path=path,
                     message="Bidirectional control characters can reorder text so the approved metadata is not what the model reads",
                     evidence=_hex_codepoints(bidi),
+                )
+            )
+
+        variation = variation_selector_codepoints(text)
+        if variation:
+            findings.append(
+                AuditFinding(
+                    rule_id="UNICODE_VARIATION_SELECTOR",
+                    severity="HIGH",
+                    tool_name=tool.name,
+                    field_path=path,
+                    message=(
+                        "Unicode variation selectors can pick an alternate glyph or"
+                        " carry an invisible marker, so the rendered metadata need"
+                        " not be the bytes the model reads"
+                    ),
+                    evidence=_hex_codepoints(variation),
                 )
             )
 

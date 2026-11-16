@@ -50,6 +50,8 @@ INGEST_VERBS = frozenset(
         "receive",
         "inspect",
         "view",
+        "harvest",
+        "extract",
     }
 )
 
@@ -69,6 +71,7 @@ EXTERNAL_CONTENT_NOUNS = frozenset(
         "slack",
         "discord",
         "ticket",
+        "tickets",
         "web",
         "webpage",
         "page",
@@ -110,6 +113,8 @@ READ_VERBS = frozenset(
         "fetch",
         "balance",
         "ledger",
+        "harvest",
+        "extract",
     }
 )
 
@@ -193,6 +198,9 @@ OUTBOUND_VERBS = frozenset(
         "curl",
         "http",
         "request",
+        "dispatch",
+        "relay",
+        "emit",
         "write",
         "append",
         "update",
@@ -224,6 +232,9 @@ EXTERNAL_TARGETS = frozenset(
         "s3",
         "external",
         "remote",
+        "dest",
+        "destination",
+        "sink",
     }
 )
 
@@ -350,10 +361,35 @@ def _parameter_names(tool: ToolDefinition) -> list[str]:
     return [str(name) for name in properties]
 
 
+def _enum_value_tokens(tool: ToolDefinition) -> set[str]:
+    """Tokens from string ``enum`` values on parameter schemas.
+
+    A generic dispatcher (``invoke_connector(action: enum["read","upload"])``)
+    hides its real capability in the enum, not in its name, so the enum values
+    are tokenized exactly like identifiers.
+    """
+
+    tokens: set[str] = set()
+    properties = tool.inputSchema.get("properties")
+    if not isinstance(properties, dict):
+        return tokens
+    for schema in properties.values():
+        if not isinstance(schema, dict):
+            continue
+        values = schema.get("enum")
+        if not isinstance(values, list):
+            continue
+        for value in values:
+            if isinstance(value, str):
+                tokens.update(tokenize_identifier(value))
+    return tokens
+
+
 def _tool_tokens(tool: ToolDefinition) -> set[str]:
     tokens = set(tokenize_identifier(tool.name))
     for parameter in _parameter_names(tool):
         tokens.update(tokenize_identifier(parameter))
+    tokens.update(_enum_value_tokens(tool))
     return tokens
 
 

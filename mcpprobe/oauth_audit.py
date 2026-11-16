@@ -25,7 +25,7 @@ import hashlib
 import re
 from collections.abc import Sequence
 from typing import Any, Literal
-from urllib.parse import urlsplit
+from urllib.parse import parse_qsl, urlsplit
 
 import httpx
 from pydantic import BaseModel, Field
@@ -79,7 +79,7 @@ LOOPBACK_HOSTS = frozenset({"localhost", "127.0.0.1", "::1", "[::1]"})
 IDENTITY_SERVER_TOKENS = frozenset({"auth", "oauth", "oidc", "iam", "sso", "login"})
 
 #: Tool parameters that carry someone else's OAuth token.
-TOKEN_PARAMETER_NAMES = frozenset(
+PASSTHROUGH_PARAM_NAMES = frozenset(
     {
         "access_token",
         "id_token",
@@ -89,7 +89,19 @@ TOKEN_PARAMETER_NAMES = frozenset(
         "session_token",
         "auth_token",
         "jwt",
+        "user_jwt",
+        "oauth_access_token",
+        "id_jwt",
+        "bearer",
     }
+)
+
+#: Backwards-compatible alias for the original name.
+TOKEN_PARAMETER_NAMES = PASSTHROUGH_PARAM_NAMES
+
+#: Query-string keys that must never carry a live credential.
+SENSITIVE_QUERY_KEYS = frozenset(
+    {"api_key", "apikey", "token", "access_token", "secret", "password"}
 )
 
 _DUMMY_VALUES = frozenset(
@@ -208,6 +220,21 @@ def _is_sensitive_env_key(key: str) -> bool:
     return any(upper.endswith(suffix) for suffix in SENSITIVE_ENV_SUFFIXES)
 
 
+def _query_credentials(url: str | None) -> list[tuple[str, str]]:
+    """``(key, value)`` for live credentials embedded in a URL query string."""
+
+    if not url:
+        return []
+    hits: list[tuple[str, str]] = []
+    for key, value in parse_qsl(urlsplit(url).query, keep_blank_values=True):
+        if key.lower() not in SENSITIVE_QUERY_KEYS:
+            continue
+        if not value or is_dummy_value(value) or _is_template_value(value):
+            continue
+        hits.append((key, value))
+    return hits
+
+
 def _sensitive_credentials(spec: ServerSpec) -> list[tuple[str, str, str]]:
     """``(field_path, label, raw_value)`` for every credential on a spec."""
 
@@ -259,10 +286,10 @@ def _token_carriers(tool: ToolDefinition) -> list[tuple[str, str]]:
 
     for name in sorted(properties):
         schema = properties[name]
-        if _normalize_token_name(name) in TOKEN_PARAMETER_NAMES:
+        if _normalize_token_name(name) in PASSTHROUGH_PARAM_NAMES:
             hits.append((f"inputSchema.properties.{name}", name))
         header = schema.get("x-mcp-header") if isinstance(schema, dict) else None
-        if isinstance(header, str) and _normalize_token_name(header) in TOKEN_PARAMETER_NAMES:
+        if isinstance(header, str) and _normalize_token_name(header) in PASSTHROUGH_PARAM_NAMES:
             hits.append((f"inputSchema.properties.{name}.x-mcp-header", header))
     return hits
 
@@ -298,6 +325,26 @@ def audit_auth_specs(
                         " environment reference or secret store."
                     ),
                     evidence=f"{label}: {redact_secret(value)}",
+                )
+            )
+
+        # HARDCODED_STATIC_CREDENTIAL in the URL query string. Query strings
+        # leak into access logs, proxies and Referer headers, so a literal key
+        # there is both exposed and unrotatable.
+        for key, value in _query_credentials(spec.url):
+            findings.append(
+                AuthFinding(
+                    rule_id="HARDCODED_STATIC_CREDENTIAL",
+                    severity="HIGH",
+                    servers=[spec.server_id],
+                    field_path=f"url.query.{key}",
+                    message=(
+                        f"server '{spec.server_id}' carries a literal credential in"
+                        f" its URL query string ({key}=...); query strings are logged"
+                        " by proxies and servers. Move it to a header from an"
+                        " environment reference."
+                    ),
+                    evidence=f"{key}: {redact_secret(value)}",
                 )
             )
 

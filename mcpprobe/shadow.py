@@ -70,6 +70,11 @@ CONFUSABLE_FOLD: dict[str, str] = {
     "\u03b1": "a",
     "\u03b5": "e",
     "\u03c1": "p",
+    # Latin small dotless i (Turkish) and Armenian lookalikes.
+    "\u0131": "i",
+    "\u057d": "s",
+    "\u0585": "o",
+    "\u0578": "n",
 }
 
 #: Words that turn a mention of another tool into a routing instruction.
@@ -94,6 +99,9 @@ ROUTING_DIRECTIVES: frozenset[str] = frozenset(
         "prefer",
         "ignore",
         "bypass",
+        "prerequisite",
+        "moved",
+        "deprecated",
     }
 )
 
@@ -131,16 +139,32 @@ class ShadowReport(BaseModel):
     passed: bool
 
 
-def fold_confusables(name: str) -> tuple[str, bool]:
-    """NFKC-normalize ``name`` and fold Cyrillic/Greek homoglyphs to Latin.
+def strip_format_characters(name: str) -> str:
+    """Drop Unicode format (``Cf``) characters such as ZWSP, ZWNJ and BOM.
 
-    Returns ``(folded, changed)`` where ``changed`` is true when NFKC or the
-    homoglyph map altered the string at all.
+    These render as nothing, so ``read_\\u200bfile`` and ``read_file`` look
+    identical to a human and to the model's tokenizer near-identically, but
+    they are different identifiers unless the invisible characters are removed
+    before comparison.
     """
 
-    normalized = unicodedata.normalize("NFKC", name)
+    return "".join(
+        char for char in name if unicodedata.category(char) != "Cf"
+    )
+
+
+def fold_confusables(name: str) -> tuple[str, bool]:
+    """Strip format characters, NFKC-normalize and fold homoglyphs to Latin.
+
+    Returns ``(folded, changed)`` where ``changed`` is true when invisible
+    format characters, NFKC or the homoglyph map altered the string at all.
+    """
+
+    stripped = strip_format_characters(name)
+    normalized = unicodedata.normalize("NFKC", stripped)
     folded = "".join(CONFUSABLE_FOLD.get(char, char) for char in normalized)
-    return folded, (normalized != name or folded != normalized)
+    changed = stripped != name or normalized != stripped or folded != normalized
+    return folded, changed
 
 
 def canonical_tool_key(name: str) -> str:

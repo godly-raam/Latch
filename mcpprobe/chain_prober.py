@@ -22,7 +22,10 @@ Every static ``TrifectaPath`` therefore resolves to ``CONFIRMED_EXPLOITABLE``,
 from __future__ import annotations
 
 import asyncio
+import base64
+import binascii
 import contextlib
+import re
 import uuid
 from collections.abc import Sequence
 from contextlib import AsyncExitStack
@@ -83,6 +86,30 @@ PAYLOAD_PARAMS = frozenset(
 
 #: How long to wait for the sink to finish recording an in-flight request.
 SINK_FLUSH_SECONDS = 0.05
+
+#: Candidate base64 runs inside a captured request field.
+_BASE64_RUN_RE = re.compile(r"[A-Za-z0-9+/_-]{8,}={0,2}")
+
+
+def _decode_base64_runs(value: str) -> str:
+    """Decode every base64-looking run in ``value`` and join the results.
+
+    Encoding a whole payload is not the same as encoding the needle: the
+    base64 of ``prefix + canary`` does not contain the base64 of ``canary``.
+    So a base64 body is decoded and searched in the clear rather than being
+    compared against precomputed encodings alone.
+    """
+
+    decoded_parts: list[str] = []
+    for run in _BASE64_RUN_RE.findall(value):
+        candidate = run.replace("-", "+").replace("_", "/").rstrip("=")
+        candidate += "=" * (-len(candidate) % 4)
+        try:
+            decoded = base64.b64decode(candidate, validate=True)
+        except (binascii.Error, ValueError):
+            continue
+        decoded_parts.append(decoded.decode("utf-8", "replace"))
+    return "\n".join(decoded_parts)
 
 
 class ChainProbeResult(BaseModel):
@@ -201,7 +228,20 @@ class CanarySinkServer:
             await writer.wait_closed()
 
     def find_canary(self, canary_token: str) -> tuple[str, str] | None:
-        """Return ``(request summary, matched field)`` for the token, if seen."""
+        """Return ``(request summary, matched field)`` for the token, if seen.
+
+        Egress tools routinely encode the payload (base64 JSON bodies, padded
+        or URL-safe alphabets), so the raw token plus its two standard base64
+        encodings are all accepted. The matched field is suffixed with
+        ``(base64)`` when an encoding is what crossed the wire.
+        """
+
+        raw = canary_token.encode("utf-8")
+        needles: list[tuple[str, str]] = [
+            (canary_token, ""),
+            (base64.b64encode(raw).decode("ascii"), " (base64)"),
+            (base64.urlsafe_b64encode(raw).decode("ascii").rstrip("="), " (base64)"),
+        ]
 
         for request in self.captured_requests:
             fields: list[tuple[str, str]] = [
@@ -212,8 +252,11 @@ class CanarySinkServer:
                 (f"header:{name}", value) for name, value in request["headers"].items()
             )
             for field, value in fields:
-                if canary_token in value:
-                    return f"{request['method']} {request['path']}", field
+                for needle, suffix in needles:
+                    if needle and needle in value:
+                        return f"{request['method']} {request['path']}", f"{field}{suffix}"
+                if canary_token and canary_token in _decode_base64_runs(value):
+                    return f"{request['method']} {request['path']}", f"{field} (base64)"
         return None
 
 

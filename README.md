@@ -1,7 +1,7 @@
 # Latch
 
 `latch` (Python package `mcpprobe`) is a deterministic security tool for
-[Model Context Protocol](https://modelcontextprotocol.io) servers. Five
+[Model Context Protocol](https://modelcontextprotocol.io) servers. Six
 engines, no LLM in the loop:
 
 | Engine | Question it answers | Commands |
@@ -11,6 +11,7 @@ engines, no LLM in the loop:
 | **Lethal-trifecta capability graph** | "Can one agent combine untrusted input, private data and external egress?" | `graph` |
 | **Cross-server shadowing detector** | "Is another server impersonating a trusted tool, or steering the model away from it?" | `shadow`, `graph --check-shadow` |
 | **OAuth authorization auditor** | "Are credentials reused, hardcoded, cleartext or passed through as tool arguments?" | `auth-audit` |
+| **Execution-aware chain prober** | "Does a static trifecta chain actually exfiltrate when the tools run?" | `probe-chain` |
 
 Latch captures a server's `tools/list` response, pins every tool definition into
 a reviewable lockfile with a SHA-256 digest, and later proves that the live tool
@@ -51,6 +52,9 @@ latch graph  --config .cursor/mcp.json --check-shadow
 
 # Audit OAuth credentials, audience binding and RFC 9728 metadata.
 latch auth-audit --config .cursor/mcp.json --live --sarif auth.sarif
+
+# Prove a static trifecta chain actually fires, with a loopback canary sink.
+latch probe-chain --config .cursor/mcp.json --trust-server local-db
 
 # Write SARIF 2.1.0 for GitHub code scanning (exit codes unchanged).
 latch graph  --config .cursor/mcp.json --sarif latch.sarif
@@ -158,6 +162,7 @@ mcpprobe verify --input tools-list.json --lockfile mcpprobe.lock.json --audit
 | `UNICODE_TAG_BLOCK` | CRITICAL | Codepoints `U+E0000`–`U+E007F`; the hidden ASCII payload is decoded into `evidence`. |
 | `UNICODE_BIDI_OVERRIDE` | HIGH | `U+202A`–`U+202E`, `U+2066`–`U+2069`, `U+200E`, `U+200F`, `U+061C`. |
 | `UNICODE_ZERO_WIDTH` | MEDIUM | `U+200B`, `U+200C`, `U+200D`, `U+2060`, `U+FEFF`. |
+| `UNICODE_VARIATION_SELECTOR` | HIGH | `U+FE00`–`U+FE0F` and `U+E0100`–`U+E01EF` variation selectors, which can pick an invisible alternate glyph. |
 | `HEADER_PRIVILEGED_INJECTION` | CRITICAL | `x-mcp-header` bound to `Authorization`, `Cookie`, `Host`, `X-API-Key`, `X-Forwarded-For` and friends. |
 | `HEADER_CRLF_CONTROL` | CRITICAL | CR/LF/NUL or any ASCII control character in an `x-mcp-header` value. |
 | `HEADER_SPEC_VIOLATION` | HIGH | Non-string/empty header name, duplicate case-insensitive header name, or a parameter type other than `string`/`integer`/`boolean`. |
@@ -213,13 +218,15 @@ pass `--live` or supply a static snapshot. At least one `--config` or
 Each tool is tagged with zero, one, or several capabilities, using annotation
 hints, JSON Schema parameter signatures, and **identifier tokenization**
 (`readFile` → `read` + `file`) — never substring matching, so `asset_manager`
-cannot masquerade as `ssh` access.
+cannot masquerade as `ssh` access. Enum values on parameter schemas are
+classified the same way, so a generic `invoke_connector(action: enum["read",
+"upload"])` cannot hide its `upload` capability behind an uninformative name.
 
 | Capability | Signal |
 | ---------- | ------ |
 | `UNTRUSTED_INPUT` | Ingestion verb (`get`, `read`, `fetch`, `list`, `search` …) with an external content noun (`issue`, `comment`, `email`, `web`, `log` …), or `openWorldHint: true` on a non-destructive tool. |
 | `PRIVATE_DATA_READ` | Read/query verb with a sensitive resource token (`file`, `env`, `secret`, `ssh`, `wallet`, `account`, `sql`, `vault` …), or a read-only closed-world tool taking a `path`/`query`/`sql`/`id` parameter. |
-| `EXTERNAL_EGRESS` | Outbound verb (`send`, `post`, `upload`, `reply`, `webhook` …) with an external target (`url`, `endpoint`, `channel`, `repo` …), an outbound sink parameter (`webhook_url`, `recipient`, `to` …), an `x-mcp-header` binding, or `openWorldHint: true` without `readOnlyHint`. |
+| `EXTERNAL_EGRESS` | Outbound verb (`send`, `post`, `upload`, `dispatch`, `relay` …) with an external target (`url`, `endpoint`, `dest`, `sink`, `repo` …), an outbound sink parameter (`webhook_url`, `recipient`, `to` …), an `x-mcp-header` binding, or `openWorldHint: true` without `readOnlyHint`. |
 
 Every `ingest → read → egress` chain becomes a ranked path:
 
@@ -254,6 +261,35 @@ tool and the egress tool are different, so a write-only sink such as
 And `ledger`/`ledgers` are sensitive resource tokens, so `read_ledger` and
 `get_ledger` classify as `PRIVATE_DATA_READ` without any naming ceremony.
 
+## Execution-aware verification: `probe-chain`
+
+`latch graph` answers "could this chain fire?". It cannot see RBAC, an egress
+allowlist, or a tool that simply ignores its arguments, so on a hardened server
+a static CRITICAL can be a false positive — the BloodHound problem. `latch
+probe-chain` settles it by executing both halves of every static chain:
+
+```bash
+latch probe-chain --config .cursor/mcp.json
+latch probe-chain --config .cursor/mcp.json --trust-server local-db --format json
+```
+
+The prober calls the read tool with benign read-only arguments, then calls the
+egress tool with an ephemeral HTTP sink bound to `127.0.0.1:0` inside its own
+process, using a fresh `LATCH-CANARY-<16hex>` token. Nothing leaves the machine
+and nothing is written: success is proven by the sink receiving the canary, not
+by trusting the tool's own reply text.
+
+| Status | Meaning |
+| ------ | ------- |
+| `CONFIRMED_EXPLOITABLE` | The canary reached the sink: the chain is a real exfiltration path. |
+| `BLOCKED_AT_READ` | The read tool refused (RBAC/scope), so no private data entered the context. |
+| `BLOCKED_AT_EGRESS` | The egress tool ran but the canary never arrived (allowlist, validation). |
+| `INCONCLUSIVE_SCHEMA` | The chain cannot be parameterized (no URL/sink or string payload). |
+
+Exit `1` when any path is confirmed, `0` otherwise. The sink matches the raw
+canary, its base64 encodings, and decodes base64 request bodies, so an egress
+tool that wraps or relocates the payload is still caught.
+
 ## Cross-server tool shadowing & hijacking
 
 Several MCP servers share one flat tool namespace, so a hostile server can
@@ -276,7 +312,9 @@ latch graph  --config .cursor/mcp.json --check-shadow
 
 Names are folded with NFKC plus a fixed homoglyph map and compared on a
 canonical key, so `read_file` and `rеad_file` collide while `read_file` and
-`read_file_metadata` do not. Directive words alone are not enough: the text must
+`read_file_metadata` do not. Invisible format characters (`U+200B`, `U+200C`,
+`U+200D`, `U+FEFF`) and Latin/Armenian lookalikes are folded too, so
+`read_<ZWSP>file` collides. Directive words alone are not enough: the text must
 also name a tool owned by another server. `--trust-server` bars a server from
 being a hijack source and makes shadowing it CRITICAL.
 
@@ -296,7 +334,7 @@ latch auth-audit --config .cursor/mcp.json --live --sarif auth.sarif
 | Rule | Severity | Detects |
 | ---- | -------- | ------- |
 | `CROSS_SERVER_CREDENTIAL_REUSE` | CRITICAL | Two or more servers send the same credential, literal or the same `${ENV}` reference. |
-| `HARDCODED_STATIC_CREDENTIAL` | HIGH | A sensitive header/env value that is neither an interpolation nor a dummy. |
+| `HARDCODED_STATIC_CREDENTIAL` | HIGH | A sensitive header/env value, or a literal `api_key`/`token` in the server URL query string, that is neither an interpolation nor a dummy. |
 | `INSECURE_HTTP_AUTH_TRANSPORT` | CRITICAL | A non-loopback `http://` server with credentials configured, or probed live. |
 | `TOKEN_PASSTHROUGH_RISK` | HIGH | A non-identity server accepts `access_token`/`refresh_token`/… as a parameter or header binding. |
 | `OPEN_UNAUTHENTICATED_REMOTE_MCP` | HIGH | A public HTTP endpoint answers `server/discover` with a 200 result and no auth. |
@@ -363,6 +401,38 @@ normalizing credentials and analyzing capability chains. Per-case detail,
 including which engine fired and which keywords the baseline matched, is in
 [`benchmark/RESULTS.md`](benchmark/RESULTS.md); raw numbers are in
 [`benchmark/results.json`](benchmark/results.json).
+
+## Evaluations: disclosed CVEs and adversarial self-red-team
+
+Two deterministic corpora keep the engines honest, both regenerable offline:
+
+| Suite | Corpus | Result | Report |
+| ----- | ------ | ------ | ------ |
+| Real-world advisories | 24 targets: 12 pre-patch, 8 post-patch, 4 official upstream reference servers | 100% in-scope recall, 0.00 FPR on every post-patch and upstream server, 2 honest out-of-scope handler-bug misses | [`cve_eval/CVE_EVAL_REPORT.md`](cve_eval/CVE_EVAL_REPORT.md) |
+| Adversarial self-red-team | 24 evasion probes in 7 families | 19/19 hardened catches (100%), 5/5 irreducible static boundaries documented and left unflagged | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
+
+`cve_eval/` reconstructs the mechanisms behind 2025–2026 MCP advisories —
+gateway token passthrough, cleartext Atlassian transport, WhatsApp post-approval
+rug pull, GitHub issue-to-repo trifecta, `x-mcp-header` and Unicode poisoning,
+registry homoglyphs, RFC 9728 gaps, and runtime allowlist patches — and pairs
+each with its patched counterpart. It also counts what Latch does *not* claim: a
+symlink/path-canonicalization traversal and a SQL string-concatenation
+injection inside tool handlers are recorded as false negatives, because no
+manifest-level analyzer can see them.
+
+`adversarial/` attacks Latch itself: new capability vocabulary, `enum`
+indirection, zero-width and Armenian homoglyphs, `prerequisite`/`moved`
+directives, variation selectors, nested header bindings, new passthrough
+parameter names, credentials in URL query strings, and base64/query/4-hop
+runtime exfiltration. It also pins five boundaries — word-order inversion, pure
+paraphrase, opaque `op_1`/`op_2`/`op_3` names, metaphorical codebooks and
+overprivileged IdP scopes — where Latch stays silent on purpose, because the
+rules that would catch them flag legitimate registries.
+
+```bash
+python -m cve_eval.run_cve_eval
+python -m adversarial.run_evasion
+```
 
 ## GitHub Actions
 
@@ -468,5 +538,7 @@ print(report.passed, [item.kind for item in report.drift])
 ```bash
 .venv/bin/pytest -v
 python -m benchmark.run_benchmark
+python -m cve_eval.run_cve_eval
+python -m adversarial.run_evasion
 bash demo.sh
 ```
