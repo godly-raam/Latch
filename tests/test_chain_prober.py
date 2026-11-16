@@ -38,22 +38,49 @@ def tool(
     )
 
 
-def write_chain_config(tmp_path: Path, *roles: str) -> Path:
+SAFETY = ("--i-understand-this-executes-tools", "--allow-all-tools")
+
+
+def fixture_args(*roles: str) -> list[str]:
     args = [str(FIXTURE)]
     for role in roles:
         args.extend(["--role", role])
+    return args
+
+
+def write_chain_config(tmp_path: Path, *roles: str) -> Path:
     payload = {
-        "mcpServers": {"chain": {"command": sys.executable, "args": args}}
+        "mcpServers": {"chain": {"command": sys.executable, "args": fixture_args(*roles)}}
     }
     path = tmp_path / "chain.json"
     path.write_text(json.dumps(payload), encoding="utf-8")
     return path
 
 
-def run_probe(config: Path, *extra: str) -> Any:
+def write_two_chain_config(tmp_path: Path, *roles: str) -> Path:
+    payload = {
+        "mcpServers": {
+            server_id: {"command": sys.executable, "args": fixture_args(*roles)}
+            for server_id in ("alpha", "beta")
+        }
+    }
+    path = tmp_path / "two-chains.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def run_probe(config: Path, *extra: str, safety: tuple[str, ...] = SAFETY) -> Any:
     return CliRunner().invoke(
         cli,
-        ["probe-chain", "--config", str(config), "--format", "json", *extra],
+        [
+            "probe-chain",
+            "--config",
+            str(config),
+            "--format",
+            "json",
+            *safety,
+            *extra,
+        ],
     )
 
 
@@ -335,7 +362,7 @@ def test_no_seed_canary_cannot_confirm_propagation(tmp_path: Path) -> None:
     assert payload["confirmed_exploitable"] == 0
     [probe] = payload["results"]
     assert probe["status"] == "BLOCKED_AT_EGRESS"
-    assert "without forwarding canary payload" in probe["block_reason"]
+    assert "without forwarding the canary payload" in probe["block_reason"]
 
 
 def test_trusted_servers_remove_the_chain(tmp_path: Path) -> None:
@@ -377,7 +404,9 @@ def test_probe_chain_malformed_manifest_exits_two() -> None:
 def test_cli_text_output_prints_status_and_evidence(tmp_path: Path) -> None:
     config = write_chain_config(tmp_path, "read-open", "egress-open")
 
-    result = CliRunner().invoke(cli, ["probe-chain", "--config", str(config)])
+    result = CliRunner().invoke(
+        cli, ["probe-chain", "--config", str(config), *SAFETY]
+    )
 
     assert result.exit_code == 1, result.output
     assert "CONFIRMED_EXPLOITABLE" in result.output
@@ -393,7 +422,15 @@ def test_sarif_emits_confirmed_chain_only(tmp_path: Path) -> None:
     sarif_path = tmp_path / "chain.sarif"
 
     result = CliRunner().invoke(
-        cli, ["probe-chain", "--config", str(config), "--sarif", str(sarif_path)]
+        cli,
+        [
+            "probe-chain",
+            "--config",
+            str(config),
+            "--sarif",
+            str(sarif_path),
+            *SAFETY,
+        ],
     )
 
     assert result.exit_code == 1, result.output
@@ -411,7 +448,15 @@ def test_sarif_has_no_error_for_blocked_chains(tmp_path: Path) -> None:
     sarif_path = tmp_path / "chain.sarif"
 
     result = CliRunner().invoke(
-        cli, ["probe-chain", "--config", str(config), "--sarif", str(sarif_path)]
+        cli,
+        [
+            "probe-chain",
+            "--config",
+            str(config),
+            "--sarif",
+            str(sarif_path),
+            *SAFETY,
+        ],
     )
 
     assert result.exit_code == 0, result.output
@@ -456,3 +501,209 @@ def test_to_sarif_chain_report_round_trip(tmp_path: Path) -> None:
     assert entry["locations"][0]["physicalLocation"]["artifactLocation"]["uri"] == (
         "chain.json"
     )
+
+
+# -- execution safety gates -------------------------------------------------
+
+
+def test_probe_chain_refuses_to_execute_without_consent(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(config, safety=("--allow-all-tools",))
+
+    assert result.exit_code == 2, result.output
+    combined = result.output + getattr(result, "stderr", "")
+    assert "i-understand-this-executes-tools" in combined
+    assert "--dry-run" in combined
+
+
+def test_probe_chain_requires_a_tool_allowlist(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(config, safety=("--i-understand-this-executes-tools",))
+
+    assert result.exit_code == 2, result.output
+    combined = result.output + getattr(result, "stderr", "")
+    assert "--allow-tool" in combined
+    assert "--allow-all-tools" in combined
+
+
+def test_dry_run_synthesizes_arguments_without_executing(tmp_path: Path) -> None:
+    # read-denied would block a real probe; a dry run must never call it.
+    config = write_chain_config(tmp_path, "read-denied", "egress-open")
+
+    result = run_probe(config, "--dry-run", safety=())
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["dry_run_count"] == 1
+    assert payload["confirmed_exploitable"] == 0
+    assert payload["passed"] is True
+    [probe] = payload["results"]
+    assert probe["status"] == "DRY_RUN_SKIPPED"
+    assert probe["read_observed"] is False
+    assert probe["egress_invoked"] is False
+    assert probe["read_args"] == {"query": "SELECT * FROM records LIMIT 1"}
+    assert probe["egress_args"]["webhook_url"].endswith("/exfil")
+    assert "read output from chain:read_ledger" in probe["egress_args"]["payload"]
+
+
+def test_dry_run_text_output_prints_the_arguments(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = CliRunner().invoke(
+        cli, ["probe-chain", "--config", str(config), "--dry-run"]
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "DRY_RUN_SKIPPED" in result.output
+    assert "read args: " in result.output
+    assert "egress args: " in result.output
+
+
+def test_allow_tool_scopes_which_paths_are_invoked(tmp_path: Path) -> None:
+    config = write_two_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(
+        config,
+        "--allow-tool",
+        "alpha:*",
+        safety=("--i-understand-this-executes-tools",),
+    )
+
+    assert result.exit_code == 1, result.output
+    payload = json.loads(result.output)
+    confirmed = [
+        probe
+        for probe in payload["results"]
+        if probe["status"] == "CONFIRMED_EXPLOITABLE"
+    ]
+    skipped = [
+        probe
+        for probe in payload["results"]
+        if probe["status"] == "SKIPPED_NOT_ALLOWLISTED"
+    ]
+    assert payload["confirmed_exploitable"] == len(confirmed) >= 1
+    assert payload["skipped_not_allowlisted_count"] == len(skipped) >= 1
+    for probe in confirmed:
+        assert probe["read_tool"].startswith("alpha:")
+        assert probe["egress_tool"].startswith("alpha:")
+    for probe in skipped:
+        assert not (
+            probe["read_tool"].startswith("alpha:")
+            and probe["egress_tool"].startswith("alpha:")
+        )
+        assert probe["egress_invoked"] is False
+        assert probe["read_observed"] is False
+        assert probe["verified_severity"] == probe["static_severity"]
+
+
+def test_ssrf_guarded_egress_is_unconfirmed_not_blocked(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-ssrf-guard")
+
+    result = run_probe(config)
+
+    assert result.exit_code == 1, result.output
+    payload = json.loads(result.output)
+    assert payload["confirmed_exploitable"] == 0
+    assert payload["unconfirmed_ssrf_count"] == 1
+    assert payload["blocked_count"] == 0
+    assert payload["passed"] is False
+    [probe] = payload["results"]
+    assert probe["status"] == "UNCONFIRMED_SSRF_GUARD"
+    assert probe["verified_severity"] == "CRITICAL"
+    assert probe["canary_captured_at_sink"] is False
+    assert "SSRF" in probe["block_reason"]
+    assert "--sink-url" in probe["block_reason"]
+
+
+def test_ssrf_guard_emits_sarif_warning(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-ssrf-guard")
+    sarif_path = tmp_path / "ssrf.sarif"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "probe-chain",
+            "--config",
+            str(config),
+            "--sarif",
+            str(sarif_path),
+            *SAFETY,
+        ],
+    )
+
+    assert result.exit_code == 1, result.output
+    sarif = json.loads(sarif_path.read_text(encoding="utf-8"))
+    [entry] = sarif["runs"][0]["results"]
+    assert entry["ruleId"] == "LATCH-CHAIN-UNCONFIRMED-SSRF"
+    assert entry["level"] == "warning"
+    assert entry["properties"]["chainStatus"] == "UNCONFIRMED_SSRF_GUARD"
+    assert entry["properties"]["tags"] == ["security", "CWE-200", "CWE-284"]
+
+
+def test_sink_url_forwards_canary_to_operator_sink(tmp_path: Path) -> None:
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    captured: list[bytes] = []
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self) -> None:  # noqa: N802
+            length = int(self.headers.get("Content-Length", "0"))
+            captured.append(self.rfile.read(length))
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"ok": true}')
+
+        def log_message(self, *args: object) -> None:
+            return
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        base = f"http://127.0.0.1:{server.server_port}"
+        config = write_chain_config(tmp_path, "read-open", "egress-open")
+        result = run_probe(config, "--sink-url", base)
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+    assert result.exit_code == 1, result.output
+    payload = json.loads(result.output)
+    [probe] = payload["results"]
+    assert probe["status"] == "UNCONFIRMED_SSRF_GUARD"
+    assert "external operator sink" in (probe["sink_request_summary"] or "")
+    assert captured, "operator sink received nothing"
+    assert b"LATCH-CANARY-" in b"".join(captured)
+
+
+def test_sink_url_trailing_slash_is_normalized() -> None:
+    tool_definition = tool(
+        "send_report",
+        {"url": {"type": "string"}, "payload": {"type": "string"}},
+        required=["url", "payload"],
+    )
+
+    args, has_channel = synthesize_egress_args(
+        tool_definition, "https://sink.example/collect/", "payload"
+    )
+
+    assert has_channel is True
+    assert args["url"] == "https://sink.example/collect/exfil"
+
+
+def test_egress_rejection_classifier_separates_ssrf_from_allowlist() -> None:
+    from mcpprobe.chain_prober import _is_ssrf_or_loopback_rejection
+
+    assert _is_ssrf_or_loopback_rejection(
+        "SSRF protection: loopback address 127.0.0.1 is blocked"
+    )
+    assert _is_ssrf_or_loopback_rejection("blocked private network destination")
+    assert not _is_ssrf_or_loopback_rejection(
+        "destination '127.0.0.1' is not in the *.corp.internal allowlist"
+    )
+    assert not _is_ssrf_or_loopback_rejection("rate limited, try later")

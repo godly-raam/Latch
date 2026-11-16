@@ -783,6 +783,42 @@ def auth_audit(
     help="Do not append the canary to read output before invoking egress.",
 )
 @click.option(
+    "--i-understand-this-executes-tools",
+    "acknowledge_execution",
+    is_flag=True,
+    help=(
+        "Required for a live run: confirms you consent to live tools/call"
+        " invocations."
+    ),
+)
+@click.option(
+    "--dry-run",
+    "dry_run",
+    is_flag=True,
+    help="Synthesize the read/egress arguments without calling any tool.",
+)
+@click.option(
+    "--allow-tool",
+    "allow_tools",
+    multiple=True,
+    help="Scope execution to <server:tool> or <server>:*. Repeatable.",
+)
+@click.option(
+    "--allow-all-tools",
+    "allow_all_tools",
+    is_flag=True,
+    help="Explicitly allow every tool named by a static chain.",
+)
+@click.option(
+    "--sink-url",
+    "sink_url",
+    default=None,
+    help=(
+        "Send egress to this operator-controlled base URL instead of the"
+        " loopback canary sink."
+    ),
+)
+@click.option(
     "--format",
     "output_format",
     type=click.Choice(["text", "json"]),
@@ -810,6 +846,11 @@ def probe_chain(
     server_manifests: tuple[str, ...],
     trusted_servers: tuple[str, ...],
     no_seed_canary: bool,
+    acknowledge_execution: bool,
+    dry_run: bool,
+    allow_tools: tuple[str, ...],
+    allow_all_tools: bool,
+    sink_url: str | None,
     output_format: str,
     sarif_path: Path | None,
     timeout: float,
@@ -834,12 +875,37 @@ def probe_chain(
                 " 'latch pin --stdio/--url' first."
             )
 
+        if sink_url is not None and not sink_url.startswith(("http://", "https://")):
+            _fail("--sink-url must be an http:// or https:// base URL")
+
+        # Two independent safety gates: consent to execution, and a scope for
+        # which tools may be called. Neither applies to --dry-run.
+        if not dry_run:
+            if not acknowledge_execution:
+                _fail(
+                    "probe-chain invokes live tools/call endpoints on the servers you"
+                    " named, which can change state or send data. Re-run with"
+                    " --i-understand-this-executes-tools once you consent, or use"
+                    " --dry-run to inspect the exact read/egress arguments without"
+                    " executing anything."
+                )
+            if not allow_tools and not allow_all_tools:
+                _fail(
+                    "probe-chain will invoke tools; scope it with --allow-tool"
+                    " <server:tool> (or <server>:*) or pass --allow-all-tools."
+                )
+
         report = asyncio.run(
             verify_trifecta_chains(
                 live_specs,
                 trusted_servers=set(trusted_servers) or None,
                 seed_canary=not no_seed_canary,
                 timeout=timeout,
+                sink_url=sink_url,
+                allowed_tools=(
+                    None if allow_all_tools or not allow_tools else set(allow_tools)
+                ),
+                dry_run=dry_run,
             )
         )
     except ProbeError as exc:
@@ -1156,8 +1222,14 @@ def _print_chain_report(report: ChainVerificationReport) -> None:
     click.echo(
         f"  confirmed: {report.confirmed_exploitable}"
         f"   blocked: {report.blocked_count}"
+        f"   unconfirmed-ssrf: {report.unconfirmed_ssrf_count}"
         f"   inconclusive: {report.inconclusive_count}"
     )
+    if report.skipped_not_allowlisted_count or report.dry_run_count:
+        click.echo(
+            f"  skipped-not-allowlisted: {report.skipped_not_allowlisted_count}"
+            f"   dry-run: {report.dry_run_count}"
+        )
 
     for result in report.results:
         click.echo("")
@@ -1169,11 +1241,21 @@ def _print_chain_report(report: ChainVerificationReport) -> None:
         click.echo(
             f"      {result.ingest_tool} -> {result.read_tool} -> {result.egress_tool}"
         )
+        if result.canary_token:
+            click.echo(f"      canary: {result.canary_token}")
         click.echo(
-            f"      canary: {result.canary_token}"
-            f"   read observed: {result.read_observed}"
+            f"      read observed: {result.read_observed}"
             f"   egress invoked: {result.egress_invoked}"
         )
+        if result.status in ("DRY_RUN_SKIPPED", "SKIPPED_NOT_ALLOWLISTED"):
+            click.echo(
+                "      read args: "
+                + json.dumps(result.read_args or {}, sort_keys=True)
+            )
+            click.echo(
+                "      egress args: "
+                + json.dumps(result.egress_args or {}, sort_keys=True)
+            )
         if result.sink_request_summary is not None:
             click.echo(f"      sink: {result.sink_request_summary}")
         if result.block_reason is not None:
@@ -1182,9 +1264,14 @@ def _print_chain_report(report: ChainVerificationReport) -> None:
     click.echo("")
     if report.passed:
         click.echo("RESULT: no static chain could be reproduced at runtime")
-    else:
+    elif report.confirmed_exploitable:
         click.echo(
             f"RESULT: {report.confirmed_exploitable} confirmed exploitable chain(s)"
+        )
+    else:
+        click.echo(
+            f"RESULT: {report.unconfirmed_ssrf_count} chain(s) could not be verified"
+            " (SSRF guard or unreadable operator sink); they are not proven safe"
         )
 
 

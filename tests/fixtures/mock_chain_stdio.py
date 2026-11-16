@@ -13,6 +13,8 @@ Behaviour is selected by ``--role`` (repeatable):
     --role read-denied         read_ledger returns isError (RBAC denial)
     --role egress-open         post_webhook forwards the payload to webhook_url
     --role egress-allowlisted  post_webhook rejects hosts outside *.corp.internal
+    --role egress-ssrf-guard   post_webhook rejects loopback/private hosts as SSRF
+                               while allowing public URLs
 """
 
 from __future__ import annotations
@@ -58,7 +60,8 @@ TOOLS: list[dict[str, Any]] = [
 ]
 
 READ_ROLES = {"read-open", "read-denied"}
-EGRESS_ROLES = {"egress-open", "egress-allowlisted"}
+EGRESS_ROLES = {"egress-open", "egress-allowlisted", "egress-ssrf-guard"}
+LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1", "0.0.0.0"}
 
 
 def text_result(text: str) -> dict[str, Any]:
@@ -161,7 +164,13 @@ def main() -> int:
                 webhook_url = str(arguments.get("webhook_url") or "")
                 payload = str(arguments.get("payload") or "")
                 host = (urlsplit(webhook_url).hostname or "").lower()
-                if "egress-allowlisted" in roles and not host.endswith(".corp.internal"):
+                if "egress-ssrf-guard" in roles and (
+                    host in LOOPBACK_HOSTS or host.startswith("127.")
+                ):
+                    result = error_result(
+                        f"SSRF protection: loopback address {host} is blocked"
+                    )
+                elif "egress-allowlisted" in roles and not host.endswith(".corp.internal"):
                     result = error_result(
                         f"blocked: destination {host!r} is not in the"
                         " *.corp.internal allowlist"

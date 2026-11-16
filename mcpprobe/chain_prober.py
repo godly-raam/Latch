@@ -16,7 +16,15 @@ The probe is non-destructive by construction:
   ``LATCH-CANARY-<16hex>`` token, not by trusting the tool's own text.
 
 Every static ``TrifectaPath`` therefore resolves to ``CONFIRMED_EXPLOITABLE``,
-``BLOCKED_AT_READ``, ``BLOCKED_AT_EGRESS`` or ``INCONCLUSIVE_SCHEMA``.
+``BLOCKED_AT_READ``, ``BLOCKED_AT_EGRESS``, ``UNCONFIRMED_SSRF_GUARD``,
+``INCONCLUSIVE_SCHEMA``, ``DRY_RUN_SKIPPED`` or ``SKIPPED_NOT_ALLOWLISTED``.
+
+Two limits matter for honesty. A loopback sink cannot prove public-internet
+reachability: when the egress tool rejects ``127.0.0.1`` as an SSRF/private
+address, the result is ``UNCONFIRMED_SSRF_GUARD`` (never "blocked"), keeps the
+static severity, and fails the run unless ``--sink-url`` supplies an operator
+sink. And because every probe really invokes ``tools/call``, the CLI demands
+explicit consent and a tool allowlist (or ``--dry-run``) before it runs.
 """
 
 from __future__ import annotations
@@ -43,8 +51,37 @@ ChainProbeStatus = Literal[
     "CONFIRMED_EXPLOITABLE",
     "BLOCKED_AT_READ",
     "BLOCKED_AT_EGRESS",
+    "UNCONFIRMED_SSRF_GUARD",
     "INCONCLUSIVE_SCHEMA",
+    "DRY_RUN_SKIPPED",
+    "SKIPPED_NOT_ALLOWLISTED",
 ]
+
+#: Error text that shows an egress tool refused the *destination class* rather
+#: than an operator allowlist. A loopback sink cannot prove internet egress.
+SSRF_REJECTION_INDICATORS: tuple[str, ...] = (
+    "127.0.0.1",
+    "localhost",
+    "loopback",
+    "private ip",
+    "private address",
+    "private network",
+    "internal ip",
+    "link-local",
+    "rfc1918",
+    "ssrf",
+    "non-routable",
+    "local address",
+    "0.0.0.0",
+)
+
+#: An explicit operator allowlist is a real control, not an SSRF guard.
+ALLOWLIST_INDICATORS: tuple[str, ...] = (
+    "allowlist",
+    "whitelist",
+    "approved domains",
+    "allowed hosts",
+)
 
 #: Parameters that make a read-only probe query.
 READ_QUERY_PARAMS = frozenset({"query", "sql", "statement"})
@@ -120,7 +157,7 @@ class ChainProbeResult(BaseModel):
     read_tool: str
     egress_tool: str
     static_severity: Literal["CRITICAL", "HIGH", "MEDIUM"]
-    verified_severity: Literal["CRITICAL", "MEDIUM", "LOW"]
+    verified_severity: Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
     status: ChainProbeStatus
     canary_token: str
     read_observed: bool
@@ -128,6 +165,9 @@ class ChainProbeResult(BaseModel):
     canary_captured_at_sink: bool
     sink_request_summary: str | None = None
     block_reason: str | None = None
+    #: Exact arguments Latch would send (and did send, except in dry runs).
+    read_args: dict[str, Any] | None = None
+    egress_args: dict[str, Any] | None = None
 
 
 class ChainVerificationReport(BaseModel):
@@ -139,6 +179,9 @@ class ChainVerificationReport(BaseModel):
     confirmed_exploitable: int
     blocked_count: int
     inconclusive_count: int
+    unconfirmed_ssrf_count: int = 0
+    skipped_not_allowlisted_count: int = 0
+    dry_run_count: int = 0
     results: list[ChainProbeResult] = Field(default_factory=list)
     passed: bool
 
@@ -333,7 +376,7 @@ def synthesize_egress_args(
     for name, schema in properties.items():
         key = name.lower()
         if key in URL_PARAMS:
-            args[name] = f"{sink_url}/exfil"
+            args[name] = f"{sink_url.rstrip('/')}/exfil"
             if _accepts_string(schema):
                 has_channel = True
         elif key in PAYLOAD_PARAMS:
@@ -388,14 +431,59 @@ def _error_text(result: dict[str, Any]) -> str:
     return text or "tool returned isError without a message"
 
 
+def _tool_allowed(qualified_name: str, allowed_tools: set[str] | None) -> bool:
+    """True when the ``--allow-tool`` patterns cover a ``server:tool`` name."""
+
+    if not allowed_tools:
+        return True
+    server_id, _, tool_name = qualified_name.partition(":")
+    for pattern in allowed_tools:
+        raw = pattern.strip()
+        if not raw:
+            continue
+        if raw in ("*", qualified_name):
+            return True
+        if raw.endswith(":*") and raw[:-2] == server_id:
+            return True
+        if ":" not in raw and raw == tool_name:
+            return True
+    return False
+
+
+def _is_ssrf_or_loopback_rejection(error_text: str) -> bool:
+    """True when an egress error rejects loopback/private destinations.
+
+    An explicit operator allowlist ("not in the *.corp.internal allowlist") is
+    a real control and stays a plain blocked-at-egress result; an SSRF guard
+    only blocked *our* loopback canary, so internet egress is unproven.
+    """
+
+    lowered = (error_text or "").lower()
+    if any(marker in lowered for marker in ALLOWLIST_INDICATORS):
+        return False
+    return any(marker in lowered for marker in SSRF_REJECTION_INDICATORS)
+
+
+def _classify_egress_rejection(error_text: str) -> ChainProbeStatus:
+    """Separate an SSRF/loopback guard from an operator allowlist rejection."""
+
+    if _is_ssrf_or_loopback_rejection(error_text):
+        return "UNCONFIRMED_SSRF_GUARD"
+    return "BLOCKED_AT_EGRESS"
+
+
 async def _probe_path(
     path: TrifectaPath,
     sessions: dict[str, Any],
     manifests: dict[str, list[ToolDefinition]],
-    sink: CanarySinkServer,
+    sink: CanarySinkServer | None,
     seed_canary: bool,
+    *,
+    sink_url: str | None = None,
+    allowed_tools: set[str] | None = None,
+    dry_run: bool = False,
 ) -> ChainProbeResult:
-    canary_token = f"LATCH-CANARY-{uuid.uuid4().hex[:16]}"
+    canary_token = "" if dry_run else f"LATCH-CANARY-{uuid.uuid4().hex[:16]}"
 
     read_server, read_name = _split_qualified(path.read_tool)
     egress_server, egress_name = _split_qualified(path.egress_tool)
@@ -422,7 +510,53 @@ async def _probe_path(
             block_reason="the live tool list no longer contains every tool in the path",
         )
 
+    egress_target = (
+        sink.base_url if sink is not None else (sink_url or "http://127.0.0.1:0")
+    ).rstrip("/")
     read_args = synthesize_read_args(read_tool, canary_token)
+
+    if dry_run:
+        egress_args, has_channel = synthesize_egress_args(
+            egress_tool, egress_target, f"[read output from {path.read_tool}]"
+        )
+        return ChainProbeResult(
+            **base,
+            verified_severity=path.severity,
+            status="DRY_RUN_SKIPPED",
+            read_observed=False,
+            egress_invoked=False,
+            canary_captured_at_sink=False,
+            read_args=read_args,
+            egress_args=egress_args,
+            block_reason=(
+                None
+                if has_channel
+                else "egress tool exposes no URL/sink or string payload parameter"
+            ),
+        )
+
+    if not (
+        _tool_allowed(path.read_tool, allowed_tools)
+        and _tool_allowed(path.egress_tool, allowed_tools)
+    ):
+        egress_args, _has_channel = synthesize_egress_args(
+            egress_tool, egress_target, f"[read output from {path.read_tool}]"
+        )
+        return ChainProbeResult(
+            **base,
+            verified_severity=path.severity,
+            status="SKIPPED_NOT_ALLOWLISTED",
+            read_observed=False,
+            egress_invoked=False,
+            canary_captured_at_sink=False,
+            read_args=read_args,
+            egress_args=egress_args,
+            block_reason=(
+                "path uses a tool that --allow-tool does not match, so it was not"
+                f" invoked (read={path.read_tool!r}, egress={path.egress_tool!r})"
+            ),
+        )
+
     read_result = await sessions[read_server].call_tool(read_name, read_args)
 
     if _is_error_result(read_result):
@@ -445,7 +579,7 @@ async def _probe_path(
         tainted_payload = read_text
 
     egress_args, has_channel = synthesize_egress_args(
-        egress_tool, sink.base_url, tainted_payload
+        egress_tool, egress_target, tainted_payload
     )
     if not has_channel:
         return ChainProbeResult(
@@ -455,6 +589,7 @@ async def _probe_path(
             read_observed=True,
             egress_invoked=False,
             canary_captured_at_sink=False,
+            read_args=read_args,
             block_reason=(
                 "egress tool exposes no URL/sink or string payload parameter, so"
                 " exfiltration cannot be parameterized"
@@ -462,22 +597,42 @@ async def _probe_path(
         )
 
     egress_result = await sessions[egress_server].call_tool(egress_name, egress_args)
-    await asyncio.sleep(SINK_FLUSH_SECONDS)
-
-    match = sink.find_canary(canary_token)
-    if match is not None:
-        summary, field = match
-        return ChainProbeResult(
-            **base,
-            verified_severity="CRITICAL",
-            status="CONFIRMED_EXPLOITABLE",
-            read_observed=True,
-            egress_invoked=True,
-            canary_captured_at_sink=True,
-            sink_request_summary=f"{summary} (matched {field})",
-        )
+    if sink is not None:
+        await asyncio.sleep(SINK_FLUSH_SECONDS)
+        match = sink.find_canary(canary_token)
+        if match is not None:
+            summary, field = match
+            return ChainProbeResult(
+                **base,
+                verified_severity="CRITICAL",
+                status="CONFIRMED_EXPLOITABLE",
+                read_observed=True,
+                egress_invoked=True,
+                canary_captured_at_sink=True,
+                sink_request_summary=f"{summary} (matched {field})",
+                read_args=read_args,
+                egress_args=egress_args,
+            )
 
     if _is_error_result(egress_result):
+        error_text = _error_text(egress_result)
+        if _classify_egress_rejection(error_text) == "UNCONFIRMED_SSRF_GUARD":
+            return ChainProbeResult(
+                **base,
+                verified_severity=path.severity,
+                status="UNCONFIRMED_SSRF_GUARD",
+                read_observed=True,
+                egress_invoked=True,
+                canary_captured_at_sink=False,
+                read_args=read_args,
+                egress_args=egress_args,
+                block_reason=(
+                    f"{error_text} -- loopback/private-IP SSRF protection blocked"
+                    " the canary destination, so public-internet exfiltration is"
+                    " UNCONFIRMED (not blocked). Re-run with --sink-url to target"
+                    " an operator-controlled external sink."
+                ),
+            )
         return ChainProbeResult(
             **base,
             verified_severity="LOW",
@@ -485,7 +640,30 @@ async def _probe_path(
             read_observed=True,
             egress_invoked=True,
             canary_captured_at_sink=False,
-            block_reason=_error_text(egress_result),
+            read_args=read_args,
+            egress_args=egress_args,
+            block_reason=error_text,
+        )
+
+    if sink is None:
+        return ChainProbeResult(
+            **base,
+            verified_severity=path.severity,
+            status="UNCONFIRMED_SSRF_GUARD",
+            read_observed=True,
+            egress_invoked=True,
+            canary_captured_at_sink=False,
+            read_args=read_args,
+            egress_args=egress_args,
+            sink_request_summary=(
+                f"external operator sink targeted: {egress_target}/exfil"
+                " (local read-back skipped)"
+            ),
+            block_reason=(
+                "egress tool accepted the call and sent the payload to the"
+                " operator sink, but an external sink cannot be read back, so"
+                " exfiltration is UNVERIFIED rather than blocked."
+            ),
         )
 
     return ChainProbeResult(
@@ -495,8 +673,12 @@ async def _probe_path(
         read_observed=True,
         egress_invoked=True,
         canary_captured_at_sink=False,
+        read_args=read_args,
+        egress_args=egress_args,
         block_reason=(
-            "egress tool completed without forwarding canary payload to loopback sink"
+            "egress tool completed without forwarding the canary payload to the"
+            " loopback sink; if the server blocks loopback silently, re-run with"
+            " --sink-url"
         ),
     )
 
@@ -508,8 +690,18 @@ async def verify_trifecta_chains(
     seed_canary: bool = True,
     timeout: float = DEFAULT_TIMEOUT,
     http_transport: httpx.AsyncBaseTransport | None = None,
+    sink_url: str | None = None,
+    allowed_tools: set[str] | None = None,
+    dry_run: bool = False,
 ) -> ChainVerificationReport:
-    """Execute every static trifecta path against the live servers."""
+    """Execute (or dry-run) every static trifecta path against the live servers.
+
+    ``allowed_tools`` scopes which ``server:tool`` names may be invoked; every
+    other path is reported ``SKIPPED_NOT_ALLOWLISTED`` and never called. ``None``
+    means unrestricted -- the CLI requires the operator to choose a scope.
+    ``sink_url`` replaces the loopback canary sink with an operator endpoint.
+    ``dry_run`` synthesizes the arguments without calling any tool.
+    """
 
     live_specs = [spec for spec in specs if spec.transport in ("stdio", "http")]
     manifests: dict[str, list[ToolDefinition]] = {}
@@ -525,13 +717,25 @@ async def verify_trifecta_chains(
             sessions[spec.server_id] = session
             manifests[spec.server_id] = await session.list_tools()
 
-        sink = await stack.enter_async_context(CanarySinkServer())
+        sink: CanarySinkServer | None = None
+        if sink_url is None and not dry_run:
+            sink = await stack.enter_async_context(CanarySinkServer())
+
         graph = analyze_capability_graph(
             manifests, trusted_servers=trusted_servers or None
         )
 
         results = [
-            await _probe_path(path, sessions, manifests, sink, seed_canary)
+            await _probe_path(
+                path,
+                sessions,
+                manifests,
+                sink,
+                seed_canary,
+                sink_url=sink_url,
+                allowed_tools=allowed_tools,
+                dry_run=dry_run,
+            )
             for path in graph.trifecta_paths
         ]
 
@@ -544,6 +748,13 @@ async def verify_trifecta_chains(
     inconclusive = sum(
         1 for result in results if result.status == "INCONCLUSIVE_SCHEMA"
     )
+    unconfirmed = sum(
+        1 for result in results if result.status == "UNCONFIRMED_SSRF_GUARD"
+    )
+    skipped = sum(
+        1 for result in results if result.status == "SKIPPED_NOT_ALLOWLISTED"
+    )
+    dry = sum(1 for result in results if result.status == "DRY_RUN_SKIPPED")
 
     return ChainVerificationReport(
         server_count=len(live_specs),
@@ -552,6 +763,9 @@ async def verify_trifecta_chains(
         confirmed_exploitable=confirmed,
         blocked_count=blocked,
         inconclusive_count=inconclusive,
+        unconfirmed_ssrf_count=unconfirmed,
+        skipped_not_allowlisted_count=skipped,
+        dry_run_count=dry,
         results=results,
-        passed=confirmed == 0,
+        passed=confirmed == 0 and unconfirmed == 0,
     )

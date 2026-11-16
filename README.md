@@ -53,8 +53,8 @@ latch graph  --config .cursor/mcp.json --check-shadow
 # Audit OAuth credentials, audience binding and RFC 9728 metadata.
 latch auth-audit --config .cursor/mcp.json --live --sarif auth.sarif
 
-# Prove a static trifecta chain actually fires, with a loopback canary sink.
-latch probe-chain --config .cursor/mcp.json --trust-server local-db
+# Inspect the exact read/egress arguments without executing anything.
+latch probe-chain --config .cursor/mcp.json --dry-run
 
 # Write SARIF 2.1.0 for GitHub code scanning (exit codes unchanged).
 latch graph  --config .cursor/mcp.json --sarif latch.sarif
@@ -266,27 +266,58 @@ And `ledger`/`ledgers` are sensitive resource tokens, so `read_ledger` and
 `latch graph` answers "could this chain fire?". It cannot see RBAC, an egress
 allowlist, or a tool that simply ignores its arguments, so on a hardened server
 a static CRITICAL can be a false positive — the BloodHound problem. `latch
-probe-chain` settles it by executing both halves of every static chain:
+probe-chain` settles it by executing both halves of every static chain.
+
+Because that means real `tools/call` invocations, it refuses to run without
+explicit consent and a tool scope, and it can show you the plan instead:
 
 ```bash
-latch probe-chain --config .cursor/mcp.json
-latch probe-chain --config .cursor/mcp.json --trust-server local-db --format json
+# Inspect the exact read/egress arguments without executing anything.
+latch probe-chain --config .cursor/mcp.json --dry-run
+
+# Execute only the paths you named, after consenting to execution.
+latch probe-chain --config .cursor/mcp.json \
+  --i-understand-this-executes-tools \
+  --allow-tool github:get_issue --allow-tool slack:post_message
+
+# Or allow every tool a static path names (consent is still required).
+latch probe-chain --config .cursor/mcp.json \
+  --i-understand-this-executes-tools --allow-all-tools
+
+# Send egress to your own capture endpoint instead of the loopback sink.
+latch probe-chain --config .cursor/mcp.json \
+  --i-understand-this-executes-tools --allow-all-tools \
+  --sink-url https://canary.corp.example
 ```
+
+Without `--i-understand-this-executes-tools` (and without `--dry-run`) the
+command exits `2` and prints the consent warning; without `--allow-tool` or
+`--allow-all-tools` it exits `2` asking for a scope. `--allow-tool` accepts
+`<server>:<tool>` and `<server>:*`, and a path whose read or egress tool is not
+matched is reported `SKIPPED_NOT_ALLOWLISTED` and never called.
 
 The prober calls the read tool with benign read-only arguments, then calls the
 egress tool with an ephemeral HTTP sink bound to `127.0.0.1:0` inside its own
 process, using a fresh `LATCH-CANARY-<16hex>` token. Nothing leaves the machine
 and nothing is written: success is proven by the sink receiving the canary, not
-by trusting the tool's own reply text.
+by trusting the tool's own reply text. With `--sink-url` the payload goes to
+your endpoint instead; Latch cannot read that sink back, so the result is
+`UNCONFIRMED_SSRF_GUARD` with the target recorded in `sink_request_summary`.
 
 | Status | Meaning |
 | ------ | ------- |
-| `CONFIRMED_EXPLOITABLE` | The canary reached the sink: the chain is a real exfiltration path. |
+| `CONFIRMED_EXPLOITABLE` | The canary reached the loopback sink: the chain is a real exfiltration path. |
 | `BLOCKED_AT_READ` | The read tool refused (RBAC/scope), so no private data entered the context. |
-| `BLOCKED_AT_EGRESS` | The egress tool ran but the canary never arrived (allowlist, validation). |
+| `BLOCKED_AT_EGRESS` | The egress tool ran but the canary never arrived, and the error names an operator allowlist or validation rule. |
+| `UNCONFIRMED_SSRF_GUARD` | The egress tool rejected `127.0.0.1` as an SSRF/private address, or an external sink cannot be read back: internet egress is **unverified**, not blocked. |
 | `INCONCLUSIVE_SCHEMA` | The chain cannot be parameterized (no URL/sink or string payload). |
+| `DRY_RUN_SKIPPED` | `--dry-run`: the synthesized `read_args`/`egress_args` are returned and nothing was called. |
+| `SKIPPED_NOT_ALLOWLISTED` | The path's tools were not matched by `--allow-tool`; nothing was called. |
 
-Exit `1` when any path is confirmed, `0` otherwise. The sink matches the raw
+Exit `1` when a chain is confirmed **or left unconfirmed by an SSRF guard**, and
+`0` only when every static path was disproven or skipped. An SSRF-guarded chain
+is never reported as safe: SARIF keeps it visible as
+`LATCH-CHAIN-UNCONFIRMED-SSRF` at `warning` level. The sink matches the raw
 canary, its base64 encodings, and decodes base64 request bodies, so an egress
 tool that wraps or relocates the payload is still caught.
 
@@ -357,6 +388,7 @@ instead of it — and never changes the exit code (`0`, `1`, `2`).
 | `verify`, `watch` | `LATCH-DRIFT-ADDED`, `LATCH-DRIFT-REMOVED`, `LATCH-DRIFT-MODIFIED` |
 | `audit` | `LATCH-AUDIT-<RULE_ID>` (e.g. `LATCH-AUDIT-UNICODE_TAG_BLOCK`) |
 | `graph` | `LATCH-GRAPH-TRIFECTA` |
+| `probe-chain` | `LATCH-CHAIN-CONFIRMED`, `LATCH-CHAIN-UNCONFIRMED-SSRF` |
 
 Severity maps to SARIF `level`: `CRITICAL` and `HIGH` → `error`, `MEDIUM` →
 `warning`, `LOW` → `note`. Rules carry CWE tags (`CWE-345`, `CWE-74`,
@@ -402,23 +434,37 @@ including which engine fired and which keywords the baseline matched, is in
 [`benchmark/RESULTS.md`](benchmark/RESULTS.md); raw numbers are in
 [`benchmark/results.json`](benchmark/results.json).
 
-## Evaluations: disclosed CVEs and adversarial self-red-team
+## Evaluation suites: synthetic regression, real packages, self-red-team
 
-Two deterministic corpora keep the engines honest, both regenerable offline:
+Three deterministic corpora keep the engines honest. Only the capture step
+touches the network (it installs the packages it captures); every scoring run
+is offline.
 
 | Suite | Corpus | Result | Report |
 | ----- | ------ | ------ | ------ |
-| Real-world advisories | 24 targets: 12 pre-patch, 8 post-patch, 4 official upstream reference servers | 100% in-scope recall, 0.00 FPR on every post-patch and upstream server, 2 honest out-of-scope handler-bug misses | [`cve_eval/CVE_EVAL_REPORT.md`](cve_eval/CVE_EVAL_REPORT.md) |
+| Synthetic regression | 24 modeled fixtures: 12 pre-patch, 8 post-patch, 4 reference-server surfaces | 100% in-scope recall, 0.00 FPR on every post-patch/reference model, 2 honest out-of-scope handler-bug misses | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
+| Real pinned packages | 5 packages / 62 tools captured live over stdio with registry-resolved versions | 4/5 first-party packages clean; the SDK diagnostics server flagged and reported as a static over-approximation; naive baseline flags 4/5 | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
 | Adversarial self-red-team | 24 evasion probes in 7 families | 19/19 hardened catches (100%), 5/5 irreducible static boundaries documented and left unflagged | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
 
-`cve_eval/` reconstructs the mechanisms behind 2025–2026 MCP advisories —
-gateway token passthrough, cleartext Atlassian transport, WhatsApp post-approval
-rug pull, GitHub issue-to-repo trifecta, `x-mcp-header` and Unicode poisoning,
-registry homoglyphs, RFC 9728 gaps, and runtime allowlist patches — and pairs
-each with its patched counterpart. It also counts what Latch does *not* claim: a
+`synthetic_regression/` models the *shapes* of 2025–2026 MCP advisory bug
+classes — gateway token passthrough, cleartext transport, post-approval rug
+pull, the GitHub issue-to-repo trifecta, `x-mcp-header` and Unicode poisoning,
+registry homoglyphs, RFC 9728 gaps, runtime allowlist patches — and pairs each
+with its patched counterpart. These fixtures are synthetic models, not advisory
+captures: `bug_class` labels replace CVE/GHSA identifiers and no advisory text
+is quoted. The suite still counts what Latch does *not* claim: a
 symlink/path-canonicalization traversal and a SQL string-concatenation
-injection inside tool handlers are recorded as false negatives, because no
+injection inside handlers are recorded as false negatives, because no
 manifest-level analyzer can see them.
+
+`package_eval/` is the blind complement. It launches real packages
+(`@modelcontextprotocol/server-filesystem`, `-memory`, `-everything`,
+`mcp-server-fetch`, `mcp-server-git`), records the verbatim `tools/list` bytes
+with a registry-resolved version and a manifest digest, and scores Latch and the
+naive baseline against those captures and against multi-server compositions
+built from the unmodified bytes. The one flagged real package is the SDK's
+diagnostics server, where generic capability heuristics over-approximate
+diagnostic tools; the report says so and counts it as a false positive.
 
 `adversarial/` attacks Latch itself: new capability vocabulary, `enum`
 indirection, zero-width and Armenian homoglyphs, `prerequisite`/`moved`
@@ -430,7 +476,9 @@ overprivileged IdP scopes — where Latch stays silent on purpose, because the
 rules that would catch them flag legitimate registries.
 
 ```bash
-python -m cve_eval.run_cve_eval
+python -m synthetic_regression.run_regression
+python -m package_eval.capture_manifests   # network: re-captures the packages
+python -m package_eval.run_package_eval
 python -m adversarial.run_evasion
 ```
 
@@ -538,7 +586,8 @@ print(report.passed, [item.kind for item in report.drift])
 ```bash
 .venv/bin/pytest -v
 python -m benchmark.run_benchmark
-python -m cve_eval.run_cve_eval
+python -m synthetic_regression.run_regression
+python -m package_eval.run_package_eval
 python -m adversarial.run_evasion
 bash demo.sh
 ```

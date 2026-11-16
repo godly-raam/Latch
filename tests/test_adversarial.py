@@ -387,7 +387,11 @@ def test_other_suites_still_report_zero_false_positives() -> None:
         if not row["expected_positive"] and row["latch_flagged"]
     ] == []
 
-    cve = json.loads((ROOT / "cve_eval" / "cve_results.json").read_text("utf-8"))
-    assert cve["in_scope"]["fp"] == 0
-    assert cve["in_scope"]["fpr"] == 0.0
-    assert cve["overall"]["fp"] == 0
+    regression = json.loads(
+        (ROOT / "synthetic_regression" / "regression_results.json").read_text(
+            "utf-8"
+        )
+    )
+    assert regression["in_scope"]["fp"] == 0
+    assert regression["in_scope"]["fpr"] == 0.0
+    assert regression["overall"]["fp"] == 0

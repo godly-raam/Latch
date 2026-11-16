@@ -2,8 +2,8 @@
   "case_count": 24,
   "cases": [
     {
-      "advisory_ref": "CVE-2026-30623",
-      "case_id": "CVE-2026-30623-pre",
+      "bug_class": "AUTH-TOKEN-PASSTHROUGH",
+      "case_id": "auth-token-passthrough-pre",
       "engines_used": [
         "auth-audit"
       ],
@@ -24,8 +24,8 @@
       "title": "LiteLLM MCP gateway forwards user tokens and reuses one gateway credential"
     },
     {
-      "advisory_ref": "CVE-2026-27825",
-      "case_id": "CVE-2026-27825-pre",
+      "bug_class": "CLEARTEXT-HTTP-TRIFECTA",
+      "case_id": "cleartext-http-trifecta-pre",
       "engines_used": [
         "auth-audit",
         "graph"
@@ -49,8 +49,8 @@
       "title": "mcp-atlassian cleartext transport and unrestricted issue-to-webhook exfiltration"
     },
     {
-      "advisory_ref": "GHSA-MCP-2025-WHATSAPP",
-      "case_id": "GHSA-MCP-2025-WHATSAPP-pre",
+      "bug_class": "RUGPULL-POST-APPROVAL",
+      "case_id": "rugpull-post-approval-pre",
       "engines_used": [
         "verify",
         "graph"
@@ -70,8 +70,8 @@
       "title": "WhatsApp MCP post-approval rug pull enabling message exfiltration"
     },
     {
-      "advisory_ref": "GHSA-MCP-2025-GITHUB-TRIFECTA",
-      "case_id": "GHSA-MCP-2025-GITHUB-TRIFECTA-pre",
+      "bug_class": "GITHUB-TRIFECTA-EXFIL",
+      "case_id": "github-trifecta-exfil-pre",
       "engines_used": [
         "graph"
       ],
@@ -89,8 +89,8 @@
       "title": "GitHub MCP private-repo-to-public-issue prompt injection trifecta"
     },
     {
-      "advisory_ref": "MCP-2026-07-28-HEADER",
-      "case_id": "MCP-2026-07-28-HEADER-pre",
+      "bug_class": "HEADER-UNICODE-POISON",
+      "case_id": "header-unicode-poison-pre",
       "engines_used": [
         "audit"
       ],
@@ -110,8 +110,8 @@
       "title": "Privileged x-mcp-header binding plus Unicode tag-block concealment"
     },
     {
-      "advisory_ref": "MCP-REGISTRY-HOMOGLYPH",
-      "case_id": "MCP-REGISTRY-HOMOGLYPH-pre",
+      "bug_class": "HOMOGLYPH-SHADOW",
+      "case_id": "homoglyph-shadow-pre",
       "engines_used": [
         "shadow"
       ],
@@ -131,8 +131,8 @@
       "title": "Malicious registry entry spoofs a trusted tool name and hijacks routing"
     },
     {
-      "advisory_ref": "MCP-RUNTIME-ALLOWLIST",
-      "case_id": "MCP-RUNTIME-ALLOWLIST-pre",
+      "bug_class": "RUNTIME-ALLOWLIST-PATCH",
+      "case_id": "runtime-allowlist-patch-pre",
       "engines_used": [
         "graph",
         "probe-chain"
@@ -160,8 +160,8 @@
       "title": "Read-and-exfiltrate chain with no runtime egress guard"
     },
     {
-      "advisory_ref": "CVE-2025-FILESYSTEM-TRAVERSAL",
-      "case_id": "CVE-2025-FILESYSTEM-TRAVERSAL-pre",
+      "bug_class": "OOB-HANDLER-PATH-TRAVERSAL",
+      "case_id": "oob-handler-path-traversal-pre",
       "engines_used": [
         "audit"
       ],
@@ -179,8 +179,8 @@
       "title": "Filesystem server symlink/path-canonicalization traversal (out of scope)"
     },
     {
-      "advisory_ref": "MCP-2026-07-28-PRM-401",
-      "case_id": "MCP-2026-07-28-PRM-401-pre",
+      "bug_class": "PRM-401-CHALLENGE",
+      "case_id": "prm-401-challenge-pre",
       "engines_used": [
         "auth-audit"
       ],
@@ -198,8 +198,8 @@
       "title": "Remote MCP endpoint returns 401 without RFC 9728 resource_metadata"
     },
     {
-      "advisory_ref": "MCP-2026-07-28-HEADER-CRLF",
-      "case_id": "MCP-2026-07-28-HEADER-CRLF-pre",
+      "bug_class": "HEADER-UNICODE-POISON-CRLF",
+      "case_id": "HEADER-UNICODE-POISON-CRLF-pre",
       "engines_used": [
         "audit"
       ],
@@ -220,8 +220,8 @@
       "title": "CRLF injection through an x-mcp-header binding"
     },
     {
-      "advisory_ref": "MCP-DUPLICATE-TOOL-SHADOW",
-      "case_id": "MCP-DUPLICATE-TOOL-SHADOW-pre",
+      "bug_class": "DUPLICATE-TOOL-SHADOW",
+      "case_id": "duplicate-tool-shadow-pre",
       "engines_used": [
         "shadow"
       ],
@@ -239,8 +239,8 @@
       "title": "Duplicate tool name across two mounted servers"
     },
     {
-      "advisory_ref": "CVE-2025-POSTGRES-SQLI",
-      "case_id": "CVE-2025-POSTGRES-SQLI-pre",
+      "bug_class": "OOB-HANDLER-SQLI",
+      "case_id": "oob-handler-sqli-pre",
       "engines_used": [
         "audit"
       ],
@@ -260,8 +260,8 @@
       "title": "Postgres server query handler string concatenation SQL injection (out of scope)"
     },
     {
-      "advisory_ref": "CVE-2026-30623",
-      "case_id": "CVE-2026-30623-post",
+      "bug_class": "AUTH-TOKEN-PASSTHROUGH",
+      "case_id": "auth-token-passthrough-post",
       "engines_used": [
         "auth-audit"
       ],
@@ -282,8 +282,8 @@
       "title": "Gateway patch: per-server environment credentials, no token parameters"
     },
     {
-      "advisory_ref": "CVE-2026-27825",
-      "case_id": "CVE-2026-27825-post",
+      "bug_class": "CLEARTEXT-HTTP-TRIFECTA",
+      "case_id": "cleartext-http-trifecta-post",
       "engines_used": [
         "auth-audit",
         "graph"
@@ -307,8 +307,8 @@
       "title": "Atlassian patch: loopback/TLS endpoint and read-only mode"
     },
     {
-      "advisory_ref": "GHSA-MCP-2025-WHATSAPP",
-      "case_id": "GHSA-MCP-2025-WHATSAPP-post",
+      "bug_class": "RUGPULL-POST-APPROVAL",
+      "case_id": "rugpull-post-approval-post",
       "engines_used": [
         "verify",
         "graph"
@@ -328,8 +328,8 @@
       "title": "WhatsApp patch: pinned surface with a trusted internal sink"
     },
     {
-      "advisory_ref": "GHSA-MCP-2025-GITHUB-TRIFECTA",
-      "case_id": "GHSA-MCP-2025-GITHUB-TRIFECTA-post",
+      "bug_class": "GITHUB-TRIFECTA-EXFIL",
+      "case_id": "github-trifecta-exfil-post",
       "engines_used": [
         "graph"
       ],
@@ -347,8 +347,8 @@
       "title": "GitHub patch: read-only scoped server without write tools"
     },
     {
-      "advisory_ref": "MCP-2026-07-28-HEADER",
-      "case_id": "MCP-2026-07-28-HEADER-post",
+      "bug_class": "HEADER-UNICODE-POISON",
+      "case_id": "header-unicode-poison-post",
       "engines_used": [
         "audit"
       ],
@@ -368,8 +368,8 @@
       "title": "Header patch: ASCII description and a telemetry-only header binding"
     },
     {
-      "advisory_ref": "MCP-REGISTRY-HOMOGLYPH",
-      "case_id": "MCP-REGISTRY-HOMOGLYPH-post",
+      "bug_class": "HOMOGLYPH-SHADOW",
+      "case_id": "homoglyph-shadow-post",
       "engines_used": [
         "shadow"
       ],
@@ -387,8 +387,8 @@
       "title": "Registry patch: official filesystem server mounted alone"
     },
     {
-      "advisory_ref": "MCP-RUNTIME-ALLOWLIST",
-      "case_id": "MCP-RUNTIME-ALLOWLIST-post",
+      "bug_class": "RUNTIME-ALLOWLIST-PATCH",
+      "case_id": "runtime-allowlist-patch-post",
       "engines_used": [
         "graph",
         "probe-chain"
@@ -416,8 +416,8 @@
       "title": "Runtime allowlist patch: identical schema, egress blocked at execution"
     },
     {
-      "advisory_ref": "CVE-2025-FILESYSTEM-TRAVERSAL",
-      "case_id": "CVE-2025-FILESYSTEM-TRAVERSAL-post",
+      "bug_class": "OOB-HANDLER-PATH-TRAVERSAL",
+      "case_id": "oob-handler-path-traversal-post",
       "engines_used": [
         "audit"
       ],
@@ -435,8 +435,8 @@
       "title": "Filesystem patch: canonical path resolution inside the handler"
     },
     {
-      "advisory_ref": "UPSTREAM-FS",
-      "case_id": "UPSTREAM-FS",
+      "bug_class": "CLEAN-FILESYSTEM-MODEL",
+      "case_id": "clean-filesystem-model",
       "engines_used": [
         "audit",
         "graph"
@@ -458,8 +458,8 @@
       "title": "@modelcontextprotocol/server-filesystem official manifest"
     },
     {
-      "advisory_ref": "UPSTREAM-GIT",
-      "case_id": "UPSTREAM-GIT",
+      "bug_class": "CLEAN-GIT-MODEL",
+      "case_id": "clean-git-model",
       "engines_used": [
         "audit",
         "graph"
@@ -481,8 +481,8 @@
       "title": "@modelcontextprotocol/server-git official manifest"
     },
     {
-      "advisory_ref": "UPSTREAM-MEMORY",
-      "case_id": "UPSTREAM-MEMORY",
+      "bug_class": "CLEAN-MEMORY-MODEL",
+      "case_id": "clean-memory-model",
       "engines_used": [
         "audit",
         "graph"
@@ -502,8 +502,8 @@
       "title": "@modelcontextprotocol/server-memory official manifest"
     },
     {
-      "advisory_ref": "UPSTREAM-POSTGRES",
-      "case_id": "UPSTREAM-POSTGRES",
+      "bug_class": "CLEAN-POSTGRES-MODEL",
+      "case_id": "clean-postgres-model",
       "engines_used": [
         "audit",
         "graph"
@@ -526,7 +526,7 @@
     }
   ],
   "execution_aware_comparison": {
-    "case_id": "MCP-RUNTIME-ALLOWLIST-post",
+    "case_id": "runtime-allowlist-patch-post",
     "probe_block_reason": "blocked: destination '127.0.0.1' is not in the *.corp.internal allowlist",
     "probe_confirmed": false,
     "probe_status": "BLOCKED_AT_EGRESS",

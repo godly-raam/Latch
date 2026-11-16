@@ -1,4 +1,4 @@
-"""Tests for the real-world CVE & upstream reference evaluation suite."""
+"""Tests for the synthetic regression suite modeled on disclosed bug classes."""
 
 from __future__ import annotations
 
@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from cve_eval.cases import CASES, POST_PATCH_CASES, PRE_PATCH_CASES, CveEvalCase
-from cve_eval.run_cve_eval import (
+from synthetic_regression.cases import CASES, POST_PATCH_CASES, PRE_PATCH_CASES, RegressionCase
+from synthetic_regression.run_regression import (
     REPORT_MD,
     RESULTS_JSON,
     compute_results,
@@ -20,7 +20,7 @@ from cve_eval.run_cve_eval import (
 
 ROOT = Path(__file__).resolve().parents[1]
 
-OUT_OF_SCOPE_REFS = {"CVE-2025-FILESYSTEM-TRAVERSAL", "CVE-2025-POSTGRES-SQLI"}
+OUT_OF_SCOPE_REFS = {"OOB-HANDLER-PATH-TRAVERSAL", "OOB-HANDLER-SQLI"}
 
 
 @pytest.fixture(scope="module")
@@ -59,13 +59,13 @@ def test_corpus_declares_out_of_scope_implementation_bugs() -> None:
         for case in CASES
         if not case.in_latch_threat_model and case.expected_positive
     ]
-    assert {case.advisory_ref for case in out_of_scope} == OUT_OF_SCOPE_REFS
+    assert {case.bug_class for case in out_of_scope} == OUT_OF_SCOPE_REFS
     assert all(case.status == "pre_patch_vulnerable" for case in out_of_scope)
 
 
 def test_each_case_carries_payloads_for_its_engines() -> None:
     for case in CASES:
-        assert isinstance(case, CveEvalCase)
+        assert isinstance(case, RegressionCase)
         assert case.engines_used, case.case_id
         assert case.notes, case.case_id
 
@@ -113,7 +113,7 @@ def test_overall_metrics_record_honest_misses(results: dict) -> None:
     assert metrics["fpr"] == 0.0
 
     missed = [
-        row["advisory_ref"]
+        row["bug_class"]
         for row in results["cases"]
         if row["expected_positive"] and not row["latch_flagged"]
     ]
@@ -142,7 +142,7 @@ def test_detections_come_from_the_declared_engines(results: dict) -> None:
 
 
 def test_execution_aware_probe_confirms_pre_patch_exploit(results: dict) -> None:
-    [row] = [row for row in results["cases"] if row["case_id"] == "MCP-RUNTIME-ALLOWLIST-pre"]
+    [row] = [row for row in results["cases"] if row["case_id"] == "runtime-allowlist-patch-pre"]
     assert row["static_graph_flagged"] is True
     assert row["latch_flagged"] is True
     probe = row["probe"]
@@ -155,7 +155,7 @@ def test_execution_aware_probe_confirms_pre_patch_exploit(results: dict) -> None
 def test_probe_chain_eliminates_static_false_positive_on_allowlist_patch(
     results: dict,
 ) -> None:
-    [row] = [row for row in results["cases"] if row["case_id"] == "MCP-RUNTIME-ALLOWLIST-post"]
+    [row] = [row for row in results["cases"] if row["case_id"] == "runtime-allowlist-patch-post"]
     # Identical schema, so static graph still reports the theoretical path...
     assert row["static_graph_flagged"] is True
     # ...but execution-aware probing proves the runtime guard blocks it.
@@ -168,7 +168,7 @@ def test_probe_chain_eliminates_static_false_positive_on_allowlist_patch(
 
     comparison = results["execution_aware_comparison"]
     assert comparison == {
-        "case_id": "MCP-RUNTIME-ALLOWLIST-post",
+        "case_id": "runtime-allowlist-patch-post",
         "static_graph_flagged": True,
         "probe_confirmed": False,
         "probe_status": "BLOCKED_AT_EGRESS",
@@ -187,10 +187,10 @@ def test_naive_baseline_is_worse_on_the_same_targets(results: dict) -> None:
         row["case_id"] for row in results["cases"] if row["naive_flagged"]
     }
     # Keywords in benign copy fool the baseline on official reference servers.
-    assert {"UPSTREAM-FS", "UPSTREAM-GIT", "UPSTREAM-POSTGRES"} <= flagged_names
-    assert {"UPSTREAM-FS", "UPSTREAM-GIT", "UPSTREAM-POSTGRES"} - {
+    assert {"clean-filesystem-model", "clean-git-model", "clean-postgres-model"} <= flagged_names
+    assert {"clean-filesystem-model", "clean-git-model", "clean-postgres-model"} - {
         row["case_id"] for row in results["cases"] if row["latch_flagged"]
-    } == {"UPSTREAM-FS", "UPSTREAM-GIT", "UPSTREAM-POSTGRES"}
+    } == {"clean-filesystem-model", "clean-git-model", "clean-postgres-model"}
 
 
 def test_artifacts_match_deterministic_recomputation(results: dict) -> None:
@@ -214,7 +214,7 @@ def test_writing_artifacts_twice_is_byte_identical(results: dict) -> None:
 
 def test_module_cli_runs_and_reports_metrics() -> None:
     completed = subprocess.run(
-        [sys.executable, "-m", "cve_eval.run_cve_eval"],
+        [sys.executable, "-m", "synthetic_regression.run_regression"],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -224,7 +224,7 @@ def test_module_cli_runs_and_reports_metrics() -> None:
     assert "In-scope (22 targets)" in completed.stdout
     assert "10   0  12   0" in completed.stdout
     assert "Overall (24 targets)" in completed.stdout
-    assert "MCP-RUNTIME-ALLOWLIST-post" in completed.stdout
+    assert "runtime-allowlist-patch-post" in completed.stdout
 
 
 def test_report_documents_boundaries_and_limitations(results: dict) -> None:
@@ -237,4 +237,4 @@ def test_report_documents_boundaries_and_limitations(results: dict) -> None:
     assert "| **Latch** | 10 | 0 | 12 | 0 | 1.00 | 1.00 | 1.00 | 0.00 |" in report
     assert "| **Latch** | 10 | 0 | 12 | 2 | 1.00 | 0.83 | 0.91 | 0.00 |" in report
     for case in CASES:
-        assert f"| `{case.case_id}` | {case.advisory_ref} |" in report, case.case_id
+        assert f"| `{case.case_id}` | {case.bug_class} |" in report, case.case_id

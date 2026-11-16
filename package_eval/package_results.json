@@ -1,0 +1,550 @@
+{
+  "compositions": [
+    {
+      "audit_findings": [],
+      "composition_id": "filesystem-plus-memory",
+      "cross_server_path_count": 0,
+      "latch_flagged": false,
+      "naive_flagged": true,
+      "rationale": "Local file read plus local knowledge-graph memory: both are first-party reference servers with no network egress.",
+      "servers": [
+        "npm-server-filesystem",
+        "npm-server-memory"
+      ],
+      "severity_counts": {},
+      "shadow_findings": [],
+      "tool_count": 25,
+      "trifecta_path_count": 0,
+      "trifecta_paths": []
+    },
+    {
+      "audit_findings": [],
+      "composition_id": "filesystem-plus-git",
+      "cross_server_path_count": 27,
+      "latch_flagged": true,
+      "naive_flagged": true,
+      "rationale": "Two repository-oriented servers: file access plus git history inspection, still with no outbound sink.",
+      "servers": [
+        "npm-server-filesystem",
+        "pypi-mcp-server-git"
+      ],
+      "severity_counts": {
+        "CRITICAL": 27
+      },
+      "shadow_findings": [],
+      "tool_count": 30,
+      "trifecta_path_count": 27,
+      "trifecta_paths": [
+        {
+          "cross_server": true,
+          "egress_tool": "pypi-mcp-server-git:git_commit",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-001",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "pypi-mcp-server-git:git_create_branch",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-002",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "pypi-mcp-server-git:git_merge",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-003",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "pypi-mcp-server-git:git_commit",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-004",
+          "read_tool": "npm-server-filesystem:get_file_info",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "pypi-mcp-server-git:git_create_branch",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-005",
+          "read_tool": "npm-server-filesystem:get_file_info",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "pypi-mcp-server-git:git_merge",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-006",
+          "read_tool": "npm-server-filesystem:get_file_info",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "pypi-mcp-server-git:git_commit",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-007",
+          "read_tool": "npm-server-filesystem:list_directory",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "pypi-mcp-server-git:git_create_branch",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-008",
+          "read_tool": "npm-server-filesystem:list_directory",
+          "severity": "CRITICAL"
+        }
+      ]
+    },
+    {
+      "audit_findings": [],
+      "composition_id": "filesystem-plus-fetch",
+      "cross_server_path_count": 0,
+      "latch_flagged": false,
+      "naive_flagged": true,
+      "rationale": "File read plus a web fetcher: the closest official pairing to an ingest/egress chain, so the static graph deserves a look.",
+      "servers": [
+        "npm-server-filesystem",
+        "pypi-mcp-server-fetch"
+      ],
+      "severity_counts": {},
+      "shadow_findings": [],
+      "tool_count": 17,
+      "trifecta_path_count": 0,
+      "trifecta_paths": []
+    },
+    {
+      "audit_findings": [
+        "ANNOTATION_CONTRADICTION (get-header-params)"
+      ],
+      "composition_id": "everything-plus-filesystem",
+      "cross_server_path_count": 288,
+      "latch_flagged": true,
+      "naive_flagged": true,
+      "rationale": "The SDK's everything server (the largest captured surface) mounted beside the filesystem server.",
+      "servers": [
+        "npm-server-everything",
+        "npm-server-filesystem"
+      ],
+      "severity_counts": {
+        "CRITICAL": 302,
+        "HIGH": 12
+      },
+      "shadow_findings": [],
+      "tool_count": 38,
+      "trifecta_path_count": 314,
+      "trifecta_paths": [
+        {
+          "cross_server": true,
+          "egress_tool": "npm-server-everything:get-header-params",
+          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "path_id": "trifecta-001",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "npm-server-everything:gzip-file-as-resource",
+          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "path_id": "trifecta-002",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "npm-server-everything:trigger-resource-update",
+          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "path_id": "trifecta-003",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "npm-server-everything:trigger-sampling-request",
+          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "path_id": "trifecta-004",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "npm-server-everything:trigger-sampling-request-async",
+          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "path_id": "trifecta-005",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "npm-server-everything:trigger-url-elicitation",
+          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "path_id": "trifecta-006",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "npm-server-everything:get-header-params",
+          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "path_id": "trifecta-007",
+          "read_tool": "npm-server-filesystem:get_file_info",
+          "severity": "CRITICAL"
+        },
+        {
+          "cross_server": true,
+          "egress_tool": "npm-server-everything:gzip-file-as-resource",
+          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "path_id": "trifecta-008",
+          "read_tool": "npm-server-filesystem:get_file_info",
+          "severity": "CRITICAL"
+        }
+      ]
+    }
+  ],
+  "package_count": 5,
+  "packages": [
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "npm",
+      "finding_count": 27,
+      "findings": [
+        {
+          "engine": "audit",
+          "rule_id": "ANNOTATION_CONTRADICTION",
+          "severity": "MEDIUM",
+          "tool": "get-header-params"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:get-annotated-message"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:get-annotated-message"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:get-annotated-message"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:gzip-file-as-resource"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:gzip-file-as-resource"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:gzip-file-as-resource"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:trigger-sampling-request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:trigger-sampling-request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:trigger-sampling-request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:trigger-sampling-request-async"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:trigger-sampling-request-async"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:trigger-sampling-request-async"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:trigger-url-elicitation"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "CRITICAL",
+          "tool": "npm-server-everything:trigger-url-elicitation"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-everything:get-annotated-message"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-everything:get-annotated-message"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-everything:get-annotated-message"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-everything:gzip-file-as-resource"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-everything:gzip-file-as-resource"
+        }
+      ],
+      "latch_flagged": true,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "@modelcontextprotocol/server-everything"
+      ],
+      "manifest_sha256": "2933e591ac78202ec54bbaaf9f4bf9c058dde48d0bfa0e0723b8b6ed8a3574c5",
+      "naive_flagged": true,
+      "naive_hits": [
+        "secret",
+        "token",
+        "pass",
+        "ignore",
+        "instead",
+        "before",
+        "x-mcp-header"
+      ],
+      "package_name": "@modelcontextprotocol/server-everything",
+      "package_version": "2.3.0",
+      "protocol_version": "2026-07-28",
+      "severity_counts": {
+        "CRITICAL": 14,
+        "HIGH": 12,
+        "MEDIUM": 1
+      },
+      "slug": "npm-server-everything",
+      "tool_count": 22,
+      "tool_names": [
+        "echo",
+        "get-annotated-message",
+        "get-env",
+        "get-header-params",
+        "get-resource-links",
+        "get-resource-reference",
+        "get-roots-list",
+        "get-structured-content",
+        "get-sum",
+        "get-tiny-image",
+        "gzip-file-as-resource",
+        "simulate-research-query",
+        "trigger-elicitation-request",
+        "trigger-elicitation-request-async",
+        "trigger-list-changed",
+        "trigger-log-messages",
+        "trigger-long-running-operation",
+        "trigger-multi-step-elicitation",
+        "trigger-resource-update",
+        "trigger-sampling-request",
+        "trigger-sampling-request-async",
+        "trigger-url-elicitation"
+      ]
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "findings": [],
+      "latch_flagged": false,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "@modelcontextprotocol/server-filesystem",
+        "{sandbox}"
+      ],
+      "manifest_sha256": "b53f2e27460f105deed2051bb02b57df6929fc0c8f4ff55a7f15e54d9aff411d",
+      "naive_flagged": true,
+      "naive_hits": [
+        "ignore",
+        "instead",
+        "before"
+      ],
+      "package_name": "@modelcontextprotocol/server-filesystem",
+      "package_version": "2.3.0",
+      "protocol_version": "2026-07-28",
+      "severity_counts": {},
+      "slug": "npm-server-filesystem",
+      "tool_count": 16,
+      "tool_names": [
+        "append_file",
+        "copy_file",
+        "create_directory",
+        "directory_tree",
+        "edit_file",
+        "get_file_info",
+        "list_allowed_directories",
+        "list_directory",
+        "list_directory_with_sizes",
+        "move_file",
+        "read_file",
+        "read_media_file",
+        "read_multiple_files",
+        "read_text_file",
+        "search_files",
+        "write_file"
+      ]
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "findings": [],
+      "latch_flagged": false,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "manifest_sha256": "f6c207f6b59b72de6c69103446c3735108b9d877e21fa0b34cbaf5004ce08bac",
+      "naive_flagged": false,
+      "naive_hits": [],
+      "package_name": "@modelcontextprotocol/server-memory",
+      "package_version": "2.1.1",
+      "protocol_version": "2026-07-28",
+      "severity_counts": {},
+      "slug": "npm-server-memory",
+      "tool_count": 9,
+      "tool_names": [
+        "add_observations",
+        "create_entities",
+        "create_relations",
+        "delete_entities",
+        "delete_observations",
+        "delete_relations",
+        "open_nodes",
+        "read_graph",
+        "search_nodes"
+      ]
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "findings": [],
+      "latch_flagged": false,
+      "launch_command": [
+        "uvx",
+        "mcp-server-fetch"
+      ],
+      "manifest_sha256": "4a6dfa4e396475e3fabc6f70215db6acf7e033f12b73a1d16e8d3416ceec5f70",
+      "naive_flagged": true,
+      "naive_hits": [
+        "before"
+      ],
+      "package_name": "mcp-server-fetch",
+      "package_version": "2026.11.11",
+      "protocol_version": "2026-07-28",
+      "severity_counts": {},
+      "slug": "pypi-mcp-server-fetch",
+      "tool_count": 1,
+      "tool_names": [
+        "fetch"
+      ]
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "findings": [],
+      "latch_flagged": false,
+      "launch_command": [
+        "uvx",
+        "mcp-server-git",
+        "--repository",
+        "{sandbox}"
+      ],
+      "manifest_sha256": "bd88748c777e6a3a8e3bf7c1c6e0f43a38d9d8ca4f84909244334e2a60db5c7d",
+      "naive_flagged": true,
+      "naive_hits": [
+        "pass"
+      ],
+      "package_name": "mcp-server-git",
+      "package_version": "2026.11.11",
+      "protocol_version": "2026-07-28",
+      "severity_counts": {},
+      "slug": "pypi-mcp-server-git",
+      "tool_count": 14,
+      "tool_names": [
+        "git_add",
+        "git_branch",
+        "git_checkout",
+        "git_commit",
+        "git_create_branch",
+        "git_diff",
+        "git_diff_staged",
+        "git_diff_unstaged",
+        "git_log",
+        "git_merge",
+        "git_remote",
+        "git_reset",
+        "git_show",
+        "git_status"
+      ]
+    }
+  ],
+  "summary": {
+    "compositions_with_paths": [
+      "filesystem-plus-git",
+      "everything-plus-filesystem"
+    ],
+    "latch_clean_packages": 4,
+    "latch_false_positive_rate": 0.2,
+    "latch_flagged_packages": [
+      "npm-server-everything"
+    ],
+    "naive_false_positive_rate": 0.8,
+    "naive_flagged_packages": [
+      "npm-server-everything",
+      "npm-server-filesystem",
+      "pypi-mcp-server-fetch",
+      "pypi-mcp-server-git"
+    ]
+  },
+  "tool_count": 62
+}

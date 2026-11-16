@@ -1,0 +1,51 @@
+{
+  "captured": 5,
+  "captures": [
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "npm",
+      "package_name": "@modelcontextprotocol/server-everything",
+      "reason": null,
+      "slug": "npm-server-everything",
+      "status": "captured",
+      "tool_count": 22
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "npm",
+      "package_name": "@modelcontextprotocol/server-filesystem",
+      "reason": null,
+      "slug": "npm-server-filesystem",
+      "status": "captured",
+      "tool_count": 16
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "npm",
+      "package_name": "@modelcontextprotocol/server-memory",
+      "reason": null,
+      "slug": "npm-server-memory",
+      "status": "captured",
+      "tool_count": 9
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "pypi",
+      "package_name": "mcp-server-fetch",
+      "reason": null,
+      "slug": "pypi-mcp-server-fetch",
+      "status": "captured",
+      "tool_count": 1
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "pypi",
+      "package_name": "mcp-server-git",
+      "reason": null,
+      "slug": "pypi-mcp-server-git",
+      "status": "captured",
+      "tool_count": 14
+    }
+  ],
+  "skipped": 0
+}

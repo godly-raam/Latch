@@ -271,6 +271,18 @@ _RULES: dict[str, dict[str, Any]] = {
         "tags": ["security", "CWE-200", "CWE-284"],
         "level": "error",
     },
+    "LATCH-CHAIN-UNCONFIRMED-SSRF": {
+        "name": "UnconfirmedSsrfGuardedChain",
+        "short": "Static chain unverified because an SSRF guard blocked the canary",
+        "full": (
+            "The egress tool rejected the loopback canary destination as an"
+            " SSRF/private address, so the static chain could be neither confirmed"
+            " nor disproven. Public-internet exfiltration remains unverified; pass"
+            " an operator sink (--sink-url) to test it."
+        ),
+        "tags": ["security", "CWE-200", "CWE-284"],
+        "level": "warning",
+    },
     "LATCH-AUTH-PRM_RESOURCE_MISMATCH": {
         "name": "PrmResourceMismatch",
         "short": "Metadata resource does not match the endpoint",
@@ -469,6 +481,29 @@ def to_sarif(
 
     if chain is not None:
         for probe in chain.results:
+            if probe.status == "UNCONFIRMED_SSRF_GUARD":
+                entry = _result(
+                    "LATCH-CHAIN-UNCONFIRMED-SSRF",
+                    probe.static_severity,
+                    (
+                        f"Unconfirmed chain {probe.path_id}:"
+                        f" {probe.ingest_tool} -> {probe.read_tool} ->"
+                        f" {probe.egress_tool} could not be verified"
+                        f" ({probe.block_reason or 'no canary observed'})"
+                    ),
+                    artifact_uri,
+                    {
+                        "pathId": probe.path_id,
+                        "toolName": probe.ingest_tool,
+                        "servers": [],
+                        "chainStatus": probe.status,
+                        "sink": probe.sink_request_summary,
+                        "blockReason": probe.block_reason,
+                    },
+                )
+                entry["level"] = "warning"
+                results.append(entry)
+                continue
             if probe.status != "CONFIRMED_EXPLOITABLE":
                 continue
             message = (

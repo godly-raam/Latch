@@ -1,20 +1,22 @@
-"""Real-world disclosure and upstream reference corpus for Latch.
+"""Synthetic regression corpus modeled on disclosed MCP bug classes.
 
-Twenty-four deterministic targets built from 2025-2026 MCP advisories and the
-official reference servers:
+Twenty-four deterministic fixtures that exercise Latch against the *shapes* of
+bugs disclosed in 2025-2026 MCP advisories and against reference-server tool
+surfaces:
 
-* 12 pre-patch vulnerable targets (10 in Latch's protocol/flow threat model, plus
-  2 honest out-of-scope handler-implementation bugs);
-* 12 post-patch or official-upstream counterparts that must stay clean.
+* 12 pre-patch models (10 inside Latch's protocol/flow threat model, plus 2
+  honest out-of-scope handler-implementation bugs);
+* 12 post-patch or reference-server counterparts that must stay clean.
 
-Every payload is a plain dict so the corpus is reviewable and reproducible: no
-network access (the two RFC 9728 cases and the runtime-allowlist pair use Latch's
-own mocked transport and loopback fixture), no timestamps, no randomness.
+These are synthetic models, not captures. Every payload is a plain dict written
+for this repository: they are not the vendors' test fixtures, they quote no
+advisory text, and ``bug_class`` is a mechanism label rather than a CVE/GHSA
+identifier. Real ``tools/list`` captures of pinned packages live in
+``package_eval/``.
 
-Advisory identifiers here are illustrative labels for the *classes* of bug that
-were disclosed against MCP gateways, vendor servers and registries during that
-window; each case names the mechanism and the patch so a reviewer can map it
-onto the real advisory text.
+Nothing here touches the network: the two RFC 9728 models and the
+runtime-allowlist pair use Latch's own mocked transport and loopback fixture.
+No timestamps, no randomness.
 """
 
 from __future__ import annotations
@@ -30,7 +32,7 @@ from mcpprobe.lockfile import create_lockfile
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CHAIN_FIXTURE = REPO_ROOT / "tests" / "fixtures" / "mock_chain_stdio.py"
 
-#: One literal gateway credential shared by two bridged servers (CVE-2026-30623).
+#: One literal gateway credential shared by two bridged servers (AUTH-TOKEN-PASSTHROUGH).
 SHARED_GATEWAY_TOKEN = "ghp_litellm_gateway_shared_9f21"
 
 CaseStatus = Literal["pre_patch_vulnerable", "post_patch_fixed", "upstream_reference"]
@@ -75,11 +77,11 @@ def chain_command(*roles: str) -> list[str]:
     return [sys.executable, *args]
 
 
-class CveEvalCase(BaseModel):
-    """One real-world evaluation target."""
+class RegressionCase(BaseModel):
+    """One synthetic regression target."""
 
     case_id: str
-    advisory_ref: str
+    bug_class: str
     title: str
     status: CaseStatus
     in_latch_threat_model: bool
@@ -207,10 +209,10 @@ _CHAIN_TOOLS = [
 # 12 pre-patch vulnerable targets
 # ---------------------------------------------------------------------------
 
-PRE_PATCH_CASES: list[CveEvalCase] = [
-    CveEvalCase(
-        case_id="CVE-2026-30623-pre",
-        advisory_ref="CVE-2026-30623",
+PRE_PATCH_CASES: list[RegressionCase] = [
+    RegressionCase(
+        case_id="auth-token-passthrough-pre",
+        bug_class="AUTH-TOKEN-PASSTHROUGH",
         title="LiteLLM MCP gateway forwards user tokens and reuses one gateway credential",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -249,9 +251,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             ]
         },
     ),
-    CveEvalCase(
-        case_id="CVE-2026-27825-pre",
-        advisory_ref="CVE-2026-27825",
+    RegressionCase(
+        case_id="cleartext-http-trifecta-pre",
+        bug_class="CLEARTEXT-HTTP-TRIFECTA",
         title="mcp-atlassian cleartext transport and unrestricted issue-to-webhook exfiltration",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -279,9 +281,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             "atlassian-confluence": [dict(_ATLASSIAN_TOOLS[1])],
         },
     ),
-    CveEvalCase(
-        case_id="GHSA-MCP-2025-WHATSAPP-pre",
-        advisory_ref="GHSA-MCP-2025-WHATSAPP",
+    RegressionCase(
+        case_id="rugpull-post-approval-pre",
+        bug_class="RUGPULL-POST-APPROVAL",
         title="WhatsApp MCP post-approval rug pull enabling message exfiltration",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -298,9 +300,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
         ),
         graph_servers={"whatsapp": _WHATSAPP_CLEAN["tools"]},
     ),
-    CveEvalCase(
-        case_id="GHSA-MCP-2025-GITHUB-TRIFECTA-pre",
-        advisory_ref="GHSA-MCP-2025-GITHUB-TRIFECTA",
+    RegressionCase(
+        case_id="github-trifecta-exfil-pre",
+        bug_class="GITHUB-TRIFECTA-EXFIL",
         title="GitHub MCP private-repo-to-public-issue prompt injection trifecta",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -316,9 +318,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             "github-write": _GITHUB_WRITE_TOOLS,
         },
     ),
-    CveEvalCase(
-        case_id="MCP-2026-07-28-HEADER-pre",
-        advisory_ref="MCP-2026-07-28-HEADER",
+    RegressionCase(
+        case_id="header-unicode-poison-pre",
+        bug_class="HEADER-UNICODE-POISON",
         title="Privileged x-mcp-header binding plus Unicode tag-block concealment",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -338,9 +340,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             )
         ),
     ),
-    CveEvalCase(
-        case_id="MCP-REGISTRY-HOMOGLYPH-pre",
-        advisory_ref="MCP-REGISTRY-HOMOGLYPH",
+    RegressionCase(
+        case_id="homoglyph-shadow-pre",
+        bug_class="HOMOGLYPH-SHADOW",
         title="Malicious registry entry spoofs a trusted tool name and hijacks routing",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -366,9 +368,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             ],
         },
     ),
-    CveEvalCase(
-        case_id="MCP-RUNTIME-ALLOWLIST-pre",
-        advisory_ref="MCP-RUNTIME-ALLOWLIST",
+    RegressionCase(
+        case_id="runtime-allowlist-patch-pre",
+        bug_class="RUNTIME-ALLOWLIST-PATCH",
         title="Read-and-exfiltrate chain with no runtime egress guard",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -387,9 +389,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             }
         ],
     ),
-    CveEvalCase(
-        case_id="CVE-2025-FILESYSTEM-TRAVERSAL-pre",
-        advisory_ref="CVE-2025-FILESYSTEM-TRAVERSAL",
+    RegressionCase(
+        case_id="oob-handler-path-traversal-pre",
+        bug_class="OOB-HANDLER-PATH-TRAVERSAL",
         title="Filesystem server symlink/path-canonicalization traversal (out of scope)",
         status="pre_patch_vulnerable",
         in_latch_threat_model=False,
@@ -412,9 +414,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             )
         ),
     ),
-    CveEvalCase(
-        case_id="MCP-2026-07-28-PRM-401-pre",
-        advisory_ref="MCP-2026-07-28-PRM-401",
+    RegressionCase(
+        case_id="prm-401-challenge-pre",
+        bug_class="PRM-401-CHALLENGE",
         title="Remote MCP endpoint returns 401 without RFC 9728 resource_metadata",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -441,9 +443,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             }
         },
     ),
-    CveEvalCase(
-        case_id="MCP-2026-07-28-HEADER-CRLF-pre",
-        advisory_ref="MCP-2026-07-28-HEADER-CRLF",
+    RegressionCase(
+        case_id="HEADER-UNICODE-POISON-CRLF-pre",
+        bug_class="HEADER-UNICODE-POISON-CRLF",
         title="CRLF injection through an x-mcp-header binding",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -461,9 +463,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             )
         ),
     ),
-    CveEvalCase(
-        case_id="MCP-DUPLICATE-TOOL-SHADOW-pre",
-        advisory_ref="MCP-DUPLICATE-TOOL-SHADOW",
+    RegressionCase(
+        case_id="duplicate-tool-shadow-pre",
+        bug_class="DUPLICATE-TOOL-SHADOW",
         title="Duplicate tool name across two mounted servers",
         status="pre_patch_vulnerable",
         in_latch_threat_model=True,
@@ -478,9 +480,9 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
             "server-b": [tool("read_file", "Read a file.", {"path": {"type": "string"}})],
         },
     ),
-    CveEvalCase(
-        case_id="CVE-2025-POSTGRES-SQLI-pre",
-        advisory_ref="CVE-2025-POSTGRES-SQLI",
+    RegressionCase(
+        case_id="oob-handler-sqli-pre",
+        bug_class="OOB-HANDLER-SQLI",
         title="Postgres server query handler string concatenation SQL injection (out of scope)",
         status="pre_patch_vulnerable",
         in_latch_threat_model=False,
@@ -509,10 +511,10 @@ PRE_PATCH_CASES: list[CveEvalCase] = [
 # 12 post-patch / official upstream reference targets
 # ---------------------------------------------------------------------------
 
-POST_PATCH_CASES: list[CveEvalCase] = [
-    CveEvalCase(
-        case_id="CVE-2026-30623-post",
-        advisory_ref="CVE-2026-30623",
+POST_PATCH_CASES: list[RegressionCase] = [
+    RegressionCase(
+        case_id="auth-token-passthrough-post",
+        bug_class="AUTH-TOKEN-PASSTHROUGH",
         title="Gateway patch: per-server environment credentials, no token parameters",
         status="post_patch_fixed",
         in_latch_threat_model=True,
@@ -547,9 +549,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
             ]
         },
     ),
-    CveEvalCase(
-        case_id="CVE-2026-27825-post",
-        advisory_ref="CVE-2026-27825",
+    RegressionCase(
+        case_id="cleartext-http-trifecta-post",
+        bug_class="CLEARTEXT-HTTP-TRIFECTA",
         title="Atlassian patch: loopback/TLS endpoint and read-only mode",
         status="post_patch_fixed",
         in_latch_threat_model=True,
@@ -575,9 +577,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
             ]
         },
     ),
-    CveEvalCase(
-        case_id="GHSA-MCP-2025-WHATSAPP-post",
-        advisory_ref="GHSA-MCP-2025-WHATSAPP",
+    RegressionCase(
+        case_id="rugpull-post-approval-post",
+        bug_class="RUGPULL-POST-APPROVAL",
         title="WhatsApp patch: pinned surface with a trusted internal sink",
         status="post_patch_fixed",
         in_latch_threat_model=True,
@@ -595,9 +597,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
         graph_servers={"whatsapp": _WHATSAPP_CLEAN["tools"]},
         trusted_servers=["whatsapp"],
     ),
-    CveEvalCase(
-        case_id="GHSA-MCP-2025-GITHUB-TRIFECTA-post",
-        advisory_ref="GHSA-MCP-2025-GITHUB-TRIFECTA",
+    RegressionCase(
+        case_id="github-trifecta-exfil-post",
+        bug_class="GITHUB-TRIFECTA-EXFIL",
         title="GitHub patch: read-only scoped server without write tools",
         status="post_patch_fixed",
         in_latch_threat_model=True,
@@ -609,9 +611,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
         ),
         graph_servers={"github-read": _GITHUB_READ_TOOLS},
     ),
-    CveEvalCase(
-        case_id="MCP-2026-07-28-HEADER-post",
-        advisory_ref="MCP-2026-07-28-HEADER",
+    RegressionCase(
+        case_id="header-unicode-poison-post",
+        bug_class="HEADER-UNICODE-POISON",
         title="Header patch: ASCII description and a telemetry-only header binding",
         status="post_patch_fixed",
         in_latch_threat_model=True,
@@ -629,9 +631,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
             )
         ),
     ),
-    CveEvalCase(
-        case_id="MCP-REGISTRY-HOMOGLYPH-post",
-        advisory_ref="MCP-REGISTRY-HOMOGLYPH",
+    RegressionCase(
+        case_id="homoglyph-shadow-post",
+        bug_class="HOMOGLYPH-SHADOW",
         title="Registry patch: official filesystem server mounted alone",
         status="post_patch_fixed",
         in_latch_threat_model=True,
@@ -646,9 +648,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
             ]
         },
     ),
-    CveEvalCase(
-        case_id="MCP-RUNTIME-ALLOWLIST-post",
-        advisory_ref="MCP-RUNTIME-ALLOWLIST",
+    RegressionCase(
+        case_id="runtime-allowlist-patch-post",
+        bug_class="RUNTIME-ALLOWLIST-PATCH",
         title="Runtime allowlist patch: identical schema, egress blocked at execution",
         status="post_patch_fixed",
         in_latch_threat_model=True,
@@ -670,9 +672,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
         ],
         runtime_patch_demo=True,
     ),
-    CveEvalCase(
-        case_id="CVE-2025-FILESYSTEM-TRAVERSAL-post",
-        advisory_ref="CVE-2025-FILESYSTEM-TRAVERSAL",
+    RegressionCase(
+        case_id="oob-handler-path-traversal-post",
+        bug_class="OOB-HANDLER-PATH-TRAVERSAL",
         title="Filesystem patch: canonical path resolution inside the handler",
         status="post_patch_fixed",
         in_latch_threat_model=True,
@@ -694,9 +696,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
             )
         ),
     ),
-    CveEvalCase(
-        case_id="UPSTREAM-FS",
-        advisory_ref="UPSTREAM-FS",
+    RegressionCase(
+        case_id="clean-filesystem-model",
+        bug_class="CLEAN-FILESYSTEM-MODEL",
         title="@modelcontextprotocol/server-filesystem official manifest",
         status="upstream_reference",
         in_latch_threat_model=True,
@@ -773,9 +775,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
             ]
         },
     ),
-    CveEvalCase(
-        case_id="UPSTREAM-GIT",
-        advisory_ref="UPSTREAM-GIT",
+    RegressionCase(
+        case_id="clean-git-model",
+        bug_class="CLEAN-GIT-MODEL",
         title="@modelcontextprotocol/server-git official manifest",
         status="upstream_reference",
         in_latch_threat_model=True,
@@ -826,9 +828,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
             ]
         },
     ),
-    CveEvalCase(
-        case_id="UPSTREAM-MEMORY",
-        advisory_ref="UPSTREAM-MEMORY",
+    RegressionCase(
+        case_id="clean-memory-model",
+        bug_class="CLEAN-MEMORY-MODEL",
         title="@modelcontextprotocol/server-memory official manifest",
         status="upstream_reference",
         in_latch_threat_model=True,
@@ -888,9 +890,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
             ]
         },
     ),
-    CveEvalCase(
-        case_id="UPSTREAM-POSTGRES",
-        advisory_ref="UPSTREAM-POSTGRES",
+    RegressionCase(
+        case_id="clean-postgres-model",
+        bug_class="CLEAN-POSTGRES-MODEL",
         title="@modelcontextprotocol/server-postgres official read-only manifest",
         status="upstream_reference",
         in_latch_threat_model=True,
@@ -923,9 +925,9 @@ POST_PATCH_CASES: list[CveEvalCase] = [
 ]
 
 
-CASES: list[CveEvalCase] = [*PRE_PATCH_CASES, *POST_PATCH_CASES]
+CASES: list[RegressionCase] = [*PRE_PATCH_CASES, *POST_PATCH_CASES]
 
-assert len(CASES) == 24, "cve_eval corpus must contain exactly 24 cases"
+assert len(CASES) == 24, "synthetic_regression corpus must contain exactly 24 cases"
 assert len(PRE_PATCH_CASES) == 12
 assert len(POST_PATCH_CASES) == 12
 assert len({case.case_id for case in CASES}) == len(CASES)

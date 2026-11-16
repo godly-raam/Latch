@@ -1,15 +1,23 @@
-"""Deterministic real-world evaluation of Latch against advisories and upstream servers.
+"""Deterministic synthetic regression suite modeled on disclosed MCP bug classes.
 
-    python -m cve_eval.run_cve_eval
+    python -m synthetic_regression.run_regression
+
+The 24 fixtures are synthetic: they are written for this repository to exercise
+Latch against the *shapes* of disclosed bug classes and the clean surfaces of
+reference servers. They are not raw captures of vendor packages, not the
+vendors' test fixtures, and they quote no advisory text. Real ``tools/list``
+captures of pinned npm/PyPI packages are evaluated separately in
+``package_eval/``.
 
 Every target is evaluated with Latch's real engines (``verify_manifest``,
 ``audit_manifest``, ``analyze_capability_graph``, ``analyze_shadowing``,
 ``run_auth_audit`` and live ``verify_trifecta_chains``) plus the naive
 keyword/substring baseline from ``benchmark/naive_baseline.py``.
 
-Writes ``cve_eval/cve_results.json`` and ``cve_eval/CVE_EVAL_REPORT.md`` and
-prints a summary. No timestamps and no randomness: re-running reproduces both
-files byte for byte (live probes record only status text, never their canary).
+Writes ``synthetic_regression/regression_results.json`` and
+``synthetic_regression/REGRESSION_REPORT.md`` and prints a summary. No
+timestamps and no randomness: re-running reproduces both files byte for byte
+(live probes record only status text, never their canary).
 """
 
 from __future__ import annotations
@@ -31,11 +39,11 @@ from mcpprobe.models import Lockfile, ToolDefinition
 from mcpprobe.oauth_audit import run_auth_audit
 from mcpprobe.shadow import analyze_shadowing
 
-from .cases import CASES, CveEvalCase
+from .cases import CASES, RegressionCase
 
 EVAL_DIR = Path(__file__).resolve().parent
-RESULTS_JSON = EVAL_DIR / "cve_results.json"
-REPORT_MD = EVAL_DIR / "CVE_EVAL_REPORT.md"
+RESULTS_JSON = EVAL_DIR / "regression_results.json"
+REPORT_MD = EVAL_DIR / "REGRESSION_REPORT.md"
 
 SEVERITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
 
@@ -70,7 +78,7 @@ def _mock_transport(routes: dict[str, dict[str, Any]]) -> httpx.MockTransport:
     return httpx.MockTransport(handler)
 
 
-def evaluate_case(case: CveEvalCase) -> dict[str, Any]:
+def evaluate_case(case: RegressionCase) -> dict[str, Any]:
     """Run the engines this case declares and return its verdict."""
 
     signals: dict[str, bool] = {}
@@ -144,7 +152,7 @@ def evaluate_case(case: CveEvalCase) -> dict[str, Any]:
     }
 
 
-def _naive_hits(case: CveEvalCase) -> list[str]:
+def _naive_hits(case: RegressionCase) -> list[str]:
     payloads = (
         case.manifest_payload,
         case.lockfile_payload,
@@ -194,7 +202,7 @@ def compute_results() -> dict[str, Any]:
         rows.append(
             {
                 "case_id": case.case_id,
-                "advisory_ref": case.advisory_ref,
+                "bug_class": case.bug_class,
                 "title": case.title,
                 "status": case.status,
                 "in_latch_threat_model": case.in_latch_threat_model,
@@ -262,7 +270,7 @@ def _row(name: str, metrics: dict[str, Any], bold: bool = False) -> str:
 
 def _missed_refs(results: dict[str, Any]) -> list[str]:
     return [
-        row["advisory_ref"]
+        row["bug_class"]
         for row in results["cases"]
         if row["expected_positive"] and not row["latch_flagged"]
     ]
@@ -277,7 +285,7 @@ def _naive_false_positives(results: dict[str, Any]) -> list[str]:
 
 
 def render_report(results: dict[str, Any]) -> str:
-    """Render ``CVE_EVAL_REPORT.md`` deterministically."""
+    """Render ``REGRESSION_REPORT.md`` deterministically."""
 
     overall = results["overall"]
     in_scope = results["in_scope"]
@@ -287,7 +295,15 @@ def render_report(results: dict[str, Any]) -> str:
     naive_fps = _naive_false_positives(results)
 
     lines = [
-        "# Latch real-world evaluation: disclosed advisories & upstream reference servers",
+        "# Synthetic Regression Suite Modeled on Disclosed MCP Bug Classes",
+        "",
+        "**These 24 fixtures are synthetic models, not raw upstream captures.** Each",
+        "one is written for this repository to reproduce the *shape* of a bug class",
+        "disclosed in 2025-2026 MCP advisories, or the clean tool surface of a",
+        "reference server. They are not the vendors' own test fixtures, they quote",
+        "no advisory text, and `bug_class` labels are mechanism names rather than",
+        "CVE/GHSA identifiers. Real `tools/list` captures of pinned npm and PyPI",
+        "packages are evaluated separately in `package_eval/`.",
         "",
         "Deterministic evaluation of Latch's static engines (`verify_manifest`,",
         "`audit_manifest`, `analyze_capability_graph`, `analyze_shadowing`,",
@@ -295,12 +311,13 @@ def render_report(results: dict[str, Any]) -> str:
         "and the naive keyword/substring baseline on the same targets.",
         "",
         f"- Targets: {results['case_count']}"
-        f" ({results['pre_patch_count']} pre-patch vulnerable,"
-        f" {results['post_patch_count']} post-patch fixed,"
-        f" {results['upstream_reference_count']} official upstream reference servers)",
+        f" ({results['pre_patch_count']} pre-patch models,"
+        f" {results['post_patch_count']} post-patch models,"
+        f" {results['upstream_reference_count']} reference-server models)",
         f"- Targets inside Latch's threat model: {results['in_scope_case_count']}",
         "- No timestamps or random values are recorded; re-running",
-        "  `python -m cve_eval.run_cve_eval` reproduces this report byte for byte.",
+        "  `python -m synthetic_regression.run_regression` reproduces this report",
+        "  byte for byte.",
         "",
         "## In-scope detection (protocol, schema, auth, shadow and flow flaws)",
         "",
@@ -367,14 +384,14 @@ def render_report(results: dict[str, Any]) -> str:
             "",
             "## Per-case results",
             "",
-            "| Case | Advisory | Status | In model | Expected | Latch | Engines | Naive |",
+            "| Case | Bug class | Status | In model | Expected | Latch | Engines | Naive |",
             "| ---- | -------- | ------ | -------- | -------- | ----- | ------- | ----- |",
         ]
     )
 
     for row in results["cases"]:
         lines.append(
-            f"| `{row['case_id']}` | {row['advisory_ref']} | {row['status']} |"
+            f"| `{row['case_id']}` | {row['bug_class']} | {row['status']} |"
             f" {'yes' if row['in_latch_threat_model'] else 'no'} |"
             f" {'positive' if row['expected_positive'] else 'negative'} |"
             f" {'detected' if row['latch_flagged'] else 'clean'} |"
@@ -393,21 +410,24 @@ def render_report(results: dict[str, Any]) -> str:
             "  read handler source code, so pure implementation bugs are out of scope.",
             "- **Out-of-scope misses recorded:** counted as false negatives in the",
             "  overall table, never quietly excluded, and marked",
-            "  `in_latch_threat_model: false` in `cve_results.json`:",
+            "  `in_latch_threat_model: false` in `regression_results.json`:",
             "",
             *[f"  - `{ref}`" for ref in missed],
             "- **Runtime guards are treated as ground truth.** When `probe-chain`",
             "  runs, its verdict overrides the static graph, because a guard that",
             "  blocks the live canary means the path is not exploitable as served.",
             "  Probing is non-destructive: benign read arguments, a loopback-only",
-            "  sink, and a random canary.",
+            "  sink, and a random canary. An egress tool that rejects that loopback",
+            "  sink as an SSRF/private address is reported `UNCONFIRMED_SSRF_GUARD`,",
+            "  never \"blocked\"; pass `--sink-url` to test internet egress.",
             "- **Coverage is bounded by the probe's schema synthesis.** A chain whose",
             "  egress tool accepts no URL or string payload cannot be parameterized",
             "  and is reported `INCONCLUSIVE_SCHEMA`, never as confirmed.",
-            "- **Advisory identifiers are labels for bug classes.** The payloads are",
-            "  reconstructed from public 2025-2026 disclosures against MCP gateways,",
-            "  vendor servers and registries; they are not byte-for-byte copies of",
-            "  the vendors' test fixtures.",
+            "- **Bug-class labels are synthetic.** `bug_class` names the mechanism",
+            "  (`AUTH-TOKEN-PASSTHROUGH`, `RUGPULL-POST-APPROVAL`, ...). It is not a CVE",
+            "  or GHSA identifier and no advisory text is quoted. The reference-server",
+            "  cases model published tool surfaces, not captured bytes; see",
+            "  `package_eval/PACKAGE_EVAL_REPORT.md` for real package captures.",
             "",
         ]
     )

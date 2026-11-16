@@ -82,24 +82,40 @@ class HarvestResult(BaseModel):
     session_id: str | None = None
 
 
-def discover_params() -> dict[str, Any]:
-    """``server/discover`` params, including the required ``_meta`` block."""
+def request_meta(protocol_version: str = PROTOCOL_2026) -> dict[str, Any]:
+    """The ``_meta`` envelope 2026-07-28 servers require on every request.
+
+    Real servers reject a request whose envelope omits
+    ``io.modelcontextprotocol/clientCapabilities``, and validate it for
+    ``server/discover``, ``initialize`` and ``tools/list`` alike.
+    """
 
     return {
-        "_meta": {
-            "io.modelcontextprotocol/protocolVersion": PROTOCOL_2026,
-            "io.modelcontextprotocol/clientInfo": dict(CLIENT_INFO),
-        }
+        "io.modelcontextprotocol/protocolVersion": protocol_version,
+        "io.modelcontextprotocol/clientInfo": dict(CLIENT_INFO),
+        "io.modelcontextprotocol/clientCapabilities": {},
     }
 
 
+def discover_params() -> dict[str, Any]:
+    """``server/discover`` params, including the required ``_meta`` block."""
+
+    return {"_meta": request_meta(PROTOCOL_2026)}
+
+
 def initialize_params() -> dict[str, Any]:
-    """``initialize`` params for the 2025-11-25 handshake."""
+    """``initialize`` params for the 2025-11-25 handshake.
+
+    Newer servers validate the same ``_meta`` envelope the 2026-07-28
+    ``server/discover`` request uses, even while falling back to the older
+    handshake, so the envelope is sent in both.
+    """
 
     return {
         "protocolVersion": PROTOCOL_2025,
         "capabilities": {},
         "clientInfo": dict(CLIENT_INFO),
+        "_meta": request_meta(PROTOCOL_2025),
     }
 
 
@@ -384,7 +400,9 @@ class StdioSession:
 
     async def fetch_tools(self) -> dict[str, Any]:
         async def fetch(cursor: str | None) -> dict[str, Any]:
-            params = {"cursor": cursor} if cursor else None
+            params: dict[str, Any] = {"_meta": request_meta(self.protocol_version)}
+            if cursor:
+                params["cursor"] = cursor
             return await self.request("tools/list", params)
 
         return await _paginate(fetch)
@@ -625,7 +643,9 @@ class HttpHarvester:
 
     async def fetch_tools(self) -> dict[str, Any]:
         async def fetch(cursor: str | None) -> dict[str, Any]:
-            params = {"cursor": cursor} if cursor else None
+            params: dict[str, Any] = {"_meta": request_meta(self.protocol_version)}
+            if cursor:
+                params["cursor"] = cursor
             return await self.call("tools/list", params)
 
         return await _paginate(fetch)

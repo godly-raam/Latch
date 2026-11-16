@@ -34,8 +34,11 @@ jobs:
       - name: Run benchmark
         run: python -m benchmark.run_benchmark
 
-      - name: Run CVE and upstream reference evaluation
-        run: python -m cve_eval.run_cve_eval
+      - name: Run synthetic regression suite
+        run: python -m synthetic_regression.run_regression
+
+      - name: Run pinned-package blind evaluation
+        run: python -m package_eval.run_package_eval
 
       - name: Run adversarial self-red-team
         run: python -m adversarial.run_evasion

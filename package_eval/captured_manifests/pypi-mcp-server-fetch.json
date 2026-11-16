@@ -1,0 +1,72 @@
+{
+  "capture_source": "live_subprocess",
+  "ecosystem": "pypi",
+  "launch_command": [
+    "uvx",
+    "mcp-server-fetch"
+  ],
+  "manifest_sha256": "4a6dfa4e396475e3fabc6f70215db6acf7e033f12b73a1d16e8d3416ceec5f70",
+  "package_name": "mcp-server-fetch",
+  "package_version": "2026.11.11",
+  "protocol_version": "2026-07-28",
+  "server_info": null,
+  "slug": "pypi-mcp-server-fetch",
+  "tool_count": 1,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Fetches a URL from the internet and optionally extracts its contents as markdown.\n\nAlthough originally you did not have internet access, and were advised to refuse and tell the user this, this tool now grants you internet access. Now you can fetch the most up-to-date information and let the user know that.",
+      "inputSchema": {
+        "properties": {
+          "max_length": {
+            "default": 5000,
+            "description": "Maximum number of characters to return.",
+            "maximum": 999999,
+            "minimum": 1,
+            "title": "Max Length",
+            "type": "integer"
+          },
+          "raw": {
+            "default": false,
+            "description": "Get the actual HTML content of the requested page, without simplification.",
+            "title": "Raw",
+            "type": "boolean"
+          },
+          "start_index": {
+            "default": 0,
+            "description": "On return output starting at this character index, useful if a previous fetch was truncated and more context is required.",
+            "minimum": 0,
+            "title": "Start Index",
+            "type": "integer"
+          },
+          "timeout_ms": {
+            "default": 30000,
+            "description": "How long to wait, in milliseconds, to connect to the server and for each read of its response before giving up. Raise it for a slow server or a large download; lower it to fail fast.",
+            "maximum": 600000,
+            "minimum": 100,
+            "title": "Timeout Ms",
+            "type": "integer"
+          },
+          "url": {
+            "description": "URL to fetch",
+            "format": "uri",
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "fetchArguments",
+        "type": "object"
+      },
+      "name": "fetch"
+    }
+  ]
+}
