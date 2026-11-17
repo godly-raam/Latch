@@ -41,7 +41,14 @@ from mcpprobe.lockfile import create_lockfile, verify_manifest
 from mcpprobe.oauth_audit import run_auth_audit
 from mcpprobe.shadow import analyze_shadowing
 from mcpprobe.watcher import watch_stdio
-from package_eval.run_package_eval import evaluate_package, load_captures
+from package_eval.run_package_eval import (
+    FIRST_RUN_BLIND,
+    evaluate_package,
+    load_captures,
+)
+from package_eval.run_package_eval import (
+    compute_results as package_eval_results,
+)
 from synthetic_regression.run_regression import _auth_inputs, _mock_transport
 
 from .mcp_scan_probe import run_measurement
@@ -524,6 +531,44 @@ def _third_party_status(measurement: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
+def evaluation_stages() -> dict[str, Any]:
+    """The two evaluation stages, both sourced from ``package_eval``.
+
+    ``package_eval`` owns the corpus and scores the compositions, so its
+    numbers are re-derived here instead of being copied by hand; the run is
+    local, deterministic and network-free.
+    """
+
+    package = package_eval_results()
+    return {
+        "first_run_blind": {
+            "label": FIRST_RUN_BLIND["label"],
+            "evaluation_stage": FIRST_RUN_BLIND["evaluation_stage"],
+            "package_count": FIRST_RUN_BLIND["package_count"],
+            "clean_package_count": FIRST_RUN_BLIND["clean_package_count"],
+            "latch_package_false_positive_rate": FIRST_RUN_BLIND[
+                "clean_false_positive_rate"
+            ],
+            "latch_false_positive_packages": FIRST_RUN_BLIND[
+                "clean_false_positive_packages"
+            ],
+            "in_scope_targets": FIRST_RUN_BLIND["in_scope_targets"],
+            "in_scope_detected": FIRST_RUN_BLIND["in_scope_detected"],
+            "in_scope_recall": FIRST_RUN_BLIND["in_scope_recall"],
+            "overall_targets": FIRST_RUN_BLIND["overall_targets"],
+            "overall_detected": FIRST_RUN_BLIND["overall_detected"],
+            "overall_recall": FIRST_RUN_BLIND["overall_recall"],
+            "note": FIRST_RUN_BLIND["note"],
+        },
+        "post_tuning": {
+            **package["stages"]["post_tuning"],
+            "detector_fingerprint_sha256": package[
+                "detector_fingerprint_sha256"
+            ],
+        },
+    }
+
+
 def compute_results(
     *,
     measurement: dict[str, Any] | None = None,
@@ -598,6 +643,7 @@ def compute_results(
 
     return {
         "schema_version": 1,
+        "evaluation_stages": evaluation_stages(),
         "packages": packages,
         "scenarios": scenarios,
         "third_party": third_party,
@@ -695,6 +741,9 @@ def render_report(results: dict[str, Any]) -> str:
     metrics = results["metrics"]
     measurement = results["mcp_scan_measurement"]
     scenarios = results["scenarios"]
+    stages = results["evaluation_stages"]
+    first_run = stages["first_run_blind"]
+    post_tuning = stages["post_tuning"]
 
     lines = [
         "# mcpprobe (Latch): measured real-package comparison",
@@ -709,7 +758,66 @@ def render_report(results: dict[str, Any]) -> str:
         "The self-authored protocol scenarios are demoted to an appendix, because",
         "they demonstrate rule coverage rather than generalization.",
         "",
+        "## Two evaluation stages, side by side",
+        "",
+        "The corpus grew and the vocabulary changed in the same commit",
+        "(`4a089e1`), so the two stages are reported separately instead of being",
+        "blended into one headline.",
+        "",
+        "| Stage | Corpus | Clean-package FPR | In-scope real-target recall | Overall real-target recall |",
+        "| ----- | ------ | ----------------- | --------------------------- | -------------------------- |",
+        f"| **First-Run Blind Baseline** (pre-`4a089e1` rules) |"
+        f" {first_run['package_count']} packages"
+        f" ({first_run['clean_package_count']} clean) |"
+        f" {first_run['latch_package_false_positive_rate']:.2f}"
+        f" ({len(first_run['latch_false_positive_packages'])}"
+        f"/{first_run['clean_package_count']}) |"
+        f" {first_run['in_scope_recall']:.2f}"
+        f" ({len(first_run['in_scope_detected'])}"
+        f"/{len(first_run['in_scope_targets'])}) |"
+        f" {first_run['overall_recall']:.2f}"
+        f" ({len(first_run['overall_detected'])}"
+        f"/{first_run['overall_targets']}) |",
+        f"| **Post-Tuning Corpus** (post-`4a089e1` vocabulary) |"
+        f" {post_tuning['package_count']} packages"
+        f" ({post_tuning['clean_package_count']} clean) |"
+        f" {post_tuning['clean_false_positive_rate']:.2f}"
+        f" ({len(post_tuning['clean_false_positive_packages'])}"
+        f"/{post_tuning['clean_package_count']}) |"
+        f" {post_tuning['in_scope_recall']:.2f}"
+        f" ({len(post_tuning['in_scope_detected'])}"
+        f"/{len(post_tuning['in_scope_targets'])}) |"
+        f" {post_tuning['overall_recall']:.2f}"
+        f" ({len(post_tuning['overall_detected'])}"
+        f"/{post_tuning['overall_targets']}) |",
+        "",
+        "- **`0.20` / `0.67` is the only blind row.** The nine-package run was",
+        "  scored on an untouched engine before `4a089e1`; it is recorded, not",
+        "  recomputed, because the pre-tuning classifier no longer exists.",
+        "- **`0.17` / `0.88` is regression evidence, not blind evidence.**",
+        "  `4a089e1` added five packages and the `navigate` egress verb, which is",
+        "  what makes target D (`@modelcontextprotocol/server-puppeteer@2025.5.12",
+        "  + `@modelcontextprotocol/server-filesystem@2.3.0`) visible:",
+        "  **Detected (post-tuning: \"navigate\" added to egress vocabulary in",
+        "  `4a089e1`; would have missed on first run)**.",
+        "- **GitHub and Slack are known-class manifest checks, not",
+        "  generalization proof.**",
+        "  `@modelcontextprotocol/server-github@2025.4.8` and",
+        "  `@modelcontextprotocol/server-slack@2025.4.25` were chosen from",
+        "  capability classes the engine was already built to detect",
+        "  (`get_issue` / `get_file_contents` / `create_issue` and",
+        "  `get_channel_history` / `post_message`). Detecting them confirms the",
+        "  rules fire on real upstream manifests; it says nothing about servers",
+        "  nobody inspected.",
+        "- **Unseen-server recall is unmeasured.** Only the",
+        "  **First-Run Blind Baseline (9 packages)** and the **Wave 2",
+        "  Author-Blind Suite (`0.42` recall)** are pre-tuning runs, and both were",
+        "  authored by this project.",
+        "",
         "## Headline: measured on real captured packages",
+        "",
+        "The headline row below is the **Post-Tuning Corpus** stage; the",
+        "nine-package blind baseline is the row above.",
         "",
         "| Scanner | Clean-package FPR | In-model real targets | Evidence |",
         "| ------- | ----------------- | --------------------- | -------- |",
@@ -863,6 +971,15 @@ def render_report(results: dict[str, Any]) -> str:
             "- `agent-latch` was **not exercised at all**: its row is an",
             "  `architectural_comparison_only` documentation comparison, and a",
             "  documentation comparison cannot prove a detection either way.",
+            "- The fourteen-package row is not blind: `4a089e1` added five",
+            "  packages and the `navigate` egress verb, and target D would have",
+            "  been missed before it. Only the nine-package First-Run Blind",
+            "  Baseline and the Wave 2 author-blind suite (`0.42` recall) predate",
+            "  the tuning.",
+            "- GitHub and Slack were selected from capability classes the engine",
+            "  already models, so their detection is a known-class manifest check",
+            "  rather than evidence that recall generalizes. Recall on unseen",
+            "  third-party servers remains unmeasured.",
             "- The ten scenarios are canonical shapes written alongside the rules,",
             "  not a random sample: they verify rule wiring (see the appendix) and",
             "  say nothing about generalization. The measurement this project is",

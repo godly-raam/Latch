@@ -10,7 +10,44 @@ against the same real upstream `tools/list` captures in
 The self-authored protocol scenarios are demoted to an appendix, because
 they demonstrate rule coverage rather than generalization.
 
+## Two evaluation stages, side by side
+
+The corpus grew and the vocabulary changed in the same commit
+(`4a089e1`), so the two stages are reported separately instead of being
+blended into one headline.
+
+| Stage | Corpus | Clean-package FPR | In-scope real-target recall | Overall real-target recall |
+| ----- | ------ | ----------------- | --------------------------- | -------------------------- |
+| **First-Run Blind Baseline** (pre-`4a089e1` rules) | 9 packages (5 clean) | 0.20 (1/5) | 0.67 (2/3) | 0.40 (2/5) |
+| **Post-Tuning Corpus** (post-`4a089e1` vocabulary) | 14 packages (6 clean) | 0.17 (1/6) | 0.88 (7/8) | 0.70 (7/10) |
+
+- **`0.20` / `0.67` is the only blind row.** The nine-package run was
+  scored on an untouched engine before `4a089e1`; it is recorded, not
+  recomputed, because the pre-tuning classifier no longer exists.
+- **`0.17` / `0.88` is regression evidence, not blind evidence.**
+  `4a089e1` added five packages and the `navigate` egress verb, which is
+  what makes target D (`@modelcontextprotocol/server-puppeteer@2025.5.12
+  + `@modelcontextprotocol/server-filesystem@2.3.0`) visible:
+  **Detected (post-tuning: "navigate" added to egress vocabulary in
+  `4a089e1`; would have missed on first run)**.
+- **GitHub and Slack are known-class manifest checks, not
+  generalization proof.**
+  `@modelcontextprotocol/server-github@2025.4.8` and
+  `@modelcontextprotocol/server-slack@2025.4.25` were chosen from
+  capability classes the engine was already built to detect
+  (`get_issue` / `get_file_contents` / `create_issue` and
+  `get_channel_history` / `post_message`). Detecting them confirms the
+  rules fire on real upstream manifests; it says nothing about servers
+  nobody inspected.
+- **Unseen-server recall is unmeasured.** Only the
+  **First-Run Blind Baseline (9 packages)** and the **Wave 2
+  Author-Blind Suite (`0.42` recall)** are pre-tuning runs, and both were
+  authored by this project.
+
 ## Headline: measured on real captured packages
+
+The headline row below is the **Post-Tuning Corpus** stage; the
+nine-package blind baseline is the row above.
 
 | Scanner | Clean-package FPR | In-model real targets | Evidence |
 | ------- | ----------------- | --------------------- | -------- |
@@ -92,6 +129,15 @@ Sources: mcpprobe (Latch) — this repository; Invariant / Snyk mcp-scan — htt
 - `agent-latch` was **not exercised at all**: its row is an
   `architectural_comparison_only` documentation comparison, and a
   documentation comparison cannot prove a detection either way.
+- The fourteen-package row is not blind: `4a089e1` added five
+  packages and the `navigate` egress verb, and target D would have
+  been missed before it. Only the nine-package First-Run Blind
+  Baseline and the Wave 2 author-blind suite (`0.42` recall) predate
+  the tuning.
+- GitHub and Slack were selected from capability classes the engine
+  already models, so their detection is a known-class manifest check
+  rather than evidence that recall generalizes. Recall on unseen
+  third-party servers remains unmeasured.
 - The ten scenarios are canonical shapes written alongside the rules,
   not a random sample: they verify rule wiring (see the appendix) and
   say nothing about generalization. The measurement this project is

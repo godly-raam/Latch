@@ -43,6 +43,89 @@
       "tool": "AgentLatch (agent-latch)"
     }
   ],
+  "evaluation_stages": {
+    "first_run_blind": {
+      "clean_package_count": 5,
+      "evaluation_stage": "pre-tuning (pre-4a089e1 rules)",
+      "in_scope_detected": [
+        "npm-mcp-remote-0-14-3",
+        "pypi-mcp-proxy-0-8-2"
+      ],
+      "in_scope_recall": 0.6667,
+      "in_scope_targets": [
+        "npm-mcp-remote-0-14-3",
+        "pypi-mcp-proxy-0-8-2",
+        "B"
+      ],
+      "label": "First-Run Blind Baseline",
+      "latch_false_positive_packages": [
+        "npm-server-everything"
+      ],
+      "latch_package_false_positive_rate": 0.2,
+      "note": "Scored before commit 4a089e1, on engines that did not contain the post-tuning vocabulary. Nine packages, four compositions.",
+      "overall_detected": [
+        "npm-mcp-remote-0-14-3",
+        "pypi-mcp-proxy-0-8-2"
+      ],
+      "overall_recall": 0.4,
+      "overall_targets": 5,
+      "package_count": 9
+    },
+    "post_tuning": {
+      "clean_false_positive_packages": [
+        "npm-server-everything"
+      ],
+      "clean_false_positive_rate": 0.1667,
+      "clean_package_count": 6,
+      "detector_fingerprint_sha256": "fbd6c67aac4e527f79b4e4ad328103ffb091ff4f0c85b7cca5cf63a27aa5cf6b",
+      "evaluation_stage": "post-tuning (post-4a089e1)",
+      "everything_single_server_paths": 9,
+      "everything_with_filesystem_paths": 11,
+      "in_scope_detected": [
+        "npm-mcp-remote-0-14-3-static-header",
+        "npm-mcp-remote-0-14-3",
+        "npm-server-github-2025-4-8",
+        "npm-server-slack-2025-4-25",
+        "npm-supergateway-3-1-0",
+        "pypi-mcp-proxy-0-8-2",
+        "D"
+      ],
+      "in_scope_recall": 0.875,
+      "in_scope_targets": [
+        "npm-mcp-remote-0-14-3-static-header",
+        "npm-mcp-remote-0-14-3",
+        "npm-server-github-2025-4-8",
+        "npm-server-slack-2025-4-25",
+        "npm-supergateway-3-1-0",
+        "pypi-mcp-proxy-0-8-2",
+        "B",
+        "D"
+      ],
+      "label": "Post-Tuning Corpus",
+      "note": "Recomputed on every run from the engines pinned by detector_fingerprint_sha256. Fourteen packages, five compositions; five packages and the `navigate` egress verb were added by 4a089e1.",
+      "overall_detected": [
+        "npm-mcp-remote-0-14-3-static-header",
+        "npm-mcp-remote-0-14-3",
+        "npm-server-github-2025-4-8",
+        "npm-server-slack-2025-4-25",
+        "npm-supergateway-3-1-0",
+        "pypi-mcp-proxy-0-8-2",
+        "D"
+      ],
+      "overall_recall": 0.7,
+      "overall_targets": 10,
+      "package_count": 14,
+      "targets_added_post_tuning": [
+        "npm-mcp-remote-0-14-3-static-header",
+        "npm-server-filesystem-0-6-2",
+        "npm-server-github-2025-4-8",
+        "npm-server-slack-2025-4-25",
+        "npm-supergateway-3-1-0",
+        "pypi-mcp-server-git-2025-9-25",
+        "D"
+      ]
+    }
+  },
   "mcp_scan_measurement": {
     "analysis_endpoint": "https://api.snyk.io/hidden/mcp-scan/analysis-machine?version=2026-07-10",
     "binary": "snyk-agent-scan",

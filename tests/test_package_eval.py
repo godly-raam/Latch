@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -24,6 +25,17 @@ from package_eval.run_package_eval import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPTURE_REPORT = ROOT / "package_eval" / "capture_report.json"
+
+#: The files that make up the static detection surface. Editing any of them
+#: invalidates the recorded post-tuning numbers.
+DETECTOR_MODULES = (
+    "graph",
+    "auditor",
+    "shadow",
+    "oauth_audit",
+    "chain_prober",
+    "diff",
+)
 
 REFERENCE_SLUGS = {
     "npm-mcp-remote-0-14-3",
@@ -409,6 +421,79 @@ def test_report_documents_the_real_findings(results: dict) -> None:
     assert "314" in report
     for row in results["packages"]:
         assert f"`{row['package_name']}`" in report
+
+
+def _detector_fingerprint() -> str:
+    """Recompute the provenance hash independently of the module that wrote it."""
+
+    digest = hashlib.sha256()
+    for relative in sorted(
+        f"mcpprobe/{module}.py" for module in DETECTOR_MODULES
+    ):
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update((ROOT / relative).read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def test_detector_provenance_pins_the_ruleset() -> None:
+    """Any rule or vocabulary edit must force a re-run and a re-label.
+
+    The stored label claims these numbers were produced by this exact detector
+    set. If ``mcpprobe/`` drifts, the claim silently becomes false, so the
+    fingerprint is asserted here rather than trusted.
+    """
+
+    stored = json.loads(RESULTS_JSON.read_text(encoding="utf-8"))
+    assert stored["evaluation_stage"] == "post-tuning (post-4a089e1)"
+    assert stored["detector_fingerprint_sha256"] == _detector_fingerprint(), (
+        "mcpprobe/ detection code changed since package_eval was last run;"
+        " re-run `python -m package_eval.run_package_eval` and re-label the"
+        " evaluation stage before trusting these numbers"
+    )
+
+
+def test_report_separates_first_run_blind_from_post_tuning(results: dict) -> None:
+    report = REPORT_MD.read_text(encoding="utf-8")
+
+    assert "First-Run Blind Baseline" in report
+    assert "Post-Tuning Corpus" in report
+    assert "Selection Bias & Unseen-Server Recall Caveat" in report
+    assert "No rule or vocabulary was adjusted" not in report
+    assert (
+        '- Target `D`: **Detected (post-tuning: "navigate" added to egress'
+        " vocabulary in `4a089e1`; would have missed on first run)**."
+    ) in report
+    assert "0.20 (1/5)" in report
+    assert "0.67 (2/3)" in report
+    assert "0.40 (2/5)" in report
+    assert "0.17 (1/6)" in report
+    assert "0.88 (7/8)" in report
+    assert "0.70 (7/10)" in report
+    assert "| `D` |" in report
+    assert "post-tuning (new)" in report
+    assert "first-run blind" in report
+
+    stages = results["stages"]
+    first_run = stages["first_run_blind"]
+    assert first_run["package_count"] == 9
+    assert first_run["clean_package_count"] == 5
+    assert first_run["clean_false_positive_rate"] == 0.2
+    assert first_run["in_scope_recall"] == 0.6667
+    assert first_run["overall_recall"] == 0.4
+    assert first_run["everything_single_server_paths"] == 26
+    assert first_run["everything_with_filesystem_paths"] == 32
+
+    post_tuning = stages["post_tuning"]
+    assert post_tuning["package_count"] == 14
+    assert post_tuning["clean_package_count"] == 6
+    assert post_tuning["clean_false_positive_rate"] == 0.1667
+    assert post_tuning["in_scope_recall"] == 0.875
+    assert post_tuning["overall_recall"] == 0.7
+    assert post_tuning["everything_single_server_paths"] == 9
+    assert post_tuning["everything_with_filesystem_paths"] == 11
+    assert "D" in post_tuning["targets_added_post_tuning"]
 
 
 def test_before_after_table_matches_the_recorded_measurements(results: dict) -> None:

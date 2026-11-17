@@ -1,4 +1,4 @@
-"""Blind evaluation of Latch against captured real package manifests.
+"""Evaluation of Latch against captured real package manifests.
 
     python -m package_eval.run_package_eval
 
@@ -7,7 +7,15 @@ Loads every capture in ``package_eval/captured_manifests/`` (see
 engines plus the naive keyword baseline, and evaluates multi-server compositions
 built directly from those unmodified captures.
 
-The corpus mixes three kinds of target:
+The corpus is reported in two stages, because the engines changed between
+``4a089e1`` and now. Nine packages were scored on an untouched engine before
+that commit -- the only genuinely blind baseline here. Five more packages were
+added by ``4a089e1``, which also added ``navigate`` to the egress vocabulary so
+target D (``puppeteer + filesystem``) became visible. Post-tuning numbers are
+regression evidence, not blind evidence, and every surface in this module
+labels them that way.
+
+Each stage mixes three kinds of target:
 
 * **in-model real targets** -- a cleartext-HTTP OAuth proxy, an unauthenticated
   cleartext SSE bridge, and a cross-server fetch + filesystem composition. A
@@ -25,6 +33,7 @@ Writes ``package_eval/package_results.json`` and
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -41,6 +50,69 @@ EVAL_DIR = Path(__file__).resolve().parent
 MANIFEST_DIR = EVAL_DIR / "captured_manifests"
 RESULTS_JSON = EVAL_DIR / "package_results.json"
 REPORT_MD = EVAL_DIR / "PACKAGE_EVAL_REPORT.md"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+#: The detection surface this evaluation was run against. Editing any of these
+#: files changes the fingerprint and fails the provenance test until the corpus
+#: is re-run and re-labelled.
+DETECTOR_FILES: tuple[str, ...] = (
+    "mcpprobe/graph.py",
+    "mcpprobe/auditor.py",
+    "mcpprobe/shadow.py",
+    "mcpprobe/oauth_audit.py",
+    "mcpprobe/chain_prober.py",
+    "mcpprobe/diff.py",
+)
+
+EVALUATION_STAGE = "post-tuning (post-4a089e1)"
+
+#: Targets that already existed in the nine-package first run. Anything else in
+#: the current corpus was added by the same commit that tuned the vocabulary.
+FIRST_RUN_TARGET_IDS: tuple[str, ...] = (
+    "npm-mcp-remote-0-14-3",
+    "pypi-mcp-proxy-0-8-2",
+    "B",
+)
+
+#: The one blind measurement this project has. Recorded rather than recomputed:
+#: the pre-``4a089e1`` classifier no longer exists in ``mcpprobe/``, so a
+#: derived "before" number would describe rules that cannot be re-run.
+FIRST_RUN_BLIND: dict[str, Any] = {
+    "label": "First-Run Blind Baseline",
+    "evaluation_stage": "pre-tuning (pre-4a089e1 rules)",
+    "package_count": 9,
+    "clean_package_count": 5,
+    "clean_false_positive_packages": ["npm-server-everything"],
+    "clean_false_positive_rate": 0.2,
+    "in_scope_targets": [
+        "npm-mcp-remote-0-14-3",
+        "pypi-mcp-proxy-0-8-2",
+        "B",
+    ],
+    "in_scope_detected": ["npm-mcp-remote-0-14-3", "pypi-mcp-proxy-0-8-2"],
+    "in_scope_recall": 0.6667,
+    "overall_targets": 5,
+    "overall_detected": ["npm-mcp-remote-0-14-3", "pypi-mcp-proxy-0-8-2"],
+    "overall_recall": 0.4,
+    "everything_single_server_paths": 26,
+    "everything_with_filesystem_paths": 32,
+    "note": (
+        "Scored before commit 4a089e1, on engines that did not contain the"
+        " post-tuning vocabulary. Nine packages, four compositions."
+    ),
+}
+
+
+def detector_fingerprint() -> str:
+    """SHA-256 over the sorted canonical bytes of the detection surface."""
+
+    digest = hashlib.sha256()
+    for relative in sorted(DETECTOR_FILES):
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update((REPO_ROOT / relative).read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 #: Caps keep the report and JSON reviewable when a real surface is large.
 MAX_LISTED_FINDINGS = 20
@@ -114,6 +186,10 @@ COMPOSITIONS: list[dict[str, Any]] = [
             " (server-puppeteer) beside real private workspace reads"
             " (server-filesystem)."
         ),
+        "first_run_outcome": "missed",
+        "post_tuning_change": (
+            "`navigate` added to the egress vocabulary in `4a089e1`"
+        ),
     },
     {
         "composition_id": "everything-plus-filesystem",
@@ -160,6 +236,7 @@ def _target_row(
     findings: list[dict[str, Any]],
     naive_hits: list[str],
     tool_count: int,
+    graph_path_count: int = 0,
 ) -> dict[str, Any]:
     rule_ids = sorted({finding["rule_id"] for finding in findings})
     expected_positive = bool(
@@ -184,6 +261,7 @@ def _target_row(
         "launch_command": capture["launch_command"],
         "manifest_sha256": capture["manifest_sha256"],
         "tool_count": tool_count,
+        "graph_path_count": graph_path_count,
         "tool_names": [tool.name for tool in _tools(capture)],
         "in_latch_threat_model": capture["in_latch_threat_model"],
         "vulnerability_class": capture["vulnerability_class"],
@@ -304,6 +382,7 @@ def evaluate_package(capture: dict[str, Any]) -> dict[str, Any]:
         findings=findings,
         naive_hits=_naive_hits(capture["tools"]),
         tool_count=len(tools),
+        graph_path_count=len(graph.trifecta_paths),
     )
 
 
@@ -362,6 +441,8 @@ def evaluate_composition(
         "rationale": spec["rationale"],
         "miss_rationale": spec.get("miss_rationale"),
         "in_latch_threat_model": spec["in_latch_threat_model"],
+        "first_run_outcome": spec.get("first_run_outcome"),
+        "post_tuning_change": spec.get("post_tuning_change"),
         "expected_positive": expected_positive,
         "expected_rule_ids": spec.get("expected_rule_ids", []),
         "detected_rule_ids": [
@@ -434,7 +515,32 @@ def compute_results() -> dict[str, Any]:
 
     naive_flagged = [row["slug"] for row in packages if row["naive_flagged"]]
 
+    everything_paths = next(
+        (
+            row["graph_path_count"]
+            for row in packages
+            if row["slug"] == "npm-server-everything"
+        ),
+        0,
+    )
+    everything_composition_paths = next(
+        (
+            row["trifecta_path_count"]
+            for row in compositions
+            if row["composition_id"] == "everything-plus-filesystem"
+        ),
+        0,
+    )
+    post_tuning_only_targets = [
+        row["target_id"]
+        for row in packages + compositions
+        if row["expected_positive"]
+        and row["target_id"] not in FIRST_RUN_TARGET_IDS
+    ]
+
     return {
+        "evaluation_stage": EVALUATION_STAGE,
+        "detector_fingerprint_sha256": detector_fingerprint(),
         "package_count": len(packages),
         "tool_count": sum(row["tool_count"] for row in packages),
         "packages": packages,
@@ -493,6 +599,44 @@ def compute_results() -> dict[str, Any]:
                 if row["trifecta_path_count"]
             ],
         },
+        "stages": {
+            "first_run_blind": dict(FIRST_RUN_BLIND),
+            "post_tuning": {
+                "label": "Post-Tuning Corpus",
+                "evaluation_stage": EVALUATION_STAGE,
+                "package_count": len(packages),
+                "clean_package_count": clean_package_count,
+                "clean_false_positive_packages": false_positives,
+                "clean_false_positive_rate": round(
+                    len(false_positives) / len(clean), 4
+                )
+                if clean
+                else 0.0,
+                "in_scope_targets": [row["target_id"] for row in in_scope],
+                "in_scope_detected": in_scope_detected,
+                "in_scope_recall": round(
+                    len(in_scope_detected) / len(in_scope), 4
+                )
+                if in_scope
+                else 0.0,
+                "overall_targets": len(targets),
+                "overall_detected": overall_detected,
+                "overall_recall": round(
+                    len(overall_detected) / len(targets), 4
+                )
+                if targets
+                else 0.0,
+                "everything_single_server_paths": everything_paths,
+                "everything_with_filesystem_paths": everything_composition_paths,
+                "targets_added_post_tuning": post_tuning_only_targets,
+                "note": (
+                    "Recomputed on every run from the engines pinned by"
+                    " detector_fingerprint_sha256. Fourteen packages, five"
+                    " compositions; five packages and the `navigate` egress"
+                    " verb were added by 4a089e1."
+                ),
+            },
+        },
     }
 
 
@@ -504,6 +648,18 @@ def _mark(value: bool) -> str:
     return "yes" if value else "no"
 
 
+def _stage_cell(row: dict[str, Any]) -> str:
+    """Which stage a scored target belongs to.
+
+    Only three targets existed in the nine-package first run; everything else
+    arrived with the same commit that tuned the vocabulary.
+    """
+
+    if row["target_id"] in FIRST_RUN_TARGET_IDS:
+        return "first-run blind"
+    return "post-tuning (new)"
+
+
 def render_report(results: dict[str, Any]) -> str:
     """Render ``PACKAGE_EVAL_REPORT.md`` deterministically."""
 
@@ -512,12 +668,23 @@ def render_report(results: dict[str, Any]) -> str:
     before_after = {
         row["composition_id"]: row for row in results["precision_before_after"]
     }
+    first_run = results["stages"]["first_run_blind"]
+    post_tuning = results["stages"]["post_tuning"]
 
     lines = [
         "# Pinned-package evaluation: real `tools/list` captures",
         "",
-        "Blind evaluation of Latch against real MCP packages, launched as a client",
-        "would launch them, without tailoring any engine to these packages.",
+        "Real MCP packages, launched as a client would launch them, with their",
+        "verbatim `tools/list` responses scored by Latch's real static engines.",
+        "",
+        "**This corpus is reported in two stages, because the engines changed",
+        "between them.** Nine packages were scored on a genuinely untouched",
+        "engine before commit `4a089e1`; that is the only blind baseline here.",
+        "Five more packages were added by `4a089e1`, and the same commit added",
+        "`navigate` to the egress vocabulary so that target D",
+        "(`puppeteer + filesystem`) became visible. Post-tuning numbers are",
+        "**regression evidence, not blind evidence**, and they are labelled that",
+        "way throughout.",
         "",
         "## Method",
         "",
@@ -530,7 +697,7 @@ def render_report(results: dict[str, Any]) -> str:
         "`analyze_capability_graph`, `analyze_shadowing` and `run_auth_audit`",
         "against those records plus the naive keyword baseline.",
         "",
-        "Three kinds of target are scored separately:",
+        "The two stages mix three kinds of target:",
         "",
         "- **in-model real targets** -- single-server trifectas published by",
         "  real servers (GitHub, Slack), cleartext or unauthenticated transport",
@@ -543,7 +710,113 @@ def render_report(results: dict[str, Any]) -> str:
         "- **clean reference servers** -- first-party servers expected to be",
         "  clean; every finding on them is a false positive.",
         "",
-        "No rule or vocabulary was adjusted for any of these packages.",
+        "### Provenance of the two stages",
+        "",
+        "The nine-package numbers were produced before `4a089e1` and are",
+        "recorded, not recomputed: the pre-tuning classifier no longer exists",
+        "in `mcpprobe/`, so a derived \"before\" number would describe rules",
+        "that cannot be re-run. The fourteen-package numbers are recomputed on",
+        "every run from the current engines. The detector set behind them is",
+        "pinned by `detector_fingerprint_sha256`, a SHA-256 over the sorted",
+        "canonical bytes of",
+        "`mcpprobe/{graph,auditor,shadow,oauth_audit,chain_prober,diff}.py`;",
+        "`tests/test_package_eval.py` fails when that fingerprint drifts, which",
+        "forces an explicit re-run and re-label instead of a silently stale",
+        "claim.",
+        "",
+        "Current detector fingerprint:",
+        f"`{results['detector_fingerprint_sha256']}`",
+        f" (evaluation stage: `{results['evaluation_stage']}`).",
+        "",
+        "## Two stages: First-Run Blind Baseline vs. Post-Tuning Corpus",
+        "",
+        _row(
+            [
+                "Stage",
+                "Corpus",
+                "Clean-package FPR",
+                "In-scope real-target recall",
+                "Overall real-target recall",
+            ]
+        ),
+        _row(["---"] * 5),
+        _row(
+            [
+                "**First-Run Blind Baseline** (pre-`4a089e1` rules)",
+                f"{first_run['package_count']} packages,"
+                f" {first_run['clean_package_count']} clean",
+                f"{first_run['clean_false_positive_rate']:.2f}"
+                f" ({len(first_run['clean_false_positive_packages'])}"
+                f"/{first_run['clean_package_count']})",
+                f"{first_run['in_scope_recall']:.2f} ("
+                f"{len(first_run['in_scope_detected'])}"
+                f"/{len(first_run['in_scope_targets'])})",
+                f"{first_run['overall_recall']:.2f} ("
+                f"{len(first_run['overall_detected'])}"
+                f"/{first_run['overall_targets']})",
+            ]
+        ),
+        _row(
+            [
+                "**Post-Tuning Corpus** (post-`4a089e1` vocabulary)",
+                f"{post_tuning['package_count']} packages,"
+                f" {post_tuning['clean_package_count']} clean",
+                f"{post_tuning['clean_false_positive_rate']:.2f}"
+                f" ({len(post_tuning['clean_false_positive_packages'])}"
+                f"/{post_tuning['clean_package_count']})",
+                f"{post_tuning['in_scope_recall']:.2f} ("
+                f"{len(post_tuning['in_scope_detected'])}"
+                f"/{len(post_tuning['in_scope_targets'])})",
+                f"{post_tuning['overall_recall']:.2f} ("
+                f"{len(post_tuning['overall_detected'])}"
+                f"/{post_tuning['overall_targets']})",
+            ]
+        ),
+        "",
+        f"- First-run blind FPR: `0.20` (`1/5`), with",
+        "  `@modelcontextprotocol/server-everything` producing `26`",
+        "  single-server static paths (`32` beside `server-filesystem`).",
+        f"- Post-tuning FPR: `0.17` (`1/6`). The same package now produces"
+        f" `{post_tuning['everything_single_server_paths']}` single-server paths"
+        f" (`{post_tuning['everything_with_filesystem_paths']}` beside"
+        " `server-filesystem`) after `sampling`, `elicitation` and `trigger`"
+        " tools without an external target stopped counting as"
+        " `EXTERNAL_EGRESS`.",
+        "- First-run in-scope recall: `0.67` (`2/3`) -- `mcp-remote@0.14.3` and",
+        "  `mcp-proxy==0.8.2` caught, the `fetch + filesystem` composition",
+        "  missed statically. First-run overall recall: `0.40` (`2/5`), because",
+        "  the two out-of-scope handler CVEs are scored in overall recall.",
+        "- Post-tuning in-scope recall: `0.88` (`7/8`); overall `0.70`"
+        " (`7/10`).",
+        "- Packages and targets added by the tuning commit:"
+        " "
+        + (
+            ", ".join(
+                f"`{target}`"
+                for target in post_tuning["targets_added_post_tuning"]
+            )
+            or "none"
+        )
+        + " -- new targets scored with the post-tuning engines, so they are",
+        "  not part of the blind baseline either.",
+        "- Target D (`@modelcontextprotocol/server-puppeteer@2025.5.12 +",
+        "  `@modelcontextprotocol/server-filesystem@2.3.0`): **Detected",
+        "  (post-tuning: \"navigate\" added to egress vocabulary in `4a089e1`;",
+        "  would have missed on first run)**.",
+        "",
+        "## Selection Bias & Unseen-Server Recall Caveat",
+        "",
+        "1. `@modelcontextprotocol/server-github@2025.4.8` and",
+        "   `@modelcontextprotocol/server-slack@2025.4.25` were chosen from",
+        "   capability classes the engine was already built to detect",
+        "   (`get_issue` / `get_file_contents` / `create_issue` and",
+        "   `get_channel_history` / `post_message`). Their detection verifies",
+        "   that the rules fire on real upstream manifests; it does **not** show",
+        "   that recall generalizes to arbitrary unseen servers.",
+        "2. Real-world recall on uninspected third-party MCP servers remains",
+        "   **unmeasured**. Only the **First-Run Blind Baseline (9 packages)**",
+        "   and the **Wave 2 Author-Blind Suite (`0.42` recall)** reflect",
+        "   pre-tuning runs, and both were authored by this project.",
         "",
         "## Captured packages",
         "",
@@ -594,13 +867,14 @@ def render_report(results: dict[str, Any]) -> str:
                     "Package / composition",
                     "Class",
                     "In model",
+                    "Stage",
                     "Expected",
                     "Latch",
                     "Outcome",
                     "Rules",
                 ]
             ),
-            _row(["---"] * 8),
+            _row(["---"] * 9),
         ]
     )
 
@@ -620,6 +894,7 @@ def render_report(results: dict[str, Any]) -> str:
                     if row.get("vulnerability_class")
                     else "`cross_server_composition`",
                     _mark(row["in_latch_threat_model"]),
+                    _stage_cell(row),
                     _mark(row["expected_positive"]),
                     _mark(row["latch_flagged"]),
                     row["outcome"],
@@ -628,10 +903,23 @@ def render_report(results: dict[str, Any]) -> str:
             )
         )
 
+    lines.append("")
+    lines.append(
+        "- `first-run blind` targets existed in the nine-package baseline;"
+        " `post-tuning (new)` targets arrived with `4a089e1`."
+    )
+    for row in target_rows:
+        if row.get("post_tuning_change"):
+            lines.append(
+                f"- Target `{row['target_id']}`: **Detected (post-tuning:"
+                ' "navigate" added to egress vocabulary in `4a089e1`;'
+                " would have missed on first run)**."
+            )
+
     lines.extend(
         [
             "",
-            "## Detection and false positives",
+            "## Detection and false positives (post-tuning, 14 packages)",
             "",
             _row(["Metric", "Value"]),
             _row(["---", "---"]),
@@ -799,6 +1087,11 @@ def render_report(results: dict[str, Any]) -> str:
             )
         if row["miss_rationale"]:
             lines.append(f"  - why it is missed: {row['miss_rationale']}")
+        if row["post_tuning_change"]:
+            lines.append(
+                f"  - post-tuning only: {row['post_tuning_change']};"
+                f" first-run outcome `{row['first_run_outcome']}`"
+            )
         for finding in row["shadow_findings"]:
             lines.append(f"  - shadow finding: {finding}")
     lines.append("")
@@ -900,9 +1193,17 @@ def render_report(results: dict[str, Any]) -> str:
             "  genuine pre-patch releases plus real transport exposures, not only",
             "  clean first-party servers, so recall is measured rather than",
             "  assumed.",
-            "- **Blind evaluation.** No rule or vocabulary was adjusted for these",
-            "  packages; they are scored exactly as any other configuration would",
-            "  be.",
+            "- **Two stages, labelled as such.** Only the nine-package",
+            "  **First-Run Blind Baseline** was scored on an untouched engine. The",
+            "  fourteen-package **Post-Tuning Corpus** was captured after",
+            "  `4a089e1`, which added five packages and the `navigate` egress verb",
+            "  that makes target D visible, so it is regression evidence rather",
+            "  than blind evidence. The report states the detector fingerprint so",
+            "  a later rule change cannot silently inherit these numbers.",
+            "- **Selection bias.** GitHub and Slack were picked from capability",
+            "  classes the engine already models. Detecting them proves the rules",
+            "  fire on real upstream manifests; recall on uninspected third-party",
+            "  servers remains unmeasured (see the caveat section above).",
             "- **Only metadata is exercised.** Captures contain `tools/list` bytes",
             "  and real transport configuration. Handler behaviour, RBAC and",
             "  network policy are not observed here; `latch probe-chain` is the",

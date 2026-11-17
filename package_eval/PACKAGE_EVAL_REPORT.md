@@ -1,7 +1,16 @@
 # Pinned-package evaluation: real `tools/list` captures
 
-Blind evaluation of Latch against real MCP packages, launched as a client
-would launch them, without tailoring any engine to these packages.
+Real MCP packages, launched as a client would launch them, with their
+verbatim `tools/list` responses scored by Latch's real static engines.
+
+**This corpus is reported in two stages, because the engines changed
+between them.** Nine packages were scored on a genuinely untouched
+engine before commit `4a089e1`; that is the only blind baseline here.
+Five more packages were added by `4a089e1`, and the same commit added
+`navigate` to the egress vocabulary so that target D
+(`puppeteer + filesystem`) became visible. Post-tuning numbers are
+**regression evidence, not blind evidence**, and they are labelled that
+way throughout.
 
 ## Method
 
@@ -14,7 +23,7 @@ invoked and the cleartext endpoint they expose is probed instead.
 `analyze_capability_graph`, `analyze_shadowing` and `run_auth_audit`
 against those records plus the naive keyword baseline.
 
-Three kinds of target are scored separately:
+The two stages mix three kinds of target:
 
 - **in-model real targets** -- single-server trifectas published by
   real servers (GitHub, Slack), cleartext or unauthenticated transport
@@ -27,7 +36,60 @@ Three kinds of target are scored separately:
 - **clean reference servers** -- first-party servers expected to be
   clean; every finding on them is a false positive.
 
-No rule or vocabulary was adjusted for any of these packages.
+### Provenance of the two stages
+
+The nine-package numbers were produced before `4a089e1` and are
+recorded, not recomputed: the pre-tuning classifier no longer exists
+in `mcpprobe/`, so a derived "before" number would describe rules
+that cannot be re-run. The fourteen-package numbers are recomputed on
+every run from the current engines. The detector set behind them is
+pinned by `detector_fingerprint_sha256`, a SHA-256 over the sorted
+canonical bytes of
+`mcpprobe/{graph,auditor,shadow,oauth_audit,chain_prober,diff}.py`;
+`tests/test_package_eval.py` fails when that fingerprint drifts, which
+forces an explicit re-run and re-label instead of a silently stale
+claim.
+
+Current detector fingerprint:
+`fbd6c67aac4e527f79b4e4ad328103ffb091ff4f0c85b7cca5cf63a27aa5cf6b`
+ (evaluation stage: `post-tuning (post-4a089e1)`).
+
+## Two stages: First-Run Blind Baseline vs. Post-Tuning Corpus
+
+| Stage | Corpus | Clean-package FPR | In-scope real-target recall | Overall real-target recall |
+| --- | --- | --- | --- | --- |
+| **First-Run Blind Baseline** (pre-`4a089e1` rules) | 9 packages, 5 clean | 0.20 (1/5) | 0.67 (2/3) | 0.40 (2/5) |
+| **Post-Tuning Corpus** (post-`4a089e1` vocabulary) | 14 packages, 6 clean | 0.17 (1/6) | 0.88 (7/8) | 0.70 (7/10) |
+
+- First-run blind FPR: `0.20` (`1/5`), with
+  `@modelcontextprotocol/server-everything` producing `26`
+  single-server static paths (`32` beside `server-filesystem`).
+- Post-tuning FPR: `0.17` (`1/6`). The same package now produces `9` single-server paths (`11` beside `server-filesystem`) after `sampling`, `elicitation` and `trigger` tools without an external target stopped counting as `EXTERNAL_EGRESS`.
+- First-run in-scope recall: `0.67` (`2/3`) -- `mcp-remote@0.14.3` and
+  `mcp-proxy==0.8.2` caught, the `fetch + filesystem` composition
+  missed statically. First-run overall recall: `0.40` (`2/5`), because
+  the two out-of-scope handler CVEs are scored in overall recall.
+- Post-tuning in-scope recall: `0.88` (`7/8`); overall `0.70` (`7/10`).
+- Packages and targets added by the tuning commit: `npm-mcp-remote-0-14-3-static-header`, `npm-server-filesystem-0-6-2`, `npm-server-github-2025-4-8`, `npm-server-slack-2025-4-25`, `npm-supergateway-3-1-0`, `pypi-mcp-server-git-2025-9-25`, `D` -- new targets scored with the post-tuning engines, so they are
+  not part of the blind baseline either.
+- Target D (`@modelcontextprotocol/server-puppeteer@2025.5.12 +
+  `@modelcontextprotocol/server-filesystem@2.3.0`): **Detected
+  (post-tuning: "navigate" added to egress vocabulary in `4a089e1`;
+  would have missed on first run)**.
+
+## Selection Bias & Unseen-Server Recall Caveat
+
+1. `@modelcontextprotocol/server-github@2025.4.8` and
+   `@modelcontextprotocol/server-slack@2025.4.25` were chosen from
+   capability classes the engine was already built to detect
+   (`get_issue` / `get_file_contents` / `create_issue` and
+   `get_channel_history` / `post_message`). Their detection verifies
+   that the rules fire on real upstream manifests; it does **not** show
+   that recall generalizes to arbitrary unseen servers.
+2. Real-world recall on uninspected third-party MCP servers remains
+   **unmeasured**. Only the **First-Run Blind Baseline (9 packages)**
+   and the **Wave 2 Author-Blind Suite (`0.42` recall)** reflect
+   pre-tuning runs, and both were authored by this project.
 
 ## Captured packages
 
@@ -52,20 +114,23 @@ Totals: 14 packages, 124 tools captured (4 proxy/transport packages expose no to
 
 ## Real-package targets
 
-| Target | Package / composition | Class | In model | Expected | Latch | Outcome | Rules |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `npm-mcp-remote-0-14-3-static-header` | `mcp-remote` 0.14.3 over `https://remote-mcp.example.com/sse` | `hardcoded_static_credential` | yes | yes | yes | detected | `HARDCODED_STATIC_CREDENTIAL` |
-| `npm-mcp-remote-0-14-3` | `mcp-remote` 0.14.3 over `http://remote-mcp.example.com/sse` | `cleartext_http_oauth_transport` | yes | yes | yes | detected | `INSECURE_HTTP_AUTH_TRANSPORT` |
-| `npm-server-filesystem-0-6-2` | `@modelcontextprotocol/server-filesystem` 0.6.2 | `handler_implementation_cve` | no | yes | no | missed | — |
-| `npm-server-github-2025-4-8` | `@modelcontextprotocol/server-github` 2025.4.8 | `single_server_lethal_trifecta` | yes | yes | yes | detected | `LETHAL_TRIFECTA` |
-| `npm-server-slack-2025-4-25` | `@modelcontextprotocol/server-slack` 2025.4.25 | `single_server_lethal_trifecta` | yes | yes | yes | detected | `LETHAL_TRIFECTA` |
-| `npm-supergateway-3-1-0` | `supergateway` 3.1.0 over `http://0.0.0.0:18080/sse` | `unauthenticated_cleartext_sse_bridge` | yes | yes | yes | detected | `INSECURE_HTTP_AUTH_TRANSPORT` |
-| `pypi-mcp-proxy-0-8-2` | `mcp-proxy` 0.8.2 over `http://0.0.0.0:18008/sse` | `unauthenticated_cleartext_sse_bridge` | yes | yes | yes | detected | `INSECURE_HTTP_AUTH_TRANSPORT` |
-| `pypi-mcp-server-git-2025-9-25` | `mcp-server-git` 2025.9.25 | `handler_implementation_cve` | no | yes | no | missed | — |
-| `B` | `npm-server-filesystem` + `pypi-mcp-server-fetch` | `cross_server_composition` | yes | yes | no | missed | — |
-| `D` | `npm-server-puppeteer-2025-5-12` + `npm-server-filesystem` | `cross_server_composition` | yes | yes | yes | detected | `LETHAL_TRIFECTA` |
+| Target | Package / composition | Class | In model | Stage | Expected | Latch | Outcome | Rules |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `npm-mcp-remote-0-14-3-static-header` | `mcp-remote` 0.14.3 over `https://remote-mcp.example.com/sse` | `hardcoded_static_credential` | yes | post-tuning (new) | yes | yes | detected | `HARDCODED_STATIC_CREDENTIAL` |
+| `npm-mcp-remote-0-14-3` | `mcp-remote` 0.14.3 over `http://remote-mcp.example.com/sse` | `cleartext_http_oauth_transport` | yes | first-run blind | yes | yes | detected | `INSECURE_HTTP_AUTH_TRANSPORT` |
+| `npm-server-filesystem-0-6-2` | `@modelcontextprotocol/server-filesystem` 0.6.2 | `handler_implementation_cve` | no | post-tuning (new) | yes | no | missed | — |
+| `npm-server-github-2025-4-8` | `@modelcontextprotocol/server-github` 2025.4.8 | `single_server_lethal_trifecta` | yes | post-tuning (new) | yes | yes | detected | `LETHAL_TRIFECTA` |
+| `npm-server-slack-2025-4-25` | `@modelcontextprotocol/server-slack` 2025.4.25 | `single_server_lethal_trifecta` | yes | post-tuning (new) | yes | yes | detected | `LETHAL_TRIFECTA` |
+| `npm-supergateway-3-1-0` | `supergateway` 3.1.0 over `http://0.0.0.0:18080/sse` | `unauthenticated_cleartext_sse_bridge` | yes | post-tuning (new) | yes | yes | detected | `INSECURE_HTTP_AUTH_TRANSPORT` |
+| `pypi-mcp-proxy-0-8-2` | `mcp-proxy` 0.8.2 over `http://0.0.0.0:18008/sse` | `unauthenticated_cleartext_sse_bridge` | yes | first-run blind | yes | yes | detected | `INSECURE_HTTP_AUTH_TRANSPORT` |
+| `pypi-mcp-server-git-2025-9-25` | `mcp-server-git` 2025.9.25 | `handler_implementation_cve` | no | post-tuning (new) | yes | no | missed | — |
+| `B` | `npm-server-filesystem` + `pypi-mcp-server-fetch` | `cross_server_composition` | yes | first-run blind | yes | no | missed | — |
+| `D` | `npm-server-puppeteer-2025-5-12` + `npm-server-filesystem` | `cross_server_composition` | yes | post-tuning (new) | yes | yes | detected | `LETHAL_TRIFECTA` |
 
-## Detection and false positives
+- `first-run blind` targets existed in the nine-package baseline; `post-tuning (new)` targets arrived with `4a089e1`.
+- Target `D`: **Detected (post-tuning: "navigate" added to egress vocabulary in `4a089e1`; would have missed on first run)**.
+
+## Detection and false positives (post-tuning, 14 packages)
 
 | Metric | Value |
 | --- | --- |
@@ -116,6 +181,7 @@ collapses every read tool feeding the same `(ingest, egress)` pair.
   - why it is missed: mcp-server-fetch is GET-only: it has no payload parameter, so the static graph does not model it as an egress sink. Data can still leave in a caller-chosen query string, which `latch probe-chain` verifies at runtime, but the static path enumeration has nothing to enumerate here.
 - `puppeteer-plus-filesystem`: Target D: real untrusted web navigation and page scripting (server-puppeteer) beside real private workspace reads (server-filesystem).
   - CRITICAL path trifecta-001: `npm-server-filesystem:search_files` -> `npm-server-filesystem:directory_tree` (+7 more read tools) -> `npm-server-puppeteer-2025-5-12:puppeteer_navigate`
+  - post-tuning only: `navigate` added to the egress vocabulary in `4a089e1`; first-run outcome `missed`
 - `everything-plus-filesystem`: The SDK's everything server (the largest captured surface) mounted beside the filesystem server. Its diagnostics tools have no third-party sink, so any path is over-approximation.
   - CRITICAL path trifecta-001: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
   - CRITICAL path trifecta-002: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:gzip-file-as-resource`
@@ -315,9 +381,17 @@ collapses every read tool feeding the same `(ingest, egress)` pair.
   genuine pre-patch releases plus real transport exposures, not only
   clean first-party servers, so recall is measured rather than
   assumed.
-- **Blind evaluation.** No rule or vocabulary was adjusted for these
-  packages; they are scored exactly as any other configuration would
-  be.
+- **Two stages, labelled as such.** Only the nine-package
+  **First-Run Blind Baseline** was scored on an untouched engine. The
+  fourteen-package **Post-Tuning Corpus** was captured after
+  `4a089e1`, which added five packages and the `navigate` egress verb
+  that makes target D visible, so it is regression evidence rather
+  than blind evidence. The report states the detector fingerprint so
+  a later rule change cannot silently inherit these numbers.
+- **Selection bias.** GitHub and Slack were picked from capability
+  classes the engine already models. Detecting them proves the rules
+  fire on real upstream manifests; recall on uninspected third-party
+  servers remains unmeasured (see the caveat section above).
 - **Only metadata is exercised.** Captures contain `tools/list` bytes
   and real transport configuration. Handler behaviour, RBAC and
   network policy are not observed here; `latch probe-chain` is the

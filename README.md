@@ -477,12 +477,12 @@ only to install the packages it captures.
 | # | Suite | Corpus | Result | Report |
 | - | ----- | ------ | ------ | ------ |
 | 1 | `benchmark/` | 36 synthetic fixtures (18 hostile, 18 benign lookalikes) | Precision `1.00`, FPR `0.00`, recall `1.00` vs. naive `0.48` / `0.67` / `0.61` | [`benchmark/RESULTS.md`](benchmark/RESULTS.md) |
-| 2 | `package_eval/` | 14 real npm/PyPI packages (124 tools, pinned pre-patch releases + clean references) and 5 compositions | In-scope real-package recall `0.88` (7/8), overall `0.70` (7/10, including two honest handler-CVE misses), FPR `0.17` (1/6) vs. naive `0.83` (5/6) | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
+| 2 | `package_eval/` | 14 real npm/PyPI packages (124 tools, pinned pre-patch releases + clean references) and 5 compositions | **First-run blind baseline** (9 packages): in-scope recall `0.67` (2/3), FPR `0.20` (1/5). **Post-tuning corpus** (14 packages): in-scope `0.88` (7/8), overall `0.70` (7/10, including two honest handler-CVE misses), FPR `0.17` (1/6) vs. naive `0.83` (5/6) | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
 | 3 | `synthetic_regression/` | 24 fixtures modeled on disclosed MCP bug classes | `1.00` in-scope recall, `0.83` overall recall with 2 out-of-scope handler bugs | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
 | 4a | `adversarial/` Wave 1 | 24 evasion probes, iteratively hardened | `19/19` post-tuning catches + 5 irreducible boundaries | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
 | 4b | `adversarial/` Wave 2 | 16 self-authored blind probes (12 hostile, 4 benign), no rule edits | **Author-blind upper bound** (awaiting independent external submission): precision `1.00`, recall `0.42`, FPR `0.00` — 5 catches, **7 honest misses** | [`adversarial/WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md) |
 | 4c | `adversarial/` external kit | Contributor-authored 10-probe schema, no access to the rules | Schema/scorer validated in CI; **no external submission yet**, so nothing is claimed | [`adversarial/EXTERNAL_BLIND_REPORT.md`](adversarial/EXTERNAL_BLIND_REPORT.md) |
-| 5 | `head_to_head/` | 14 real captures, measured `mcp-scan` run against the 6 clean packages, 10 self-authored scenarios demoted to an appendix | Clean-package FPR `0.17` (1/6) vs. naive `0.83` (5/6); in-model real-package recall `6/6`; `mcp-scan` column measured or explicitly `credentials_required`; `10/10` self-authored feature demo in the appendix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
+| 5 | `head_to_head/` | 14 real captures, measured `mcp-scan` run against the 6 clean packages, 10 self-authored scenarios demoted to an appendix | Clean-package FPR `0.17` (1/6) post-tuning vs. `0.20` (1/5) on the 9-package blind baseline, naive `0.83` (5/6); in-model package recall `6/6`, two of them known-class manifest checks rather than generalization proof; `mcp-scan` column measured or explicitly `credentials_required`; `10/10` self-authored feature demo in the appendix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
 
 **Wave 1, Wave 2 and the external kit are three different claims.** Wave 1 is a
 post-tuning regression suite: every probe there was a real bypass that the
@@ -511,8 +511,17 @@ symlink/path-canonicalization traversal and a SQL string-concatenation
 injection inside handlers are recorded as false negatives, because no
 manifest-level analyzer can see them.
 
-`package_eval/` is the blind complement, and it now includes real vulnerable
-releases rather than only clean reference servers. It launches
+`package_eval/` is the real-package complement, and it now includes real
+vulnerable releases rather than only clean reference servers. It reports two
+stages, because the engines changed between them: a **First-Run Blind Baseline**
+of 9 packages scored before commit `4a089e1` (in-scope recall `0.67` (2/3),
+clean-package FPR `0.20` (1/5)), and a **Post-Tuning Corpus** of 14 packages
+(in-scope `0.88` (7/8), overall `0.70` (7/10), FPR `0.17` (1/6)). The same
+commit added five packages and the `navigate` egress verb, which is the only
+reason target D (`puppeteer + filesystem`) is visible, so the 14-package row is
+regression evidence rather than blind evidence; the report pins the exact
+detector set with a `detector_fingerprint_sha256` and a test fails if
+`mcpprobe/` drifts without a re-run. It launches
 `@modelcontextprotocol/server-filesystem` (`2.3.0` and pre-patch `0.6.2`),
 `-memory`, `-everything@2.3.0`, `-github@2025.4.8`, `-slack@2025.4.25`,
 `-puppeteer@2025.5.12`, `mcp-server-fetch`, `mcp-server-git` (`2026.11.11` and
@@ -535,6 +544,15 @@ the graph precision fixes: `filesystem + git` drops from 27 CRITICAL paths to
 `(ingest, egress)` pairs, because MCP `sampling`/`elicitation` client callbacks
 no longer count as network sinks.
 
+Two things in that corpus are deliberately not claimed as generalization.
+`server-github` and `server-slack` were selected from capability classes the
+engine was already built to detect (`get_issue` / `get_file_contents` /
+`create_issue`, `get_channel_history` / `post_message`), so their detection is a
+known-class check that the rules fire on real upstream manifests. Real-world
+recall on uninspected third-party servers remains **unmeasured**; only the
+9-package first-run baseline and the Wave 2 author-blind suite (`0.42` recall)
+are pre-tuning runs, and both were written by this project.
+
 `adversarial/` attacks Latch itself in two waves. **Wave 1** (post-tuning,
 [`EVASION_REPORT.md`](adversarial/EVASION_REPORT.md)) covers new capability
 vocabulary, `enum` indirection, zero-width and Armenian homoglyphs,
@@ -550,9 +568,13 @@ canary exfiltration inside a request **header** — plus four benign hard
 negatives that must stay clean. It catches 5 of 12 hostile probes and misses 7,
 and those 7 are printed as misses.
 
-`head_to_head/` is the measured comparison, and the headline number is the
-clean-package false-positive rate: `mcpprobe` (Latch) flags `1/6` (`0.17`), the
-naive keyword baseline flags `5/6` (`0.83`), on the same real captures. It also
+`head_to_head/` is the measured comparison. It shows both stages side by side:
+`0.20` (`1/5`) clean-package FPR with `0.67` (`2/3`) in-scope recall on the
+9-package first-run blind baseline, and `0.17` (`1/6`) with `0.88` (`7/8`) on
+the post-tuning 14-package corpus. The headline row is the post-tuning one, and
+the report marks target D as detected only because `4a089e1` added `navigate` to
+the egress vocabulary. On the same captures the naive keyword baseline flags
+`5/6` (`0.83`). It also
 runs `mcp-scan` — the current `snyk-agent-scan` distribution — live against
 those six clean packages and records the exact invocation, exit code and
 verdict class. That CLI performs deep analysis on a Snyk endpoint and requires

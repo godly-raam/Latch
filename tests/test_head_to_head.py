@@ -250,6 +250,22 @@ def test_report_leads_with_the_measured_comparison() -> None:
     assert "AgentLatch" in report
     assert "Honest limits of this comparison" in report
 
+    # The two stages are reported side by side, and the blind row is not
+    # presented as the post-tuning row.
+    assert "## Two evaluation stages, side by side" in report
+    assert "First-Run Blind Baseline" in report
+    assert "Post-Tuning Corpus" in report
+    assert "0.20 (1/5)" in report
+    assert "0.67 (2/3)" in report
+    assert "0.88 (7/8)" in report
+    assert "would have missed on first run" in report
+    assert "unseen" in report.lower()
+    stages = comparison["evaluation_stages"]
+    assert stages["first_run_blind"]["clean_package_count"] == 5
+    assert stages["first_run_blind"]["latch_package_false_positive_rate"] == 0.2
+    assert stages["post_tuning"]["clean_false_positive_rate"] == 0.1667
+    assert len(stages["post_tuning"]["detector_fingerprint_sha256"]) == 64
+
     measurement = comparison["mcp_scan_measurement"]
     assert f"`{measurement['status']}`" in report
     assert "snyk-agent-scan scan" in report
