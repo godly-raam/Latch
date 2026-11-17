@@ -5,8 +5,9 @@
 #
 # Pins a clean tool surface, catches a post-approval rug pull, audits a hostile
 # manifest (Unicode + header injection), renders a cross-server lethal trifecta
-# as Mermaid and SARIF, then detects tool shadowing/hijacking and OAuth
-# credential reuse. Everything happens in a temp directory removed on exit.
+# as Mermaid and SARIF, detects tool shadowing/hijacking and OAuth credential
+# reuse, verifies the frozen Wave 2 blind baseline, and runs the head-to-head
+# comparison. Everything happens in a temp directory removed on exit.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -14,6 +15,12 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 SHARED_TOKEN="ghp_demo_shared_credential_9f2a"
+
+if [[ -x "$ROOT/.venv/bin/python" ]]; then
+  PY="$ROOT/.venv/bin/python"
+else
+  PY="python3"
+fi
 
 if [[ -x "$ROOT/.venv/bin/latch" ]]; then
   LATCH=("$ROOT/.venv/bin/latch")
@@ -190,23 +197,23 @@ with open(path, "w", encoding="utf-8") as handle:
 PY
 
 # -------------------------------------------------------------------- demo --
-step "1/7 Pin the approved tool surface"
+step "1/9 Pin the approved tool surface"
 run_expect 0 "pin clean manifest" \
   "${LATCH[@]}" pin --input "$WORK/notes.json" --server-id notes --output "$WORK/notes.lock.json"
 
-step "2/7 Verify the approved manifest against the pin"
+step "2/9 Verify the approved manifest against the pin"
 run_expect 0 "clean verify" \
   "${LATCH[@]}" verify --input "$WORK/notes.json" --lockfile "$WORK/notes.lock.json"
 
-step "3/7 Catch the post-approval rug pull"
+step "3/9 Catch the post-approval rug pull"
 run_expect 1 "rug-pull verify" \
   "${LATCH[@]}" verify --input "$WORK/notes_rugged.json" --lockfile "$WORK/notes.lock.json"
 
-step "4/7 Audit a hostile manifest (Unicode tag block + privileged header)"
+step "4/9 Audit a hostile manifest (Unicode tag block + privileged header)"
 run_expect 1 "hostile audit" \
   "${LATCH[@]}" audit --input "$WORK/hostile.json"
 
-step "5/7 Render the cross-server lethal trifecta as Mermaid, then SARIF"
+step "5/9 Render the cross-server lethal trifecta as Mermaid, then SARIF"
 run_expect 1 "trifecta graph (mermaid)" \
   "${LATCH[@]}" graph --config "$WORK/agent.json" --format mermaid
 
@@ -227,7 +234,7 @@ for result in results:
     print(f"    - {result['ruleId']} [{result['level']}] {result['message']['text']}")
 PY
 
-step "6/7 Detect tool shadowing and cross-tool hijacking"
+step "6/9 Detect tool shadowing and cross-tool hijacking"
 run_expect 1 "shadow (homoglyph + hijack)" \
   "${LATCH[@]}" shadow --config "$WORK/shadow-agent.json" --sarif "$WORK/shadow.sarif" \
   >"$WORK/shadow.out"
@@ -239,7 +246,7 @@ grep -q "CROSS_TOOL_HIJACK" "$WORK/shadow.out" \
 printf '  rules: CONFUSABLE_UNICODE_SHADOW + CROSS_TOOL_HIJACK (SARIF: %s)\n' "$WORK/shadow.sarif"
 sed -n '2,4p' "$WORK/shadow.out"
 
-step "7/7 Audit OAuth credential reuse and token passthrough"
+step "7/9 Audit OAuth credential reuse and token passthrough"
 run_expect 1 "auth-audit (reuse + passthrough)" \
   "${LATCH[@]}" auth-audit --config "$WORK/identity.json" --sarif "$WORK/auth.sarif" \
   >"$WORK/auth.out"
@@ -254,5 +261,14 @@ fi
 grep -q "sha256:" "$WORK/auth.sarif" \
   || fail "auth-audit: no redacted SHA-256 fingerprint in the SARIF report"
 printf '  raw credential absent from SARIF; redacted fingerprint present\n'
+
+step "8/9 Verify the frozen Wave 2 blind baseline"
+run_expect 0 "wave 2 frozen baseline" \
+  "$PY" -m adversarial.run_wave2_blind
+printf '  (Wave 1 is post-tuning; Wave 2 is the frozen blind first run)\n'
+
+step "9/9 Head-to-head comparison on real captures + protocol scenarios"
+run_expect 0 "head-to-head comparison" \
+  "$PY" -m head_to_head.run_comparison
 
 printf '\n\033[32mDemo complete.\033[0m All expected exit codes matched; temp fixtures removed.\n'

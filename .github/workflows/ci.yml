@@ -40,8 +40,14 @@ jobs:
       - name: Run pinned-package blind evaluation
         run: python -m package_eval.run_package_eval
 
-      - name: Run adversarial self-red-team
+      - name: Run pinned-package head-to-head comparison
+        run: python -m head_to_head.run_comparison
+
+      - name: Run adversarial self-red-team (Wave 1, post-tuning)
         run: python -m adversarial.run_evasion
+
+      - name: Verify frozen blind wave 2 baseline
+        run: python -m adversarial.run_wave2_blind
 
       - name: Run demo
         run: bash demo.sh

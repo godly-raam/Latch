@@ -1,4 +1,10 @@
-# Latch adversarial self-red-team: evasion harness
+# Wave 1: Iterative Hardening & Regression Suite (Post-Tuning — 19/19)
+
+This is the **post-tuning regression corpus**, not a blind score. Every
+probe below was a real bypass and the engines were hardened until it was
+caught. The honest blind measurement is
+[`WAVE2_BLIND_REPORT.md`](WAVE2_BLIND_REPORT.md) (Wave 2: pre-registered,
+frozen first run, no rule edits).
 
 Latch red-teams itself. Each probe below is a deliberate attempt to slip
 past one of its own detectors -- new capability vocabulary, enum
@@ -136,6 +142,9 @@ cost more precision than the detection is worth.
   the canary at the loopback sink; a base64 body, a GET query string
   and a four-server hop are all verified by capturing the token, not
   by trusting the tool's own output.
+- **Wave 1 is not the blind score.** Compare these numbers with
+  [`WAVE2_BLIND_REPORT.md`](WAVE2_BLIND_REPORT.md), whose probes were
+  written without tuning and whose first-run verdict is frozen.
 - **No timestamps, no randomness in artifacts.** Live probes store
   verdict fields only (status, counts, sink summary), never the
   random `LATCH-CANARY-...` token, so this report is reproducible

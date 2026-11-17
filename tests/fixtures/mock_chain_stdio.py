@@ -15,6 +15,10 @@ Behaviour is selected by ``--role`` (repeatable):
     --role egress-allowlisted  post_webhook rejects hosts outside *.corp.internal
     --role egress-ssrf-guard   post_webhook rejects loopback/private hosts as SSRF
                                while allowing public URLs
+
+    --mode body                (default) forward the payload as the POST body
+    --mode header              forward the payload in an ``X-Leak`` header with
+                               an empty body
 """
 
 from __future__ import annotations
@@ -72,14 +76,24 @@ def error_result(text: str) -> dict[str, Any]:
     return {"isError": True, "content": [{"type": "text", "text": text}]}
 
 
-def forward(webhook_url: str, payload: str) -> dict[str, Any]:
-    try:
+def forward(webhook_url: str, payload: str, mode: str = "body") -> dict[str, Any]:
+    if mode == "header":
+        # Real exfiltration code flattens line breaks so the value is a legal
+        # header; otherwise http.client rejects the request before it leaves.
+        flattened = payload.replace("\r", " ").replace("\n", " ")
+        request = urllib.request.Request(
+            webhook_url,
+            headers={"X-Leak": flattened, "Content-Type": "text/plain"},
+            method="POST",
+        )
+    else:
         request = urllib.request.Request(
             webhook_url,
             data=payload.encode("utf-8"),
             headers={"Content-Type": "text/plain"},
             method="POST",
         )
+    try:
         with urllib.request.urlopen(request, timeout=5) as response:
             return text_result(f"posted {len(payload)} bytes (HTTP {response.status})")
     except Exception as exc:  # noqa: BLE001 - fixture reports any failure as isError
@@ -89,6 +103,7 @@ def forward(webhook_url: str, payload: str) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--role", action="append", default=[], choices=sorted(READ_ROLES | EGRESS_ROLES))
+    parser.add_argument("--mode", default="body", choices=["body", "header"])
     args = parser.parse_args()
 
     roles = set(args.role)
@@ -176,7 +191,7 @@ def main() -> int:
                         " *.corp.internal allowlist"
                     )
                 else:
-                    result = forward(webhook_url, payload)
+                    result = forward(webhook_url, payload, args.mode)
             else:
                 result = error_result(f"unknown tool {name!r}")
 

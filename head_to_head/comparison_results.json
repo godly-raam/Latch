@@ -1,0 +1,358 @@
+{
+  "architectural_matrix": [
+    {
+      "active_probe": "Execution-aware canary sink and SSRF-guard classification",
+      "auth": "OAuth 2.1 / RFC 9728 audit, credential reuse and token passthrough",
+      "cross_server": "Capability graph with ingest -> read -> egress trifectas",
+      "dependency": "Zero LLM or cloud dependency; offline and deterministic",
+      "live_drift": "list_changed watcher over stdio and Streamable HTTP",
+      "lockfiles": "Canonical SHA-256 tool lockfiles (pin/verify)",
+      "manifest_audit": "MCP 2026-07-28 x-mcp-header plus Unicode Tag, bidi, variation-selector and zero-width checks",
+      "output": "SARIF 2.1.0 plus text/JSON, exit codes for CI",
+      "role": "Local deterministic CLI and CI verifier",
+      "shadowing": "Exact, normalized, NFKC/homoglyph and cross-tool hijack detection",
+      "source": "this repository",
+      "tool": "Latch (mcpprobe)"
+    },
+    {
+      "active_probe": "Proxy observes live traffic; no canary exfiltration proof documented",
+      "auth": "Not documented as an RFC 9728 / OAuth metadata auditor",
+      "cross_server": "Cross-origin escalation (tool shadowing) checks",
+      "dependency": "Sends tool names/descriptions to the Snyk/Invariant API for deep classification; requires an account token in current releases",
+      "live_drift": "Rescan-based change detection; no persistent list_changed watcher documented",
+      "lockfiles": "Tool pinning by description hash (rug-pull detection)",
+      "manifest_audit": "Tool-poisoning and prompt-injection checks in descriptions",
+      "output": "CLI output; experimental and subject to change",
+      "role": "CLI scanner with an optional monitoring proxy",
+      "shadowing": "Tool shadowing and description poisoning",
+      "source": "https://github.com/snyk/agent-scan (formerly github.com/invariantlabs-ai/mcp-scan)",
+      "tool": "Invariant / Snyk mcp-scan"
+    },
+    {
+      "active_probe": "Monitor-only proxy; no active canary probing",
+      "auth": "Masks secrets in passive call logs; no RFC 9728 probing",
+      "cross_server": "No cross-server capability graph synthesis",
+      "dependency": "Local-first; no cloud classification service",
+      "live_drift": "Passive proxy logs calls; no schema pinning or drift verifier",
+      "lockfiles": "Not applicable: scans agent source, not MCP tool schemas",
+      "manifest_audit": "Python source analysis (ast), not MCP manifest auditing",
+      "output": "Local reports and logs",
+      "role": "Local-first Python AST scanner plus passive monitor-only MCP proxy",
+      "shadowing": "Not a documented MCP shadowing detector",
+      "source": "AgentLatch/agent-latch (project README)",
+      "tool": "AgentLatch (agent-latch)"
+    }
+  ],
+  "metrics": {
+    "latch_flagged_packages": [
+      "npm-server-everything"
+    ],
+    "latch_package_false_positive_rate": 0.2,
+    "latch_scenario_recall": 1.0,
+    "latch_scenarios_detected": 10,
+    "latch_scenarios_missed": [],
+    "naive_flagged_packages": [
+      "npm-server-everything",
+      "npm-server-filesystem",
+      "pypi-mcp-server-fetch",
+      "pypi-mcp-server-git"
+    ],
+    "naive_package_false_positive_rate": 0.8,
+    "naive_scenario_recall": 0.7,
+    "naive_scenarios_detected": 7,
+    "package_count": 5,
+    "scenario_count": 10,
+    "third_party_live_runs": []
+  },
+  "packages": [
+    {
+      "latch_flagged": true,
+      "latch_rule_count": 20,
+      "latch_rules": [
+        "ANNOTATION_CONTRADICTION",
+        "LETHAL_TRIFECTA"
+      ],
+      "naive_flagged": true,
+      "naive_hits": [
+        "secret",
+        "token",
+        "pass",
+        "ignore",
+        "instead",
+        "before",
+        "x-mcp-header"
+      ],
+      "package_name": "@modelcontextprotocol/server-everything",
+      "package_version": "2.3.0",
+      "slug": "npm-server-everything",
+      "tool_count": 22
+    },
+    {
+      "latch_flagged": false,
+      "latch_rule_count": 0,
+      "latch_rules": [],
+      "naive_flagged": true,
+      "naive_hits": [
+        "ignore",
+        "instead",
+        "before"
+      ],
+      "package_name": "@modelcontextprotocol/server-filesystem",
+      "package_version": "2.3.0",
+      "slug": "npm-server-filesystem",
+      "tool_count": 16
+    },
+    {
+      "latch_flagged": false,
+      "latch_rule_count": 0,
+      "latch_rules": [],
+      "naive_flagged": false,
+      "naive_hits": [],
+      "package_name": "@modelcontextprotocol/server-memory",
+      "package_version": "2.1.1",
+      "slug": "npm-server-memory",
+      "tool_count": 9
+    },
+    {
+      "latch_flagged": false,
+      "latch_rule_count": 0,
+      "latch_rules": [],
+      "naive_flagged": true,
+      "naive_hits": [
+        "before"
+      ],
+      "package_name": "mcp-server-fetch",
+      "package_version": "2026.11.11",
+      "slug": "pypi-mcp-server-fetch",
+      "tool_count": 1
+    },
+    {
+      "latch_flagged": false,
+      "latch_rule_count": 0,
+      "latch_rules": [],
+      "naive_flagged": true,
+      "naive_hits": [
+        "pass"
+      ],
+      "package_name": "mcp-server-git",
+      "package_version": "2026.11.11",
+      "slug": "pypi-mcp-server-git",
+      "tool_count": 14
+    }
+  ],
+  "scenarios": [
+    {
+      "category": "drift",
+      "engines": [
+        "verify"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "verify:MODIFIED_TOOL"
+      ],
+      "live": null,
+      "naive_detected": true,
+      "naive_hits": [
+        "ssh"
+      ],
+      "scenario_id": "post_approval_schema_rug_pull",
+      "technique": "The server keeps its tool name but rewrites the description after the user approved the pinned copy.",
+      "title": "Post-approval schema rug pull"
+    },
+    {
+      "category": "drift",
+      "engines": [
+        "watch"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "watch:MODIFIED_TOOL"
+      ],
+      "live": null,
+      "naive_detected": false,
+      "naive_hits": [],
+      "scenario_id": "live_list_changed_drift",
+      "technique": "After the first tools/list, the server emits notifications/tools/list_changed and serves a poisoned description on the next call.",
+      "title": "notifications/tools/list_changed mid-session drift"
+    },
+    {
+      "category": "manifest_text",
+      "engines": [
+        "audit"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "audit:UNICODE_TAG_BLOCK"
+      ],
+      "live": null,
+      "naive_detected": true,
+      "naive_hits": [
+        "ignore"
+      ],
+      "scenario_id": "unicode_tag_smuggling",
+      "technique": "An instruction ('ignore previous instructions') is encoded in the invisible Unicode Tag block inside a tool description.",
+      "title": "Unicode Tag-block instruction smuggling"
+    },
+    {
+      "category": "manifest_text",
+      "engines": [
+        "audit"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "audit:HEADER_PRIVILEGED_INJECTION"
+      ],
+      "live": null,
+      "naive_detected": true,
+      "naive_hits": [
+        "x-mcp-header"
+      ],
+      "scenario_id": "x_mcp_header_authorization",
+      "technique": "Binds an LLM-controlled parameter to the Authorization header, so a tool call can rewrite the caller's credential.",
+      "title": "MCP 2026-07-28 x-mcp-header bound to Authorization"
+    },
+    {
+      "category": "shadowing",
+      "engines": [
+        "shadow"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "shadow:CONFUSABLE_UNICODE_SHADOW"
+      ],
+      "live": null,
+      "naive_detected": false,
+      "naive_hits": [],
+      "scenario_id": "cyrillic_homoglyph_shadow",
+      "technique": "Publishes a tool named r\\u0435ad_file that renders as read_file, colliding with the trusted fs server.",
+      "title": "Cyrillic homoglyph tool shadowing"
+    },
+    {
+      "category": "shadowing",
+      "engines": [
+        "shadow"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "shadow:CROSS_TOOL_HIJACK"
+      ],
+      "live": null,
+      "naive_detected": true,
+      "naive_hits": [
+        "instead"
+      ],
+      "scenario_id": "cross_tool_hijack",
+      "technique": "One server's description tells the model to call its own tool instead of another server's tool.",
+      "title": "Cross-tool routing hijack"
+    },
+    {
+      "category": "capability_graph",
+      "engines": [
+        "graph"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "graph:LETHAL_TRIFECTA"
+      ],
+      "live": null,
+      "naive_detected": true,
+      "naive_hits": [
+        "sql",
+        "webhook"
+      ],
+      "scenario_id": "cross_server_lethal_trifecta",
+      "technique": "Ingest a public issue, read the customer ledger, then post to a webhook -- three servers whose capabilities line up.",
+      "title": "Cross-server lethal trifecta"
+    },
+    {
+      "category": "runtime",
+      "engines": [
+        "probe-chain"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "probe-chain:CONFIRMED_EXPLOITABLE",
+        "probe-chain:UNCONFIRMED_SSRF_GUARD"
+      ],
+      "live": {
+        "runs": [
+          {
+            "confirmed_exploitable": 1,
+            "passed": false,
+            "statuses": [
+              "CONFIRMED_EXPLOITABLE"
+            ],
+            "unconfirmed_ssrf_count": 0
+          },
+          {
+            "confirmed_exploitable": 0,
+            "passed": false,
+            "statuses": [
+              "UNCONFIRMED_SSRF_GUARD"
+            ],
+            "unconfirmed_ssrf_count": 1
+          }
+        ]
+      },
+      "naive_detected": false,
+      "naive_hits": [],
+      "scenario_id": "runtime_ssrf_guard_vs_confirmed_exfil",
+      "technique": "The same chain is probed twice: once against an egress tool that forwards the canary (confirmed) and once against a loopback SSRF guard (unconfirmed, not clean).",
+      "title": "Runtime SSRF-guarded vs confirmed canary exfiltration"
+    },
+    {
+      "category": "auth",
+      "engines": [
+        "auth-audit"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "auth-audit:PRM_RESOURCE_MISMATCH"
+      ],
+      "live": null,
+      "naive_detected": true,
+      "naive_hits": [
+        "token",
+        "bearer"
+      ],
+      "scenario_id": "rfc9728_prm_resource_mismatch",
+      "technique": "The 401 challenge points at resource metadata whose `resource` is a different origin, so tokens are not audience-bound to this server.",
+      "title": "RFC 9728 protected-resource metadata mismatch"
+    },
+    {
+      "category": "auth",
+      "engines": [
+        "auth-audit"
+      ],
+      "latch_detected": true,
+      "latch_rules": [
+        "auth-audit:CROSS_SERVER_CREDENTIAL_REUSE",
+        "auth-audit:HARDCODED_STATIC_CREDENTIAL"
+      ],
+      "live": null,
+      "naive_detected": true,
+      "naive_hits": [
+        "token",
+        "bearer"
+      ],
+      "scenario_id": "cross_server_bearer_reuse",
+      "technique": "Two remote servers share one literal Bearer token, so a compromised server can replay it against the other.",
+      "title": "Cross-server Bearer token reuse"
+    }
+  ],
+  "schema_version": 1,
+  "third_party": [
+    {
+      "binary": "mcp-scan",
+      "path": null,
+      "status": "not_installed_in_env",
+      "tool": "mcp-scan"
+    },
+    {
+      "binary": "agent-latch",
+      "path": null,
+      "status": "not_installed_in_env",
+      "tool": "agent-latch"
+    }
+  ]
+}

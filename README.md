@@ -1,8 +1,22 @@
-# Latch
+# Latch (mcpprobe) — Deterministic MCP & Agentic Protocol Security Verifier
 
-`latch` (Python package `mcpprobe`) is a deterministic security tool for
-[Model Context Protocol](https://modelcontextprotocol.io) servers. Six
-engines, no LLM in the loop:
+`Latch (mcpprobe)` is a deterministic security verifier for
+[Model Context Protocol](https://modelcontextprotocol.io) servers and the agents
+that mount them. Six engines, no LLM in the loop:
+
+> **Project disambiguation.** This repository is **`Latch (mcpprobe)`** — this
+> Python package, CLI `latch`, GitHub project `mcpprobe`. It is *not*:
+> - **`AgentLatch`** (`AgentLatch/agent-latch`): a local-first Python AST
+>   scanner plus a passive, monitor-only MCP proxy. Different tool, different
+>   author, different approach (it reads agent *source code*, not MCP schemas).
+> - **`Invariant / Snyk mcp-scan`** (`github.com/snyk/agent-scan`, formerly
+>   `invariantlabs-ai/mcp-scan`): a CLI scanner with tool pinning and a
+>   monitoring proxy that calls the Snyk/Invariant Guardrails API for deep
+>   prompt-injection classification.
+>
+> The shared word is "latch/latch", not the codebase. See
+> [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) for the
+> capability matrix.
 
 | Engine | Question it answers | Commands |
 | ------ | ------------------- | -------- |
@@ -407,9 +421,9 @@ latch watch  --stdio "npx -y some-mcp-server" --lockfile latch.lock.json --sarif
 
 ## Benchmark: precision and recall
 
-`benchmark/` is a deterministic ground-truth harness: 18 hostile cases and 18
-benign hard lookalikes spanning every engine, scored against the naive
-keyword/substring scanner that Latch replaces — the
+`benchmark/` is a deterministic ground-truth harness: 36 synthetic fixtures —
+18 hostile cases and 18 benign hard lookalikes — spanning every engine, scored
+against the naive keyword/substring scanner that Latch replaces — the
 `ssh`/`secret`/`token`/`bearer`/`http://`/`instead`/`before`/`x-mcp-header` grep
 that YARA-style rules tend to become. No network, no timestamps, no randomness.
 
@@ -434,17 +448,29 @@ including which engine fired and which keywords the baseline matched, is in
 [`benchmark/RESULTS.md`](benchmark/RESULTS.md); raw numbers are in
 [`benchmark/results.json`](benchmark/results.json).
 
-## Evaluation suites: synthetic regression, real packages, self-red-team
+## Evaluation suites: five empirical corpora
 
-Three deterministic corpora keep the engines honest. Only the capture step
-touches the network (it installs the packages it captures); every scoring run
-is offline.
+Five independent suites keep the engines honest. Every scoring run is offline
+and deterministic; only `package_eval.capture_manifests` uses the network, and
+only to install the packages it captures.
 
-| Suite | Corpus | Result | Report |
-| ----- | ------ | ------ | ------ |
-| Synthetic regression | 24 modeled fixtures: 12 pre-patch, 8 post-patch, 4 reference-server surfaces | 100% in-scope recall, 0.00 FPR on every post-patch/reference model, 2 honest out-of-scope handler-bug misses | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
-| Real pinned packages | 5 packages / 62 tools captured live over stdio with registry-resolved versions | 4/5 first-party packages clean; the SDK diagnostics server flagged and reported as a static over-approximation; naive baseline flags 4/5 | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
-| Adversarial self-red-team | 24 evasion probes in 7 families | 19/19 hardened catches (100%), 5/5 irreducible static boundaries documented and left unflagged | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
+| # | Suite | Corpus | Result | Report |
+| - | ----- | ------ | ------ | ------ |
+| 1 | `benchmark/` | 36 synthetic fixtures (18 hostile, 18 benign lookalikes) | Precision `1.00`, FPR `0.00`, recall `1.00` vs. naive `0.48` / `0.67` / `0.61` | [`benchmark/RESULTS.md`](benchmark/RESULTS.md) |
+| 2 | `package_eval/` | 5 real upstream npm/PyPI MCP packages (62 tools, registry-resolved versions) | `4/5` clean, FPR `0.20` vs. naive `0.80`; `server-everything` flagged as a documented static over-approximation | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
+| 3 | `synthetic_regression/` | 24 fixtures modeled on disclosed MCP bug classes | `1.00` in-scope recall, `0.83` overall recall with 2 out-of-scope handler bugs | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
+| 4a | `adversarial/` Wave 1 | 24 evasion probes, iteratively hardened | `19/19` post-tuning catches + 5 irreducible boundaries | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
+| 4b | `adversarial/` Wave 2 | 16 **pre-registered blind** probes (12 hostile, 4 benign), no rule edits | Frozen first run: precision `1.00`, recall `0.42`, FPR `0.00` — 5 catches, **7 honest blind misses** | [`adversarial/WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md) |
+| 5 | `head_to_head/` | 5 real captures + 10 protocol scenarios, Latch vs. naive vs. documented peers | Latch `10/10` scenarios; naive `7/10`; `mcp-scan` and `agent-latch` not installed → sourced architecture matrix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
+
+**Wave 1 and Wave 2 are not the same number.** Wave 1 is a post-tuning
+regression suite: every probe there was a real bypass that the engines were
+then hardened against. Wave 2 is the blind measurement: sixteen probes written
+against the shipped rule inventory, run once against unmodified `mcpprobe/`,
+with the first-run verdict frozen in
+[`adversarial/wave2_frozen_baseline.json`](adversarial/wave2_frozen_baseline.json).
+Wave 2's recall of `0.42` is lower than Wave 1's `19/19` on purpose, and it is
+the number to trust when judging generalization.
 
 `synthetic_regression/` models the *shapes* of 2025–2026 MCP advisory bug
 classes — gateway token passthrough, cleartext transport, post-approval rug
@@ -466,20 +492,38 @@ built from the unmodified bytes. The one flagged real package is the SDK's
 diagnostics server, where generic capability heuristics over-approximate
 diagnostic tools; the report says so and counts it as a false positive.
 
-`adversarial/` attacks Latch itself: new capability vocabulary, `enum`
-indirection, zero-width and Armenian homoglyphs, `prerequisite`/`moved`
-directives, variation selectors, nested header bindings, new passthrough
-parameter names, credentials in URL query strings, and base64/query/4-hop
-runtime exfiltration. It also pins five boundaries — word-order inversion, pure
-paraphrase, opaque `op_1`/`op_2`/`op_3` names, metaphorical codebooks and
-overprivileged IdP scopes — where Latch stays silent on purpose, because the
-rules that would catch them flag legitimate registries.
+`adversarial/` attacks Latch itself in two waves. **Wave 1** (post-tuning,
+[`EVASION_REPORT.md`](adversarial/EVASION_REPORT.md)) covers new capability
+vocabulary, `enum` indirection, zero-width and Armenian homoglyphs,
+`prerequisite`/`moved` directives, variation selectors, nested header bindings,
+new passthrough parameter names, credentials in URL query strings, and
+base64/query/4-hop runtime exfiltration, plus five irreducible static
+boundaries. **Wave 2** (blind,
+[`WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md)) adds fullwidth and
+filler-character homoglyphs, passive-voice and imperative routing hijacks,
+array-typed `x-mcp-header` bindings, non-Bearer `Authorization` schemes,
+stdio-argv secrets, compound-verb capability names, a bidi override, and
+canary exfiltration inside a request **header** — plus four benign hard
+negatives that must stay clean. It catches 5 of 12 hostile probes and misses 7,
+and those 7 are printed as misses.
+
+`head_to_head/` runs Latch and the naive baseline live over the five real
+captures and ten canonical protocol scenarios (rug pull, `list_changed` drift,
+Tag-block smuggling, `x-mcp-header: Authorization`, homoglyph shadowing,
+cross-tool hijack, cross-server trifecta, SSRF-guarded vs. confirmed
+unconfirmed exfiltration, RFC 9728 metadata mismatch, Bearer reuse). It also
+records whether `mcp-scan` and `agent-latch` are installed; here they are not,
+so the comparison reports their documented architecture with sources instead of
+pretending to have measured them.
 
 ```bash
+python -m benchmark.run_benchmark
 python -m synthetic_regression.run_regression
 python -m package_eval.capture_manifests   # network: re-captures the packages
 python -m package_eval.run_package_eval
-python -m adversarial.run_evasion
+python -m adversarial.run_evasion          # Wave 1
+python -m adversarial.run_wave2_blind      # Wave 2 (verifies the frozen baseline)
+python -m head_to_head.run_comparison
 ```
 
 ## GitHub Actions
@@ -588,6 +632,8 @@ print(report.passed, [item.kind for item in report.drift])
 python -m benchmark.run_benchmark
 python -m synthetic_regression.run_regression
 python -m package_eval.run_package_eval
-python -m adversarial.run_evasion
+python -m adversarial.run_evasion        # Wave 1 (post-tuning)
+python -m adversarial.run_wave2_blind    # Wave 2 (frozen blind baseline)
+python -m head_to_head.run_comparison
 bash demo.sh
 ```
