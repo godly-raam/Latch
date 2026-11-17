@@ -1,0 +1,43 @@
+{
+  "capture_source": "live_proxy_metadata",
+  "cve_refs": [],
+  "ecosystem": "npm",
+  "expected_positive": true,
+  "expected_rules": [
+    "HARDCODED_STATIC_CREDENTIAL"
+  ],
+  "exposed_headers": {
+    "Authorization": "Bearer mcpprobe_fixture_static_token_9f2a"
+  },
+  "exposed_url": "https://remote-mcp.example.com/sse",
+  "in_latch_threat_model": true,
+  "kind": "proxy_metadata",
+  "launch_command": [
+    "npx",
+    "--yes",
+    "mcp-remote@0.14.3",
+    "https://remote-mcp.example.com/sse",
+    "--header",
+    "Authorization: Bearer mcpprobe_fixture_static_token_9f2a"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "note": "The same pinned release configured with --header and a literal Bearer token: the credential is committed to the client config, shared by every caller of that config and impossible to rotate without editing it.",
+  "package_name": "mcp-remote",
+  "package_version": "0.14.3",
+  "probe": {
+    "cli": {
+      "exit_code": 0,
+      "status": "ok",
+      "usage": "Usage: mcp-remote <https://server-url> [callback-port] [--debug]"
+    }
+  },
+  "protocol_version": "n/a",
+  "server_info": {
+    "name": "mcp-remote",
+    "version": "0.14.3"
+  },
+  "slug": "npm-mcp-remote-0-14-3-static-header",
+  "tool_count": 0,
+  "tools": [],
+  "vulnerability_class": "hardcoded_static_credential"
+}

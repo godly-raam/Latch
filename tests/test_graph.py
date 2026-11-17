@@ -142,6 +142,82 @@ def test_x_mcp_header_binding_is_egress() -> None:
     assert any(entry.signal == "schema.x-mcp-header" for entry in node.evidence)
 
 
+def test_mcp_client_protocol_callbacks_are_not_egress() -> None:
+    sampling = classify_tool(
+        "mcp",
+        tool(
+            "triggerSamplingRequest",
+            {"prompt": {"type": "string"}, "maxTokens": {"type": "integer"}},
+            annotations={
+                "readOnlyHint": False,
+                "openWorldHint": True,
+                "destructiveHint": False,
+            },
+        ),
+    )
+    elicitation = classify_tool(
+        "mcp",
+        tool(
+            "trigger-elicitation-request",
+            {"message": {"type": "string"}},
+            annotations={"readOnlyHint": False, "openWorldHint": False},
+        ),
+    )
+    resource_update = classify_tool(
+        "mcp", tool("trigger-resource-update", {"uri": {"type": "string"}})
+    )
+    url_elicitation = classify_tool(
+        "mcp",
+        tool(
+            "trigger-url-elicitation",
+            {"url": {"type": "string"}, "message": {"type": "string"}},
+            annotations={"readOnlyHint": False, "openWorldHint": True},
+        ),
+    )
+
+    for node in (sampling, elicitation, resource_update, url_elicitation):
+        assert "EXTERNAL_EGRESS" not in node.capabilities, node.qualified_name
+        assert not any(
+            entry.tag == "EXTERNAL_EGRESS" for entry in node.evidence
+        ), node.qualified_name
+
+
+def test_trigger_with_a_remote_target_stays_egress() -> None:
+    webhook = classify_tool(
+        "mcp", tool("trigger_webhook", {"url": {"type": "string"}})
+    )
+    upload = classify_tool(
+        "mcp", tool("trigger_upload", {"url": {"type": "string"}})
+    )
+
+    assert "EXTERNAL_EGRESS" in webhook.capabilities
+    assert "EXTERNAL_EGRESS" in upload.capabilities
+
+
+def test_protocol_callbacks_do_not_complete_a_trifecta() -> None:
+    servers = {
+        "mcp": [
+            tool("get_annotated_message", {}),
+            tool("get-env", {}),
+            tool(
+                "triggerSamplingRequest",
+                {"prompt": {"type": "string"}},
+                annotations={"readOnlyHint": False, "openWorldHint": True},
+            ),
+            tool(
+                "trigger_url_elicitation",
+                {"url": {"type": "string"}, "message": {"type": "string"}},
+                annotations={"readOnlyHint": False, "openWorldHint": True},
+            ),
+        ]
+    }
+
+    report = analyze_capability_graph(servers)
+
+    assert report.trifecta_paths == []
+    assert report.passed is True
+
+
 def test_outbound_sink_parameter_is_egress() -> None:
     node = classify_tool("hooks", tool("dispatch", {"webhook_url": {"type": "string"}}))
 

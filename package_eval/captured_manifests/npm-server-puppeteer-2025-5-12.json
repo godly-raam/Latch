@@ -1,0 +1,173 @@
+{
+  "capture_source": "live_subprocess",
+  "cve_refs": [],
+  "ecosystem": "npm",
+  "expected_positive": false,
+  "in_latch_threat_model": false,
+  "kind": "stdio_tools",
+  "launch_command": [
+    "npx",
+    "--yes",
+    "@modelcontextprotocol/server-puppeteer@2025.5.12"
+  ],
+  "manifest_sha256": "6320ef8a667f43fbbd0c6b9b026caa4e65a2a62c09d950ab645903b7031395c3",
+  "note": "Untrusted web navigation and page scripting used as the ingest half of target D; on its own it has no private-data read, so no static path exists.",
+  "package_name": "@modelcontextprotocol/server-puppeteer",
+  "package_version": "2025.5.12",
+  "protocol_version": "2024-11-05",
+  "server_info": {
+    "name": "example-servers/puppeteer",
+    "version": "0.1.0"
+  },
+  "slug": "npm-server-puppeteer-2025-5-12",
+  "tool_count": 7,
+  "tools": [
+    {
+      "description": "Navigate to a URL",
+      "inputSchema": {
+        "properties": {
+          "allowDangerous": {
+            "description": "Allow dangerous LaunchOptions that reduce security. When false, dangerous args like --no-sandbox will throw errors. Default false.",
+            "type": "boolean"
+          },
+          "launchOptions": {
+            "description": "PuppeteerJS LaunchOptions. Default null. If changed and not null, browser restarts. Example: { headless: true, args: ['--no-sandbox'] }",
+            "type": "object"
+          },
+          "url": {
+            "description": "URL to navigate to",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "puppeteer_navigate"
+    },
+    {
+      "description": "Take a screenshot of the current page or a specific element",
+      "inputSchema": {
+        "properties": {
+          "encoded": {
+            "description": "If true, capture the screenshot as a base64-encoded data URI (as text) instead of binary image content. Default false.",
+            "type": "boolean"
+          },
+          "height": {
+            "description": "Height in pixels (default: 600)",
+            "type": "number"
+          },
+          "name": {
+            "description": "Name for the screenshot",
+            "type": "string"
+          },
+          "selector": {
+            "description": "CSS selector for element to screenshot",
+            "type": "string"
+          },
+          "width": {
+            "description": "Width in pixels (default: 800)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "puppeteer_screenshot"
+    },
+    {
+      "description": "Click an element on the page",
+      "inputSchema": {
+        "properties": {
+          "selector": {
+            "description": "CSS selector for element to click",
+            "type": "string"
+          }
+        },
+        "required": [
+          "selector"
+        ],
+        "type": "object"
+      },
+      "name": "puppeteer_click"
+    },
+    {
+      "description": "Fill out an input field",
+      "inputSchema": {
+        "properties": {
+          "selector": {
+            "description": "CSS selector for input field",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value to fill",
+            "type": "string"
+          }
+        },
+        "required": [
+          "selector",
+          "value"
+        ],
+        "type": "object"
+      },
+      "name": "puppeteer_fill"
+    },
+    {
+      "description": "Select an element on the page with Select tag",
+      "inputSchema": {
+        "properties": {
+          "selector": {
+            "description": "CSS selector for element to select",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value to select",
+            "type": "string"
+          }
+        },
+        "required": [
+          "selector",
+          "value"
+        ],
+        "type": "object"
+      },
+      "name": "puppeteer_select"
+    },
+    {
+      "description": "Hover an element on the page",
+      "inputSchema": {
+        "properties": {
+          "selector": {
+            "description": "CSS selector for element to hover",
+            "type": "string"
+          }
+        },
+        "required": [
+          "selector"
+        ],
+        "type": "object"
+      },
+      "name": "puppeteer_hover"
+    },
+    {
+      "description": "Execute JavaScript in the browser console",
+      "inputSchema": {
+        "properties": {
+          "script": {
+            "description": "JavaScript code to execute",
+            "type": "string"
+          }
+        },
+        "required": [
+          "script"
+        ],
+        "type": "object"
+      },
+      "name": "puppeteer_evaluate"
+    }
+  ],
+  "vulnerability_class": "cross_server_composition_member"
+}

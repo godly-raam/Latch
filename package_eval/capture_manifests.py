@@ -192,6 +192,139 @@ PACKAGE_SPECS: list[dict[str, Any]] = [
         "legacy_handshake": True,
     },
     {
+        "slug": "npm-server-github-2025-4-8",
+        "expected_positive": True,
+        "package_name": "@modelcontextprotocol/server-github",
+        "ecosystem": "npm",
+        "version_pin": "2025.4.8",
+        "kind": "stdio_tools",
+        "launch_argv": [
+            "npx",
+            "--yes",
+            "@modelcontextprotocol/server-github@2025.4.8",
+        ],
+        "in_latch_threat_model": True,
+        "vulnerability_class": "single_server_lethal_trifecta",
+        "cve_refs": [],
+        "expected_rules": ["LETHAL_TRIFECTA"],
+        "note": (
+            "One server publishes the whole trifecta at once: external issue/PR"
+            " ingestion (get_issue, list_issues), private repository file reads"
+            " (get_file_contents), and public write egress (create_issue,"
+            " add_issue_comment)."
+        ),
+    },
+    {
+        "slug": "npm-server-slack-2025-4-25",
+        "expected_positive": True,
+        "package_name": "@modelcontextprotocol/server-slack",
+        "ecosystem": "npm",
+        "version_pin": "2025.4.25",
+        "kind": "stdio_tools",
+        "launch_argv": [
+            "npx",
+            "--yes",
+            "@modelcontextprotocol/server-slack@2025.4.25",
+        ],
+        "in_latch_threat_model": True,
+        "vulnerability_class": "single_server_lethal_trifecta",
+        "cve_refs": [],
+        "expected_rules": ["LETHAL_TRIFECTA"],
+        "note": (
+            "Channel history and thread replies pull third-party messages into"
+            " context, the user directory is private tenant data, and"
+            " slack_post_message publishes outward again. The server needs"
+            " SLACK_BOT_TOKEN/SLACK_TEAM_ID to start, so a clearly fake pair is"
+            " supplied; tools/list never calls the Slack API."
+        ),
+        "env": {
+            "SLACK_BOT_TOKEN": "mcpprobe_fixture_slack_token",
+            "SLACK_TEAM_ID": "TMCPPROBE",
+        },
+    },
+    {
+        "slug": "npm-server-puppeteer-2025-5-12",
+        "expected_positive": False,
+        "package_name": "@modelcontextprotocol/server-puppeteer",
+        "ecosystem": "npm",
+        "version_pin": "2025.5.12",
+        "kind": "stdio_tools",
+        "launch_argv": [
+            "npx",
+            "--yes",
+            "@modelcontextprotocol/server-puppeteer@2025.5.12",
+        ],
+        "in_latch_threat_model": False,
+        "vulnerability_class": "cross_server_composition_member",
+        "cve_refs": [],
+        "note": (
+            "Untrusted web navigation and page scripting used as the ingest"
+            " half of target D; on its own it has no private-data read, so no"
+            " static path exists."
+        ),
+    },
+    {
+        "slug": "npm-supergateway-3-1-0",
+        "expected_positive": True,
+        "package_name": "supergateway",
+        "ecosystem": "npm",
+        "version_pin": "3.1.0",
+        "kind": "proxy_metadata",
+        "launch_argv": [
+            "npx",
+            "--yes",
+            "supergateway@3.1.0",
+            "--stdio",
+            "npx -y @modelcontextprotocol/server-everything@2.3.0",
+            "--port",
+            "18080",
+            "--host",
+            "0.0.0.0",
+        ],
+        "in_latch_threat_model": True,
+        "vulnerability_class": "unauthenticated_cleartext_sse_bridge",
+        "cve_refs": [],
+        "expected_rules": ["INSECURE_HTTP_AUTH_TRANSPORT"],
+        "note": (
+            "Bridges a stdio server onto a cleartext SSE port bound to 0.0.0.0"
+            " with no authentication challenge, so every tool call from the"
+            " network is unauthenticated and readable on the wire."
+        ),
+        "exposed_url": "http://0.0.0.0:18080/sse",
+        "exposed_headers": {"Authorization": "Bearer ${MCP_TOKEN}"},
+        "probe_url": "http://127.0.0.1:18080/sse",
+    },
+    {
+        "slug": "npm-mcp-remote-0-14-3-static-header",
+        "expected_positive": True,
+        "package_name": "mcp-remote",
+        "ecosystem": "npm",
+        "version_pin": "0.14.3",
+        "kind": "proxy_metadata",
+        "launch_argv": [
+            "npx",
+            "--yes",
+            "mcp-remote@0.14.3",
+            "https://remote-mcp.example.com/sse",
+            "--header",
+            "Authorization: Bearer mcpprobe_fixture_static_token_9f2a",
+        ],
+        "in_latch_threat_model": True,
+        "vulnerability_class": "hardcoded_static_credential",
+        "cve_refs": [],
+        "expected_rules": ["HARDCODED_STATIC_CREDENTIAL"],
+        "note": (
+            "The same pinned release configured with --header and a literal"
+            " Bearer token: the credential is committed to the client config,"
+            " shared by every caller of that config and impossible to rotate"
+            " without editing it."
+        ),
+        "exposed_url": "https://remote-mcp.example.com/sse",
+        "exposed_headers": {
+            "Authorization": "Bearer mcpprobe_fixture_static_token_9f2a"
+        },
+    },
+    {
         "slug": "npm-mcp-remote-0-14-3",
         "expected_positive": True,
         "package_name": "mcp-remote",
@@ -293,9 +426,9 @@ def package_version(
         return "unknown"
 
 
-async def _harvest(argv: list[str]) -> Any:
+async def _harvest(argv: list[str], env: dict[str, str] | None = None) -> Any:
     return await harvest_stdio(
-        shlex.join(argv), timeout=CAPTURE_TIMEOUT_SECONDS
+        shlex.join(argv), timeout=CAPTURE_TIMEOUT_SECONDS, env=env
     )
 
 
@@ -381,7 +514,7 @@ def _recorded_argv(argv: list[str], sandbox: str) -> list[str]:
 
 
 def _spec_metadata(spec: dict[str, Any]) -> dict[str, Any]:
-    return {
+    metadata = {
         "cve_refs": list(spec["cve_refs"]),
         "in_latch_threat_model": spec["in_latch_threat_model"],
         "expected_positive": spec["expected_positive"],
@@ -389,6 +522,11 @@ def _spec_metadata(spec: dict[str, Any]) -> dict[str, Any]:
         "note": spec["note"],
         "vulnerability_class": spec["vulnerability_class"],
     }
+    # Only present when the target has a named rule: adding an empty key to
+    # every legacy capture would churn them for no information.
+    if spec.get("expected_rules"):
+        metadata["expected_rules"] = list(spec["expected_rules"])
+    return metadata
 
 
 def _skip(spec: dict[str, Any], reason: str) -> dict[str, Any]:
@@ -425,7 +563,7 @@ def capture_package(spec: dict[str, Any], sandbox: str) -> dict[str, Any]:
             protocol_version = legacy["protocol_version"]
             server_info = legacy["server_info"]
         else:
-            harvest = asyncio.run(_harvest(argv))
+            harvest = asyncio.run(_harvest(argv, spec.get("env")))
             tools = harvest.tools_payload.get("tools")
             protocol_version = harvest.protocol_version
             server_info = harvest.server_info

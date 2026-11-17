@@ -477,12 +477,12 @@ only to install the packages it captures.
 | # | Suite | Corpus | Result | Report |
 | - | ----- | ------ | ------ | ------ |
 | 1 | `benchmark/` | 36 synthetic fixtures (18 hostile, 18 benign lookalikes) | Precision `1.00`, FPR `0.00`, recall `1.00` vs. naive `0.48` / `0.67` / `0.61` | [`benchmark/RESULTS.md`](benchmark/RESULTS.md) |
-| 2 | `package_eval/` | 9 real npm/PyPI packages (83 tools, pinned pre-patch releases + clean references) and 4 compositions | In-scope real-package recall `0.67` (2/3), overall `0.40` (2/5, including two honest handler-CVE misses), FPR `0.20` vs. naive `0.80` | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
+| 2 | `package_eval/` | 14 real npm/PyPI packages (124 tools, pinned pre-patch releases + clean references) and 5 compositions | In-scope real-package recall `0.88` (7/8), overall `0.70` (7/10, including two honest handler-CVE misses), FPR `0.17` (1/6) vs. naive `0.83` (5/6) | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
 | 3 | `synthetic_regression/` | 24 fixtures modeled on disclosed MCP bug classes | `1.00` in-scope recall, `0.83` overall recall with 2 out-of-scope handler bugs | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
 | 4a | `adversarial/` Wave 1 | 24 evasion probes, iteratively hardened | `19/19` post-tuning catches + 5 irreducible boundaries | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
 | 4b | `adversarial/` Wave 2 | 16 self-authored blind probes (12 hostile, 4 benign), no rule edits | **Author-blind upper bound** (awaiting independent external submission): precision `1.00`, recall `0.42`, FPR `0.00` — 5 catches, **7 honest misses** | [`adversarial/WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md) |
 | 4c | `adversarial/` external kit | Contributor-authored 10-probe schema, no access to the rules | Schema/scorer validated in CI; **no external submission yet**, so nothing is claimed | [`adversarial/EXTERNAL_BLIND_REPORT.md`](adversarial/EXTERNAL_BLIND_REPORT.md) |
-| 5 | `head_to_head/` | 9 real captures, measured `mcp-scan` run against the 5 clean packages, 10 self-authored scenarios demoted to an appendix | Clean-package FPR `0.20` (1/5) vs. naive `0.80` (4/5); in-model real-package recall `0.67`; `mcp-scan` column measured or explicitly `credentials_required`; `10/10` self-authored feature demo in the appendix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
+| 5 | `head_to_head/` | 14 real captures, measured `mcp-scan` run against the 6 clean packages, 10 self-authored scenarios demoted to an appendix | Clean-package FPR `0.17` (1/6) vs. naive `0.83` (5/6); in-model real-package recall `6/6`; `mcp-scan` column measured or explicitly `credentials_required`; `10/10` self-authored feature demo in the appendix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
 
 **Wave 1, Wave 2 and the external kit are three different claims.** Wave 1 is a
 post-tuning regression suite: every probe there was a real bypass that the
@@ -514,21 +514,26 @@ manifest-level analyzer can see them.
 `package_eval/` is the blind complement, and it now includes real vulnerable
 releases rather than only clean reference servers. It launches
 `@modelcontextprotocol/server-filesystem` (`2.3.0` and pre-patch `0.6.2`),
-`-memory`, `-everything`, `mcp-server-fetch`, `mcp-server-git` (`2026.11.11`
-and pre-patch `2025.9.25`), and pins `mcp-remote@0.14.3` and `mcp-proxy==0.8.2`
-for their real cleartext transport, recording verbatim `tools/list` bytes, a
-registry-resolved version, a manifest digest and, for proxies, the probed
-cleartext endpoint. In-scope recall counts what a manifest auditor can see: the
-cleartext OAuth transport, the unauthenticated cleartext SSE bridge, and a
-cross-server composition. Overall recall additionally counts the two handler
-CVEs, which are recorded as honest misses because path traversal and git
-argument injection live in handler code, not in `tools/list`. The one flagged
-clean package is the SDK's diagnostics server, where generic capability
-heuristics over-approximate diagnostic tools; the report says so and counts it
-as a false positive. The report also carries a before/after table for the graph
-precision fix: `filesystem + git` drops from 27 CRITICAL paths to 0, and
-`everything + filesystem` collapses 314 raw combinations into 32 unique
-`(ingest, egress)` pairs.
+`-memory`, `-everything@2.3.0`, `-github@2025.4.8`, `-slack@2025.4.25`,
+`-puppeteer@2025.5.12`, `mcp-server-fetch`, `mcp-server-git` (`2026.11.11` and
+pre-patch `2025.9.25`), and pins `supergateway@3.1.0`, `mcp-remote@0.14.3`
+(cleartext transport and a static-`--header` config) and `mcp-proxy==0.8.2`,
+recording verbatim `tools/list` bytes, a registry-resolved version, a manifest
+digest and, for proxies, the probed cleartext endpoint. In-scope recall counts
+what a manifest auditor can see: two real servers that publish a complete
+trifecta on their own (`server-github` and `server-slack`), the cleartext OAuth
+transport, the unauthenticated cleartext SSE bridge, a literal Bearer token
+committed to a client config, and two cross-server compositions
+(`fetch + filesystem`, `puppeteer + filesystem`). Overall recall additionally
+counts the two handler CVEs, which are recorded as honest misses because path
+traversal and git argument injection live in handler code, not in `tools/list`.
+The one flagged clean package is the SDK's diagnostics server, where generic
+capability heuristics over-approximate diagnostic tools; the report says so and
+counts it as a false positive. The report also carries a before/after table for
+the graph precision fixes: `filesystem + git` drops from 27 CRITICAL paths to
+0, and `everything + filesystem` collapses 314 raw combinations into 11 unique
+`(ingest, egress)` pairs, because MCP `sampling`/`elicitation` client callbacks
+no longer count as network sinks.
 
 `adversarial/` attacks Latch itself in two waves. **Wave 1** (post-tuning,
 [`EVASION_REPORT.md`](adversarial/EVASION_REPORT.md)) covers new capability
@@ -546,10 +551,10 @@ negatives that must stay clean. It catches 5 of 12 hostile probes and misses 7,
 and those 7 are printed as misses.
 
 `head_to_head/` is the measured comparison, and the headline number is the
-clean-package false-positive rate: `mcpprobe` (Latch) flags `1/5` (`0.20`), the
-naive keyword baseline flags `4/5` (`0.80`), on the same real captures. It also
+clean-package false-positive rate: `mcpprobe` (Latch) flags `1/6` (`0.17`), the
+naive keyword baseline flags `5/6` (`0.83`), on the same real captures. It also
 runs `mcp-scan` — the current `snyk-agent-scan` distribution — live against
-those five clean packages and records the exact invocation, exit code and
+those six clean packages and records the exact invocation, exit code and
 verdict class. That CLI performs deep analysis on a Snyk endpoint and requires
 an account token, so with no `SNYK_TOKEN` in the environment the column is
 reported as `credentials_required` rather than being dressed up as a clean

@@ -80,14 +80,15 @@ def test_blind_catches_and_misses_are_both_recorded() -> None:
     ]
 
 
-def test_runner_verifies_instead_of_overwriting_the_baseline() -> None:
+def test_runner_verifies_instead_of_overwriting_the_baseline(tmp_path: Path) -> None:
     before = BASELINE_JSON.read_bytes()
     before_report = REPORT_MD.read_bytes()
 
-    assert main([]) == 0
+    assert main(["--output-dir", str(tmp_path)]) == 0
 
     assert BASELINE_JSON.read_bytes() == before
     assert REPORT_MD.read_bytes() == before_report
+    assert (tmp_path / REPORT_MD.name).read_bytes() == before_report
 
 
 def test_report_is_deterministic_and_honest() -> None:

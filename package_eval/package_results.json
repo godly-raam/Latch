@@ -120,12 +120,75 @@
       "trifecta_paths": []
     },
     {
+      "audit_findings": [],
+      "collapsed_read_tools": 8,
+      "composition_id": "puppeteer-plus-filesystem",
+      "cross_server_path_count": 1,
+      "detected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "in_latch_threat_model": true,
+      "latch_flagged": true,
+      "legacy_critical_count": 0,
+      "legacy_path_count": 0,
+      "local_write_tools": [
+        "npm-server-filesystem:append_file",
+        "npm-server-filesystem:create_directory",
+        "npm-server-filesystem:edit_file",
+        "npm-server-filesystem:move_file",
+        "npm-server-filesystem:write_file"
+      ],
+      "miss_rationale": null,
+      "naive_flagged": true,
+      "outcome": "detected",
+      "rationale": "Target D: real untrusted web navigation and page scripting (server-puppeteer) beside real private workspace reads (server-filesystem).",
+      "rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "servers": [
+        "npm-server-puppeteer-2025-5-12",
+        "npm-server-filesystem"
+      ],
+      "severity_counts": {
+        "CRITICAL": 1
+      },
+      "shadow_findings": [],
+      "target_id": "D",
+      "tool_count": 23,
+      "trifecta_path_count": 1,
+      "trifecta_paths": [
+        {
+          "collapsed_read_count": 8,
+          "cross_server": true,
+          "egress_tool": "npm-server-puppeteer-2025-5-12:puppeteer_navigate",
+          "ingest_tool": "npm-server-filesystem:search_files",
+          "path_id": "trifecta-001",
+          "read_tool": "npm-server-filesystem:directory_tree",
+          "read_tools": [
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file"
+          ],
+          "severity": "CRITICAL"
+        }
+      ]
+    },
+    {
       "audit_findings": [
         "ANNOTATION_CONTRADICTION (get-header-params)"
       ],
-      "collapsed_read_tools": 314,
+      "collapsed_read_tools": 108,
       "composition_id": "everything-plus-filesystem",
-      "cross_server_path_count": 32,
+      "cross_server_path_count": 11,
       "detected_rule_ids": [],
       "expected_positive": false,
       "expected_rule_ids": [],
@@ -153,12 +216,12 @@
         "npm-server-filesystem"
       ],
       "severity_counts": {
-        "CRITICAL": 32
+        "CRITICAL": 11
       },
       "shadow_findings": [],
       "target_id": null,
       "tool_count": 38,
-      "trifecta_path_count": 32,
+      "trifecta_path_count": 11,
       "trifecta_paths": [
         {
           "collapsed_read_count": 10,
@@ -205,8 +268,8 @@
         {
           "collapsed_read_count": 10,
           "cross_server": true,
-          "egress_tool": "npm-server-everything:trigger-resource-update",
-          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "egress_tool": "npm-server-everything:get-header-params",
+          "ingest_tool": "npm-server-everything:gzip-file-as-resource",
           "path_id": "trifecta-003",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -226,8 +289,8 @@
         {
           "collapsed_read_count": 10,
           "cross_server": true,
-          "egress_tool": "npm-server-everything:trigger-sampling-request",
-          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "egress_tool": "npm-server-everything:get-header-params",
+          "ingest_tool": "npm-server-everything:trigger-sampling-request",
           "path_id": "trifecta-004",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -247,8 +310,8 @@
         {
           "collapsed_read_count": 10,
           "cross_server": true,
-          "egress_tool": "npm-server-everything:trigger-sampling-request-async",
-          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "egress_tool": "npm-server-everything:gzip-file-as-resource",
+          "ingest_tool": "npm-server-everything:trigger-sampling-request",
           "path_id": "trifecta-005",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -268,8 +331,8 @@
         {
           "collapsed_read_count": 10,
           "cross_server": true,
-          "egress_tool": "npm-server-everything:trigger-url-elicitation",
-          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "egress_tool": "npm-server-everything:get-header-params",
+          "ingest_tool": "npm-server-everything:trigger-sampling-request-async",
           "path_id": "trifecta-006",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -289,8 +352,8 @@
         {
           "collapsed_read_count": 10,
           "cross_server": true,
-          "egress_tool": "npm-server-everything:get-header-params",
-          "ingest_tool": "npm-server-everything:gzip-file-as-resource",
+          "egress_tool": "npm-server-everything:gzip-file-as-resource",
+          "ingest_tool": "npm-server-everything:trigger-sampling-request-async",
           "path_id": "trifecta-007",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -310,8 +373,8 @@
         {
           "collapsed_read_count": 10,
           "cross_server": true,
-          "egress_tool": "npm-server-everything:trigger-resource-update",
-          "ingest_tool": "npm-server-everything:gzip-file-as-resource",
+          "egress_tool": "npm-server-everything:get-header-params",
+          "ingest_tool": "npm-server-everything:trigger-url-elicitation",
           "path_id": "trifecta-008",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -333,17 +396,27 @@
   ],
   "detection": {
     "in_scope_detected": [
+      "npm-mcp-remote-0-14-3-static-header",
       "npm-mcp-remote-0-14-3",
-      "pypi-mcp-proxy-0-8-2"
+      "npm-server-github-2025-4-8",
+      "npm-server-slack-2025-4-25",
+      "npm-supergateway-3-1-0",
+      "pypi-mcp-proxy-0-8-2",
+      "D"
     ],
     "in_scope_missed": [
       "B"
     ],
-    "in_scope_recall": 0.6667,
+    "in_scope_recall": 0.875,
     "in_scope_targets": [
+      "npm-mcp-remote-0-14-3-static-header",
       "npm-mcp-remote-0-14-3",
+      "npm-server-github-2025-4-8",
+      "npm-server-slack-2025-4-25",
+      "npm-supergateway-3-1-0",
       "pypi-mcp-proxy-0-8-2",
-      "B"
+      "B",
+      "D"
     ],
     "out_of_model_detected": [],
     "out_of_model_missed": [
@@ -355,19 +428,90 @@
       "pypi-mcp-server-git-2025-9-25"
     ],
     "overall_detected": [
+      "npm-mcp-remote-0-14-3-static-header",
       "npm-mcp-remote-0-14-3",
-      "pypi-mcp-proxy-0-8-2"
+      "npm-server-github-2025-4-8",
+      "npm-server-slack-2025-4-25",
+      "npm-supergateway-3-1-0",
+      "pypi-mcp-proxy-0-8-2",
+      "D"
     ],
     "overall_missed": [
       "npm-server-filesystem-0-6-2",
       "pypi-mcp-server-git-2025-9-25",
       "B"
     ],
-    "overall_recall": 0.4,
-    "overall_targets": 5
+    "overall_recall": 0.7,
+    "overall_targets": 10
   },
-  "package_count": 9,
+  "package_count": 14,
   "packages": [
+    {
+      "capture_source": "live_proxy_metadata",
+      "cve_refs": [],
+      "detected_rule_ids": [
+        "HARDCODED_STATIC_CREDENTIAL"
+      ],
+      "ecosystem": "npm",
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "HARDCODED_STATIC_CREDENTIAL"
+      ],
+      "exposed_headers": {
+        "Authorization": "Bearer mcpprobe_fixture_static_token_9f2a"
+      },
+      "exposed_url": "https://remote-mcp.example.com/sse",
+      "finding_count": 1,
+      "findings": [
+        {
+          "engine": "auth-audit",
+          "rule_id": "HARDCODED_STATIC_CREDENTIAL",
+          "severity": "HIGH",
+          "tool": "headers.Authorization"
+        }
+      ],
+      "in_latch_threat_model": true,
+      "kind": "proxy_metadata",
+      "label": "`mcp-remote` 0.14.3 over `https://remote-mcp.example.com/sse`",
+      "latch_flagged": true,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "mcp-remote@0.14.3",
+        "https://remote-mcp.example.com/sse",
+        "--header",
+        "Authorization: Bearer mcpprobe_fixture_static_token_9f2a"
+      ],
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "naive_flagged": true,
+      "naive_hits": [
+        "token",
+        "bearer"
+      ],
+      "note": "The same pinned release configured with --header and a literal Bearer token: the credential is committed to the client config, shared by every caller of that config and impossible to rotate without editing it.",
+      "outcome": "detected",
+      "package_name": "mcp-remote",
+      "package_version": "0.14.3",
+      "protocol_version": "n/a",
+      "rule_ids": [
+        "HARDCODED_STATIC_CREDENTIAL"
+      ],
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "slug": "npm-mcp-remote-0-14-3-static-header",
+      "target_id": "npm-mcp-remote-0-14-3-static-header",
+      "tool_count": 0,
+      "tool_names": [],
+      "transport_probe": {
+        "cli": {
+          "exit_code": 0,
+          "status": "ok",
+          "usage": "Usage: mcp-remote <https://server-url> [callback-port] [--debug]"
+        }
+      },
+      "vulnerability_class": "hardcoded_static_credential"
+    },
     {
       "capture_source": "live_proxy_metadata",
       "cve_refs": [
@@ -444,7 +588,7 @@
       "ecosystem": "npm",
       "expected_positive": false,
       "expected_rule_ids": [],
-      "finding_count": 27,
+      "finding_count": 10,
       "findings": [
         {
           "engine": "audit",
@@ -462,30 +606,6 @@
           "engine": "graph",
           "rule_id": "LETHAL_TRIFECTA",
           "severity": "CRITICAL",
-          "tool": "npm-server-everything:get-annotated-message"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:get-annotated-message"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:gzip-file-as-resource"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:gzip-file-as-resource"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
           "tool": "npm-server-everything:gzip-file-as-resource"
         },
         {
@@ -493,30 +613,6 @@
           "rule_id": "LETHAL_TRIFECTA",
           "severity": "CRITICAL",
           "tool": "npm-server-everything:trigger-sampling-request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:trigger-sampling-request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:trigger-sampling-request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:trigger-sampling-request-async"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:trigger-sampling-request-async"
         },
         {
           "engine": "graph",
@@ -533,38 +629,26 @@
         {
           "engine": "graph",
           "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
+          "severity": "HIGH",
+          "tool": "npm-server-everything:get-annotated-message"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-everything:trigger-sampling-request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-everything:trigger-sampling-request-async"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
           "tool": "npm-server-everything:trigger-url-elicitation"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-everything:get-annotated-message"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-everything:get-annotated-message"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-everything:get-annotated-message"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-everything:gzip-file-as-resource"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-everything:gzip-file-as-resource"
         }
       ],
       "in_latch_threat_model": false,
@@ -597,8 +681,8 @@
         "LETHAL_TRIFECTA"
       ],
       "severity_counts": {
-        "CRITICAL": 14,
-        "HIGH": 12,
+        "CRITICAL": 5,
+        "HIGH": 4,
         "MEDIUM": 1
       },
       "slug": "npm-server-everything",
@@ -742,6 +826,198 @@
     {
       "capture_source": "live_subprocess",
       "cve_refs": [],
+      "detected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "ecosystem": "npm",
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "finding_count": 163,
+      "findings": [
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_issue"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_issue"
+        }
+      ],
+      "in_latch_threat_model": true,
+      "kind": "stdio_tools",
+      "label": "`@modelcontextprotocol/server-github` 2025.4.8",
+      "latch_flagged": true,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "@modelcontextprotocol/server-github@2025.4.8"
+      ],
+      "manifest_sha256": "db7bf13088866f340ae0a9ddd9d63ff909e2e10e7b2105bbbd642bfaa789bc8e",
+      "naive_flagged": true,
+      "naive_hits": [
+        "http://"
+      ],
+      "note": "One server publishes the whole trifecta at once: external issue/PR ingestion (get_issue, list_issues), private repository file reads (get_file_contents), and public write egress (create_issue, add_issue_comment).",
+      "outcome": "detected",
+      "package_name": "@modelcontextprotocol/server-github",
+      "package_version": "2025.4.8",
+      "protocol_version": "2024-11-05",
+      "rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "severity_counts": {
+        "HIGH": 163
+      },
+      "slug": "npm-server-github-2025-4-8",
+      "target_id": "npm-server-github-2025-4-8",
+      "tool_count": 26,
+      "tool_names": [
+        "create_or_update_file",
+        "search_repositories",
+        "create_repository",
+        "get_file_contents",
+        "push_files",
+        "create_issue",
+        "create_pull_request",
+        "fork_repository",
+        "create_branch",
+        "list_commits",
+        "list_issues",
+        "update_issue",
+        "add_issue_comment",
+        "search_code",
+        "search_issues",
+        "search_users",
+        "get_issue",
+        "get_pull_request",
+        "list_pull_requests",
+        "create_pull_request_review",
+        "merge_pull_request",
+        "get_pull_request_files",
+        "get_pull_request_status",
+        "update_pull_request_branch",
+        "get_pull_request_comments",
+        "get_pull_request_reviews"
+      ],
+      "vulnerability_class": "single_server_lethal_trifecta"
+    },
+    {
+      "capture_source": "live_subprocess",
+      "cve_refs": [],
       "detected_rule_ids": [],
       "ecosystem": "npm",
       "expected_positive": false,
@@ -782,6 +1058,237 @@
         "open_nodes"
       ],
       "vulnerability_class": "clean_reference_server"
+    },
+    {
+      "capture_source": "live_subprocess",
+      "cve_refs": [],
+      "detected_rule_ids": [],
+      "ecosystem": "npm",
+      "expected_positive": false,
+      "expected_rule_ids": [],
+      "finding_count": 0,
+      "findings": [],
+      "in_latch_threat_model": false,
+      "kind": "stdio_tools",
+      "label": "`@modelcontextprotocol/server-puppeteer` 2025.5.12",
+      "latch_flagged": false,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "@modelcontextprotocol/server-puppeteer@2025.5.12"
+      ],
+      "manifest_sha256": "6320ef8a667f43fbbd0c6b9b026caa4e65a2a62c09d950ab645903b7031395c3",
+      "naive_flagged": true,
+      "naive_hits": [
+        "instead"
+      ],
+      "note": "Untrusted web navigation and page scripting used as the ingest half of target D; on its own it has no private-data read, so no static path exists.",
+      "outcome": "true_negative",
+      "package_name": "@modelcontextprotocol/server-puppeteer",
+      "package_version": "2025.5.12",
+      "protocol_version": "2024-11-05",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-server-puppeteer-2025-5-12",
+      "target_id": "npm-server-puppeteer-2025-5-12",
+      "tool_count": 7,
+      "tool_names": [
+        "puppeteer_navigate",
+        "puppeteer_screenshot",
+        "puppeteer_click",
+        "puppeteer_fill",
+        "puppeteer_select",
+        "puppeteer_hover",
+        "puppeteer_evaluate"
+      ],
+      "vulnerability_class": "cross_server_composition_member"
+    },
+    {
+      "capture_source": "live_subprocess",
+      "cve_refs": [],
+      "detected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "ecosystem": "npm",
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "finding_count": 10,
+      "findings": [
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_get_channel_history"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_get_channel_history"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_get_thread_replies"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_get_thread_replies"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_get_user_profile"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_get_user_profile"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_get_users"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_get_users"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_list_channels"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-slack-2025-4-25:slack_list_channels"
+        }
+      ],
+      "in_latch_threat_model": true,
+      "kind": "stdio_tools",
+      "label": "`@modelcontextprotocol/server-slack` 2025.4.25",
+      "latch_flagged": true,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "@modelcontextprotocol/server-slack@2025.4.25"
+      ],
+      "manifest_sha256": "84b82c2ec58a96558e06bac8c09fb53ed614b2f61981fb3854b35ef3d76d5c1c",
+      "naive_flagged": false,
+      "naive_hits": [],
+      "note": "Channel history and thread replies pull third-party messages into context, the user directory is private tenant data, and slack_post_message publishes outward again. The server needs SLACK_BOT_TOKEN/SLACK_TEAM_ID to start, so a clearly fake pair is supplied; tools/list never calls the Slack API.",
+      "outcome": "detected",
+      "package_name": "@modelcontextprotocol/server-slack",
+      "package_version": "2025.4.25",
+      "protocol_version": "2024-11-05",
+      "rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "severity_counts": {
+        "HIGH": 10
+      },
+      "slug": "npm-server-slack-2025-4-25",
+      "target_id": "npm-server-slack-2025-4-25",
+      "tool_count": 8,
+      "tool_names": [
+        "slack_list_channels",
+        "slack_post_message",
+        "slack_reply_to_thread",
+        "slack_add_reaction",
+        "slack_get_channel_history",
+        "slack_get_thread_replies",
+        "slack_get_users",
+        "slack_get_user_profile"
+      ],
+      "vulnerability_class": "single_server_lethal_trifecta"
+    },
+    {
+      "capture_source": "live_proxy_metadata",
+      "cve_refs": [],
+      "detected_rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
+      "ecosystem": "npm",
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
+      "exposed_headers": {
+        "Authorization": "Bearer ${MCP_TOKEN}"
+      },
+      "exposed_url": "http://0.0.0.0:18080/sse",
+      "finding_count": 1,
+      "findings": [
+        {
+          "engine": "auth-audit",
+          "rule_id": "INSECURE_HTTP_AUTH_TRANSPORT",
+          "severity": "CRITICAL",
+          "tool": "url"
+        }
+      ],
+      "in_latch_threat_model": true,
+      "kind": "proxy_metadata",
+      "label": "`supergateway` 3.1.0 over `http://0.0.0.0:18080/sse`",
+      "latch_flagged": true,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "supergateway@3.1.0",
+        "--stdio",
+        "npx -y @modelcontextprotocol/server-everything@2.3.0",
+        "--port",
+        "18080",
+        "--host",
+        "0.0.0.0"
+      ],
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "naive_flagged": true,
+      "naive_hits": [
+        "http://"
+      ],
+      "note": "Bridges a stdio server onto a cleartext SSE port bound to 0.0.0.0 with no authentication challenge, so every tool call from the network is unauthenticated and readable on the wire.",
+      "outcome": "detected",
+      "package_name": "supergateway",
+      "package_version": "3.1.0",
+      "protocol_version": "n/a",
+      "rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
+      "severity_counts": {
+        "CRITICAL": 1
+      },
+      "slug": "npm-supergateway-3-1-0",
+      "target_id": "npm-supergateway-3-1-0",
+      "tool_count": 0,
+      "tool_names": [],
+      "transport_probe": {
+        "cli": {
+          "exit_code": 0,
+          "status": "ok",
+          "usage": null
+        },
+        "transport": {
+          "authentication_challenge": false,
+          "cleartext": true,
+          "content_type": "text/event-stream",
+          "http_status": 200,
+          "status": "ok"
+        }
+      },
+      "vulnerability_class": "unauthenticated_cleartext_sse_bridge"
     },
     {
       "capture_source": "live_proxy_metadata",
@@ -1037,40 +1544,57 @@
       "composition_id": "filesystem-plus-fetch"
     },
     {
-      "after_critical": 32,
-      "after_paths": 32,
+      "after_critical": 1,
+      "after_paths": 1,
+      "before_critical": 0,
+      "before_paths": 0,
+      "collapsed_read_tools": 8,
+      "composition_id": "puppeteer-plus-filesystem"
+    },
+    {
+      "after_critical": 11,
+      "after_paths": 11,
       "before_critical": 302,
       "before_paths": 314,
-      "collapsed_read_tools": 314,
+      "collapsed_read_tools": 108,
       "composition_id": "everything-plus-filesystem"
     }
   ],
   "summary": {
-    "clean_package_count": 5,
+    "clean_package_count": 6,
     "compositions_with_paths": [
+      "puppeteer-plus-filesystem",
       "everything-plus-filesystem"
     ],
     "false_positive_packages": [
       "npm-server-everything"
     ],
     "latch_clean_packages": 1,
-    "latch_false_positive_rate": 0.2,
+    "latch_false_positive_rate": 0.1667,
     "latch_flagged_packages": [
+      "npm-mcp-remote-0-14-3-static-header",
       "npm-mcp-remote-0-14-3",
       "npm-server-everything",
+      "npm-server-github-2025-4-8",
+      "npm-server-slack-2025-4-25",
+      "npm-supergateway-3-1-0",
       "pypi-mcp-proxy-0-8-2"
     ],
-    "naive_false_positive_rate": 0.8,
+    "naive_false_positive_rate": 0.8333,
     "naive_flagged_packages": [
+      "npm-mcp-remote-0-14-3-static-header",
       "npm-mcp-remote-0-14-3",
       "npm-server-everything",
       "npm-server-filesystem-0-6-2",
       "npm-server-filesystem",
+      "npm-server-github-2025-4-8",
+      "npm-server-puppeteer-2025-5-12",
+      "npm-supergateway-3-1-0",
       "pypi-mcp-proxy-0-8-2",
       "pypi-mcp-server-fetch",
       "pypi-mcp-server-git-2025-9-25",
       "pypi-mcp-server-git"
     ]
   },
-  "tool_count": 83
+  "tool_count": 124
 }

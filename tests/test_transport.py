@@ -402,10 +402,8 @@ def test_harvest_stdio_timeout_is_probe_error() -> None:
 
 
 def test_harvest_stdio_premature_exit_is_probe_error() -> None:
-    command = (
-        f"{shlex.quote(sys.executable)} -c "
-        f"{shlex.quote('import sys; sys.stderr.write(\"boom\\n\"); sys.exit(3)')}"
-    )
+    script = 'import sys; sys.stderr.write("boom\\n"); sys.exit(3)'
+    command = f"{shlex.quote(sys.executable)} -c {shlex.quote(script)}"
 
     with pytest.raises(ProbeError, match="exited"):
         run(harvest_stdio(command, timeout=5.0))

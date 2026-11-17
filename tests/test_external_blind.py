@@ -83,13 +83,13 @@ def test_template_validates_and_scores() -> None:
     assert metrics_row["false_positive_rate"] == 0.0
 
 
-def test_check_template_marks_artifacts_as_template_only() -> None:
-    assert main(["--check-template"]) == 0
+def test_check_template_marks_artifacts_as_template_only(tmp_path: Path) -> None:
+    assert main(["--check-template", "--output-dir", str(tmp_path)]) == 0
 
-    payload = json.loads(RESULTS_JSON.read_text(encoding="utf-8"))
+    payload = json.loads((tmp_path / RESULTS_JSON.name).read_text(encoding="utf-8"))
     assert payload["submission_status"] == "template_validation_only"
 
-    report = REPORT_MD.read_text(encoding="utf-8")
+    report = (tmp_path / REPORT_MD.name).read_text(encoding="utf-8")
     flat = " ".join(report.replace(">", " ").split())
     assert "TEMPLATE VALIDATION ONLY" in flat
     assert "not a red-team result" in flat
@@ -227,7 +227,7 @@ def test_main_rejects_bad_input_without_crashing(tmp_path: Path) -> None:
         tmp_path / "probes.json",
         {"schema_version": 1, "author": "t", "probes": [_probe(probe_id="x")]},
     )
-    assert main(["--input", str(bad)]) == 2
+    assert main(["--input", str(bad), "--output-dir", str(bad.parent)]) == 2
     with pytest.raises(SystemExit):
         main(["--check-template", "--input", str(bad)])
 

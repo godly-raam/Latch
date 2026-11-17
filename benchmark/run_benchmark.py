@@ -8,6 +8,7 @@ summary table. Deterministic: no timestamps, no randomness, sorted output.
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 from typing import Any
@@ -232,15 +233,31 @@ def render_markdown(results: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def write_results(results: dict[str, Any]) -> None:
-    RESULTS_JSON.write_text(
+def artifact_paths(output_dir: Path | None = None) -> tuple[Path, Path]:
+    """Where this module's two artifacts live for ``output_dir``."""
+
+    if output_dir is None:
+        return RESULTS_JSON, RESULTS_MD
+    directory = Path(output_dir)
+    return directory / RESULTS_JSON.name, directory / RESULTS_MD.name
+
+
+def write_results(
+    results: dict[str, Any], output_dir: Path | None = None
+) -> tuple[Path, Path]:
+    json_path, markdown_path = artifact_paths(output_dir)
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(
         json.dumps(results, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    RESULTS_MD.write_text(render_markdown(results), encoding="utf-8")
+    markdown_path.write_text(render_markdown(results), encoding="utf-8")
+    return json_path, markdown_path
 
 
-def print_summary(results: dict[str, Any]) -> None:
+def print_summary(
+    results: dict[str, Any], paths: tuple[Path, Path] | None = None
+) -> None:
     latch = results["latch"]
     naive = results["naive"]
     header = (
@@ -259,14 +276,24 @@ def print_summary(results: dict[str, Any]) -> None:
             f" {metrics['f1']:>6.2f} {metrics['fpr']:>6.2f}"
         )
     print()
-    print(f"Wrote {RESULTS_JSON}")
-    print(f"Wrote {RESULTS_MD}")
+    json_path, markdown_path = paths or (RESULTS_JSON, RESULTS_MD)
+    print(f"Wrote {json_path}")
+    print(f"Wrote {markdown_path}")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="write the results and report here instead of benchmark/",
+    )
+    args = parser.parse_args(argv)
+
     results = compute_results()
-    write_results(results)
-    print_summary(results)
+    paths = write_results(results, args.output_dir)
+    print_summary(results, paths)
     return 0
 
 

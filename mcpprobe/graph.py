@@ -60,6 +60,7 @@ INGEST_VERBS = frozenset(
         "view",
         "harvest",
         "extract",
+        "navigate",
     }
 )
 
@@ -212,6 +213,9 @@ OUTBOUND_VERBS = frozenset(
         "write",
         "append",
         "update",
+        # A browser navigation is a request to a caller-chosen URL, which is a
+        # destination the caller controls (``puppeteer_navigate``).
+        "navigate",
     }
 )
 
@@ -372,6 +376,46 @@ EXTERNAL_TARGETS = frozenset(
         "dest",
         "destination",
         "sink",
+    }
+)
+
+#: Tool-name tokens for MCP *client-protocol callbacks*. ``sampling`` and
+#: ``elicitation`` ask the connected client to do work -- return a completion, or
+#: prompt the user -- so they are JSON-RPC calls back to the client, not network
+#: sinks: nothing leaves for a third party.
+MCP_CLIENT_PROTOCOL_TOKENS = frozenset({"sampling", "elicitation", "elicit"})
+
+#: ``trigger`` is the SDK's verb for firing those callbacks. On its own it names
+#: a local protocol test, so it only counts as outbound together with a real
+#: remote destination noun (``trigger_url_webhook``).
+LOCAL_PROTOCOL_VERBS = frozenset({"trigger"})
+
+#: Destination nouns that do make an identifier genuinely outward-facing.
+#: ``uri`` is deliberately absent: a bare resource URI is a protocol identifier
+#: (``trigger-resource-update`` notifies the client about a resource), not a
+#: caller-chosen destination.
+NETWORK_TARGET_TOKENS = frozenset(
+    {
+        "url",
+        "http",
+        "https",
+        "webhook",
+        "endpoint",
+        "upload",
+        "email",
+        "mail",
+        "slack",
+        "discord",
+        "channel",
+        "recipient",
+        "dest",
+        "destination",
+        "sink",
+        "s3",
+        "bucket",
+        "gist",
+        "remote",
+        "external",
     }
 )
 
@@ -674,9 +718,19 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
         )
 
     # -- EXTERNAL_EGRESS ---------------------------------------------------
+    # MCP client-protocol callbacks (``sampling``, ``elicitation``, a bare
+    # ``trigger``) ask the *connected client* to run a completion or prompt a
+    # user. They are server -> client JSON-RPC calls, so an SDK diagnostics
+    # tool like ``triggerSamplingRequest`` must not become an exfiltration sink
+    # just because its name contains ``trigger``/``request``.
+    local_protocol_callback = bool(
+        tokens & MCP_CLIENT_PROTOCOL_TOKENS
+        or (tokens & LOCAL_PROTOCOL_VERBS and not tokens & NETWORK_TARGET_TOKENS)
+    )
+
     outbound_verbs = sorted(tokens & OUTBOUND_VERBS)
     external_targets = sorted(tokens & EXTERNAL_TARGETS)
-    if outbound_verbs and external_targets and not local_write:
+    if outbound_verbs and external_targets and not local_write and not local_protocol_callback:
         _add(
             capabilities,
             evidence,
@@ -708,7 +762,11 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
             "parameter values are bound to an HTTP header via x-mcp-header",
         )
 
-    if open_world and annotations.get("readOnlyHint") is not True:
+    if (
+        open_world
+        and annotations.get("readOnlyHint") is not True
+        and not local_protocol_callback
+    ):
         _add(
             capabilities,
             evidence,
@@ -718,7 +776,11 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
             "openWorldHint=true without readOnlyHint: the tool can reach external systems",
         )
 
-    if params & ARBITRARY_DESTINATION_PARAMS and params & PAYLOAD_PARAMS:
+    if (
+        params & ARBITRARY_DESTINATION_PARAMS
+        and params & PAYLOAD_PARAMS
+        and not local_protocol_callback
+    ):
         _add(
             capabilities,
             evidence,

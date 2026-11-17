@@ -356,12 +356,26 @@ def render_report(results: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def write_results(results: dict[str, Any]) -> None:
-    RESULTS_JSON.write_text(
+def artifact_paths(output_dir: Path | None = None) -> tuple[Path, Path]:
+    """Where this module's two artifacts live for ``output_dir``."""
+
+    if output_dir is None:
+        return RESULTS_JSON, REPORT_MD
+    directory = Path(output_dir)
+    return directory / RESULTS_JSON.name, directory / REPORT_MD.name
+
+
+def write_results(
+    results: dict[str, Any], output_dir: Path | None = None
+) -> tuple[Path, Path]:
+    json_path, report_path = artifact_paths(output_dir)
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(
         json.dumps(results, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    REPORT_MD.write_text(render_report(results), encoding="utf-8")
+    report_path.write_text(render_report(results), encoding="utf-8")
+    return json_path, report_path
 
 
 def submission_warnings(submission: Submission) -> list[str]:
@@ -395,6 +409,12 @@ def main(argv: list[str] | None = None) -> int:
             " result; used by CI to prove the schema and scorer."
         ),
     )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="write the results and report here instead of adversarial/",
+    )
     args = parser.parse_args(argv)
 
     if args.check_template and args.input is not None:
@@ -416,7 +436,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"warning: {warning}", file=sys.stderr)
 
     results = compute_results(submission, template_mode=args.check_template)
-    write_results(results)
+    json_path, report_path = write_results(results, args.output_dir)
 
     metrics_row = results["metrics"]
     print(
@@ -435,8 +455,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     if args.check_template:
         print("Template mode: schema validation only, not a red-team result.")
-    print(f"Wrote {RESULTS_JSON}")
-    print(f"Wrote {REPORT_MD}")
+    print(f"Wrote {json_path}")
+    print(f"Wrote {report_path}")
     return 1 if metrics_row["probe_errors"] else 0
 
 

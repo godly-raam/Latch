@@ -19,6 +19,7 @@ from package_eval.run_package_eval import (
     compute_results,
     main,
     render_report,
+    write_results,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,10 +27,15 @@ CAPTURE_REPORT = ROOT / "package_eval" / "capture_report.json"
 
 REFERENCE_SLUGS = {
     "npm-mcp-remote-0-14-3",
+    "npm-mcp-remote-0-14-3-static-header",
     "npm-server-everything",
     "npm-server-filesystem",
     "npm-server-filesystem-0-6-2",
+    "npm-server-github-2025-4-8",
     "npm-server-memory",
+    "npm-server-puppeteer-2025-5-12",
+    "npm-server-slack-2025-4-25",
+    "npm-supergateway-3-1-0",
     "pypi-mcp-proxy-0-8-2",
     "pypi-mcp-server-fetch",
     "pypi-mcp-server-git",
@@ -39,8 +45,15 @@ REFERENCE_SLUGS = {
 CLEAN_SLUGS = {
     "npm-server-filesystem",
     "npm-server-memory",
+    "npm-server-puppeteer-2025-5-12",
     "pypi-mcp-server-fetch",
     "pypi-mcp-server-git",
+}
+
+#: Real servers whose own published surface is a complete trifecta.
+TRIFECTA_SLUGS = {
+    "npm-server-github-2025-4-8",
+    "npm-server-slack-2025-4-25",
 }
 
 HANDLER_CVE_SLUGS = {
@@ -95,7 +108,7 @@ def test_captured_manifests_have_real_provenance() -> None:
         if capture["kind"] == "proxy_metadata":
             # A proxy exposes no tools of its own; its real transport is recorded.
             assert capture["tools"] == []
-            assert capture["exposed_url"].startswith("http://")
+            assert capture["exposed_url"].startswith(("http://", "https://"))
             assert "Authorization" in capture["exposed_headers"]
         else:
             assert capture["tools"], path.name
@@ -189,19 +202,29 @@ def test_detection_recall_separates_in_scope_from_overall(results: dict) -> None
 
     assert set(detection["in_scope_targets"]) == {
         "npm-mcp-remote-0-14-3",
+        "npm-mcp-remote-0-14-3-static-header",
+        "npm-server-github-2025-4-8",
+        "npm-server-slack-2025-4-25",
+        "npm-supergateway-3-1-0",
         "pypi-mcp-proxy-0-8-2",
         "B",
+        "D",
     }
     assert set(detection["in_scope_detected"]) == {
         "npm-mcp-remote-0-14-3",
+        "npm-mcp-remote-0-14-3-static-header",
+        "npm-server-github-2025-4-8",
+        "npm-server-slack-2025-4-25",
+        "npm-supergateway-3-1-0",
         "pypi-mcp-proxy-0-8-2",
+        "D",
     }
     # The fetch + filesystem composition is a documented blind miss.
     assert detection["in_scope_missed"] == ["B"]
-    assert detection["in_scope_recall"] == 0.6667
+    assert detection["in_scope_recall"] == 0.875
 
-    assert detection["overall_targets"] == 5
-    assert detection["overall_recall"] == 0.4
+    assert detection["overall_targets"] == 10
+    assert detection["overall_recall"] == 0.7
     assert set(detection["overall_missed"]) == {
         "B",
         *HANDLER_CVE_SLUGS,
@@ -211,8 +234,8 @@ def test_detection_recall_separates_in_scope_from_overall(results: dict) -> None
 def test_everything_is_the_documented_false_positive(results: dict) -> None:
     summary = results["summary"]
     assert summary["false_positive_packages"] == ["npm-server-everything"]
-    assert summary["clean_package_count"] == 5
-    assert summary["latch_false_positive_rate"] == 0.2
+    assert summary["clean_package_count"] == 6
+    assert summary["latch_false_positive_rate"] == 0.1667
     assert summary["naive_false_positive_rate"] > summary["latch_false_positive_rate"]
 
 
@@ -222,6 +245,7 @@ def test_graph_precision_fix_collapses_paths(results: dict) -> None:
         "filesystem-plus-memory",
         "filesystem-plus-git",
         "filesystem-plus-fetch",
+        "puppeteer-plus-filesystem",
         "everything-plus-filesystem",
     }
 
@@ -238,7 +262,7 @@ def test_graph_precision_fix_collapses_paths(results: dict) -> None:
     assert "npm-server-filesystem:write_file" in git["local_write_tools"]
 
     everything = compositions["everything-plus-filesystem"]
-    assert everything["trifecta_path_count"] == 32
+    assert everything["trifecta_path_count"] == 11
     assert everything["legacy_path_count"] == 314
     assert everything["trifecta_path_count"] < everything["legacy_path_count"]
     # Every emitted path stands for several read tools instead of one row each.
@@ -246,6 +270,67 @@ def test_graph_precision_fix_collapses_paths(results: dict) -> None:
     for path in everything["trifecta_paths"]:
         assert path["collapsed_read_count"] >= 1
         assert len(path["read_tools"]) == path["collapsed_read_count"]
+
+
+def test_single_server_trifectas_are_detected(results: dict) -> None:
+    rows = {row["slug"]: row for row in results["packages"]}
+
+    for slug in TRIFECTA_SLUGS:
+        row = rows[slug]
+        assert row["expected_positive"] is True
+        assert row["in_latch_threat_model"] is True
+        assert row["outcome"] == "detected", slug
+        assert row["detected_rule_ids"] == ["LETHAL_TRIFECTA"], slug
+        # One server is not cross-server and has no caller-chosen URL sink, so
+        # every path is HIGH rather than CRITICAL.
+        assert set(row["severity_counts"]) == {"HIGH"}, slug
+        assert row["severity_counts"]["HIGH"] >= 1, slug
+
+    github = rows["npm-server-github-2025-4-8"]
+    assert {
+        "get_issue",
+        "list_issues",
+        "get_file_contents",
+        "create_issue",
+        "add_issue_comment",
+    } <= set(github["tool_names"])
+    slack = rows["npm-server-slack-2025-4-25"]
+    assert {
+        "slack_get_channel_history",
+        "slack_get_thread_replies",
+        "slack_post_message",
+    } <= set(slack["tool_names"])
+
+
+def test_credential_and_transport_targets_name_their_rule(results: dict) -> None:
+    rows = {row["slug"]: row for row in results["packages"]}
+
+    gateway = rows["npm-supergateway-3-1-0"]
+    assert gateway["outcome"] == "detected"
+    assert gateway["detected_rule_ids"] == ["INSECURE_HTTP_AUTH_TRANSPORT"]
+    assert gateway["exposed_url"].startswith("http://")
+
+    static = rows["npm-mcp-remote-0-14-3-static-header"]
+    assert static["outcome"] == "detected"
+    assert static["detected_rule_ids"] == ["HARDCODED_STATIC_CREDENTIAL"]
+    assert static["exposed_url"].startswith("https://")
+
+
+def test_puppeteer_composition_is_a_cross_server_trifecta(results: dict) -> None:
+    compositions = {row["composition_id"]: row for row in results["compositions"]}
+
+    target = compositions["puppeteer-plus-filesystem"]
+    assert target["target_id"] == "D"
+    assert target["expected_positive"] is True
+    assert target["in_latch_threat_model"] is True
+    assert target["outcome"] == "detected"
+    assert target["trifecta_path_count"] >= 1
+    assert target["cross_server_path_count"] == target["trifecta_path_count"]
+    assert any(
+        path["egress_tool"] == "npm-server-puppeteer-2025-5-12:puppeteer_navigate"
+        and "npm-server-filesystem:read_file" in path["read_tools"]
+        for path in target["trifecta_paths"]
+    )
 
 
 def test_target_b_composition_records_the_miss(results: dict) -> None:
@@ -269,26 +354,44 @@ def test_artifacts_match_deterministic_recomputation(results: dict) -> None:
     assert compute_results() == results
 
 
-def test_writing_artifacts_twice_is_byte_identical(results: dict) -> None:
+def test_writing_artifacts_twice_is_byte_identical(
+    results: dict, tmp_path: Path
+) -> None:
     before_json = RESULTS_JSON.read_bytes()
     before_md = REPORT_MD.read_bytes()
-    main()
+
+    first_json, first_md = write_results(results, tmp_path)
+    first_bytes = first_json.read_bytes()
+    first_report = first_md.read_bytes()
+    second_json, second_md = write_results(results, tmp_path)
+
+    assert second_json.read_bytes() == first_bytes
+    assert second_md.read_bytes() == first_report
+    # Writing to a scratch directory never touches the tracked artifacts.
     assert RESULTS_JSON.read_bytes() == before_json
     assert REPORT_MD.read_bytes() == before_md
 
 
-def test_module_cli_runs() -> None:
+def test_module_cli_runs(tmp_path: Path) -> None:
     completed = subprocess.run(
-        [sys.executable, "-m", "package_eval.run_package_eval"],
+        [
+            sys.executable,
+            "-m",
+            "package_eval.run_package_eval",
+            "--output-dir",
+            str(tmp_path),
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,
         timeout=180,
     )
     assert completed.returncode == 0, completed.stderr
-    assert "Packages: 9" in completed.stdout
-    assert "In-scope recall: 0.67 (2/3)" in completed.stdout
-    assert "overall recall: 0.40 (2/5)" in completed.stdout
+    assert "Packages: 14" in completed.stdout
+    assert "In-scope recall: 0.88 (7/8)" in completed.stdout
+    assert "overall recall: 0.70 (7/10)" in completed.stdout
+    assert (tmp_path / RESULTS_JSON.name).exists()
+    assert (tmp_path / REPORT_MD.name).exists()
 
 
 def test_report_documents_the_real_findings(results: dict) -> None:
@@ -299,7 +402,7 @@ def test_report_documents_the_real_findings(results: dict) -> None:
     assert "over-approximation" in report
     assert "`latch probe-chain`" in report
     assert "MCP ecosystem" in report
-    assert "Nine packages" in report
+    assert "14 packages" in report
     assert "server-everything" in report
     assert "27 CRITICAL" in report
     assert "0 CRITICAL" in report
@@ -317,5 +420,7 @@ def test_before_after_table_matches_the_recorded_measurements(results: dict) -> 
 
     everything = rows["everything-plus-filesystem"]
     assert everything["before_paths"] == 314
-    assert everything["after_paths"] == 32
+    # MCP sampling/elicitation callbacks no longer become egress sinks, which
+    # removed 21 of the 32 paths this composition used to produce.
+    assert everything["after_paths"] == 11
     assert everything["after_paths"] < everything["before_paths"]

@@ -16,6 +16,7 @@ from synthetic_regression.run_regression import (
     compute_results,
     main,
     render_report,
+    write_results,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -204,17 +205,33 @@ def test_artifacts_match_deterministic_recomputation(results: dict) -> None:
     assert compute_results() == results
 
 
-def test_writing_artifacts_twice_is_byte_identical(results: dict) -> None:
+def test_writing_artifacts_twice_is_byte_identical(
+    results: dict, tmp_path: Path
+) -> None:
     before_json = RESULTS_JSON.read_bytes()
     before_md = REPORT_MD.read_bytes()
-    main()
+
+    first_json, first_md = write_results(results, tmp_path)
+    first_bytes = first_json.read_bytes()
+    first_report = first_md.read_bytes()
+    second_json, second_md = write_results(results, tmp_path)
+
+    assert second_json.read_bytes() == first_bytes
+    assert second_md.read_bytes() == first_report
+    # Writing to a scratch directory never touches the tracked artifacts.
     assert RESULTS_JSON.read_bytes() == before_json
     assert REPORT_MD.read_bytes() == before_md
 
 
-def test_module_cli_runs_and_reports_metrics() -> None:
+def test_module_cli_runs_and_reports_metrics(tmp_path: Path) -> None:
     completed = subprocess.run(
-        [sys.executable, "-m", "synthetic_regression.run_regression"],
+        [
+            sys.executable,
+            "-m",
+            "synthetic_regression.run_regression",
+            "--output-dir",
+            str(tmp_path),
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,

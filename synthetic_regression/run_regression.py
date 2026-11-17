@@ -22,6 +22,7 @@ timestamps and no randomness: re-running reproduces both files byte for byte
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import json
 from pathlib import Path
@@ -435,15 +436,31 @@ def render_report(results: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def write_results(results: dict[str, Any]) -> None:
-    RESULTS_JSON.write_text(
+def artifact_paths(output_dir: Path | None = None) -> tuple[Path, Path]:
+    """Where this module's two artifacts live for ``output_dir``."""
+
+    if output_dir is None:
+        return RESULTS_JSON, REPORT_MD
+    directory = Path(output_dir)
+    return directory / RESULTS_JSON.name, directory / REPORT_MD.name
+
+
+def write_results(
+    results: dict[str, Any], output_dir: Path | None = None
+) -> tuple[Path, Path]:
+    json_path, report_path = artifact_paths(output_dir)
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(
         json.dumps(results, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    REPORT_MD.write_text(render_report(results), encoding="utf-8")
+    report_path.write_text(render_report(results), encoding="utf-8")
+    return json_path, report_path
 
 
-def print_summary(results: dict[str, Any]) -> None:
+def print_summary(
+    results: dict[str, Any], paths: tuple[Path, Path] | None = None
+) -> None:
     header = (
         f"{'Metric set':26} {'TP':>3} {'FP':>3} {'TN':>3} {'FN':>3}"
         f" {'Prec':>6} {'Recall':>7} {'F1':>6} {'FPR':>6}"
@@ -468,14 +485,24 @@ def print_summary(results: dict[str, Any]) -> None:
             f" static={comparison['static_graph_flagged']}"
             f" probe={comparison['probe_status']}"
         )
-    print(f"Wrote {RESULTS_JSON}")
-    print(f"Wrote {REPORT_MD}")
+    json_path, report_path = paths or (RESULTS_JSON, REPORT_MD)
+    print(f"Wrote {json_path}")
+    print(f"Wrote {report_path}")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="write the results and report here instead of synthetic_regression/",
+    )
+    args = parser.parse_args(argv)
+
     results = compute_results()
-    write_results(results)
-    print_summary(results)
+    paths = write_results(results, args.output_dir)
+    print_summary(results, paths)
     return 0
 
 

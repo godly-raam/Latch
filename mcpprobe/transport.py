@@ -779,10 +779,16 @@ async def open_mcp_session(
     )
 
 
-async def harvest_stdio(command: str, *, timeout: float = DEFAULT_TIMEOUT) -> HarvestResult:
+async def harvest_stdio(
+    command: str,
+    *,
+    timeout: float = DEFAULT_TIMEOUT,
+    env: dict[str, str] | None = None,
+) -> HarvestResult:
     """Harvest ``tools/list`` from a local MCP server over stdio."""
 
-    session = StdioSession(command, timeout=timeout)
+    process_env = {**os.environ, **env} if env else None
+    session = StdioSession(command, timeout=timeout, env=process_env)
     await session.start()
     try:
         return await session.harvest()

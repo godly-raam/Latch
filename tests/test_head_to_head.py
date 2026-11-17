@@ -1,53 +1,100 @@
-"""Tests for the head-to-head scanner comparison."""
+"""Tests for the head-to-head scanner comparison.
+
+Every test here is read-only against the tracked artifacts: recomputation gets
+the recorded peer measurement handed to it instead of invoking the scanner, and
+anything that writes goes to ``tmp_path``. That keeps a plain
+``pip install -e ".[dev]"`` environment (no ``snyk-agent-scan``) green, and
+keeps ``pytest`` from mutating tracked JSON/Markdown.
+"""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
+import pytest
+
+from head_to_head.mcp_scan_probe import resolve_binary, run_measurement
 from head_to_head.run_comparison import (
-    RESULTS_JSON,
     REPORT_MD,
+    RESULTS_JSON,
     compute_results,
     main,
     render_report,
+    write_results,
 )
+from package_eval.run_package_eval import load_captures
 
 ROOT = Path(__file__).resolve().parents[1]
+
+PEER_STATUSES = {
+    "measured",
+    "measured_unparsed",
+    "credentials_required",
+    "blocked_unauthorized",
+    "blocked_network_error",
+    "blocked_timeout",
+    "not_installed_in_env",
+}
+
+
+def recorded_measurement() -> dict:
+    """The peer record committed in ``comparison_results.json``."""
+
+    return json.loads(RESULTS_JSON.read_text(encoding="utf-8"))[
+        "mcp_scan_measurement"
+    ]
+
+
+def results() -> dict:
+    """Recompute with the recorded measurement: no CLI, no cache write."""
+
+    return compute_results(measurement=recorded_measurement())
 
 
 def test_artifacts_match_recomputation() -> None:
     assert RESULTS_JSON.exists()
     assert REPORT_MD.exists()
 
-    results = compute_results()
-    assert json.loads(RESULTS_JSON.read_text(encoding="utf-8")) == results
-    assert REPORT_MD.read_text(encoding="utf-8") == render_report(results)
-    assert compute_results() == results
+    comparison = results()
+    assert json.loads(RESULTS_JSON.read_text(encoding="utf-8")) == comparison
+    assert REPORT_MD.read_text(encoding="utf-8") == render_report(comparison)
+    assert results() == comparison
 
 
 def test_live_scanner_metrics() -> None:
-    metrics = compute_results()["metrics"]
+    metrics = results()["metrics"]
 
-    assert metrics["package_count"] == 9
-    assert metrics["clean_package_count"] == 5
-    # `mcp-remote` and `mcp-proxy` are true detections, so only the SDK
+    assert metrics["package_count"] == 14
+    assert metrics["clean_package_count"] == 6
+    # `mcp-remote`, the pinned static-header config, GitHub, Slack,
+    # `supergateway` and `mcp-proxy` are true detections, so only the SDK
     # diagnostics server counts against Latch's false-positive rate.
     assert metrics["latch_flagged_packages"] == [
         "npm-mcp-remote-0-14-3",
+        "npm-mcp-remote-0-14-3-static-header",
         "npm-server-everything",
+        "npm-server-github-2025-4-8",
+        "npm-server-slack-2025-4-25",
+        "npm-supergateway-3-1-0",
         "pypi-mcp-proxy-0-8-2",
     ]
-    assert metrics["latch_package_false_positive_rate"] == 0.2
-    assert metrics["naive_package_false_positive_rate"] >= 0.8
+    assert metrics["latch_package_false_positive_rate"] == 0.1667
+    assert metrics["naive_package_false_positive_rate"] >= 0.83
     assert set(metrics["naive_flagged_packages"]) >= {
         "npm-server-everything",
         "npm-server-filesystem",
+        "npm-server-puppeteer-2025-5-12",
         "pypi-mcp-server-fetch",
         "pypi-mcp-server-git",
     }
+    assert metrics["in_model_package_count"] == 6
     assert set(metrics["latch_in_model_detected"]) == {
         "npm-mcp-remote-0-14-3",
+        "npm-mcp-remote-0-14-3-static-header",
+        "npm-server-github-2025-4-8",
+        "npm-server-slack-2025-4-25",
+        "npm-supergateway-3-1-0",
         "pypi-mcp-proxy-0-8-2",
     }
 
@@ -59,8 +106,8 @@ def test_live_scanner_metrics() -> None:
 
 
 def test_every_protocol_scenario_declares_what_fired() -> None:
-    results = compute_results()
-    scenarios = {row["scenario_id"]: row for row in results["scenarios"]}
+    comparison = results()
+    scenarios = {row["scenario_id"]: row for row in comparison["scenarios"]}
 
     assert set(scenarios) == {
         "post_approval_schema_rug_pull",
@@ -88,33 +135,30 @@ def test_every_protocol_scenario_declares_what_fired() -> None:
 
 
 def test_third_party_rows_are_explicit_about_measurement() -> None:
-    results = compute_results()
-    third_party = {row["tool"]: row for row in results["third_party"]}
+    comparison = results()
+    third_party = {row["tool"]: row for row in comparison["third_party"]}
     assert set(third_party) == {"mcp-scan", "agent-latch"}
 
     peer = third_party["mcp-scan"]
-    assert peer["status"] in {
-        "measured",
-        "measured_unparsed",
-        "credentials_required",
-        "blocked_unauthorized",
-        "blocked_network_error",
-        "blocked_timeout",
-        "not_installed_in_env",
-    }
+    assert peer["status"] in PEER_STATUSES
     measurement = peer["measurement"]
     assert measurement["tool"] == "mcp-scan"
     assert measurement["status"] == peer["status"]
-    assert isinstance(measurement["version"], str) and measurement["version"]
-    assert isinstance(measurement["cache_key"], str) and len(measurement["cache_key"]) == 64
+    assert isinstance(measurement["cache_key"], str)
+    assert len(measurement["cache_key"]) == 64
+    assert measurement["remote_api_required"] is True
+
     if measurement["status"] == "not_installed_in_env":
+        # The plain `.[dev]` install: nothing was run, and nothing is claimed.
         assert peer["path"] is None
+        assert measurement["version"] is None
         assert measurement["command"] is None
+        assert measurement["exit_code"] is None
     else:
         assert peer["path"]
+        assert isinstance(measurement["version"], str) and measurement["version"]
         assert measurement["command"][:2] == ["snyk-agent-scan", "scan"]
         assert isinstance(measurement["exit_code"], int)
-        assert measurement["remote_api_required"] is True
 
     if measurement["status"] in {"measured", "measured_unparsed"}:
         assert measurement["parsed"] is True
@@ -124,7 +168,7 @@ def test_third_party_rows_are_explicit_about_measurement() -> None:
         assert measurement["package_flags"] == {}
         assert measurement["clean_false_positive_rate"] is None
         assert measurement["reason"], measurement
-        for row in results["packages"]:
+        for row in comparison["packages"]:
             assert row["peer_flagged"] is None
 
     latch = third_party["agent-latch"]
@@ -134,8 +178,8 @@ def test_third_party_rows_are_explicit_about_measurement() -> None:
     else:
         assert latch["path"] is None
 
-    assert len(results["architectural_matrix"]) == 3
-    for row in results["architectural_matrix"]:
+    assert len(comparison["architectural_matrix"]) == 3
+    for row in comparison["architectural_matrix"]:
         for key in (
             "tool",
             "lockfiles",
@@ -152,19 +196,61 @@ def test_third_party_rows_are_explicit_about_measurement() -> None:
             assert row[key], (row["tool"], key)
 
 
+def test_measurement_without_the_peer_binary_is_explicit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A `.[dev]`-only environment records the absence instead of a verdict."""
+
+    monkeypatch.setattr("head_to_head.mcp_scan_probe.resolve_binary", lambda: None)
+    cache_path = tmp_path / "mcp_scan_measurement.json"
+
+    measurement = run_measurement(load_captures(), cache_path=cache_path)
+
+    assert measurement["status"] == "not_installed_in_env"
+    assert measurement["version"] is None
+    assert measurement["command"] is None
+    assert measurement["exit_code"] is None
+    assert measurement["package_flags"] == {}
+    assert measurement["flagged_packages"] == []
+    assert measurement["clean_false_positive_rate"] is None
+    assert json.loads(cache_path.read_text(encoding="utf-8")) == measurement
+
+    comparison = compute_results(measurement=measurement)
+    peer = next(row for row in comparison["third_party"] if row["tool"] == "mcp-scan")
+    assert peer["status"] == "not_installed_in_env"
+    assert peer["path"] is None
+    assert all(row["peer_flagged"] is None for row in comparison["packages"])
+    assert comparison["metrics"]["mcp_scan_status"] == "not_installed_in_env"
+
+
+@pytest.mark.skipif(
+    resolve_binary() is None,
+    reason="snyk-agent-scan is not installed (plain [dev] environment)",
+)
+def test_installed_peer_measurement_records_the_invocation() -> None:
+    measurement = recorded_measurement()
+    if measurement["status"] == "not_installed_in_env":
+        pytest.skip("the recorded artifact predates installing the peer extra")
+
+    assert measurement["version"]
+    assert measurement["command"][:2] == ["snyk-agent-scan", "scan"]
+    assert isinstance(measurement["exit_code"], int)
+
+
 def test_report_leads_with_the_measured_comparison() -> None:
-    results = compute_results()
+    comparison = results()
     report = REPORT_MD.read_text(encoding="utf-8")
 
     assert report.startswith("# mcpprobe (Latch): measured real-package comparison")
     assert "## Headline: measured on real captured packages" in report
-    assert "0.20 (1/5)" in report
-    assert "0.80 (4/5)" in report
+    assert "0.17 (1/6)" in report
+    assert "0.83 (5/6)" in report
+    assert "All 14 upstream captures" in report
     assert "Architectural and detection matrix" in report
     assert "AgentLatch" in report
     assert "Honest limits of this comparison" in report
 
-    measurement = results["mcp_scan_measurement"]
+    measurement = comparison["mcp_scan_measurement"]
     assert f"`{measurement['status']}`" in report
     assert "snyk-agent-scan scan" in report
     if measurement["status"] == "credentials_required":
@@ -186,24 +272,52 @@ def test_self_authored_scenarios_are_an_appendix() -> None:
 
 
 def test_measured_peer_column_appears_only_when_measured() -> None:
-    results = compute_results()
-    measurement = results["mcp_scan_measurement"]
+    comparison = results()
+    measurement = comparison["mcp_scan_measurement"]
     report = REPORT_MD.read_text(encoding="utf-8")
     assert "| mcp-scan |" in report
 
     if measurement["parsed"]:
         flagged = measurement["flagged_packages"]
-        for row in results["packages"]:
+        for row in comparison["packages"]:
             if row["slug"] in measurement["package_flags"]:
                 assert row["peer_flagged"] is (row["slug"] in flagged)
     else:
-        assert all(row["peer_flagged"] is None for row in results["packages"])
+        assert all(row["peer_flagged"] is None for row in comparison["packages"])
         assert "produced a parseable live verdict" in report
 
 
-def test_writing_twice_is_byte_identical() -> None:
-    before_json = RESULTS_JSON.read_bytes()
-    before_md = REPORT_MD.read_bytes()
-    assert main() == 0
-    assert RESULTS_JSON.read_bytes() == before_json
-    assert REPORT_MD.read_bytes() == before_md
+def test_writing_twice_is_byte_identical(tmp_path: Path) -> None:
+    comparison = results()
+
+    first_json, first_report = write_results(comparison, tmp_path)
+    before_json = first_json.read_bytes()
+    before_report = first_report.read_bytes()
+    second_json, second_report = write_results(comparison, tmp_path)
+
+    assert second_json.read_bytes() == before_json
+    assert second_report.read_bytes() == before_report
+
+
+def test_main_writes_only_where_asked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("head_to_head.mcp_scan_probe.resolve_binary", lambda: None)
+    tracked_json = RESULTS_JSON.read_bytes()
+    tracked_report = REPORT_MD.read_bytes()
+
+    exit_code = main(
+        [
+            "--output-dir",
+            str(tmp_path),
+            "--cache-path",
+            str(tmp_path / "cache.json"),
+        ]
+    )
+
+    assert exit_code == 0
+    assert (tmp_path / RESULTS_JSON.name).exists()
+    assert (tmp_path / REPORT_MD.name).exists()
+    assert (tmp_path / "cache.json").exists()
+    assert RESULTS_JSON.read_bytes() == tracked_json
+    assert REPORT_MD.read_bytes() == tracked_report

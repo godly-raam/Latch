@@ -14,33 +14,38 @@ they demonstrate rule coverage rather than generalization.
 
 | Scanner | Clean-package FPR | In-model real targets | Evidence |
 | ------- | ----------------- | --------------------- | -------- |
-| **mcpprobe (Latch)** | 0.20 (1/5) | 2/2 | measured |
-| Naive keyword/substring baseline | 0.80 (4/5) | not applicable | measured |
+| **mcpprobe (Latch)** | 0.17 (1/6) | 6/6 | measured |
+| Naive keyword/substring baseline | 0.83 (5/6) | not applicable | measured |
 | `mcp-scan` (`snyk-agent-scan`) | n/a | n/a | installed (v0.6.11), requires `SNYK_TOKEN` |
 | `AgentLatch` (`agent-latch`) | n/a | n/a | architecture comparison only (not installed) |
 
 ## Real captured packages
 
-All 9 upstream captures from
+All 14 upstream captures from
 [`package_eval/captured_manifests/`](../package_eval/captured_manifests/),
 unmodified. The `mcp-scan` column is only filled when that scanner
 produced a parseable live verdict.
 
 | Package | Version | Tools | mcpprobe (Latch) | Latch rules | Naive | mcp-scan |
 | ------- | ------- | ----- | ---------------- | ----------- | ----- | -------- |
+| `mcp-remote` | 0.14.3 | 0 | flagged | HARDCODED_STATIC_CREDENTIAL | flagged | — |
 | `mcp-remote` | 0.14.3 | 0 | flagged | INSECURE_HTTP_AUTH_TRANSPORT | flagged | — |
 | `@modelcontextprotocol/server-everything` | 2.3.0 | 22 | flagged | ANNOTATION_CONTRADICTION, LETHAL_TRIFECTA | flagged | — |
 | `@modelcontextprotocol/server-filesystem` | 0.6.2 | 9 | clean | — | flagged | — |
 | `@modelcontextprotocol/server-filesystem` | 2.3.0 | 16 | clean | — | flagged | — |
+| `@modelcontextprotocol/server-github` | 2025.4.8 | 26 | flagged | LETHAL_TRIFECTA | flagged | — |
 | `@modelcontextprotocol/server-memory` | 2.1.1 | 9 | clean | — | clean | — |
+| `@modelcontextprotocol/server-puppeteer` | 2025.5.12 | 7 | clean | — | flagged | — |
+| `@modelcontextprotocol/server-slack` | 2025.4.25 | 8 | flagged | LETHAL_TRIFECTA | clean | — |
+| `supergateway` | 3.1.0 | 0 | flagged | INSECURE_HTTP_AUTH_TRANSPORT | flagged | — |
 | `mcp-proxy` | 0.8.2 | 0 | flagged | INSECURE_HTTP_AUTH_TRANSPORT | flagged | — |
 | `mcp-server-fetch` | 2026.11.11 | 1 | clean | — | flagged | — |
 | `mcp-server-git` | 2025.9.25 | 12 | clean | — | flagged | — |
 | `mcp-server-git` | 2026.11.11 | 14 | clean | — | flagged | — |
 
-On the 5 clean packages, mcpprobe (Latch) flags 1 (FPR 0.20); the naive baseline flags 4 (FPR 0.80). The Latch flag is the SDK diagnostics server, whose generic read/egress heuristics produce a documented static over-approximation.
+On the 6 clean packages, mcpprobe (Latch) flags 1 (FPR 0.17); the naive baseline flags 5 (FPR 0.83). The Latch flag is the SDK diagnostics server, whose generic read/egress heuristics produce a documented static over-approximation.
 
-In-model real targets detected: `npm-mcp-remote-0-14-3`, `pypi-mcp-proxy-0-8-2`. Handler-level CVEs in the corpus are outside a `tools/list` threat model and are scored as misses in [`package_eval/PACKAGE_EVAL_REPORT.md`](../package_eval/PACKAGE_EVAL_REPORT.md).
+In-model real targets detected: `npm-mcp-remote-0-14-3`, `npm-mcp-remote-0-14-3-static-header`, `npm-server-github-2025-4-8`, `npm-server-slack-2025-4-25`, `npm-supergateway-3-1-0`, `pypi-mcp-proxy-0-8-2`. Handler-level CVEs in the corpus are outside a `tools/list` threat model and are scored as misses in [`package_eval/PACKAGE_EVAL_REPORT.md`](../package_eval/PACKAGE_EVAL_REPORT.md).
 
 ## Peer scanner: `mcp-scan` (`snyk-agent-scan`)
 

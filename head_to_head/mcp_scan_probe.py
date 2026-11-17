@@ -54,6 +54,7 @@ ANALYSIS_ENDPOINT = (
 )
 
 _MEMO: dict[str, Any] | None = None
+_MEMO_SCOPE: str | None = None
 
 
 def resolve_binary() -> str | None:
@@ -348,26 +349,41 @@ def _run(
 
 
 def run_measurement(
-    captures: list[dict[str, Any]], *, force: bool = False
+    captures: list[dict[str, Any]],
+    *,
+    force: bool = False,
+    cache_path: Path | None = None,
 ) -> dict[str, Any]:
-    """Return the cached measurement, running the CLI only when the key moves."""
+    """Return the cached measurement, running the CLI only when the key moves.
 
-    global _MEMO
+    ``cache_path`` redirects the cache to another file (tests use a temporary
+    directory so a plain ``pytest`` run never rewrites the tracked artifact).
+    """
 
+    global _MEMO, _MEMO_SCOPE
+
+    path = Path(cache_path) if cache_path is not None else CACHE_PATH
+    scope = str(path.resolve())
     binary = resolve_binary()
     version = scanner_version(binary) if binary else None
     key = cache_key(captures, binary, version)
 
-    if not force and _MEMO is not None and _MEMO.get("cache_key") == key:
+    if (
+        not force
+        and _MEMO is not None
+        and _MEMO.get("cache_key") == key
+        and _MEMO_SCOPE == scope
+    ):
         return _MEMO
 
-    if not force and CACHE_PATH.exists():
+    if not force and path.exists():
         try:
-            cached = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+            cached = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             cached = None
         if cached is not None and cached.get("cache_key") == key:
             _MEMO = cached
+            _MEMO_SCOPE = scope
             return cached
 
     if binary is None:
@@ -393,9 +409,11 @@ def run_measurement(
     else:
         row = _run(binary, version, captures, key)
 
-    CACHE_PATH.write_text(
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
         json.dumps(row, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     _MEMO = row
+    _MEMO_SCOPE = scope
     return row

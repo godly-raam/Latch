@@ -328,8 +328,19 @@ def render_report(results: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def write_results(results: dict[str, Any]) -> None:
-    REPORT_MD.write_text(render_report(results), encoding="utf-8")
+def artifact_path(output_dir: Path | None = None) -> Path:
+    """Where the report lives for ``output_dir``."""
+
+    if output_dir is None:
+        return REPORT_MD
+    return Path(output_dir) / REPORT_MD.name
+
+
+def write_results(results: dict[str, Any], output_dir: Path | None = None) -> Path:
+    report_path = artifact_path(output_dir)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(render_report(results), encoding="utf-8")
+    return report_path
 
 
 def load_baseline() -> dict[str, Any] | None:
@@ -345,10 +356,16 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="replace wave2_frozen_baseline.json with this run's results",
     )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="write the report here instead of adversarial/",
+    )
     args = parser.parse_args(argv)
 
     results = compute_results()
-    write_results(results)
+    report_path = write_results(results, args.output_dir)
 
     frozen = load_baseline()
     if frozen is None or args.freeze_new_baseline:
@@ -367,7 +384,7 @@ def main(argv: list[str] | None = None) -> int:
         print("Wave 2 results differ from the frozen first-run baseline.")
         print(f"  differing probes: {', '.join(differing) or '(metrics only)'}")
         print("  re-run with --freeze-new-baseline only to start a new wave.")
-        print(f"Wrote {REPORT_MD}")
+        print(f"Wrote {report_path}")
         return 1
     else:
         print(f"Verified against frozen baseline: {BASELINE_JSON}")
@@ -382,7 +399,7 @@ def main(argv: list[str] | None = None) -> int:
         f" {metrics['recall']:.2f}, FPR {metrics['false_positive_rate']:.2f});"
         " awaiting independent external submission via EXTERNAL_REDTEAM_BRIEF.md"
     )
-    print(f"Wrote {REPORT_MD}")
+    print(f"Wrote {report_path}")
     return 0
 
 
