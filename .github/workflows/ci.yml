@@ -26,7 +26,7 @@ jobs:
       - name: Install Latch
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          pip install -e ".[dev,peer]"
 
       - name: Run tests
         run: pytest -v
@@ -48,6 +48,9 @@ jobs:
 
       - name: Verify frozen blind wave 2 baseline
         run: python -m adversarial.run_wave2_blind
+
+      - name: Validate the external red-team schema and scorer
+        run: python -m adversarial.run_external_blind --check-template
 
       - name: Run demo
         run: bash demo.sh

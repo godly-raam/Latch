@@ -265,7 +265,7 @@ def target_options(*, input_help: str) -> Callable[[Callable[..., Any]], Callabl
 @click.group()
 @click.version_option(package_name="mcpprobe", prog_name="mcpprobe")
 def cli() -> None:
-    """Deterministic security verification and schema pinning for MCP servers."""
+    """mcpprobe (Latch) — Deterministic security verifier for Model Context Protocol (MCP) servers."""
 
 
 @cli.command()

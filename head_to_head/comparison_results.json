@@ -12,7 +12,7 @@
       "role": "Local deterministic CLI and CI verifier",
       "shadowing": "Exact, normalized, NFKC/homoglyph and cross-tool hijack detection",
       "source": "this repository",
-      "tool": "Latch (mcpprobe)"
+      "tool": "mcpprobe (Latch)"
     },
     {
       "active_probe": "Proxy observes live traffic; no canary exfiltration proof documented",
@@ -43,8 +43,45 @@
       "tool": "AgentLatch (agent-latch)"
     }
   ],
+  "mcp_scan_measurement": {
+    "analysis_endpoint": "https://api.snyk.io/hidden/mcp-scan/analysis-machine?version=2026-07-10",
+    "binary": "snyk-agent-scan",
+    "cache_key": "7751819a91baeb92ae39a78f8c9fb9bd443614882a37457e4e71c162a98837bc",
+    "clean_false_positive_rate": null,
+    "command": [
+      "snyk-agent-scan",
+      "scan",
+      "<temp>/mcp-scan-config.json",
+      "--json",
+      "--no-skills",
+      "--dangerously-run-mcp-servers",
+      "--suppress-mcpserver-io",
+      "true",
+      "--storage-file",
+      "<temp>/scan-state.json"
+    ],
+    "distribution": "snyk-agent-scan",
+    "exit_code": 1,
+    "flagged_packages": [],
+    "package_flags": {},
+    "packages": [
+      "npm-server-everything",
+      "npm-server-filesystem",
+      "npm-server-memory",
+      "pypi-mcp-server-fetch",
+      "pypi-mcp-server-git"
+    ],
+    "parsed": false,
+    "reason": "snyk-agent-scan requires SNYK_TOKEN; no token is present",
+    "remote_api_required": true,
+    "status": "credentials_required",
+    "token_present": false,
+    "tool": "mcp-scan",
+    "version": "0.6.11"
+  },
   "metrics": {
     "clean_package_count": 5,
+    "in_model_package_count": 2,
     "in_model_targets": [
       "npm-mcp-remote-0-14-3",
       "npm-server-filesystem-0-6-2",
@@ -67,6 +104,10 @@
     "latch_scenario_recall": 1.0,
     "latch_scenarios_detected": 10,
     "latch_scenarios_missed": [],
+    "mcp_scan_flagged_packages": [],
+    "mcp_scan_package_false_positive_rate": null,
+    "mcp_scan_status": "credentials_required",
+    "mcp_scan_version": "0.6.11",
     "naive_false_positive_packages": [
       "npm-server-everything",
       "npm-server-filesystem",
@@ -107,6 +148,7 @@
       "outcome": "detected",
       "package_name": "mcp-remote",
       "package_version": "0.14.3",
+      "peer_flagged": null,
       "slug": "npm-mcp-remote-0-14-3",
       "tool_count": 0
     },
@@ -133,6 +175,7 @@
       "outcome": "false_positive",
       "package_name": "@modelcontextprotocol/server-everything",
       "package_version": "2.3.0",
+      "peer_flagged": null,
       "slug": "npm-server-everything",
       "tool_count": 22
     },
@@ -151,6 +194,7 @@
       "outcome": "missed",
       "package_name": "@modelcontextprotocol/server-filesystem",
       "package_version": "0.6.2",
+      "peer_flagged": null,
       "slug": "npm-server-filesystem-0-6-2",
       "tool_count": 9
     },
@@ -170,6 +214,7 @@
       "outcome": "true_negative",
       "package_name": "@modelcontextprotocol/server-filesystem",
       "package_version": "2.3.0",
+      "peer_flagged": null,
       "slug": "npm-server-filesystem",
       "tool_count": 16
     },
@@ -185,6 +230,7 @@
       "outcome": "true_negative",
       "package_name": "@modelcontextprotocol/server-memory",
       "package_version": "2.1.1",
+      "peer_flagged": null,
       "slug": "npm-server-memory",
       "tool_count": 9
     },
@@ -204,6 +250,7 @@
       "outcome": "detected",
       "package_name": "mcp-proxy",
       "package_version": "0.8.2",
+      "peer_flagged": null,
       "slug": "pypi-mcp-proxy-0-8-2",
       "tool_count": 0
     },
@@ -221,6 +268,7 @@
       "outcome": "true_negative",
       "package_name": "mcp-server-fetch",
       "package_version": "2026.11.11",
+      "peer_flagged": null,
       "slug": "pypi-mcp-server-fetch",
       "tool_count": 1
     },
@@ -238,6 +286,7 @@
       "outcome": "missed",
       "package_name": "mcp-server-git",
       "package_version": "2025.9.25",
+      "peer_flagged": null,
       "slug": "pypi-mcp-server-git-2025-9-25",
       "tool_count": 12
     },
@@ -255,6 +304,7 @@
       "outcome": "true_negative",
       "package_name": "mcp-server-git",
       "package_version": "2026.11.11",
+      "peer_flagged": null,
       "slug": "pypi-mcp-server-git",
       "tool_count": 14
     }
@@ -462,15 +512,52 @@
   "schema_version": 1,
   "third_party": [
     {
-      "binary": "mcp-scan",
-      "path": null,
-      "status": "not_installed_in_env",
+      "binary": "snyk-agent-scan",
+      "measurement": {
+        "analysis_endpoint": "https://api.snyk.io/hidden/mcp-scan/analysis-machine?version=2026-07-10",
+        "binary": "snyk-agent-scan",
+        "cache_key": "7751819a91baeb92ae39a78f8c9fb9bd443614882a37457e4e71c162a98837bc",
+        "clean_false_positive_rate": null,
+        "command": [
+          "snyk-agent-scan",
+          "scan",
+          "<temp>/mcp-scan-config.json",
+          "--json",
+          "--no-skills",
+          "--dangerously-run-mcp-servers",
+          "--suppress-mcpserver-io",
+          "true",
+          "--storage-file",
+          "<temp>/scan-state.json"
+        ],
+        "distribution": "snyk-agent-scan",
+        "exit_code": 1,
+        "flagged_packages": [],
+        "package_flags": {},
+        "packages": [
+          "npm-server-everything",
+          "npm-server-filesystem",
+          "npm-server-memory",
+          "pypi-mcp-server-fetch",
+          "pypi-mcp-server-git"
+        ],
+        "parsed": false,
+        "reason": "snyk-agent-scan requires SNYK_TOKEN; no token is present",
+        "remote_api_required": true,
+        "status": "credentials_required",
+        "token_present": false,
+        "tool": "mcp-scan",
+        "version": "0.6.11"
+      },
+      "path": "snyk-agent-scan",
+      "status": "credentials_required",
       "tool": "mcp-scan"
     },
     {
       "binary": "agent-latch",
+      "measurement": null,
       "path": null,
-      "status": "not_installed_in_env",
+      "status": "architectural_comparison_only",
       "tool": "agent-latch"
     }
   ]

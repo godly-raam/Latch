@@ -1,15 +1,20 @@
-"""Head-to-head comparison: Latch vs a naive baseline vs two documented peers.
+"""Head-to-head comparison: mcpprobe (Latch) vs a naive baseline and peers.
 
-Runs ``Latch (mcpprobe)`` and the naive keyword baseline live against:
+Runs ``mcpprobe (Latch)`` and the naive keyword baseline live against:
 
-* the five real upstream MCP package captures in
+* every real upstream MCP package capture in
   ``package_eval/captured_manifests/``, and
-* ten canonical MCP protocol and agentic-risk scenarios.
+* ten self-authored canonical MCP protocol and agentic-risk scenarios.
 
-``mcp-scan`` and ``agent-latch`` are checked with ``shutil.which``. When they
-are not installed, their rows record ``not_installed_in_env`` and the report
-falls back to a sourced architectural matrix -- documented capabilities, not
-measured results.
+``mcp-scan`` (``snyk-agent-scan``) is installed and *run* against the five
+clean upstream captures in ``mcp_scan_probe``; the report records whether that
+run was ``measured`` or stopped at ``credentials_required``, so the column is
+either real output or an explicit statement of why there is none.
+``agent-latch`` is only architecture-compared unless the binary exists.
+
+The real-package comparison is the headline. The ten protocol scenarios are
+self-authored feature coverage, and the report keeps them in an appendix with
+that caveat instead of advertising a 10/10.
 
 Writes ``head_to_head/comparison_results.json`` and ``head_to_head/HEAD_TO_HEAD.md``
 with no timestamps, so a re-run reproduces both byte for byte.
@@ -37,6 +42,8 @@ from mcpprobe.shadow import analyze_shadowing
 from mcpprobe.watcher import watch_stdio
 from package_eval.run_package_eval import evaluate_package, load_captures
 from synthetic_regression.run_regression import _auth_inputs, _mock_transport
+
+from .mcp_scan_probe import run_measurement
 
 EVAL_DIR = Path(__file__).resolve().parent
 RESULTS_JSON = EVAL_DIR / "comparison_results.json"
@@ -338,7 +345,7 @@ SCENARIOS: list[Scenario] = [
 
 MATRIX: list[dict[str, Any]] = [
     {
-        "tool": "Latch (mcpprobe)",
+        "tool": "mcpprobe (Latch)",
         "role": "Local deterministic CLI and CI verifier",
         "lockfiles": "Canonical SHA-256 tool lockfiles (pin/verify)",
         "live_drift": "list_changed watcher over stdio and Streamable HTTP",
@@ -494,24 +501,33 @@ def _naive_hits(scenario: Scenario) -> list[str]:
     )
 
 
-def _third_party_status() -> list[dict[str, Any]]:
-    rows = []
-    for name, binary in (("mcp-scan", "mcp-scan"), ("agent-latch", "agent-latch")):
-        path = shutil.which(binary)
-        rows.append(
-            {
-                "tool": name,
-                "binary": binary,
-                "status": "not_installed_in_env" if path is None else "installed",
-                "path": path,
-            }
-        )
-    return rows
+def _third_party_status(measurement: dict[str, Any]) -> list[dict[str, Any]]:
+    latch = shutil.which("agent-latch")
+    return [
+        {
+            "tool": "mcp-scan",
+            "binary": measurement.get("binary") or "snyk-agent-scan",
+            "status": measurement["status"],
+            "path": measurement.get("binary"),
+            "measurement": measurement,
+        },
+        {
+            "tool": "agent-latch",
+            "binary": "agent-latch",
+            "status": (
+                "installed" if latch else "architectural_comparison_only"
+            ),
+            "path": latch,
+            "measurement": None,
+        },
+    ]
 
 
 def compute_results() -> dict[str, Any]:
+    captures = load_captures()
+    measurement = run_measurement(captures)
     packages: list[dict[str, Any]] = []
-    for capture in load_captures():
+    for capture in captures:
         row = evaluate_package(capture)
         packages.append(
             {
@@ -528,6 +544,9 @@ def compute_results() -> dict[str, Any]:
                 "latch_rules": sorted({finding["rule_id"] for finding in row["findings"]}),
                 "naive_flagged": bool(row["naive_hits"]),
                 "naive_hits": row["naive_hits"],
+                "peer_flagged": measurement.get("package_flags", {}).get(
+                    row["slug"]
+                ),
             }
         )
 
@@ -561,12 +580,14 @@ def compute_results() -> dict[str, Any]:
     )
     latch_scenarios = sum(1 for row in scenarios if row["latch_detected"])
     naive_scenarios = sum(1 for row in scenarios if row["naive_detected"])
+    third_party = _third_party_status(measurement)
 
     return {
         "schema_version": 1,
         "packages": packages,
         "scenarios": scenarios,
-        "third_party": _third_party_status(),
+        "third_party": third_party,
+        "mcp_scan_measurement": measurement,
         "architectural_matrix": MATRIX,
         "metrics": {
             "package_count": len(packages),
@@ -596,6 +617,11 @@ def compute_results() -> dict[str, Any]:
             "in_model_targets": sorted(
                 row["slug"] for row in packages if row["expected_positive"]
             ),
+            "in_model_package_count": sum(
+                1
+                for row in packages
+                if row["expected_positive"] and row["in_latch_threat_model"]
+            ),
             "latch_in_model_detected": sorted(
                 row["slug"]
                 for row in packages
@@ -613,66 +639,110 @@ def compute_results() -> dict[str, Any]:
             "latch_scenarios_missed": sorted(
                 row["scenario_id"] for row in scenarios if not row["latch_detected"]
             ),
+            "mcp_scan_status": measurement["status"],
+            "mcp_scan_version": measurement["version"],
+            "mcp_scan_flagged_packages": measurement.get(
+                "flagged_packages", []
+            ),
+            "mcp_scan_package_false_positive_rate": measurement.get(
+                "clean_false_positive_rate"
+            ),
             "third_party_live_runs": sorted(
                 row["tool"]
-                for row in _third_party_status()
-                if row["status"] == "installed"
+                for row in third_party
+                if row["status"] in {"installed", "measured"}
             ),
         },
     }
 
 
+def _peer_status_text(row: dict[str, Any]) -> str:
+    measurement = row.get("measurement") or {}
+    version = measurement.get("version")
+    status = row["status"]
+    if status == "measured":
+        return f"measured live (v{version})"
+    if status == "measured_unparsed":
+        return f"ran (v{version}), output shape not recognised"
+    if status == "credentials_required":
+        return f"installed (v{version}), requires `SNYK_TOKEN`"
+    if status == "blocked_unauthorized":
+        return f"installed (v{version}), analysis endpoint rejected the token"
+    if status == "blocked_network_error":
+        return f"installed (v{version}), analysis endpoint unreachable"
+    if status == "blocked_timeout":
+        return f"installed (v{version}), timed out"
+    if status == "architectural_comparison_only":
+        return "architecture comparison only (not installed)"
+    return status.replace("_", " ")
+
+
 def render_report(results: dict[str, Any]) -> str:
     metrics = results["metrics"]
-    missing = [row for row in results["third_party"] if row["status"] != "installed"]
+    measurement = results["mcp_scan_measurement"]
+    scenarios = results["scenarios"]
 
     lines = [
-        "# Head-to-head: Latch vs naive baseline vs documented peers",
+        "# mcpprobe (Latch): measured real-package comparison",
         "",
-        "Two scanners ran **live** on this machine: `Latch (mcpprobe)` and the",
-        "naive keyword/substring baseline. `mcp-scan` and `agent-latch` were",
-        "not installed, so their columns below are the **documented architecture**",
-        "of each tool (with sources), not measured detections.",
+        "**`mcpprobe` is the project and CLI name; `Latch` is its subtitle.**",
+        "It is unrelated to `AgentLatch` (`AgentLatch/agent-latch`), a Python",
+        "source scanner, and to unrelated `latch` packages on PyPI/npm.",
         "",
-        "| Tool | Live in this environment? |",
-        "| ---- | ------------------------ |",
+        "The headline is the measured comparison below: every scanner was run",
+        "against the same real upstream `tools/list` captures in",
+        "[`package_eval/captured_manifests/`](../package_eval/captured_manifests/).",
+        "The self-authored protocol scenarios are demoted to an appendix, because",
+        "they demonstrate rule coverage rather than generalization.",
+        "",
+        "## Headline: measured on real captured packages",
+        "",
+        "| Scanner | Clean-package FPR | In-model real targets | Evidence |",
+        "| ------- | ----------------- | --------------------- | -------- |",
+        f"| **mcpprobe (Latch)** |"
+        f" {metrics['latch_package_false_positive_rate']:.2f}"
+        f" ({len(metrics['latch_false_positive_packages'])}"
+        f"/{metrics['clean_package_count']}) |"
+        f" {len(metrics['latch_in_model_detected'])}"
+        f"/{metrics['in_model_package_count']} | measured |",
+        f"| Naive keyword/substring baseline |"
+        f" {metrics['naive_package_false_positive_rate']:.2f}"
+        f" ({len(metrics['naive_false_positive_packages'])}"
+        f"/{metrics['clean_package_count']}) | not applicable | measured |",
+        f"| `mcp-scan` (`snyk-agent-scan`) |"
+        f" {'n/a' if measurement.get('clean_false_positive_rate') is None else format(measurement['clean_false_positive_rate'], '.2f')} |"
+        " n/a |"
+        f" {_peer_status_text({'tool': 'mcp-scan', 'status': metrics['mcp_scan_status'], 'measurement': measurement})} |",
+        "| `AgentLatch` (`agent-latch`) | n/a | n/a |"
+        f" {_peer_status_text({'tool': 'agent-latch', 'status': next((row['status'] for row in results['third_party'] if row['tool'] == 'agent-latch'), 'architectural_comparison_only')})} |",
+        "",
+        "## Real captured packages",
+        "",
+        f"All {len(results['packages'])} upstream captures from",
+        "[`package_eval/captured_manifests/`](../package_eval/captured_manifests/),",
+        "unmodified. The `mcp-scan` column is only filled when that scanner",
+        "produced a parseable live verdict.",
+        "",
+        "| Package | Version | Tools | mcpprobe (Latch) | Latch rules | Naive | mcp-scan |",
+        "| ------- | ------- | ----- | ---------------- | ----------- | ----- | -------- |",
     ]
-    for row in results["third_party"]:
-        status = (
-            "not installed (`shutil.which` returned nothing)"
-            if row["status"] != "installed"
-            else f"installed at `{row['path']}`"
-        )
-        lines.append(f"| `{row['tool']}` | {status} |")
-
-    lines.extend(
-        [
-            "",
-            "## Real captured packages",
-            "",
-            f"All {len(results['packages'])} upstream captures from",
-            "[`package_eval/captured_manifests/`](../package_eval/captured_manifests/),",
-            "unmodified.",
-            "",
-            "| Package | Version | Tools | Latch | Latch rules | Naive | Naive hits |",
-            "| ------- | ------- | ----- | ----- | ----------- | ----- | ---------- |",
-        ]
-    )
     for row in results["packages"]:
+        peer = row.get("peer_flagged")
+        peer_cell = "—" if peer is None else ("flagged" if peer else "clean")
         lines.append(
             f"| `{row['package_name']}` | {row['package_version']} |"
             f" {row['tool_count']} |"
             f" {'flagged' if row['latch_flagged'] else 'clean'} |"
             f" {', '.join(row['latch_rules']) or '—'} |"
             f" {'flagged' if row['naive_flagged'] else 'clean'} |"
-            f" {', '.join(row['naive_hits']) or '—'} |"
+            f" {peer_cell} |"
         )
 
     lines.extend(
         [
             "",
-            f"On the {metrics['clean_package_count']} clean packages, Latch flags"
-            f" {len(metrics['latch_false_positive_packages'])}"
+            f"On the {metrics['clean_package_count']} clean packages, mcpprobe"
+            f" (Latch) flags {len(metrics['latch_false_positive_packages'])}"
             " (FPR"
             f" {metrics['latch_package_false_positive_rate']:.2f}); the naive"
             f" baseline flags {len(metrics['naive_false_positive_packages'])} (FPR"
@@ -689,42 +759,62 @@ def render_report(results: dict[str, Any]) -> str:
             " threat model and are scored as misses in"
             " [`package_eval/PACKAGE_EVAL_REPORT.md`](../package_eval/PACKAGE_EVAL_REPORT.md).",
             "",
-            "## Ten canonical protocol and agentic-risk scenarios",
+            "## Peer scanner: `mcp-scan` (`snyk-agent-scan`)",
             "",
-            "| Scenario | Category | Latch | Rules | Naive |",
-            "| -------- | -------- | ----- | ----- | ----- |",
+            f"- Installed distribution: `{measurement.get('distribution')}`"
+            f" `{measurement.get('version')}`",
+            f"- Exit status: `{measurement.get('status')}`"
+            + (
+                f" (`{measurement['reason']}`)"
+                if measurement.get("reason")
+                else ""
+            ),
+            f"- Exit code: `{measurement.get('exit_code')}`",
+            f"- Remote analysis required: `{measurement.get('remote_api_required')}`"
+            f" -> `{measurement.get('analysis_endpoint')}`",
+            "- Exact invocation:",
+            "",
+            "```console",
+            " ".join(measurement.get("command") or []),
+            "```",
+            "",
         ]
     )
-    for row in results["scenarios"]:
+
+    if measurement.get("status") == "measured":
         lines.append(
-            f"| {row['title']} (`{row['scenario_id']}`) | `{row['category']}` |"
-            f" {'detected' if row['latch_detected'] else 'MISSED'} |"
-            f" {', '.join(row['latch_rules']) or '—'} |"
-            f" {'detected' if row['naive_detected'] else 'missed'} |"
+            "The peer scanner ran live and its per-package verdicts are in the"
+            " table above; its clean-package FPR is"
+            f" {measurement.get('clean_false_positive_rate')}."
         )
+    else:
+        lines.append(
+            "This environment could not obtain a **measured** peer verdict."
+            " Current `snyk-agent-scan` releases require a `SNYK_TOKEN` account"
+            " credential and perform deep analysis on Snyk's endpoint, so with no"
+            " token the CLI stops before scanning and emits no findings. That is"
+            " recorded exactly as observed instead of being reported as a clean"
+            " scan or a detection. Set `SNYK_TOKEN` and re-run"
+            " `python -m head_to_head.run_comparison` to replace this row with"
+            " measured output; the runner caches the result keyed by scanner"
+            " version, capture digests and token presence."
+        )
+        lines.append("")
 
     lines.extend(
         [
-            "",
-            f"Latch detects {metrics['latch_scenarios_detected']}"
-            f"/{metrics['scenario_count']} scenarios"
-            f" ({metrics['latch_scenario_recall']:.2f} recall); the naive baseline"
-            f" detects {metrics['naive_scenarios_detected']}"
-            f"/{metrics['scenario_count']}"
-            f" ({metrics['naive_scenario_recall']:.2f}).",
-            "",
             "## Architectural and detection matrix",
             "",
             "Capabilities are taken from each project's current public",
             "documentation. Where a project does not document a capability, the row",
             "says so instead of assuming absence of the code.",
             "",
-            "| Capability | Latch (mcpprobe) | Invariant / Snyk mcp-scan | AgentLatch |",
+            "| Capability | mcpprobe (Latch) | Invariant / Snyk mcp-scan | AgentLatch |",
             "| ---------- | ---------------- | ------------------------- | ---------- |",
         ]
     )
     rows_by_tool = {row["tool"]: row for row in results["architectural_matrix"]}
-    columns = ["Latch (mcpprobe)", "Invariant / Snyk mcp-scan", "AgentLatch (agent-latch)"]
+    columns = ["mcpprobe (Latch)", "Invariant / Snyk mcp-scan", "AgentLatch (agent-latch)"]
     labels = [
         ("role", "Role"),
         ("lockfiles", "Schema lockfiles / pinning"),
@@ -751,26 +841,64 @@ def render_report(results: dict[str, Any]) -> str:
             "",
             "## Honest limits of this comparison",
             "",
-            "- Two of the three peers were **not exercised**. Their rows are a",
-            "  documentation comparison, and a documentation comparison cannot",
-            "  prove a detection either way.",
-            "- The ten scenarios are canonical shapes, not a random sample. They",
-            "  exercise the engines Latch ships, so the recall number describes",
-            "  those shapes.",
-            "- `Latch` is measured on the same frozen captures as",
+            "- `mcp-scan` was **invoked, not measured**. Its CLI requires an",
+            "  account token and performs deep analysis on a Snyk endpoint, so the",
+            "  recorded row proves the installation, the version and the exact",
+            "  invocation -- not a false-positive rate. It is neither a clean scan",
+            "  nor a detection.",
+            "- `agent-latch` was **not exercised at all**: its row is an",
+            "  `architectural_comparison_only` documentation comparison, and a",
+            "  documentation comparison cannot prove a detection either way.",
+            "- The ten scenarios are canonical shapes written alongside the rules,",
+            "  not a random sample: they verify rule wiring (see the appendix) and",
+            "  say nothing about generalization. The measurement this project is",
+            "  still missing is an independent 10-probe submission through",
+            "  [`adversarial/EXTERNAL_REDTEAM_BRIEF.md`](../adversarial/EXTERNAL_REDTEAM_BRIEF.md).",
+            "- `mcpprobe` (Latch) is measured on the same frozen captures as",
             "  [`package_eval`](../package_eval/PACKAGE_EVAL_REPORT.md), including the",
             "  diagnostics-server false positive, which is not excused here.",
             "",
         ]
     )
 
-    if missing:
+    lines.extend(
+        [
+            "## Appendix: Self-Authored Protocol Feature Coverage Demo (10/10)",
+            "",
+            "> **Self-Authored Protocol Feature Demo (10/10 — Feature Coverage",
+            "> Check, Not a Generalization Benchmark).** These ten scenarios were",
+            "> written by this project alongside the engines they exercise. A",
+            "> `10/10` here verifies that each shipped rule is wired and fires; it",
+            "> is not a random sample of real-world attacks and must not be read",
+            "> as a detection rate. The measured evidence is the real-package",
+            "> comparison above and",
+            "> [`package_eval/PACKAGE_EVAL_REPORT.md`](../package_eval/PACKAGE_EVAL_REPORT.md).",
+            "",
+            "| Scenario | Category | Latch | Rules | Naive |",
+            "| -------- | -------- | ----- | ----- | ----- |",
+        ]
+    )
+    for row in scenarios:
         lines.append(
-            "To make the peer columns measured rather than documented, install"
-            " the CLIs and re-run: `python -m head_to_head.run_comparison` will"
-            " record live output for any binary it finds on `PATH`."
+            f"| {row['title']} (`{row['scenario_id']}`) | `{row['category']}` |"
+            f" {'detected' if row['latch_detected'] else 'MISSED'} |"
+            f" {', '.join(row['latch_rules']) or '—'} |"
+            f" {'detected' if row['naive_detected'] else 'missed'} |"
         )
-        lines.append("")
+
+    lines.extend(
+        [
+            "",
+            f"Feature coverage: Latch fires on"
+            f" {metrics['latch_scenarios_detected']}"
+            f"/{metrics['scenario_count']} self-authored scenarios"
+            f" ({metrics['latch_scenario_recall']:.2f}); the naive baseline"
+            f" fires on {metrics['naive_scenarios_detected']}"
+            f"/{metrics['scenario_count']}"
+            f" ({metrics['naive_scenario_recall']:.2f}).",
+            "",
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -802,8 +930,14 @@ def print_summary(results: dict[str, Any]) -> None:
         f"/{metrics['scenario_count']}, naive"
         f" {metrics['naive_scenarios_detected']}/{metrics['scenario_count']}"
     )
+    print(
+        "  mcp-scan (snyk-agent-scan):"
+        f" {metrics['mcp_scan_status']}"
+        f" v{metrics['mcp_scan_version']}"
+    )
     for row in results["third_party"]:
-        print(f"  {row['tool']}: {row['status']}")
+        if row["tool"] != "mcp-scan":
+            print(f"  {row['tool']}: {row['status']}")
     if metrics["latch_scenarios_missed"]:
         print(f"  Latch missed: {', '.join(metrics['latch_scenarios_missed'])}")
     print(f"Wrote {RESULTS_JSON}")

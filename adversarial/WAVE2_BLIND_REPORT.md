@@ -1,13 +1,28 @@
-# Wave 2: Pre-Registered Blind Evaluation (Frozen First Run)
+# Wave 2: Author-Blind Upper Bound (Self-Authored, Frozen First Run)
+
+> **Author-Blind Upper Bound (awaiting independent external 10-probe
+> submission via `EXTERNAL_REDTEAM_BRIEF.md`).** These probes were written
+> by this project against its own rule inventory before the engines were
+> changed, which controls for rule edits but **not** for author bias: the
+> same people chose the scenarios, the detectors and the pass criteria.
+> Read the score as an upper bound until an outside contributor submits
+> a probe set through
+> [`EXTERNAL_REDTEAM_BRIEF.md`](EXTERNAL_REDTEAM_BRIEF.md).
 
 Wave 1 in [`EVASION_REPORT.md`](EVASION_REPORT.md) is an *iterative*
 corpus: every probe there was a real bypass that the engines were then
 hardened against, so its `19/19` is a post-tuning regression result.
-Wave 2 is the blind complement. These sixteen probes were written
+Wave 2 is the frozen complement. These sixteen probes were written
 against the shipped rule inventory, run once against unmodified
 `mcpprobe/`, and their first-run verdict was frozen in
 [`wave2_frozen_baseline.json`](wave2_frozen_baseline.json). No
 detection rule in `mcpprobe/` was changed in this chunk.
+
+The external kit
+([`EXTERNAL_REDTEAM_BRIEF.md`](EXTERNAL_REDTEAM_BRIEF.md),
+[`external_probes_template.json`](external_probes_template.json),
+`python -m adversarial.run_external_blind`) exists so a contributor who
+never saw these rules can replace the upper bound with a measurement.
 
 | Metric | Frozen value |
 | ------ | ------------ |

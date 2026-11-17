@@ -19,6 +19,12 @@ dependencies = [
 dev = [
     "pytest>=8.3,<10.0",
 ]
+# Optional: the peer scanner used for the measured comparison in head_to_head/.
+# Its CLI requires a SNYK_TOKEN for an actual scan; without one the comparison
+# records `credentials_required` instead of a verdict.
+peer = [
+    "snyk-agent-scan==0.6.11",
+]
 
 [project.scripts]
 mcpprobe = "mcpprobe.cli:main"

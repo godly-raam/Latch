@@ -95,7 +95,13 @@ def test_report_is_deterministic_and_honest() -> None:
     report = REPORT_MD.read_text(encoding="utf-8")
     assert report == render_report(results)
 
-    assert report.startswith("# Wave 2: Pre-Registered Blind Evaluation")
+    assert report.startswith(
+        "# Wave 2: Author-Blind Upper Bound (Self-Authored, Frozen First Run)"
+    )
+    flat = " ".join(report.replace(">", " ").split())
+    assert "Author-Blind Upper Bound" in flat
+    assert "awaiting independent external 10-probe submission" in flat
+    assert "EXTERNAL_REDTEAM_BRIEF.md" in report
     assert "## Blind catches" in report
     assert "## Blind misses" in report
     assert "## Benign hard negatives" in report

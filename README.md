@@ -1,22 +1,26 @@
-# Latch (mcpprobe) — Deterministic MCP & Agentic Protocol Security Verifier
+# mcpprobe (Latch) — Deterministic MCP & Agentic Protocol Security Verifier
 
-`Latch (mcpprobe)` is a deterministic security verifier for
+**`mcpprobe`** is the project, Python package and CLI name; **`(Latch)`** is its
+subtitle. `mcpprobe (Latch)` is a deterministic security verifier for
 [Model Context Protocol](https://modelcontextprotocol.io) servers and the agents
 that mount them. Six engines, no LLM in the loop:
 
-> **Project disambiguation.** This repository is **`Latch (mcpprobe)`** — this
-> Python package, CLI `latch`, GitHub project `mcpprobe`. It is *not*:
+> **Name disambiguation.** This repository is **`mcpprobe`**, subtitle
+> **`Latch`**, CLI `mcpprobe` (alias `latch`). It is *not*:
 > - **`AgentLatch`** (`AgentLatch/agent-latch`): a local-first Python AST
 >   scanner plus a passive, monitor-only MCP proxy. Different tool, different
 >   author, different approach (it reads agent *source code*, not MCP schemas).
 > - **`Invariant / Snyk mcp-scan`** (`github.com/snyk/agent-scan`, formerly
 >   `invariantlabs-ai/mcp-scan`): a CLI scanner with tool pinning and a
 >   monitoring proxy that calls the Snyk/Invariant Guardrails API for deep
->   prompt-injection classification.
+>   prompt-injection classification. `mcpprobe` compares itself against it
+>   empirically in [`head_to_head/`](head_to_head/HEAD_TO_HEAD.md).
+> - Unrelated `latch` packages on PyPI/npm (build tooling, hardware buttons):
+>   no shared code, no shared authors.
 >
-> The shared word is "latch/latch", not the codebase. See
-> [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) for the
-> capability matrix.
+> The overlapping word is "latch", not the codebase. The scored comparison and
+> capability matrix live in
+> [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md).
 
 | Engine | Question it answers | Commands |
 | ------ | ------------------- | -------- |
@@ -41,8 +45,10 @@ python -m venv .venv
 .venv/bin/pip install -e ".[dev]"
 ```
 
-`pydantic` and `click` are the only runtime dependencies; `pytest` lives in the
-`dev` extra.
+`pydantic`, `click` and `httpx` are the only runtime dependencies; `pytest`
+lives in the `dev` extra and the optional `peer` extra installs
+`snyk-agent-scan` (the `mcp-scan` distribution) for the measured comparison in
+[`head_to_head/`](head_to_head/HEAD_TO_HEAD.md).
 
 Both console names — `mcpprobe` and `latch` — invoke the same entrypoint.
 
@@ -474,17 +480,25 @@ only to install the packages it captures.
 | 2 | `package_eval/` | 9 real npm/PyPI packages (83 tools, pinned pre-patch releases + clean references) and 4 compositions | In-scope real-package recall `0.67` (2/3), overall `0.40` (2/5, including two honest handler-CVE misses), FPR `0.20` vs. naive `0.80` | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
 | 3 | `synthetic_regression/` | 24 fixtures modeled on disclosed MCP bug classes | `1.00` in-scope recall, `0.83` overall recall with 2 out-of-scope handler bugs | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
 | 4a | `adversarial/` Wave 1 | 24 evasion probes, iteratively hardened | `19/19` post-tuning catches + 5 irreducible boundaries | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
-| 4b | `adversarial/` Wave 2 | 16 **pre-registered blind** probes (12 hostile, 4 benign), no rule edits | Frozen first run: precision `1.00`, recall `0.42`, FPR `0.00` — 5 catches, **7 honest blind misses** | [`adversarial/WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md) |
-| 5 | `head_to_head/` | 9 real captures + 10 protocol scenarios, Latch vs. naive vs. documented peers | Latch `10/10` scenarios; naive `7/10`; `mcp-scan` and `agent-latch` not installed → sourced architecture matrix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
+| 4b | `adversarial/` Wave 2 | 16 self-authored blind probes (12 hostile, 4 benign), no rule edits | **Author-blind upper bound** (awaiting independent external submission): precision `1.00`, recall `0.42`, FPR `0.00` — 5 catches, **7 honest misses** | [`adversarial/WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md) |
+| 4c | `adversarial/` external kit | Contributor-authored 10-probe schema, no access to the rules | Schema/scorer validated in CI; **no external submission yet**, so nothing is claimed | [`adversarial/EXTERNAL_BLIND_REPORT.md`](adversarial/EXTERNAL_BLIND_REPORT.md) |
+| 5 | `head_to_head/` | 9 real captures, measured `mcp-scan` run against the 5 clean packages, 10 self-authored scenarios demoted to an appendix | Clean-package FPR `0.20` (1/5) vs. naive `0.80` (4/5); in-model real-package recall `0.67`; `mcp-scan` column measured or explicitly `credentials_required`; `10/10` self-authored feature demo in the appendix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
 
-**Wave 1 and Wave 2 are not the same number.** Wave 1 is a post-tuning
-regression suite: every probe there was a real bypass that the engines were
-then hardened against. Wave 2 is the blind measurement: sixteen probes written
-against the shipped rule inventory, run once against unmodified `mcpprobe/`,
-with the first-run verdict frozen in
-[`adversarial/wave2_frozen_baseline.json`](adversarial/wave2_frozen_baseline.json).
-Wave 2's recall of `0.42` is lower than Wave 1's `19/19` on purpose, and it is
-the number to trust when judging generalization.
+**Wave 1, Wave 2 and the external kit are three different claims.** Wave 1 is a
+post-tuning regression suite: every probe there was a real bypass that the
+engines were then hardened against. Wave 2 was written by this project against
+its own rule inventory, run once against unmodified `mcpprobe/`, and frozen in
+[`adversarial/wave2_frozen_baseline.json`](adversarial/wave2_frozen_baseline.json);
+because the same people chose the scenarios, the detectors and the pass
+criteria, its `0.42` recall is an **Author-Blind Upper Bound**, not an
+independent measurement. The external kit
+([`adversarial/EXTERNAL_REDTEAM_BRIEF.md`](adversarial/EXTERNAL_REDTEAM_BRIEF.md))
+exists to replace that upper bound: a contributor who has not read the rules
+writes ten probes (7–8 hostile, 2–3 benign controls), and
+`python -m adversarial.run_external_blind --input <path>` scores them unedited.
+No such submission has arrived yet, and
+[`adversarial/EXTERNAL_BLIND_REPORT.md`](adversarial/EXTERNAL_BLIND_REPORT.md)
+says so instead of implying a result.
 
 `synthetic_regression/` models the *shapes* of 2025–2026 MCP advisory bug
 classes — gateway token passthrough, cleartext transport, post-approval rug
@@ -522,7 +536,7 @@ vocabulary, `enum` indirection, zero-width and Armenian homoglyphs,
 `prerequisite`/`moved` directives, variation selectors, nested header bindings,
 new passthrough parameter names, credentials in URL query strings, and
 base64/query/4-hop runtime exfiltration, plus five irreducible static
-boundaries. **Wave 2** (blind,
+boundaries. **Wave 2** (self-authored, **author-blind upper bound**,
 [`WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md)) adds fullwidth and
 filler-character homoglyphs, passive-voice and imperative routing hijacks,
 array-typed `x-mcp-header` bindings, non-Bearer `Authorization` schemes,
@@ -531,14 +545,24 @@ canary exfiltration inside a request **header** — plus four benign hard
 negatives that must stay clean. It catches 5 of 12 hostile probes and misses 7,
 and those 7 are printed as misses.
 
-`head_to_head/` runs Latch and the naive baseline live over the nine real
-captures and ten canonical protocol scenarios (rug pull, `list_changed` drift,
-Tag-block smuggling, `x-mcp-header: Authorization`, homoglyph shadowing,
+`head_to_head/` is the measured comparison, and the headline number is the
+clean-package false-positive rate: `mcpprobe` (Latch) flags `1/5` (`0.20`), the
+naive keyword baseline flags `4/5` (`0.80`), on the same real captures. It also
+runs `mcp-scan` — the current `snyk-agent-scan` distribution — live against
+those five clean packages and records the exact invocation, exit code and
+verdict class. That CLI performs deep analysis on a Snyk endpoint and requires
+an account token, so with no `SNYK_TOKEN` in the environment the column is
+reported as `credentials_required` rather than being dressed up as a clean
+scan; the run is cached by scanner version, capture digests and token presence,
+and a token enables a real per-package verdict on the next run. `agent-latch`
+remains an `architectural_comparison_only` row because the binary is not
+installed. The ten canonical protocol scenarios (rug pull, `list_changed`
+drift, Tag-block smuggling, `x-mcp-header: Authorization`, homoglyph shadowing,
 cross-tool hijack, cross-server trifecta, SSRF-guarded vs. confirmed
-unconfirmed exfiltration, RFC 9728 metadata mismatch, Bearer reuse). It also
-records whether `mcp-scan` and `agent-latch` are installed; here they are not,
-so the comparison reports their documented architecture with sources instead of
-pretending to have measured them.
+exfiltration, RFC 9728 metadata mismatch, Bearer reuse) were written alongside
+the rules, so they are an appendix labelled **"Self-Authored Protocol Feature
+Demo (10/10 — Feature Coverage Check, Not a Generalization Benchmark)"** instead
+of a headline.
 
 ```bash
 python -m benchmark.run_benchmark
@@ -547,6 +571,7 @@ python -m package_eval.capture_manifests   # network: re-captures the packages
 python -m package_eval.run_package_eval
 python -m adversarial.run_evasion          # Wave 1
 python -m adversarial.run_wave2_blind      # Wave 2 (verifies the frozen baseline)
+python -m adversarial.run_external_blind --check-template  # schema/scorer check only
 python -m head_to_head.run_comparison
 ```
 
@@ -657,7 +682,8 @@ python -m benchmark.run_benchmark
 python -m synthetic_regression.run_regression
 python -m package_eval.run_package_eval
 python -m adversarial.run_evasion        # Wave 1 (post-tuning)
-python -m adversarial.run_wave2_blind    # Wave 2 (frozen blind baseline)
+python -m adversarial.run_wave2_blind    # Wave 2 (author-blind upper bound)
+python -m adversarial.run_external_blind --check-template  # template validation
 python -m head_to_head.run_comparison
 bash demo.sh
 ```

@@ -91,12 +91,48 @@ def test_third_party_rows_are_explicit_about_measurement() -> None:
     results = compute_results()
     third_party = {row["tool"]: row for row in results["third_party"]}
     assert set(third_party) == {"mcp-scan", "agent-latch"}
-    for row in third_party.values():
-        assert row["status"] in {"installed", "not_installed_in_env"}
-        if row["status"] == "installed":
-            assert row["path"]
-        else:
-            assert row["path"] is None
+
+    peer = third_party["mcp-scan"]
+    assert peer["status"] in {
+        "measured",
+        "measured_unparsed",
+        "credentials_required",
+        "blocked_unauthorized",
+        "blocked_network_error",
+        "blocked_timeout",
+        "not_installed_in_env",
+    }
+    measurement = peer["measurement"]
+    assert measurement["tool"] == "mcp-scan"
+    assert measurement["status"] == peer["status"]
+    assert isinstance(measurement["version"], str) and measurement["version"]
+    assert isinstance(measurement["cache_key"], str) and len(measurement["cache_key"]) == 64
+    if measurement["status"] == "not_installed_in_env":
+        assert peer["path"] is None
+        assert measurement["command"] is None
+    else:
+        assert peer["path"]
+        assert measurement["command"][:2] == ["snyk-agent-scan", "scan"]
+        assert isinstance(measurement["exit_code"], int)
+        assert measurement["remote_api_required"] is True
+
+    if measurement["status"] in {"measured", "measured_unparsed"}:
+        assert measurement["parsed"] is True
+        assert set(measurement["package_flags"]) <= set(measurement["packages"])
+        assert isinstance(measurement["clean_false_positive_rate"], float)
+    else:
+        assert measurement["package_flags"] == {}
+        assert measurement["clean_false_positive_rate"] is None
+        assert measurement["reason"], measurement
+        for row in results["packages"]:
+            assert row["peer_flagged"] is None
+
+    latch = third_party["agent-latch"]
+    assert latch["status"] in {"installed", "architectural_comparison_only"}
+    if latch["status"] == "installed":
+        assert latch["path"]
+    else:
+        assert latch["path"] is None
 
     assert len(results["architectural_matrix"]) == 3
     for row in results["architectural_matrix"]:
@@ -116,17 +152,53 @@ def test_third_party_rows_are_explicit_about_measurement() -> None:
             assert row[key], (row["tool"], key)
 
 
-def test_report_separates_measured_from_documented() -> None:
+def test_report_leads_with_the_measured_comparison() -> None:
+    results = compute_results()
     report = REPORT_MD.read_text(encoding="utf-8")
-    assert "# Head-to-head" in report
-    assert "documented architecture" in report
+
+    assert report.startswith("# mcpprobe (Latch): measured real-package comparison")
+    assert "## Headline: measured on real captured packages" in report
+    assert "0.20 (1/5)" in report
+    assert "0.80 (4/5)" in report
     assert "Architectural and detection matrix" in report
     assert "AgentLatch" in report
-    assert "mcp-scan" in report
     assert "Honest limits of this comparison" in report
-    assert "not installed" in report or not any(
-        row["status"] != "installed" for row in compute_results()["third_party"]
-    )
+
+    measurement = results["mcp_scan_measurement"]
+    assert f"`{measurement['status']}`" in report
+    assert "snyk-agent-scan scan" in report
+    if measurement["status"] == "credentials_required":
+        assert "SNYK_TOKEN" in report
+        assert "could not obtain a **measured** peer verdict" in report
+
+
+def test_self_authored_scenarios_are_an_appendix() -> None:
+    report = REPORT_MD.read_text(encoding="utf-8")
+    flat = " ".join(report.replace(">", " ").split())
+
+    appendix = "## Appendix: Self-Authored Protocol Feature Coverage Demo (10/10)"
+    assert appendix in report
+    assert "Feature Coverage Check, Not a Generalization Benchmark" in flat
+    assert report.index(appendix) > report.index("Architectural and detection matrix")
+    assert report.index(appendix) > report.index("Honest limits")
+    assert "Ten canonical protocol and agentic-risk scenarios" not in report
+    assert "Feature coverage: Latch fires on 10/10" in report
+
+
+def test_measured_peer_column_appears_only_when_measured() -> None:
+    results = compute_results()
+    measurement = results["mcp_scan_measurement"]
+    report = REPORT_MD.read_text(encoding="utf-8")
+    assert "| mcp-scan |" in report
+
+    if measurement["parsed"]:
+        flagged = measurement["flagged_packages"]
+        for row in results["packages"]:
+            if row["slug"] in measurement["package_flags"]:
+                assert row["peer_flagged"] is (row["slug"] in flagged)
+    else:
+        assert all(row["peer_flagged"] is None for row in results["packages"])
+        assert "produced a parseable live verdict" in report
 
 
 def test_writing_twice_is_byte_identical() -> None:
