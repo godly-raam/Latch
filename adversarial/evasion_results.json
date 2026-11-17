@@ -380,15 +380,13 @@
         "probe-chain": true
       },
       "live": {
-        "confirmed_exploitable": 2,
-        "paths_tested": 2,
+        "confirmed_exploitable": 1,
+        "paths_tested": 1,
         "server_count": 4,
         "sink_request_summaries": [
-          "POST /exfil (matched body)",
           "POST /exfil (matched body)"
         ],
         "statuses": [
-          "CONFIRMED_EXPLOITABLE",
           "CONFIRMED_EXPLOITABLE"
         ]
       },

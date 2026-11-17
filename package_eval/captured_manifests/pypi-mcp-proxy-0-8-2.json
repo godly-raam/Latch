@@ -1,0 +1,52 @@
+{
+  "capture_source": "live_proxy_metadata",
+  "cve_refs": [],
+  "ecosystem": "pypi",
+  "expected_positive": true,
+  "exposed_headers": {
+    "Authorization": "Bearer ${MCP_TOKEN}"
+  },
+  "exposed_url": "http://0.0.0.0:18008/sse",
+  "in_latch_threat_model": true,
+  "kind": "proxy_metadata",
+  "launch_command": [
+    "uvx",
+    "--from",
+    "mcp-proxy==0.8.2",
+    "mcp-proxy",
+    "--port",
+    "18008",
+    "--host",
+    "0.0.0.0",
+    "npx",
+    "@modelcontextprotocol/server-filesystem@2.3.0",
+    "{sandbox}"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "note": "Bridges a stdio server to an SSE endpoint with no authentication and no TLS; version 0.8.2 predates its streamable-http transport.",
+  "package_name": "mcp-proxy",
+  "package_version": "0.8.2",
+  "probe": {
+    "cli": {
+      "exit_code": 0,
+      "status": "ok",
+      "usage": null
+    },
+    "transport": {
+      "authentication_challenge": false,
+      "cleartext": true,
+      "content_type": "text/event-stream",
+      "http_status": 200,
+      "status": "ok"
+    }
+  },
+  "protocol_version": "n/a",
+  "server_info": {
+    "name": "mcp-proxy",
+    "version": "0.8.2"
+  },
+  "slug": "pypi-mcp-proxy-0-8-2",
+  "tool_count": 0,
+  "tools": [],
+  "vulnerability_class": "unauthenticated_cleartext_sse_bridge"
+}

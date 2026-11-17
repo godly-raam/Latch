@@ -2,118 +2,119 @@
   "compositions": [
     {
       "audit_findings": [],
+      "collapsed_read_tools": 0,
       "composition_id": "filesystem-plus-memory",
       "cross_server_path_count": 0,
+      "detected_rule_ids": [],
+      "expected_positive": false,
+      "expected_rule_ids": [],
+      "in_latch_threat_model": true,
       "latch_flagged": false,
+      "legacy_critical_count": 0,
+      "legacy_path_count": 0,
+      "local_write_tools": [
+        "npm-server-filesystem:append_file",
+        "npm-server-filesystem:create_directory",
+        "npm-server-filesystem:edit_file",
+        "npm-server-filesystem:move_file",
+        "npm-server-filesystem:write_file",
+        "npm-server-memory:add_observations",
+        "npm-server-memory:create_entities",
+        "npm-server-memory:create_relations",
+        "npm-server-memory:delete_entities",
+        "npm-server-memory:delete_observations",
+        "npm-server-memory:delete_relations"
+      ],
+      "miss_rationale": null,
       "naive_flagged": true,
-      "rationale": "Local file read plus local knowledge-graph memory: both are first-party reference servers with no network egress.",
+      "outcome": "true_negative",
+      "rationale": "Local file read plus local knowledge-graph memory: every write is local state, so there is no outbound sink.",
+      "rule_ids": [],
       "servers": [
         "npm-server-filesystem",
         "npm-server-memory"
       ],
       "severity_counts": {},
       "shadow_findings": [],
+      "target_id": null,
       "tool_count": 25,
       "trifecta_path_count": 0,
       "trifecta_paths": []
     },
     {
       "audit_findings": [],
+      "collapsed_read_tools": 0,
       "composition_id": "filesystem-plus-git",
-      "cross_server_path_count": 27,
-      "latch_flagged": true,
+      "cross_server_path_count": 0,
+      "detected_rule_ids": [],
+      "expected_positive": false,
+      "expected_rule_ids": [],
+      "in_latch_threat_model": true,
+      "latch_flagged": false,
+      "legacy_critical_count": 27,
+      "legacy_path_count": 27,
+      "local_write_tools": [
+        "npm-server-filesystem:append_file",
+        "npm-server-filesystem:create_directory",
+        "npm-server-filesystem:edit_file",
+        "npm-server-filesystem:move_file",
+        "npm-server-filesystem:write_file",
+        "pypi-mcp-server-git:git_add",
+        "pypi-mcp-server-git:git_checkout",
+        "pypi-mcp-server-git:git_commit",
+        "pypi-mcp-server-git:git_create_branch",
+        "pypi-mcp-server-git:git_merge",
+        "pypi-mcp-server-git:git_reset"
+      ],
+      "miss_rationale": null,
       "naive_flagged": true,
-      "rationale": "Two repository-oriented servers: file access plus git history inspection, still with no outbound sink.",
+      "outcome": "true_negative",
+      "rationale": "Two repository-oriented servers: file read plus git history and local commits. No outbound sink exists.",
+      "rule_ids": [],
       "servers": [
         "npm-server-filesystem",
         "pypi-mcp-server-git"
       ],
-      "severity_counts": {
-        "CRITICAL": 27
-      },
+      "severity_counts": {},
       "shadow_findings": [],
+      "target_id": null,
       "tool_count": 30,
-      "trifecta_path_count": 27,
-      "trifecta_paths": [
-        {
-          "cross_server": true,
-          "egress_tool": "pypi-mcp-server-git:git_commit",
-          "ingest_tool": "npm-server-filesystem:search_files",
-          "path_id": "trifecta-001",
-          "read_tool": "npm-server-filesystem:directory_tree",
-          "severity": "CRITICAL"
-        },
-        {
-          "cross_server": true,
-          "egress_tool": "pypi-mcp-server-git:git_create_branch",
-          "ingest_tool": "npm-server-filesystem:search_files",
-          "path_id": "trifecta-002",
-          "read_tool": "npm-server-filesystem:directory_tree",
-          "severity": "CRITICAL"
-        },
-        {
-          "cross_server": true,
-          "egress_tool": "pypi-mcp-server-git:git_merge",
-          "ingest_tool": "npm-server-filesystem:search_files",
-          "path_id": "trifecta-003",
-          "read_tool": "npm-server-filesystem:directory_tree",
-          "severity": "CRITICAL"
-        },
-        {
-          "cross_server": true,
-          "egress_tool": "pypi-mcp-server-git:git_commit",
-          "ingest_tool": "npm-server-filesystem:search_files",
-          "path_id": "trifecta-004",
-          "read_tool": "npm-server-filesystem:get_file_info",
-          "severity": "CRITICAL"
-        },
-        {
-          "cross_server": true,
-          "egress_tool": "pypi-mcp-server-git:git_create_branch",
-          "ingest_tool": "npm-server-filesystem:search_files",
-          "path_id": "trifecta-005",
-          "read_tool": "npm-server-filesystem:get_file_info",
-          "severity": "CRITICAL"
-        },
-        {
-          "cross_server": true,
-          "egress_tool": "pypi-mcp-server-git:git_merge",
-          "ingest_tool": "npm-server-filesystem:search_files",
-          "path_id": "trifecta-006",
-          "read_tool": "npm-server-filesystem:get_file_info",
-          "severity": "CRITICAL"
-        },
-        {
-          "cross_server": true,
-          "egress_tool": "pypi-mcp-server-git:git_commit",
-          "ingest_tool": "npm-server-filesystem:search_files",
-          "path_id": "trifecta-007",
-          "read_tool": "npm-server-filesystem:list_directory",
-          "severity": "CRITICAL"
-        },
-        {
-          "cross_server": true,
-          "egress_tool": "pypi-mcp-server-git:git_create_branch",
-          "ingest_tool": "npm-server-filesystem:search_files",
-          "path_id": "trifecta-008",
-          "read_tool": "npm-server-filesystem:list_directory",
-          "severity": "CRITICAL"
-        }
-      ]
+      "trifecta_path_count": 0,
+      "trifecta_paths": []
     },
     {
       "audit_findings": [],
+      "collapsed_read_tools": 0,
       "composition_id": "filesystem-plus-fetch",
       "cross_server_path_count": 0,
+      "detected_rule_ids": [],
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "in_latch_threat_model": true,
       "latch_flagged": false,
+      "legacy_critical_count": 0,
+      "legacy_path_count": 0,
+      "local_write_tools": [
+        "npm-server-filesystem:append_file",
+        "npm-server-filesystem:create_directory",
+        "npm-server-filesystem:edit_file",
+        "npm-server-filesystem:move_file",
+        "npm-server-filesystem:write_file"
+      ],
+      "miss_rationale": "mcp-server-fetch is GET-only: it has no payload parameter, so the static graph does not model it as an egress sink. Data can still leave in a caller-chosen query string, which `latch probe-chain` verifies at runtime, but the static path enumeration has nothing to enumerate here.",
       "naive_flagged": true,
-      "rationale": "File read plus a web fetcher: the closest official pairing to an ingest/egress chain, so the static graph deserves a look.",
+      "outcome": "missed",
+      "rationale": "Target B: real untrusted web ingestion (mcp-server-fetch) beside real private workspace reads (server-filesystem).",
+      "rule_ids": [],
       "servers": [
         "npm-server-filesystem",
         "pypi-mcp-server-fetch"
       ],
       "severity_counts": {},
       "shadow_findings": [],
+      "target_id": "B",
       "tool_count": 17,
       "trifecta_path_count": 0,
       "trifecta_paths": []
@@ -122,95 +123,327 @@
       "audit_findings": [
         "ANNOTATION_CONTRADICTION (get-header-params)"
       ],
+      "collapsed_read_tools": 314,
       "composition_id": "everything-plus-filesystem",
-      "cross_server_path_count": 288,
+      "cross_server_path_count": 32,
+      "detected_rule_ids": [],
+      "expected_positive": false,
+      "expected_rule_ids": [],
+      "in_latch_threat_model": false,
       "latch_flagged": true,
+      "legacy_critical_count": 302,
+      "legacy_path_count": 314,
+      "local_write_tools": [
+        "npm-server-filesystem:append_file",
+        "npm-server-filesystem:create_directory",
+        "npm-server-filesystem:edit_file",
+        "npm-server-filesystem:move_file",
+        "npm-server-filesystem:write_file"
+      ],
+      "miss_rationale": null,
       "naive_flagged": true,
-      "rationale": "The SDK's everything server (the largest captured surface) mounted beside the filesystem server.",
+      "outcome": "false_positive",
+      "rationale": "The SDK's everything server (the largest captured surface) mounted beside the filesystem server. Its diagnostics tools have no third-party sink, so any path is over-approximation.",
+      "rule_ids": [
+        "ANNOTATION_CONTRADICTION",
+        "LETHAL_TRIFECTA"
+      ],
       "servers": [
         "npm-server-everything",
         "npm-server-filesystem"
       ],
       "severity_counts": {
-        "CRITICAL": 302,
-        "HIGH": 12
+        "CRITICAL": 32
       },
       "shadow_findings": [],
+      "target_id": null,
       "tool_count": 38,
-      "trifecta_path_count": 314,
+      "trifecta_path_count": 32,
       "trifecta_paths": [
         {
+          "collapsed_read_count": 10,
           "cross_server": true,
           "egress_tool": "npm-server-everything:get-header-params",
           "ingest_tool": "npm-server-everything:get-annotated-message",
           "path_id": "trifecta-001",
-          "read_tool": "npm-server-filesystem:directory_tree",
+          "read_tool": "npm-server-everything:get-env",
+          "read_tools": [
+            "npm-server-everything:get-env",
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file",
+            "npm-server-filesystem:search_files"
+          ],
           "severity": "CRITICAL"
         },
         {
+          "collapsed_read_count": 10,
           "cross_server": true,
           "egress_tool": "npm-server-everything:gzip-file-as-resource",
           "ingest_tool": "npm-server-everything:get-annotated-message",
           "path_id": "trifecta-002",
-          "read_tool": "npm-server-filesystem:directory_tree",
+          "read_tool": "npm-server-everything:get-env",
+          "read_tools": [
+            "npm-server-everything:get-env",
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file",
+            "npm-server-filesystem:search_files"
+          ],
           "severity": "CRITICAL"
         },
         {
+          "collapsed_read_count": 10,
           "cross_server": true,
           "egress_tool": "npm-server-everything:trigger-resource-update",
           "ingest_tool": "npm-server-everything:get-annotated-message",
           "path_id": "trifecta-003",
-          "read_tool": "npm-server-filesystem:directory_tree",
+          "read_tool": "npm-server-everything:get-env",
+          "read_tools": [
+            "npm-server-everything:get-env",
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file",
+            "npm-server-filesystem:search_files"
+          ],
           "severity": "CRITICAL"
         },
         {
+          "collapsed_read_count": 10,
           "cross_server": true,
           "egress_tool": "npm-server-everything:trigger-sampling-request",
           "ingest_tool": "npm-server-everything:get-annotated-message",
           "path_id": "trifecta-004",
-          "read_tool": "npm-server-filesystem:directory_tree",
+          "read_tool": "npm-server-everything:get-env",
+          "read_tools": [
+            "npm-server-everything:get-env",
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file",
+            "npm-server-filesystem:search_files"
+          ],
           "severity": "CRITICAL"
         },
         {
+          "collapsed_read_count": 10,
           "cross_server": true,
           "egress_tool": "npm-server-everything:trigger-sampling-request-async",
           "ingest_tool": "npm-server-everything:get-annotated-message",
           "path_id": "trifecta-005",
-          "read_tool": "npm-server-filesystem:directory_tree",
+          "read_tool": "npm-server-everything:get-env",
+          "read_tools": [
+            "npm-server-everything:get-env",
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file",
+            "npm-server-filesystem:search_files"
+          ],
           "severity": "CRITICAL"
         },
         {
+          "collapsed_read_count": 10,
           "cross_server": true,
           "egress_tool": "npm-server-everything:trigger-url-elicitation",
           "ingest_tool": "npm-server-everything:get-annotated-message",
           "path_id": "trifecta-006",
-          "read_tool": "npm-server-filesystem:directory_tree",
+          "read_tool": "npm-server-everything:get-env",
+          "read_tools": [
+            "npm-server-everything:get-env",
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file",
+            "npm-server-filesystem:search_files"
+          ],
           "severity": "CRITICAL"
         },
         {
+          "collapsed_read_count": 10,
           "cross_server": true,
           "egress_tool": "npm-server-everything:get-header-params",
-          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "ingest_tool": "npm-server-everything:gzip-file-as-resource",
           "path_id": "trifecta-007",
-          "read_tool": "npm-server-filesystem:get_file_info",
+          "read_tool": "npm-server-everything:get-env",
+          "read_tools": [
+            "npm-server-everything:get-env",
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file",
+            "npm-server-filesystem:search_files"
+          ],
           "severity": "CRITICAL"
         },
         {
+          "collapsed_read_count": 10,
           "cross_server": true,
-          "egress_tool": "npm-server-everything:gzip-file-as-resource",
-          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "egress_tool": "npm-server-everything:trigger-resource-update",
+          "ingest_tool": "npm-server-everything:gzip-file-as-resource",
           "path_id": "trifecta-008",
-          "read_tool": "npm-server-filesystem:get_file_info",
+          "read_tool": "npm-server-everything:get-env",
+          "read_tools": [
+            "npm-server-everything:get-env",
+            "npm-server-filesystem:directory_tree",
+            "npm-server-filesystem:get_file_info",
+            "npm-server-filesystem:list_directory",
+            "npm-server-filesystem:list_directory_with_sizes",
+            "npm-server-filesystem:read_file",
+            "npm-server-filesystem:read_media_file",
+            "npm-server-filesystem:read_multiple_files",
+            "npm-server-filesystem:read_text_file",
+            "npm-server-filesystem:search_files"
+          ],
           "severity": "CRITICAL"
         }
       ]
     }
   ],
-  "package_count": 5,
+  "detection": {
+    "in_scope_detected": [
+      "npm-mcp-remote-0-14-3",
+      "pypi-mcp-proxy-0-8-2"
+    ],
+    "in_scope_missed": [
+      "B"
+    ],
+    "in_scope_recall": 0.6667,
+    "in_scope_targets": [
+      "npm-mcp-remote-0-14-3",
+      "pypi-mcp-proxy-0-8-2",
+      "B"
+    ],
+    "out_of_model_detected": [],
+    "out_of_model_missed": [
+      "npm-server-filesystem-0-6-2",
+      "pypi-mcp-server-git-2025-9-25"
+    ],
+    "out_of_model_targets": [
+      "npm-server-filesystem-0-6-2",
+      "pypi-mcp-server-git-2025-9-25"
+    ],
+    "overall_detected": [
+      "npm-mcp-remote-0-14-3",
+      "pypi-mcp-proxy-0-8-2"
+    ],
+    "overall_missed": [
+      "npm-server-filesystem-0-6-2",
+      "pypi-mcp-server-git-2025-9-25",
+      "B"
+    ],
+    "overall_recall": 0.4,
+    "overall_targets": 5
+  },
+  "package_count": 9,
   "packages": [
     {
-      "capture_source": "live_subprocess",
+      "capture_source": "live_proxy_metadata",
+      "cve_refs": [
+        "CVE-2026-108716",
+        "CVE-2025-6514"
+      ],
+      "detected_rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
       "ecosystem": "npm",
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
+      "exposed_headers": {
+        "Authorization": "Bearer ${MCP_TOKEN}"
+      },
+      "exposed_url": "http://remote-mcp.example.com/sse",
+      "finding_count": 1,
+      "findings": [
+        {
+          "engine": "auth-audit",
+          "rule_id": "INSECURE_HTTP_AUTH_TRANSPORT",
+          "severity": "CRITICAL",
+          "tool": "url"
+        }
+      ],
+      "in_latch_threat_model": true,
+      "kind": "proxy_metadata",
+      "label": "`mcp-remote` 0.14.3 over `http://remote-mcp.example.com/sse`",
+      "latch_flagged": true,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "mcp-remote@0.14.3",
+        "http://remote-mcp.example.com/sse",
+        "--allow-http"
+      ],
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "naive_flagged": true,
+      "naive_hits": [
+        "http://"
+      ],
+      "note": "Pre-0.15.0 accepts a cleartext http remote URL with --allow-http, so OAuth codes and bearer tokens cross the network in the clear.",
+      "outcome": "detected",
+      "package_name": "mcp-remote",
+      "package_version": "0.14.3",
+      "protocol_version": "n/a",
+      "rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
+      "severity_counts": {
+        "CRITICAL": 1
+      },
+      "slug": "npm-mcp-remote-0-14-3",
+      "target_id": "npm-mcp-remote-0-14-3",
+      "tool_count": 0,
+      "tool_names": [],
+      "transport_probe": {
+        "cli": {
+          "exit_code": 0,
+          "status": "ok",
+          "usage": "Usage: mcp-remote <https://server-url> [callback-port] [--debug]"
+        }
+      },
+      "vulnerability_class": "cleartext_http_oauth_transport"
+    },
+    {
+      "capture_source": "live_subprocess",
+      "cve_refs": [],
+      "detected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "ecosystem": "npm",
+      "expected_positive": false,
+      "expected_rule_ids": [],
       "finding_count": 27,
       "findings": [
         {
@@ -334,6 +567,9 @@
           "tool": "npm-server-everything:gzip-file-as-resource"
         }
       ],
+      "in_latch_threat_model": false,
+      "kind": "stdio_tools",
+      "label": "`@modelcontextprotocol/server-everything` 2.3.0",
       "latch_flagged": true,
       "launch_command": [
         "npx",
@@ -351,15 +587,22 @@
         "before",
         "x-mcp-header"
       ],
+      "note": "SDK diagnostics server: its parameter names and open-world annotations over-approximate into static capability edges.",
+      "outcome": "false_positive",
       "package_name": "@modelcontextprotocol/server-everything",
       "package_version": "2.3.0",
       "protocol_version": "2026-07-28",
+      "rule_ids": [
+        "ANNOTATION_CONTRADICTION",
+        "LETHAL_TRIFECTA"
+      ],
       "severity_counts": {
         "CRITICAL": 14,
         "HIGH": 12,
         "MEDIUM": 1
       },
       "slug": "npm-server-everything",
+      "target_id": "npm-server-everything",
       "tool_count": 22,
       "tool_names": [
         "echo",
@@ -368,29 +611,90 @@
         "get-header-params",
         "get-resource-links",
         "get-resource-reference",
-        "get-roots-list",
         "get-structured-content",
         "get-sum",
         "get-tiny-image",
         "gzip-file-as-resource",
-        "simulate-research-query",
-        "trigger-elicitation-request",
-        "trigger-elicitation-request-async",
         "trigger-list-changed",
         "trigger-log-messages",
         "trigger-long-running-operation",
-        "trigger-multi-step-elicitation",
         "trigger-resource-update",
+        "get-roots-list",
+        "trigger-elicitation-request",
+        "trigger-multi-step-elicitation",
+        "trigger-url-elicitation",
         "trigger-sampling-request",
+        "simulate-research-query",
         "trigger-sampling-request-async",
-        "trigger-url-elicitation"
-      ]
+        "trigger-elicitation-request-async"
+      ],
+      "vulnerability_class": "clean_reference_server"
     },
     {
       "capture_source": "live_subprocess",
+      "cve_refs": [
+        "CVE-2025-53109",
+        "CVE-2025-53110"
+      ],
+      "detected_rule_ids": [],
       "ecosystem": "npm",
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
       "finding_count": 0,
       "findings": [],
+      "in_latch_threat_model": false,
+      "kind": "stdio_tools",
+      "label": "`@modelcontextprotocol/server-filesystem` 0.6.2",
+      "latch_flagged": false,
+      "launch_command": [
+        "npx",
+        "--yes",
+        "@modelcontextprotocol/server-filesystem@0.6.2",
+        "{sandbox}"
+      ],
+      "manifest_sha256": "009e3f7d1f7db40126bede911d7b6d1acca4612e1dbe45ce07170a6f680a5e50",
+      "naive_flagged": true,
+      "naive_hits": [
+        "before",
+        "http://"
+      ],
+      "note": "Pre-patch symlink and path-prefix bypass in the file handlers. Handler code is outside a tools/list threat model; 0.6.3 does not exist on the npm registry, so 0.6.2 is the last pre-patch 0.6.x.",
+      "outcome": "missed",
+      "package_name": "@modelcontextprotocol/server-filesystem",
+      "package_version": "0.6.2",
+      "protocol_version": "2024-11-05",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-server-filesystem-0-6-2",
+      "target_id": "npm-server-filesystem-0-6-2",
+      "tool_count": 9,
+      "tool_names": [
+        "read_file",
+        "read_multiple_files",
+        "write_file",
+        "create_directory",
+        "list_directory",
+        "move_file",
+        "search_files",
+        "get_file_info",
+        "list_allowed_directories"
+      ],
+      "vulnerability_class": "handler_implementation_cve"
+    },
+    {
+      "capture_source": "live_subprocess",
+      "cve_refs": [],
+      "detected_rule_ids": [],
+      "ecosystem": "npm",
+      "expected_positive": false,
+      "expected_rule_ids": [],
+      "finding_count": 0,
+      "findings": [],
+      "in_latch_threat_model": false,
+      "kind": "stdio_tools",
+      "label": "`@modelcontextprotocol/server-filesystem` 2.3.0",
       "latch_flagged": false,
       "launch_command": [
         "npx",
@@ -405,36 +709,48 @@
         "instead",
         "before"
       ],
+      "note": "First-party reference server with no captured advisory.",
+      "outcome": "true_negative",
       "package_name": "@modelcontextprotocol/server-filesystem",
       "package_version": "2.3.0",
       "protocol_version": "2026-07-28",
+      "rule_ids": [],
       "severity_counts": {},
       "slug": "npm-server-filesystem",
+      "target_id": "npm-server-filesystem",
       "tool_count": 16,
       "tool_names": [
-        "append_file",
-        "copy_file",
-        "create_directory",
-        "directory_tree",
-        "edit_file",
-        "get_file_info",
-        "list_allowed_directories",
-        "list_directory",
-        "list_directory_with_sizes",
-        "move_file",
         "read_file",
+        "read_text_file",
         "read_media_file",
         "read_multiple_files",
-        "read_text_file",
+        "write_file",
+        "append_file",
+        "edit_file",
+        "create_directory",
+        "list_directory",
+        "list_directory_with_sizes",
+        "directory_tree",
+        "move_file",
+        "copy_file",
         "search_files",
-        "write_file"
-      ]
+        "get_file_info",
+        "list_allowed_directories"
+      ],
+      "vulnerability_class": "clean_reference_server"
     },
     {
       "capture_source": "live_subprocess",
+      "cve_refs": [],
+      "detected_rule_ids": [],
       "ecosystem": "npm",
+      "expected_positive": false,
+      "expected_rule_ids": [],
       "finding_count": 0,
       "findings": [],
+      "in_latch_threat_model": false,
+      "kind": "stdio_tools",
+      "label": "`@modelcontextprotocol/server-memory` 2.1.1",
       "latch_flagged": false,
       "launch_command": [
         "npx",
@@ -444,29 +760,118 @@
       "manifest_sha256": "f6c207f6b59b72de6c69103446c3735108b9d877e21fa0b34cbaf5004ce08bac",
       "naive_flagged": false,
       "naive_hits": [],
+      "note": "First-party reference server with no captured advisory.",
+      "outcome": "true_negative",
       "package_name": "@modelcontextprotocol/server-memory",
       "package_version": "2.1.1",
       "protocol_version": "2026-07-28",
+      "rule_ids": [],
       "severity_counts": {},
       "slug": "npm-server-memory",
+      "target_id": "npm-server-memory",
       "tool_count": 9,
       "tool_names": [
-        "add_observations",
         "create_entities",
         "create_relations",
+        "add_observations",
         "delete_entities",
         "delete_observations",
         "delete_relations",
-        "open_nodes",
         "read_graph",
-        "search_nodes"
-      ]
+        "search_nodes",
+        "open_nodes"
+      ],
+      "vulnerability_class": "clean_reference_server"
+    },
+    {
+      "capture_source": "live_proxy_metadata",
+      "cve_refs": [],
+      "detected_rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
+      "ecosystem": "pypi",
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
+      "exposed_headers": {
+        "Authorization": "Bearer ${MCP_TOKEN}"
+      },
+      "exposed_url": "http://0.0.0.0:18008/sse",
+      "finding_count": 1,
+      "findings": [
+        {
+          "engine": "auth-audit",
+          "rule_id": "INSECURE_HTTP_AUTH_TRANSPORT",
+          "severity": "CRITICAL",
+          "tool": "url"
+        }
+      ],
+      "in_latch_threat_model": true,
+      "kind": "proxy_metadata",
+      "label": "`mcp-proxy` 0.8.2 over `http://0.0.0.0:18008/sse`",
+      "latch_flagged": true,
+      "launch_command": [
+        "uvx",
+        "--from",
+        "mcp-proxy==0.8.2",
+        "mcp-proxy",
+        "--port",
+        "18008",
+        "--host",
+        "0.0.0.0",
+        "npx",
+        "@modelcontextprotocol/server-filesystem@2.3.0",
+        "{sandbox}"
+      ],
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "naive_flagged": true,
+      "naive_hits": [
+        "http://"
+      ],
+      "note": "Bridges a stdio server to an SSE endpoint with no authentication and no TLS; version 0.8.2 predates its streamable-http transport.",
+      "outcome": "detected",
+      "package_name": "mcp-proxy",
+      "package_version": "0.8.2",
+      "protocol_version": "n/a",
+      "rule_ids": [
+        "INSECURE_HTTP_AUTH_TRANSPORT"
+      ],
+      "severity_counts": {
+        "CRITICAL": 1
+      },
+      "slug": "pypi-mcp-proxy-0-8-2",
+      "target_id": "pypi-mcp-proxy-0-8-2",
+      "tool_count": 0,
+      "tool_names": [],
+      "transport_probe": {
+        "cli": {
+          "exit_code": 0,
+          "status": "ok",
+          "usage": null
+        },
+        "transport": {
+          "authentication_challenge": false,
+          "cleartext": true,
+          "content_type": "text/event-stream",
+          "http_status": 200,
+          "status": "ok"
+        }
+      },
+      "vulnerability_class": "unauthenticated_cleartext_sse_bridge"
     },
     {
       "capture_source": "live_subprocess",
+      "cve_refs": [],
+      "detected_rule_ids": [],
       "ecosystem": "pypi",
+      "expected_positive": false,
+      "expected_rule_ids": [],
       "finding_count": 0,
       "findings": [],
+      "in_latch_threat_model": false,
+      "kind": "stdio_tools",
+      "label": "`mcp-server-fetch` 2026.11.11",
       "latch_flagged": false,
       "launch_command": [
         "uvx",
@@ -477,21 +882,94 @@
       "naive_hits": [
         "before"
       ],
+      "note": "Untrusted web content ingestion used as the ingest half of target B; on its own it has no egress sink and no advisory.",
+      "outcome": "true_negative",
       "package_name": "mcp-server-fetch",
       "package_version": "2026.11.11",
       "protocol_version": "2026-07-28",
+      "rule_ids": [],
       "severity_counts": {},
       "slug": "pypi-mcp-server-fetch",
+      "target_id": "pypi-mcp-server-fetch",
       "tool_count": 1,
       "tool_names": [
         "fetch"
-      ]
+      ],
+      "vulnerability_class": "cross_server_composition_member"
     },
     {
       "capture_source": "live_subprocess",
+      "cve_refs": [
+        "CVE-2025-68145",
+        "CVE-2025-68143"
+      ],
+      "detected_rule_ids": [],
       "ecosystem": "pypi",
+      "expected_positive": true,
+      "expected_rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
       "finding_count": 0,
       "findings": [],
+      "in_latch_threat_model": false,
+      "kind": "stdio_tools",
+      "label": "`mcp-server-git` 2025.9.25",
+      "latch_flagged": false,
+      "launch_command": [
+        "uvx",
+        "--with",
+        "pydantic==2.10.6",
+        "--with",
+        "mcp==1.9.4",
+        "--from",
+        "mcp-server-git==2025.9.25",
+        "mcp-server-git",
+        "--repository",
+        "{sandbox}"
+      ],
+      "manifest_sha256": "5d147f83d15000cfc67b0bb4bc60de112e8b7994c7f736c86ad2c053d5054882",
+      "naive_flagged": true,
+      "naive_hits": [
+        "pass"
+      ],
+      "note": "Pre-patch git argument/path injection in the tool handlers. The 2025.9.25 release needs mcp==1.9.4 and pydantic==2.10.6 pinned to start at all, and it predates the 2026 ``_meta`` request envelope, so it is harvested with the plain 2025 initialize handshake; its own tool metadata is unchanged.",
+      "outcome": "missed",
+      "package_name": "mcp-server-git",
+      "package_version": "2025.9.25",
+      "protocol_version": "2025-03-26",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-mcp-server-git-2025-9-25",
+      "target_id": "pypi-mcp-server-git-2025-9-25",
+      "tool_count": 12,
+      "tool_names": [
+        "git_status",
+        "git_diff_unstaged",
+        "git_diff_staged",
+        "git_diff",
+        "git_commit",
+        "git_add",
+        "git_reset",
+        "git_log",
+        "git_create_branch",
+        "git_checkout",
+        "git_show",
+        "git_branch"
+      ],
+      "vulnerability_class": "handler_implementation_cve"
+    },
+    {
+      "capture_source": "live_subprocess",
+      "cve_refs": [],
+      "detected_rule_ids": [],
+      "ecosystem": "pypi",
+      "expected_positive": false,
+      "expected_rule_ids": [],
+      "finding_count": 0,
+      "findings": [],
+      "in_latch_threat_model": false,
+      "kind": "stdio_tools",
+      "label": "`mcp-server-git` 2026.11.11",
       "latch_flagged": false,
       "launch_command": [
         "uvx",
@@ -504,47 +982,95 @@
       "naive_hits": [
         "pass"
       ],
+      "note": "Current release; local state mutations only.",
+      "outcome": "true_negative",
       "package_name": "mcp-server-git",
       "package_version": "2026.11.11",
       "protocol_version": "2026-07-28",
+      "rule_ids": [],
       "severity_counts": {},
       "slug": "pypi-mcp-server-git",
+      "target_id": "pypi-mcp-server-git",
       "tool_count": 14,
       "tool_names": [
-        "git_add",
-        "git_branch",
-        "git_checkout",
-        "git_commit",
-        "git_create_branch",
-        "git_diff",
-        "git_diff_staged",
+        "git_status",
         "git_diff_unstaged",
-        "git_log",
-        "git_merge",
-        "git_remote",
+        "git_diff_staged",
+        "git_diff",
+        "git_commit",
+        "git_add",
         "git_reset",
+        "git_log",
+        "git_create_branch",
+        "git_checkout",
+        "git_merge",
         "git_show",
-        "git_status"
-      ]
+        "git_branch",
+        "git_remote"
+      ],
+      "vulnerability_class": "clean_reference_server"
+    }
+  ],
+  "precision_before_after": [
+    {
+      "after_critical": 0,
+      "after_paths": 0,
+      "before_critical": 0,
+      "before_paths": 0,
+      "collapsed_read_tools": 0,
+      "composition_id": "filesystem-plus-memory"
+    },
+    {
+      "after_critical": 0,
+      "after_paths": 0,
+      "before_critical": 27,
+      "before_paths": 27,
+      "collapsed_read_tools": 0,
+      "composition_id": "filesystem-plus-git"
+    },
+    {
+      "after_critical": 0,
+      "after_paths": 0,
+      "before_critical": 0,
+      "before_paths": 0,
+      "collapsed_read_tools": 0,
+      "composition_id": "filesystem-plus-fetch"
+    },
+    {
+      "after_critical": 32,
+      "after_paths": 32,
+      "before_critical": 302,
+      "before_paths": 314,
+      "collapsed_read_tools": 314,
+      "composition_id": "everything-plus-filesystem"
     }
   ],
   "summary": {
+    "clean_package_count": 5,
     "compositions_with_paths": [
-      "filesystem-plus-git",
       "everything-plus-filesystem"
     ],
-    "latch_clean_packages": 4,
+    "false_positive_packages": [
+      "npm-server-everything"
+    ],
+    "latch_clean_packages": 1,
     "latch_false_positive_rate": 0.2,
     "latch_flagged_packages": [
-      "npm-server-everything"
+      "npm-mcp-remote-0-14-3",
+      "npm-server-everything",
+      "pypi-mcp-proxy-0-8-2"
     ],
     "naive_false_positive_rate": 0.8,
     "naive_flagged_packages": [
+      "npm-mcp-remote-0-14-3",
       "npm-server-everything",
+      "npm-server-filesystem-0-6-2",
       "npm-server-filesystem",
+      "pypi-mcp-proxy-0-8-2",
       "pypi-mcp-server-fetch",
+      "pypi-mcp-server-git-2025-9-25",
       "pypi-mcp-server-git"
     ]
   },
-  "tool_count": 62
+  "tool_count": 83
 }

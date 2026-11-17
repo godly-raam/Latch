@@ -12,20 +12,25 @@ of each tool (with sources), not measured detections.
 
 ## Real captured packages
 
-All five upstream `tools/list` captures from
+All 9 upstream captures from
 [`package_eval/captured_manifests/`](../package_eval/captured_manifests/),
 unmodified.
 
 | Package | Version | Tools | Latch | Latch rules | Naive | Naive hits |
 | ------- | ------- | ----- | ----- | ----------- | ----- | ---------- |
+| `mcp-remote` | 0.14.3 | 0 | flagged | INSECURE_HTTP_AUTH_TRANSPORT | flagged | http:// |
 | `@modelcontextprotocol/server-everything` | 2.3.0 | 22 | flagged | ANNOTATION_CONTRADICTION, LETHAL_TRIFECTA | flagged | secret, token, pass, ignore, instead, before, x-mcp-header |
+| `@modelcontextprotocol/server-filesystem` | 0.6.2 | 9 | clean | — | flagged | before, http:// |
 | `@modelcontextprotocol/server-filesystem` | 2.3.0 | 16 | clean | — | flagged | ignore, instead, before |
 | `@modelcontextprotocol/server-memory` | 2.1.1 | 9 | clean | — | clean | — |
+| `mcp-proxy` | 0.8.2 | 0 | flagged | INSECURE_HTTP_AUTH_TRANSPORT | flagged | http:// |
 | `mcp-server-fetch` | 2026.11.11 | 1 | clean | — | flagged | before |
+| `mcp-server-git` | 2025.9.25 | 12 | clean | — | flagged | pass |
 | `mcp-server-git` | 2026.11.11 | 14 | clean | — | flagged | pass |
 
-Latch flags 1 of 5 packages (FPR 0.20); the naive baseline flags 4 (FPR 0.80). The single Latch flag is the SDK diagnostics server, whose generic read/egress
-heuristics produce a documented static over-approximation.
+On the 5 clean packages, Latch flags 1 (FPR 0.20); the naive baseline flags 4 (FPR 0.80). The Latch flag is the SDK diagnostics server, whose generic read/egress heuristics produce a documented static over-approximation.
+
+In-model real targets detected: `npm-mcp-remote-0-14-3`, `pypi-mcp-proxy-0-8-2`. Handler-level CVEs in the corpus are outside a `tools/list` threat model and are scored as misses in [`package_eval/PACKAGE_EVAL_REPORT.md`](../package_eval/PACKAGE_EVAL_REPORT.md).
 
 ## Ten canonical protocol and agentic-risk scenarios
 

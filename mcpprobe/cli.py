@@ -1120,6 +1120,11 @@ def _print_graph_report(report: GraphReport) -> None:
             "  trusted servers barred as sources/sinks:"
             f" {', '.join(report.trusted_servers_excluded)}"
         )
+    if report.local_write_tools:
+        click.echo(
+            "  local-write tools (never an exfil sink):"
+            f" {', '.join(report.local_write_tools)}"
+        )
 
     click.echo("")
     for node in report.nodes:
@@ -1140,8 +1145,14 @@ def _print_graph_report(report: GraphReport) -> None:
                 f"  {index}. [{path.severity}] {scope} ({', '.join(path.servers)})"
                 f"  {path.path_id}"
             )
+            collapsed = (
+                f" (+{path.collapsed_read_count - 1} more read tools)"
+                if path.collapsed_read_count > 1
+                else ""
+            )
             click.echo(
                 f"     {path.ingest_tool} -> {path.read_tool} -> {path.egress_tool}"
+                f"{collapsed}"
             )
             click.echo(f"     {path.attack_narrative}")
         click.echo("")

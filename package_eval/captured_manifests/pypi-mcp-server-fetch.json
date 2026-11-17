@@ -1,11 +1,16 @@
 {
   "capture_source": "live_subprocess",
+  "cve_refs": [],
   "ecosystem": "pypi",
+  "expected_positive": false,
+  "in_latch_threat_model": false,
+  "kind": "stdio_tools",
   "launch_command": [
     "uvx",
     "mcp-server-fetch"
   ],
   "manifest_sha256": "4a6dfa4e396475e3fabc6f70215db6acf7e033f12b73a1d16e8d3416ceec5f70",
+  "note": "Untrusted web content ingestion used as the ingest half of target B; on its own it has no egress sink and no advisory.",
   "package_name": "mcp-server-fetch",
   "package_version": "2026.11.11",
   "protocol_version": "2026-07-28",
@@ -68,5 +73,6 @@
       },
       "name": "fetch"
     }
-  ]
+  ],
+  "vulnerability_class": "cross_server_composition_member"
 }

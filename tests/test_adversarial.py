@@ -147,8 +147,10 @@ def test_runtime_probes_confirm_at_the_canary_sink(results: dict) -> None:
     hops = rows["adv_runtime_4_hop_chain"]["live"]
     assert hops is not None
     assert hops["server_count"] == 4
-    assert hops["paths_tested"] >= 2
-    assert hops["confirmed_exploitable"] == hops["paths_tested"]
+    # Both read hops (s2 and s3) feed the same (ingest, egress) pair, so the
+    # path is probed once instead of once per read tool.
+    assert hops["paths_tested"] == 1
+    assert hops["confirmed_exploitable"] == 1
     assert set(hops["statuses"]) == {"CONFIRMED_EXPLOITABLE"}
 
 

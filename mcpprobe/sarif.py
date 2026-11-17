@@ -424,6 +424,8 @@ def to_sarif(
                         "crossServer": path.cross_server,
                         "ingestTool": path.ingest_tool,
                         "readTool": path.read_tool,
+                        "readTools": path.read_tools or [path.read_tool],
+                        "collapsedReadCount": path.collapsed_read_count,
                         "egressTool": path.egress_tool,
                     },
                 )

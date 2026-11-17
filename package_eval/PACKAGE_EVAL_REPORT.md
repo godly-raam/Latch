@@ -1,79 +1,152 @@
 # Pinned-package evaluation: real `tools/list` captures
 
-Blind evaluation of Latch against real MCP servers, launched as a client
+Blind evaluation of Latch against real MCP packages, launched as a client
 would launch them, without tailoring any engine to these packages.
 
 ## Method
 
-`python -m package_eval.capture_manifests` starts each pinned package over
-stdio, captures the `tools/list` response verbatim, resolves the pinned
-version from the npm registry or PyPI, and hashes the canonical tool list.
-Captures marked `live_subprocess` were harvested here; any kept
-`pinned_package_capture` snapshot is a previous verbatim capture of the
-same package version. `python -m package_eval.run_package_eval` then runs
-`audit_manifest`, `analyze_capability_graph`, `analyze_shadowing` and
-`run_auth_audit` against those records plus the naive keyword baseline,
-and scores the multi-server compositions built from the unmodified
-captures.
+`python -m package_eval.capture_manifests` starts each pinned package,
+records the `tools/list` response verbatim, and resolves the pinned
+version from the npm registry or PyPI. Proxy packages (`mcp-remote`,
+`mcp-proxy`) advertise no tools of their own, so their real CLI is
+invoked and the cleartext endpoint they expose is probed instead.
+`python -m package_eval.run_package_eval` then runs `audit_manifest`,
+`analyze_capability_graph`, `analyze_shadowing` and `run_auth_audit`
+against those records plus the naive keyword baseline.
 
-These are first-party reference servers, so the expected result is clean:
-any finding below is reported as a finding, not tuned away.
+Three kinds of target are scored separately:
+
+- **in-model real targets** -- a cleartext OAuth/transport proxy, an
+  unauthenticated cleartext SSE bridge, and a cross-server fetch +
+  filesystem composition. A static manifest auditor can see these.
+- **out-of-model real CVEs** -- pre-patch handler-level path traversal
+  and git argument injection. Those live in handler code, not in
+  `tools/list`, so they are counted honestly as misses in overall recall.
+- **clean reference servers** -- first-party servers expected to be
+  clean; every finding on them is a false positive.
+
+No rule or vocabulary was adjusted for any of these packages.
 
 ## Captured packages
 
-| Package | Version | Ecosystem | Protocol | Tools | SHA-256 | Capture |
+| Package | Version | Kind | Ecosystem | Protocol | Tools | In threat model | SHA-256 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `mcp-remote` | 0.14.3 | `proxy_metadata` | npm | `n/a` | 0 | yes | `fe2f3b4ef49492d8…` |
+| `@modelcontextprotocol/server-everything` | 2.3.0 | `stdio_tools` | npm | `2026-07-28` | 22 | no | `2933e591ac78202e…` |
+| `@modelcontextprotocol/server-filesystem` | 0.6.2 | `stdio_tools` | npm | `2024-11-05` | 9 | no | `009e3f7d1f7db401…` |
+| `@modelcontextprotocol/server-filesystem` | 2.3.0 | `stdio_tools` | npm | `2026-07-28` | 16 | no | `b53f2e27460f105d…` |
+| `@modelcontextprotocol/server-memory` | 2.1.1 | `stdio_tools` | npm | `2026-07-28` | 9 | no | `f6c207f6b59b72de…` |
+| `mcp-proxy` | 0.8.2 | `proxy_metadata` | pypi | `n/a` | 0 | yes | `fe2f3b4ef49492d8…` |
+| `mcp-server-fetch` | 2026.11.11 | `stdio_tools` | pypi | `2026-07-28` | 1 | no | `4a6dfa4e396475e3…` |
+| `mcp-server-git` | 2025.9.25 | `stdio_tools` | pypi | `2025-03-26` | 12 | no | `5d147f83d15000cf…` |
+| `mcp-server-git` | 2026.11.11 | `stdio_tools` | pypi | `2026-07-28` | 14 | no | `bd88748c777e6a3a…` |
+
+Totals: 9 packages, 83 tools captured (2 proxy/transport packages expose no tools of their own).
+
+## Real-package targets
+
+| Target | Package / composition | Class | In model | Expected | Latch | Outcome | Rules |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `npm-mcp-remote-0-14-3` | `mcp-remote` 0.14.3 over `http://remote-mcp.example.com/sse` | `cleartext_http_oauth_transport` | yes | yes | yes | detected | `INSECURE_HTTP_AUTH_TRANSPORT` |
+| `npm-server-filesystem-0-6-2` | `@modelcontextprotocol/server-filesystem` 0.6.2 | `handler_implementation_cve` | no | yes | no | missed | — |
+| `pypi-mcp-proxy-0-8-2` | `mcp-proxy` 0.8.2 over `http://0.0.0.0:18008/sse` | `unauthenticated_cleartext_sse_bridge` | yes | yes | yes | detected | `INSECURE_HTTP_AUTH_TRANSPORT` |
+| `pypi-mcp-server-git-2025-9-25` | `mcp-server-git` 2025.9.25 | `handler_implementation_cve` | no | yes | no | missed | — |
+| `B` | `npm-server-filesystem` + `pypi-mcp-server-fetch` | `cross_server_composition` | yes | yes | no | missed | — |
+
+## Detection and false positives
+
+| Metric | Value |
+| --- | --- |
+| In-scope real-package recall | 0.67 (2/3) |
+| Overall real-package recall | 0.40 (2/5) |
+| Latch false-positive rate on clean packages | 0.20 (1/5) |
+| Naive baseline false-positive rate | 0.80 |
+
+- Detected in scope: `npm-mcp-remote-0-14-3`, `pypi-mcp-proxy-0-8-2`
+- Missed in scope: `B`
+- Out-of-model CVEs (handler code, not `tools/list`): `npm-server-filesystem-0-6-2` (CVE-2025-53109, CVE-2025-53110), `pypi-mcp-server-git-2025-9-25` (CVE-2025-68145, CVE-2025-68143)
+
+## Before vs. after the static graph precision fix
+
+The pre-fix model treated every local state mutation as an
+`EXTERNAL_EGRESS` sink and emitted one path per
+(ingest, read, egress) triple. The current engine separates
+`LOCAL_WRITE`, only emits a path when a real egress sink exists, and
+collapses every read tool feeding the same `(ingest, egress)` pair.
+
+| Composition | Before: paths | Before: CRITICAL | After: paths | After: CRITICAL | Read tools collapsed into paths |
+| --- | --- | --- | --- | --- | --- |
+| `filesystem-plus-memory` | 0 | 0 | 0 | 0 | 0 |
+| `filesystem-plus-git` | 27 | 27 | 0 | 0 | 0 |
+| `filesystem-plus-fetch` | 0 | 0 | 0 | 0 | 0 |
+| `everything-plus-filesystem` | 314 | 302 | 32 | 32 | 314 |
+
+- `filesystem-plus-git`: **27 CRITICAL** paths become **0 CRITICAL** paths. `git_commit`, `git_merge`, `git_create_branch`, `git_checkout`, `git_reset` and `git_add` are local state mutations; there is no network sink in that configuration, so no exfiltration path exists.
+- `everything-plus-filesystem`: 314 raw combinations collapse to 32 unique `(ingest, egress)` pairs (9.8x fewer rows), each listing up to 9 read tools in `read_tools`.
+
+## Multi-server compositions from unmodified captures
+
+| Composition | Servers | Tools | Static paths | Expected | Outcome | Naive |
 | --- | --- | --- | --- | --- | --- | --- |
-| `@modelcontextprotocol/server-everything` | 2.3.0 | npm | `2026-07-28` | 22 | `2933e591ac78202e…` | `live_subprocess` |
-| `@modelcontextprotocol/server-filesystem` | 2.3.0 | npm | `2026-07-28` | 16 | `b53f2e27460f105d…` | `live_subprocess` |
-| `@modelcontextprotocol/server-memory` | 2.1.1 | npm | `2026-07-28` | 9 | `f6c207f6b59b72de…` | `live_subprocess` |
-| `mcp-server-fetch` | 2026.11.11 | pypi | `2026-07-28` | 1 | `4a6dfa4e396475e3…` | `live_subprocess` |
-| `mcp-server-git` | 2026.11.11 | pypi | `2026-07-28` | 14 | `bd88748c777e6a3a…` | `live_subprocess` |
+| `filesystem-plus-memory` | `npm-server-filesystem`, `npm-server-memory` | 25 | 0 | no | true_negative | flagged |
+| `filesystem-plus-git` | `npm-server-filesystem`, `pypi-mcp-server-git` | 30 | 0 | no | true_negative | flagged |
+| `filesystem-plus-fetch` | `npm-server-filesystem`, `pypi-mcp-server-fetch` | 17 | 0 | yes | missed | flagged |
+| `everything-plus-filesystem` | `npm-server-everything`, `npm-server-filesystem` | 38 | 32 | no | false_positive | flagged |
 
-Totals: 5 packages, 62 tools captured.
-
-## Latch vs. the naive baseline
-
-| Scanner | Flagged packages | Clean packages | False-positive rate |
-| --- | --- | --- | --- |
-| **Latch** | 1 | 4 | 0.20 |
-| Naive keyword/substring baseline | 4 | 1 | 0.80 |
-
-Latch findings on real packages: `npm-server-everything`.
-
-The baseline flags: `npm-server-everything`, `npm-server-filesystem`, `pypi-mcp-server-fetch`, `pypi-mcp-server-git` -- ordinary tool descriptions (`ignore`, `http://`, `token`, …) are enough to trip it.
+- `filesystem-plus-memory`: Local file read plus local knowledge-graph memory: every write is local state, so there is no outbound sink.
+  - no ingest -> read -> egress path
+- `filesystem-plus-git`: Two repository-oriented servers: file read plus git history and local commits. No outbound sink exists.
+  - no ingest -> read -> egress path
+- `filesystem-plus-fetch`: Target B: real untrusted web ingestion (mcp-server-fetch) beside real private workspace reads (server-filesystem).
+  - no ingest -> read -> egress path
+  - why it is missed: mcp-server-fetch is GET-only: it has no payload parameter, so the static graph does not model it as an egress sink. Data can still leave in a caller-chosen query string, which `latch probe-chain` verifies at runtime, but the static path enumeration has nothing to enumerate here.
+- `everything-plus-filesystem`: The SDK's everything server (the largest captured surface) mounted beside the filesystem server. Its diagnostics tools have no third-party sink, so any path is over-approximation.
+  - CRITICAL path trifecta-001: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
+  - CRITICAL path trifecta-002: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:gzip-file-as-resource`
+  - CRITICAL path trifecta-003: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:trigger-resource-update`
+  - CRITICAL path trifecta-004: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:trigger-sampling-request`
+  - CRITICAL path trifecta-005: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:trigger-sampling-request-async`
+  - CRITICAL path trifecta-006: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:trigger-url-elicitation`
+  - CRITICAL path trifecta-007: `npm-server-everything:gzip-file-as-resource` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
+  - CRITICAL path trifecta-008: `npm-server-everything:gzip-file-as-resource` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:trigger-resource-update`
+  - +24 more paths (see `package_results.json`)
 
 ## What the real-package findings are telling us
-
-Two results deserve to be read as limitations rather than
-detections, and they are counted against Latch in the numbers
-above:
 
 - **`@modelcontextprotocol/server-everything`** is the SDK's
   diagnostics server. `get-env` really does read environment
   variables, and `get-header-params`, `gzip-file-as-resource` and
   the `trigger-*` tools carry parameter names and open-world
-  annotations that Latch's generic egress heuristics match. There
-  is no third-party sink in that surface, so the static
-  ingest -> read -> egress paths are an over-approximation of a
-  capability graph, not a live exfiltration path.
-- **`filesystem-plus-git`** pairs file ingestion/reads with
-  `git_commit`, `git_create_branch` and `git_merge`. Those are
-  write verbs pointing at the local repository, not at an external
-  destination, so the cross-server paths are again theoretical.
-
-This is exactly what the static graph promises -- "could these
-capabilities line up?" -- and exactly why `latch probe-chain`
-exists: a dry run shows the synthesized calls, and a live probe
-with an operator sink settles whether data actually leaves. The
-blind evaluation is more useful for surfacing this than a
-hand-tuned corpus would be, so it stays in the report.
+  annotations that Latch's generic egress heuristics match. There is
+  no third-party sink in that surface, so the remaining static paths
+  are an over-approximation, and they are counted as false positives
+  above.
+- **The fetch + filesystem composition is a real blind miss.** A
+  GET-only fetcher can leak data in a query string, but it has no
+  payload parameter, so the static graph has no egress sink to
+  enumerate. This is recorded as a miss, not relabelled after the
+  fact; `latch probe-chain` is the execution-aware complement.
+- **Pre-patch handler CVEs are out of model.** Path traversal and git
+  argument injection happen inside the handlers, not in the published
+  schema, so `0` findings on those captures is the honest result and
+  it is what overall recall is measured against.
 
 ## Per-package detail
 
-### `@modelcontextprotocol/server-everything` 2.3.0 (22 tools)
+### `mcp-remote` 0.14.3 (0 tools, `proxy_metadata`)
 
-- Tools: `echo`, `get-annotated-message`, `get-env`, `get-header-params`, `get-resource-links`, `get-resource-reference`, `get-roots-list`, `get-structured-content`, `get-sum`, `get-tiny-image`, `gzip-file-as-resource`, `simulate-research-query`, `trigger-elicitation-request`, `trigger-elicitation-request-async`, `trigger-list-changed`, `trigger-log-messages`, `trigger-long-running-operation`, `trigger-multi-step-elicitation`, `trigger-resource-update`, `trigger-sampling-request`, `trigger-sampling-request-async`, `trigger-url-elicitation`
-- Launched as: `['npx', '--yes', '@modelcontextprotocol/server-everything']`
+- Exposed transport: `http://remote-mcp.example.com/sse` (no tools of its own)
+- CLI probe: exit 0, usage `Usage: mcp-remote <https://server-url> [callback-port] [--debug]`
+- Launched as: `npx --yes mcp-remote@0.14.3 http://remote-mcp.example.com/sse --allow-http`
+- In Latch's threat model: yes (`cleartext_http_oauth_transport`)
+- Latch `auth-audit` finding: `INSECURE_HTTP_AUTH_TRANSPORT` [CRITICAL] on `url`
+- Naive baseline matched: `http://`
+
+### `@modelcontextprotocol/server-everything` 2.3.0 (22 tools, `stdio_tools`)
+
+- Tools: `echo`, `get-annotated-message`, `get-env`, `get-header-params`, `get-resource-links`, `get-resource-reference`, `get-structured-content`, `get-sum`, `get-tiny-image`, `gzip-file-as-resource`, `trigger-list-changed`, `trigger-log-messages`, `trigger-long-running-operation`, `trigger-resource-update`, `get-roots-list`, `trigger-elicitation-request`, `trigger-multi-step-elicitation`, `trigger-url-elicitation`, `trigger-sampling-request`, `simulate-research-query`, `trigger-sampling-request-async`, `trigger-elicitation-request-async`
+- Launched as: `npx --yes @modelcontextprotocol/server-everything`
+- In Latch's threat model: no (`clean_reference_server`)
 - Latch `audit` finding: `ANNOTATION_CONTRADICTION` [MEDIUM] on `get-header-params`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [CRITICAL] on `npm-server-everything:get-annotated-message`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [CRITICAL] on `npm-server-everything:get-annotated-message`
@@ -97,82 +170,84 @@ hand-tuned corpus would be, so it stays in the report.
 - +7 more findings (see `package_results.json`)
 - Naive baseline matched: `secret`, `token`, `pass`, `ignore`, `instead`, `before`, `x-mcp-header`
 
-### `@modelcontextprotocol/server-filesystem` 2.3.0 (16 tools)
+### `@modelcontextprotocol/server-filesystem` 0.6.2 (9 tools, `stdio_tools`)
 
-- Tools: `append_file`, `copy_file`, `create_directory`, `directory_tree`, `edit_file`, `get_file_info`, `list_allowed_directories`, `list_directory`, `list_directory_with_sizes`, `move_file`, `read_file`, `read_media_file`, `read_multiple_files`, `read_text_file`, `search_files`, `write_file`
-- Launched as: `['npx', '--yes', '@modelcontextprotocol/server-filesystem', '{sandbox}']`
+- Tools: `read_file`, `read_multiple_files`, `write_file`, `create_directory`, `list_directory`, `move_file`, `search_files`, `get_file_info`, `list_allowed_directories`
+- Launched as: `npx --yes @modelcontextprotocol/server-filesystem@0.6.2 {sandbox}`
+- In Latch's threat model: no (`handler_implementation_cve`)
+- Latch: no findings
+- Naive baseline matched: `before`, `http://`
+
+### `@modelcontextprotocol/server-filesystem` 2.3.0 (16 tools, `stdio_tools`)
+
+- Tools: `read_file`, `read_text_file`, `read_media_file`, `read_multiple_files`, `write_file`, `append_file`, `edit_file`, `create_directory`, `list_directory`, `list_directory_with_sizes`, `directory_tree`, `move_file`, `copy_file`, `search_files`, `get_file_info`, `list_allowed_directories`
+- Launched as: `npx --yes @modelcontextprotocol/server-filesystem {sandbox}`
+- In Latch's threat model: no (`clean_reference_server`)
 - Latch: no findings
 - Naive baseline matched: `ignore`, `instead`, `before`
 
-### `@modelcontextprotocol/server-memory` 2.1.1 (9 tools)
+### `@modelcontextprotocol/server-memory` 2.1.1 (9 tools, `stdio_tools`)
 
-- Tools: `add_observations`, `create_entities`, `create_relations`, `delete_entities`, `delete_observations`, `delete_relations`, `open_nodes`, `read_graph`, `search_nodes`
-- Launched as: `['npx', '--yes', '@modelcontextprotocol/server-memory']`
+- Tools: `create_entities`, `create_relations`, `add_observations`, `delete_entities`, `delete_observations`, `delete_relations`, `read_graph`, `search_nodes`, `open_nodes`
+- Launched as: `npx --yes @modelcontextprotocol/server-memory`
+- In Latch's threat model: no (`clean_reference_server`)
 - Latch: no findings
 - Naive baseline: no keyword matches
 
-### `mcp-server-fetch` 2026.11.11 (1 tools)
+### `mcp-proxy` 0.8.2 (0 tools, `proxy_metadata`)
+
+- Exposed transport: `http://0.0.0.0:18008/sse` (no tools of its own)
+- CLI probe: exit 0
+- Cleartext probe: HTTP 200 `text/event-stream`, auth challenge: none
+- Launched as: `uvx --from mcp-proxy==0.8.2 mcp-proxy --port 18008 --host 0.0.0.0 npx @modelcontextprotocol/server-filesystem@2.3.0 {sandbox}`
+- In Latch's threat model: yes (`unauthenticated_cleartext_sse_bridge`)
+- Latch `auth-audit` finding: `INSECURE_HTTP_AUTH_TRANSPORT` [CRITICAL] on `url`
+- Naive baseline matched: `http://`
+
+### `mcp-server-fetch` 2026.11.11 (1 tools, `stdio_tools`)
 
 - Tools: `fetch`
-- Launched as: `['uvx', 'mcp-server-fetch']`
+- Launched as: `uvx mcp-server-fetch`
+- In Latch's threat model: no (`cross_server_composition_member`)
 - Latch: no findings
 - Naive baseline matched: `before`
 
-### `mcp-server-git` 2026.11.11 (14 tools)
+### `mcp-server-git` 2025.9.25 (12 tools, `stdio_tools`)
 
-- Tools: `git_add`, `git_branch`, `git_checkout`, `git_commit`, `git_create_branch`, `git_diff`, `git_diff_staged`, `git_diff_unstaged`, `git_log`, `git_merge`, `git_remote`, `git_reset`, `git_show`, `git_status`
-- Launched as: `['uvx', 'mcp-server-git', '--repository', '{sandbox}']`
+- Tools: `git_status`, `git_diff_unstaged`, `git_diff_staged`, `git_diff`, `git_commit`, `git_add`, `git_reset`, `git_log`, `git_create_branch`, `git_checkout`, `git_show`, `git_branch`
+- Launched as: `uvx --with pydantic==2.10.6 --with mcp==1.9.4 --from mcp-server-git==2025.9.25 mcp-server-git --repository {sandbox}`
+- In Latch's threat model: no (`handler_implementation_cve`)
 - Latch: no findings
 - Naive baseline matched: `pass`
 
-## Multi-server compositions from unmodified captures
+### `mcp-server-git` 2026.11.11 (14 tools, `stdio_tools`)
 
-| Composition | Servers | Tools | Static trifecta paths | Audit findings | Naive |
-| --- | --- | --- | --- | --- | --- |
-| `filesystem-plus-memory` | `npm-server-filesystem`, `npm-server-memory` | 25 | 0 | 0 | flagged |
-| `filesystem-plus-git` | `npm-server-filesystem`, `pypi-mcp-server-git` | 30 | 27 | 0 | flagged |
-| `filesystem-plus-fetch` | `npm-server-filesystem`, `pypi-mcp-server-fetch` | 17 | 0 | 0 | flagged |
-| `everything-plus-filesystem` | `npm-server-everything`, `npm-server-filesystem` | 38 | 314 | 1 | flagged |
-
-- `filesystem-plus-memory`: Local file read plus local knowledge-graph memory: both are first-party reference servers with no network egress.
-  - no ingest -> read -> egress path
-- `filesystem-plus-git`: Two repository-oriented servers: file access plus git history inspection, still with no outbound sink.
-  - CRITICAL path trifecta-001: `npm-server-filesystem:search_files` -> `npm-server-filesystem:directory_tree` -> `pypi-mcp-server-git:git_commit`
-  - CRITICAL path trifecta-002: `npm-server-filesystem:search_files` -> `npm-server-filesystem:directory_tree` -> `pypi-mcp-server-git:git_create_branch`
-  - CRITICAL path trifecta-003: `npm-server-filesystem:search_files` -> `npm-server-filesystem:directory_tree` -> `pypi-mcp-server-git:git_merge`
-  - CRITICAL path trifecta-004: `npm-server-filesystem:search_files` -> `npm-server-filesystem:get_file_info` -> `pypi-mcp-server-git:git_commit`
-  - CRITICAL path trifecta-005: `npm-server-filesystem:search_files` -> `npm-server-filesystem:get_file_info` -> `pypi-mcp-server-git:git_create_branch`
-  - CRITICAL path trifecta-006: `npm-server-filesystem:search_files` -> `npm-server-filesystem:get_file_info` -> `pypi-mcp-server-git:git_merge`
-  - CRITICAL path trifecta-007: `npm-server-filesystem:search_files` -> `npm-server-filesystem:list_directory` -> `pypi-mcp-server-git:git_commit`
-  - CRITICAL path trifecta-008: `npm-server-filesystem:search_files` -> `npm-server-filesystem:list_directory` -> `pypi-mcp-server-git:git_create_branch`
-  - +19 more paths (see `package_results.json`)
-- `filesystem-plus-fetch`: File read plus a web fetcher: the closest official pairing to an ingest/egress chain, so the static graph deserves a look.
-  - no ingest -> read -> egress path
-- `everything-plus-filesystem`: The SDK's everything server (the largest captured surface) mounted beside the filesystem server.
-  - CRITICAL path trifecta-001: `npm-server-everything:get-annotated-message` -> `npm-server-filesystem:directory_tree` -> `npm-server-everything:get-header-params`
-  - CRITICAL path trifecta-002: `npm-server-everything:get-annotated-message` -> `npm-server-filesystem:directory_tree` -> `npm-server-everything:gzip-file-as-resource`
-  - CRITICAL path trifecta-003: `npm-server-everything:get-annotated-message` -> `npm-server-filesystem:directory_tree` -> `npm-server-everything:trigger-resource-update`
-  - CRITICAL path trifecta-004: `npm-server-everything:get-annotated-message` -> `npm-server-filesystem:directory_tree` -> `npm-server-everything:trigger-sampling-request`
-  - CRITICAL path trifecta-005: `npm-server-everything:get-annotated-message` -> `npm-server-filesystem:directory_tree` -> `npm-server-everything:trigger-sampling-request-async`
-  - CRITICAL path trifecta-006: `npm-server-everything:get-annotated-message` -> `npm-server-filesystem:directory_tree` -> `npm-server-everything:trigger-url-elicitation`
-  - CRITICAL path trifecta-007: `npm-server-everything:get-annotated-message` -> `npm-server-filesystem:get_file_info` -> `npm-server-everything:get-header-params`
-  - CRITICAL path trifecta-008: `npm-server-everything:get-annotated-message` -> `npm-server-filesystem:get_file_info` -> `npm-server-everything:gzip-file-as-resource`
-  - +306 more paths (see `package_results.json`)
+- Tools: `git_status`, `git_diff_unstaged`, `git_diff_staged`, `git_diff`, `git_commit`, `git_add`, `git_reset`, `git_log`, `git_create_branch`, `git_checkout`, `git_merge`, `git_show`, `git_branch`, `git_remote`
+- Launched as: `uvx mcp-server-git --repository {sandbox}`
+- In Latch's threat model: no (`clean_reference_server`)
+- Latch: no findings
+- Naive baseline matched: `pass`
 
 ## What this proves, and what it does not
 
 - **Real surfaces, real provenance.** Every row above comes from an
   actual package launch with a registry-resolved version and a digest
-  of the captured tool list; the JSON under `captured_manifests/` is the
-  raw record, not a hand-written model.
+  of the captured tool list; the JSON under `captured_manifests/` is
+  the raw record, not a hand-written model.
+- **Real vulnerabilities are included.** The corpus now contains
+  genuine pre-patch releases plus real transport exposures, not only
+  clean first-party servers, so recall is measured rather than
+  assumed.
 - **Blind evaluation.** No rule or vocabulary was adjusted for these
-  packages; they are scored exactly as any other configuration would be.
-- **Only metadata is exercised.** Captures contain `tools/list` bytes.
-  Handler behaviour, RBAC and network policy are not observed here;
-  `latch probe-chain` is the execution-aware complement.
-- **Small sample.** Five reference servers is not the MCP ecosystem.
-  The result is evidence about first-party surfaces, not a claim about
-  registry-wide precision.
+  packages; they are scored exactly as any other configuration would
+  be.
+- **Only metadata is exercised.** Captures contain `tools/list` bytes
+  and real transport configuration. Handler behaviour, RBAC and
+  network policy are not observed here; `latch probe-chain` is the
+  execution-aware complement.
+- **Small sample.** Nine packages and four compositions are not the
+  MCP ecosystem. The result is evidence about these targets, not a
+  claim about registry-wide precision.
 - **Compositions are still static.** A clean composition means the
   published schemas do not line up into a chain, not that the servers
   can never exfiltrate.

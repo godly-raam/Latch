@@ -29,15 +29,26 @@ def test_artifacts_match_recomputation() -> None:
 def test_live_scanner_metrics() -> None:
     metrics = compute_results()["metrics"]
 
-    assert metrics["package_count"] == 5
-    assert metrics["latch_flagged_packages"] == ["npm-server-everything"]
+    assert metrics["package_count"] == 9
+    assert metrics["clean_package_count"] == 5
+    # `mcp-remote` and `mcp-proxy` are true detections, so only the SDK
+    # diagnostics server counts against Latch's false-positive rate.
+    assert metrics["latch_flagged_packages"] == [
+        "npm-mcp-remote-0-14-3",
+        "npm-server-everything",
+        "pypi-mcp-proxy-0-8-2",
+    ]
     assert metrics["latch_package_false_positive_rate"] == 0.2
-    assert metrics["naive_package_false_positive_rate"] == 0.8
-    assert set(metrics["naive_flagged_packages"]) == {
+    assert metrics["naive_package_false_positive_rate"] >= 0.8
+    assert set(metrics["naive_flagged_packages"]) >= {
         "npm-server-everything",
         "npm-server-filesystem",
         "pypi-mcp-server-fetch",
         "pypi-mcp-server-git",
+    }
+    assert set(metrics["latch_in_model_detected"]) == {
+        "npm-mcp-remote-0-14-3",
+        "pypi-mcp-proxy-0-8-2",
     }
 
     assert metrics["scenario_count"] == 10

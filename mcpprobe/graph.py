@@ -6,8 +6,13 @@ A "lethal trifecta" needs three capabilities to line up:
 2. ``PRIVATE_DATA_READ`` -- sensitive local/tenant data is readable,
 3. ``EXTERNAL_EGRESS`` -- data can leave to an attacker-chosen destination.
 
-Any chain ``ingest -> read -> egress`` is an exfiltration path. Latch finds
-them across servers, ranks them, and explains the attack.
+A tool that mutates *local* state (``git_commit``, ``write_file``,
+``create_entities`` -- a write verb with no network, recipient or
+remote-publishing target) is ``LOCAL_WRITE``, not ``EXTERNAL_EGRESS``: a commit
+lands in the local repository, so it cannot exfiltrate anything. Only a chain
+``ingest -> read -> egress`` is an exfiltration path, and paths are collapsed per
+``(ingest, egress)`` pair so a server with 15 read tools yields one path, not
+fifteen. Latch finds them across servers, ranks them, and explains the attack.
 
 Everything here is rule-based and deterministic: identifiers are *tokenized*
 (``readFile`` -> ``read``, ``file``), never substring-matched, so a tool called
@@ -25,11 +30,14 @@ from pydantic import BaseModel, Field
 from .auditor import iter_header_bindings
 from .models import ToolDefinition
 
-CapabilityTag = Literal["UNTRUSTED_INPUT", "PRIVATE_DATA_READ", "EXTERNAL_EGRESS"]
+CapabilityTag = Literal[
+    "UNTRUSTED_INPUT", "PRIVATE_DATA_READ", "LOCAL_WRITE", "EXTERNAL_EGRESS"
+]
 
 CAPABILITY_ORDER: tuple[CapabilityTag, ...] = (
     "UNTRUSTED_INPUT",
     "PRIVATE_DATA_READ",
+    "LOCAL_WRITE",
     "EXTERNAL_EGRESS",
 )
 
@@ -207,6 +215,134 @@ OUTBOUND_VERBS = frozenset(
     }
 )
 
+#: Verbs that mutate state which stays on this machine or in this account.
+LOCAL_MUTATION_VERBS = frozenset(
+    {
+        "write",
+        "edit",
+        "move",
+        "rename",
+        "mkdir",
+        "commit",
+        "merge",
+        "reset",
+        "checkout",
+        "init",
+        "insert",
+        "upsert",
+        "append",
+        "save",
+        "store",
+        "persist",
+        "truncate",
+    }
+)
+
+#: Mutating verbs that are also everyday math/API words (``add``, ``set``).
+#: They only count as a local write together with a local object noun.
+GENERIC_MUTATION_VERBS = frozenset(
+    {"add", "set", "apply", "modify", "update", "create", "delete", "remove"}
+)
+
+#: Nouns naming state that lives on this machine or in this repository.
+LOCAL_OBJECT_TOKENS = frozenset(
+    {
+        "file",
+        "files",
+        "repo",
+        "repository",
+        "git",
+        "vcs",
+        "branch",
+        "directory",
+        "dir",
+        "path",
+        "entity",
+        "entities",
+        "relation",
+        "relations",
+        "observation",
+        "observations",
+        "record",
+        "records",
+        "row",
+        "rows",
+        "table",
+        "memory",
+        "note",
+        "notes",
+        "workspace",
+        "node",
+        "nodes",
+        "graph",
+        "kb",
+        "db",
+        "database",
+        "config",
+        "document",
+        "doc",
+        "docs",
+        "tag",
+        "tags",
+    }
+)
+
+#: Verbs that publish outward. Used only to veto a local-write classification
+#: (``publish_post`` publishes; it does not merely write local state); making a
+#: remote sink is still decided by the destination/sink rules below.
+REMOTE_PUBLISH_VERBS = frozenset(
+    {
+        "send",
+        "post",
+        "put",
+        "patch",
+        "upload",
+        "publish",
+        "push",
+        "reply",
+        "forward",
+        "share",
+        "invite",
+        "notify",
+        "webhook",
+        "transfer",
+        "pay",
+        "dispatch",
+        "relay",
+        "emit",
+    }
+)
+
+#: Tool-name tokens that name a genuinely remote destination.
+REMOTE_TARGET_TOKENS = frozenset(
+    {
+        "url",
+        "uri",
+        "endpoint",
+        "webhook",
+        "http",
+        "https",
+        "remote",
+        "gist",
+        "bucket",
+        "s3",
+        "external",
+        "dest",
+        "destination",
+        "sink",
+        "recipient",
+        "issue",
+        "pr",
+        "comment",
+        "email",
+        "mail",
+        "slack",
+        "discord",
+        "channel",
+        "message",
+    }
+)
+
 EXTERNAL_TARGETS = frozenset(
     {
         "url",
@@ -226,6 +362,7 @@ EXTERNAL_TARGETS = frozenset(
         "issue",
         "comment",
         "pr",
+        "pull",
         "gist",
         "repo",
         "bucket",
@@ -315,7 +452,12 @@ class FlowEdge(BaseModel):
 
 
 class TrifectaPath(BaseModel):
-    """A complete ingest -> read -> egress exfiltration chain."""
+    """A complete ingest -> read -> egress exfiltration chain.
+
+    Paths are collapsed per ``(ingest_tool, egress_tool)`` pair: every
+    ``PRIVATE_DATA_READ`` tool that feeds the same pair is listed in
+    ``read_tools`` instead of producing another near-identical path.
+    """
 
     path_id: str
     severity: Literal["CRITICAL", "HIGH", "MEDIUM"]
@@ -323,6 +465,8 @@ class TrifectaPath(BaseModel):
     servers: list[str]
     ingest_tool: str
     read_tool: str
+    read_tools: list[str] = Field(default_factory=list)
+    collapsed_read_count: int = 1
     egress_tool: str
     attack_narrative: str
 
@@ -336,6 +480,8 @@ class GraphReport(BaseModel):
     nodes: list[ToolNode] = Field(default_factory=list)
     edges: list[FlowEdge] = Field(default_factory=list)
     trifecta_paths: list[TrifectaPath] = Field(default_factory=list)
+    #: Local mutations, reported for visibility and never as an exfil sink.
+    local_write_tools: list[str] = Field(default_factory=list)
     passed: bool
 
 
@@ -488,10 +634,49 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
             f" parameter {sorted(params & RESOURCE_IDENTIFIER_PARAMS)}",
         )
 
+    # -- LOCAL_WRITE --------------------------------------------------------
+    # A mutation that cannot leave the machine is not an exfiltration sink.
+    # Decided from the tool *name* (a parameter called ``message`` must not turn
+    # ``git_commit`` into an outbound sender) and vetoed by any real outbound
+    # signal: a destination/recipient parameter, a header binding, or an
+    # open-world non-read-only annotation.
+    name_tokens = set(tokenize_identifier(tool.name))
+    strong_local_verbs = sorted(name_tokens & LOCAL_MUTATION_VERBS)
+    generic_local_verbs = sorted(name_tokens & GENERIC_MUTATION_VERBS)
+    local_objects = sorted(name_tokens & LOCAL_OBJECT_TOKENS)
+    local_verbs = sorted(set(strong_local_verbs) | set(generic_local_verbs))
+    # ``add``/``create`` alone is too generic (a math ``add`` tool); it only
+    # counts as a local write beside a local object noun (``create_entities``).
+    mutates_local_state = bool(strong_local_verbs) or bool(
+        generic_local_verbs and local_objects
+    )
+    name_publishes = sorted(name_tokens & REMOTE_PUBLISH_VERBS)
+    name_remote_targets = sorted(name_tokens & REMOTE_TARGET_TOKENS)
+    destination_params = sorted(
+        params & (ARBITRARY_DESTINATION_PARAMS | OUTBOUND_SINK_PARAMS)
+    )
+    local_write = mutates_local_state and not (
+        name_publishes
+        or name_remote_targets
+        or destination_params
+        or has_header_binding(tool)
+        or open_world
+    )
+    if local_write:
+        _add(
+            capabilities,
+            evidence,
+            "LOCAL_WRITE",
+            "identifier.local_mutation",
+            0.8,
+            f"local mutation verb(s) {local_verbs} with no outbound network,"
+            " recipient or remote-publishing target: state stays on this machine",
+        )
+
     # -- EXTERNAL_EGRESS ---------------------------------------------------
     outbound_verbs = sorted(tokens & OUTBOUND_VERBS)
     external_targets = sorted(tokens & EXTERNAL_TARGETS)
-    if outbound_verbs and external_targets:
+    if outbound_verbs and external_targets and not local_write:
         _add(
             capabilities,
             evidence,
@@ -556,9 +741,15 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
 
 
 def _build_path(
-    ingest: ToolNode, read: ToolNode, egress: ToolNode, egress_tool: ToolDefinition
+    ingest: ToolNode,
+    reads: list[ToolNode],
+    egress: ToolNode,
+    egress_tool: ToolDefinition,
 ) -> TrifectaPath:
-    servers = sorted({ingest.server_id, read.server_id, egress.server_id})
+    read_tools = sorted(read.qualified_name for read in reads)
+    servers = sorted(
+        {ingest.server_id, egress.server_id, *(read.server_id for read in reads)}
+    )
     cross_server = len(servers) >= 2
     arbitrary_sink = has_arbitrary_destination(egress_tool)
     severity: Literal["CRITICAL", "HIGH", "MEDIUM"]
@@ -567,9 +758,18 @@ def _build_path(
     else:
         severity = "HIGH"
 
+    first_read = read_tools[0]
+    if len(read_tools) == 1:
+        read_phrase = f" {first_read} can read private data"
+    else:
+        read_phrase = (
+            f" {len(read_tools)} private-data tools ({', '.join(read_tools)})"
+            " can read it"
+        )
+
     narrative = (
-        f"{ingest.qualified_name} pulls untrusted third-party content into the model context;"
-        f" {read.qualified_name} can read private data;"
+        f"{ingest.qualified_name} pulls untrusted third-party content into the"
+        f" model context;{read_phrase};"
         f" {egress.qualified_name} sends it to an attacker-reachable destination"
     )
     if cross_server:
@@ -583,7 +783,9 @@ def _build_path(
         cross_server=cross_server,
         servers=servers,
         ingest_tool=ingest.qualified_name,
-        read_tool=read.qualified_name,
+        read_tool=first_read,
+        read_tools=read_tools,
+        collapsed_read_count=len(read_tools),
         egress_tool=egress.qualified_name,
         attack_narrative=narrative + ".",
     )
@@ -651,7 +853,7 @@ def analyze_capability_graph(
     ingest_edges = [edge for edge in edges if edge.stage == "INGEST_TO_READ"]
     read_edges = [edge for edge in edges if edge.stage == "READ_TO_EGRESS"]
 
-    candidates: dict[tuple[str, str, str], TrifectaPath] = {}
+    candidates: dict[tuple[str, str], dict[str, ToolNode]] = {}
     for first in ingest_edges:
         for second in read_edges:
             if second.source != first.target:
@@ -661,25 +863,28 @@ def analyze_capability_graph(
             # one node holding two roles, not an exfiltration chain.
             if first.source == second.target:
                 continue
-            key = (first.source, first.target, second.target)
-            if key in candidates:
-                continue
-            candidates[key] = _build_path(
-                by_name[first.source],
-                by_name[first.target],
-                by_name[second.target],
-                tool_index[second.target],
-            )
+            # Collapse every read tool feeding the same (ingest, egress) pair.
+            candidates.setdefault((first.source, second.target), {})[
+                first.target
+            ] = by_name[first.target]
 
-    trifecta_paths = sorted(
-        candidates.values(),
+    trifecta_paths = [
+        _build_path(
+            by_name[ingest_name],
+            list(reads.values()),
+            by_name[egress_name],
+            tool_index[egress_name],
+        )
+        for (ingest_name, egress_name), reads in candidates.items()
+    ]
+    trifecta_paths.sort(
         key=lambda path: (
             SEVERITY_ORDER[path.severity],
             0 if path.cross_server else 1,
             path.ingest_tool,
             path.read_tool,
             path.egress_tool,
-        ),
+        )
     )
     for index, path in enumerate(trifecta_paths, start=1):
         path.path_id = f"trifecta-{index:03d}"
@@ -691,6 +896,11 @@ def analyze_capability_graph(
         nodes=nodes,
         edges=edges,
         trifecta_paths=trifecta_paths,
+        local_write_tools=sorted(
+            node.qualified_name
+            for node in nodes
+            if "LOCAL_WRITE" in node.capabilities
+        ),
         passed=not trifecta_paths,
     )
 
@@ -698,6 +908,7 @@ def analyze_capability_graph(
 _CLASS_FOR_TAG = {
     "UNTRUSTED_INPUT": "untrusted",
     "PRIVATE_DATA_READ": "private",
+    "LOCAL_WRITE": "local",
     "EXTERNAL_EGRESS": "egress",
 }
 
@@ -716,6 +927,7 @@ def render_mermaid(report: GraphReport) -> str:
     lines = ["flowchart LR"]
     lines.append("  classDef untrusted fill:#fff8e1,stroke:#b8860b,stroke-width:2px")
     lines.append("  classDef private fill:#fde2e4,stroke:#b02a37,stroke-width:2px")
+    lines.append("  classDef local fill:#eef2ff,stroke:#4338ca,stroke-width:1px")
     lines.append("  classDef egress fill:#dcfce7,stroke:#15803d,stroke-width:2px")
 
     ids = {node.qualified_name: f"n{index}" for index, node in enumerate(report.nodes)}
@@ -733,7 +945,9 @@ def render_mermaid(report: GraphReport) -> str:
         lines.append("  end")
 
     exfil_edges = {
-        (path.read_tool, path.egress_tool) for path in report.trifecta_paths
+        (read_tool, path.egress_tool)
+        for path in report.trifecta_paths
+        for read_tool in (path.read_tools or [path.read_tool])
     }
     for edge in report.edges:
         source = ids[edge.source]

@@ -1,6 +1,10 @@
 {
   "capture_source": "live_subprocess",
+  "cve_refs": [],
   "ecosystem": "npm",
+  "expected_positive": false,
+  "in_latch_threat_model": false,
+  "kind": "stdio_tools",
   "launch_command": [
     "npx",
     "--yes",
@@ -8,6 +12,7 @@
     "{sandbox}"
   ],
   "manifest_sha256": "b53f2e27460f105deed2051bb02b57df6929fc0c8f4ff55a7f15e54d9aff411d",
+  "note": "First-party reference server with no captured advisory.",
   "package_name": "@modelcontextprotocol/server-filesystem",
   "package_version": "2.3.0",
   "protocol_version": "2026-07-28",
@@ -771,5 +776,6 @@
       },
       "title": "List Allowed Directories"
     }
-  ]
+  ],
+  "vulnerability_class": "clean_reference_server"
 }

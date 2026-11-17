@@ -519,6 +519,10 @@ def compute_results() -> dict[str, Any]:
                 "package_name": row["package_name"],
                 "package_version": row["package_version"],
                 "tool_count": row["tool_count"],
+                "kind": row["kind"],
+                "expected_positive": row["expected_positive"],
+                "in_latch_threat_model": row["in_latch_threat_model"],
+                "outcome": row["outcome"],
                 "latch_flagged": row["latch_flagged"],
                 "latch_rule_count": len(row["findings"]),
                 "latch_rules": sorted({finding["rule_id"] for finding in row["findings"]}),
@@ -546,8 +550,15 @@ def compute_results() -> dict[str, Any]:
             }
         )
 
-    latch_package_flags = sum(1 for row in packages if row["latch_flagged"])
-    naive_package_flags = sum(1 for row in packages if row["naive_flagged"])
+    # False positives are only meaningful on packages that are not themselves
+    # valid targets: flagging `mcp-remote` is a detection, not a false alarm.
+    clean_packages = [row for row in packages if not row["expected_positive"]]
+    latch_package_flags = sum(
+        1 for row in clean_packages if row["latch_flagged"]
+    )
+    naive_package_flags = sum(
+        1 for row in clean_packages if row["naive_flagged"]
+    )
     latch_scenarios = sum(1 for row in scenarios if row["latch_detected"])
     naive_scenarios = sum(1 for row in scenarios if row["naive_detected"])
 
@@ -562,19 +573,34 @@ def compute_results() -> dict[str, Any]:
             "latch_flagged_packages": sorted(
                 row["slug"] for row in packages if row["latch_flagged"]
             ),
+            "clean_package_count": len(clean_packages),
             "latch_package_false_positive_rate": round(
-                latch_package_flags / len(packages), 4
+                latch_package_flags / len(clean_packages), 4
             )
-            if packages
+            if clean_packages
             else 0.0,
             "naive_flagged_packages": sorted(
                 row["slug"] for row in packages if row["naive_flagged"]
             ),
             "naive_package_false_positive_rate": round(
-                naive_package_flags / len(packages), 4
+                naive_package_flags / len(clean_packages), 4
             )
-            if packages
+            if clean_packages
             else 0.0,
+            "latch_false_positive_packages": sorted(
+                row["slug"] for row in clean_packages if row["latch_flagged"]
+            ),
+            "naive_false_positive_packages": sorted(
+                row["slug"] for row in clean_packages if row["naive_flagged"]
+            ),
+            "in_model_targets": sorted(
+                row["slug"] for row in packages if row["expected_positive"]
+            ),
+            "latch_in_model_detected": sorted(
+                row["slug"]
+                for row in packages
+                if row["expected_positive"] and row["in_latch_threat_model"] and row["latch_flagged"]
+            ),
             "scenario_count": len(scenarios),
             "latch_scenarios_detected": latch_scenarios,
             "naive_scenarios_detected": naive_scenarios,
@@ -624,7 +650,7 @@ def render_report(results: dict[str, Any]) -> str:
             "",
             "## Real captured packages",
             "",
-            "All five upstream `tools/list` captures from",
+            f"All {len(results['packages'])} upstream captures from",
             "[`package_eval/captured_manifests/`](../package_eval/captured_manifests/),",
             "unmodified.",
             "",
@@ -645,13 +671,23 @@ def render_report(results: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            f"Latch flags {len(metrics['latch_flagged_packages'])} of"
-            f" {metrics['package_count']} packages (FPR"
-            f" {metrics['latch_package_false_positive_rate']:.2f}); the naive baseline"
-            f" flags {len(metrics['naive_flagged_packages'])} (FPR"
-            f" {metrics['naive_package_false_positive_rate']:.2f}). The single"
-            " Latch flag is the SDK diagnostics server, whose generic read/egress",
-            "heuristics produce a documented static over-approximation.",
+            f"On the {metrics['clean_package_count']} clean packages, Latch flags"
+            f" {len(metrics['latch_false_positive_packages'])}"
+            " (FPR"
+            f" {metrics['latch_package_false_positive_rate']:.2f}); the naive"
+            f" baseline flags {len(metrics['naive_false_positive_packages'])} (FPR"
+            f" {metrics['naive_package_false_positive_rate']:.2f}). The Latch flag"
+            " is the SDK diagnostics server, whose generic read/egress"
+            " heuristics produce a documented static over-approximation.",
+            "",
+            "In-model real targets detected: "
+            + (
+                ", ".join(f"`{slug}`" for slug in metrics["latch_in_model_detected"])
+                or "none"
+            )
+            + ". Handler-level CVEs in the corpus are outside a `tools/list`"
+            " threat model and are scored as misses in"
+            " [`package_eval/PACKAGE_EVAL_REPORT.md`](../package_eval/PACKAGE_EVAL_REPORT.md).",
             "",
             "## Ten canonical protocol and agentic-risk scenarios",
             "",
@@ -751,9 +787,15 @@ def print_summary(results: dict[str, Any]) -> None:
     metrics = results["metrics"]
     print("Head-to-head comparison")
     print(
-        f"  Packages: Latch flagged {len(metrics['latch_flagged_packages'])}"
-        f"/{metrics['package_count']}, naive flagged"
-        f" {len(metrics['naive_flagged_packages'])}/{metrics['package_count']}"
+        f"  Packages: {metrics['package_count']} captured,"
+        f" {metrics['clean_package_count']} clean; Latch flagged"
+        f" {len(metrics['latch_false_positive_packages'])} clean (FPR"
+        f" {metrics['latch_package_false_positive_rate']:.2f}), naive flagged"
+        f" {len(metrics['naive_false_positive_packages'])}"
+    )
+    print(
+        "  In-model real targets detected:"
+        f" {', '.join(metrics['latch_in_model_detected']) or 'none'}"
     )
     print(
         f"  Scenarios: Latch {metrics['latch_scenarios_detected']}"

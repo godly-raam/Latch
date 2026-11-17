@@ -1,12 +1,17 @@
 {
   "capture_source": "live_subprocess",
+  "cve_refs": [],
   "ecosystem": "npm",
+  "expected_positive": false,
+  "in_latch_threat_model": false,
+  "kind": "stdio_tools",
   "launch_command": [
     "npx",
     "--yes",
     "@modelcontextprotocol/server-memory"
   ],
   "manifest_sha256": "f6c207f6b59b72de6c69103446c3735108b9d877e21fa0b34cbaf5004ce08bac",
+  "note": "First-party reference server with no captured advisory.",
   "package_name": "@modelcontextprotocol/server-memory",
   "package_version": "2.1.1",
   "protocol_version": "2026-07-28",
@@ -751,5 +756,6 @@
       },
       "title": "Open Nodes"
     }
-  ]
+  ],
+  "vulnerability_class": "clean_reference_server"
 }

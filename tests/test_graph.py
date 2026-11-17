@@ -178,6 +178,112 @@ def test_substring_lookalike_tools_have_no_capabilities() -> None:
     assert classify_tool("x", tool("asset_manager", {"asset_id": {"type": "string"}})).capabilities == []
     assert classify_tool("x", tool("passhash", {"value": {"type": "string"}})).capabilities == []
     assert classify_tool("x", tool("add", {"a": {"type": "number"}})).capabilities == []
+    assert classify_tool("x", tool("multiply", {"a": {"type": "number"}})).capabilities == []
+
+
+def test_local_state_mutations_are_local_write_not_egress() -> None:
+    local_tools = [
+        tool("git_commit", {"repo_path": {"type": "string"}, "message": {"type": "string"}}),
+        tool(
+            "git_merge",
+            {
+                "repo_path": {"type": "string"},
+                "source_branch": {"type": "string"},
+                "fast_forward_only": {"type": "boolean"},
+            },
+        ),
+        tool("git_create_branch", {"repo_path": {"type": "string"}, "branch_name": {"type": "string"}}),
+        tool("git_checkout", {"repo_path": {"type": "string"}, "branch": {"type": "string"}}),
+        tool("git_reset", {"repo_path": {"type": "string"}}),
+        tool("git_add", {"repo_path": {"type": "string"}, "files": {"type": "array"}}),
+        tool("write_file", {"path": {"type": "string"}, "content": {"type": "string"}}),
+        tool("edit_file", {"path": {"type": "string"}, "edits": {"type": "array"}}),
+        tool("delete_file", {"path": {"type": "string"}}),
+        tool("move_file", {"source": {"type": "string"}, "destination": {"type": "string"}}),
+        tool("create_directory", {"path": {"type": "string"}}),
+        tool("create_entities", {"entities": {"type": "array"}}),
+        tool("create_relations", {"relations": {"type": "array"}}),
+        tool("add_observations", {"observations": {"type": "array"}}),
+        tool("delete_entities", {"entityNames": {"type": "array"}}),
+        tool("update_record", {"record": {"type": "string"}}),
+        tool("insert_row", {"row": {"type": "string"}}),
+    ]
+
+    for definition in local_tools:
+        node = classify_tool("local", definition)
+        assert node.capabilities == ["LOCAL_WRITE"], definition.name
+        assert any(
+            entry.signal == "identifier.local_mutation" for entry in node.evidence
+        )
+
+
+def test_remote_sinks_stay_external_egress() -> None:
+    remote_tools = [
+        tool("git_push", {"repo_path": {"type": "string"}, "remote": {"type": "string"}}),
+        tool("send_email", {"to": {"type": "string"}, "body": {"type": "string"}}),
+        tool("create_issue", {"title": {"type": "string"}, "body": {"type": "string"}}),
+        tool("create_pull_request", {"head": {"type": "string"}}),
+        tool("upload_file", {"url": {"type": "string"}, "path": {"type": "string"}}),
+        tool("post_webhook", {"webhook_url": {"type": "string"}, "payload": {"type": "string"}}),
+        tool("create_issue_comment", {"comment": {"type": "string"}}),
+    ]
+
+    for definition in remote_tools:
+        node = classify_tool("remote", definition)
+        assert "EXTERNAL_EGRESS" in node.capabilities, definition.name
+        assert "LOCAL_WRITE" not in node.capabilities, definition.name
+
+
+def test_local_write_never_becomes_a_trifecta_sink() -> None:
+    servers = {
+        "workspace": [
+            tool("get_issue", {"issue_number": {"type": "integer"}}),
+            tool("read_file", {"path": {"type": "string"}}),
+            tool("git_commit", {"repo_path": {"type": "string"}, "message": {"type": "string"}}),
+            tool("git_merge", {"repo_path": {"type": "string"}, "source_branch": {"type": "string"}}),
+            tool("write_file", {"path": {"type": "string"}, "content": {"type": "string"}}),
+        ]
+    }
+
+    report = analyze_capability_graph(servers)
+
+    assert report.trifecta_paths == []
+    assert report.passed is True
+    assert report.local_write_tools == [
+        "workspace:git_commit",
+        "workspace:git_merge",
+        "workspace:write_file",
+    ]
+    for node in report.nodes:
+        if "LOCAL_WRITE" in node.capabilities:
+            assert "EXTERNAL_EGRESS" not in node.capabilities, node.qualified_name
+
+
+def test_trifecta_paths_collapse_per_ingest_egress_pair() -> None:
+    servers = {
+        "workspace": [
+            tool("get_issue", {"issue_number": {"type": "integer"}}),
+            tool("read_file", {"path": {"type": "string"}}),
+            tool("read_text_file", {"path": {"type": "string"}}),
+            tool("read_media_file", {"path": {"type": "string"}}),
+            tool("post_webhook", {"webhook_url": {"type": "string"}}),
+        ]
+    }
+
+    report = analyze_capability_graph(servers)
+
+    assert len(report.trifecta_paths) == 1
+    path = report.trifecta_paths[0]
+    assert path.ingest_tool == "workspace:get_issue"
+    assert path.egress_tool == "workspace:post_webhook"
+    assert path.read_tool == "workspace:read_file"
+    assert path.read_tools == [
+        "workspace:read_file",
+        "workspace:read_media_file",
+        "workspace:read_text_file",
+    ]
+    assert path.collapsed_read_count == 3
+    assert "3 private-data tools" in path.attack_narrative
 
 
 def test_has_arbitrary_destination() -> None:
@@ -375,7 +481,6 @@ def test_paths_sort_critical_before_high() -> None:
     servers = {
         "alpha": [
             tool("get_issue", {"issue_number": {"type": "integer"}}),
-            tool("read_file", {"path": {"type": "string"}}),
             tool("post_webhook", {"webhook": {"type": "string"}}),
         ],
         "beta": [
@@ -390,6 +495,7 @@ def test_paths_sort_critical_before_high() -> None:
 
     assert severities[0] == "CRITICAL"
     assert "HIGH" in severities
+    assert severities[-1] == "HIGH"
     assert severities == sorted(severities, key=lambda value: 0 if value == "CRITICAL" else 1)
     assert [path.path_id for path in report.trifecta_paths] == [
         f"trifecta-{index:03d}" for index in range(1, len(report.trifecta_paths) + 1)

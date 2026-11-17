@@ -1,6 +1,10 @@
 {
   "capture_source": "live_subprocess",
+  "cve_refs": [],
   "ecosystem": "pypi",
+  "expected_positive": false,
+  "in_latch_threat_model": false,
+  "kind": "stdio_tools",
   "launch_command": [
     "uvx",
     "mcp-server-git",
@@ -8,6 +12,7 @@
     "{sandbox}"
   ],
   "manifest_sha256": "bd88748c777e6a3a8e3bf7c1c6e0f43a38d9d8ca4f84909244334e2a60db5c7d",
+  "note": "Current release; local state mutations only.",
   "package_name": "mcp-server-git",
   "package_version": "2026.11.11",
   "protocol_version": "2026-07-28",
@@ -478,5 +483,6 @@
       },
       "name": "git_remote"
     }
-  ]
+  ],
+  "vulnerability_class": "clean_reference_server"
 }

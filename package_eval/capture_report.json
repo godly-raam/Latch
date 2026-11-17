@@ -1,9 +1,20 @@
 {
-  "captured": 5,
+  "captured": 9,
   "captures": [
+    {
+      "capture_source": "live_proxy_metadata",
+      "ecosystem": "npm",
+      "kind": "proxy_metadata",
+      "package_name": "mcp-remote",
+      "reason": null,
+      "slug": "npm-mcp-remote-0-14-3",
+      "status": "captured",
+      "tool_count": 0
+    },
     {
       "capture_source": "live_subprocess",
       "ecosystem": "npm",
+      "kind": "stdio_tools",
       "package_name": "@modelcontextprotocol/server-everything",
       "reason": null,
       "slug": "npm-server-everything",
@@ -13,6 +24,7 @@
     {
       "capture_source": "live_subprocess",
       "ecosystem": "npm",
+      "kind": "stdio_tools",
       "package_name": "@modelcontextprotocol/server-filesystem",
       "reason": null,
       "slug": "npm-server-filesystem",
@@ -22,6 +34,17 @@
     {
       "capture_source": "live_subprocess",
       "ecosystem": "npm",
+      "kind": "stdio_tools",
+      "package_name": "@modelcontextprotocol/server-filesystem",
+      "reason": null,
+      "slug": "npm-server-filesystem-0-6-2",
+      "status": "captured",
+      "tool_count": 9
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "npm",
+      "kind": "stdio_tools",
       "package_name": "@modelcontextprotocol/server-memory",
       "reason": null,
       "slug": "npm-server-memory",
@@ -29,8 +52,19 @@
       "tool_count": 9
     },
     {
+      "capture_source": "live_proxy_metadata",
+      "ecosystem": "pypi",
+      "kind": "proxy_metadata",
+      "package_name": "mcp-proxy",
+      "reason": null,
+      "slug": "pypi-mcp-proxy-0-8-2",
+      "status": "captured",
+      "tool_count": 0
+    },
+    {
       "capture_source": "live_subprocess",
       "ecosystem": "pypi",
+      "kind": "stdio_tools",
       "package_name": "mcp-server-fetch",
       "reason": null,
       "slug": "pypi-mcp-server-fetch",
@@ -40,11 +74,22 @@
     {
       "capture_source": "live_subprocess",
       "ecosystem": "pypi",
+      "kind": "stdio_tools",
       "package_name": "mcp-server-git",
       "reason": null,
       "slug": "pypi-mcp-server-git",
       "status": "captured",
       "tool_count": 14
+    },
+    {
+      "capture_source": "live_subprocess",
+      "ecosystem": "pypi",
+      "kind": "stdio_tools",
+      "package_name": "mcp-server-git",
+      "reason": null,
+      "slug": "pypi-mcp-server-git-2025-9-25",
+      "status": "captured",
+      "tool_count": 12
     }
   ],
   "skipped": 0

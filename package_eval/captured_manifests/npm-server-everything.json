@@ -1,12 +1,17 @@
 {
   "capture_source": "live_subprocess",
+  "cve_refs": [],
   "ecosystem": "npm",
+  "expected_positive": false,
+  "in_latch_threat_model": false,
+  "kind": "stdio_tools",
   "launch_command": [
     "npx",
     "--yes",
     "@modelcontextprotocol/server-everything"
   ],
   "manifest_sha256": "2933e591ac78202ec54bbaaf9f4bf9c058dde48d0bfa0e0723b8b6ed8a3574c5",
+  "note": "SDK diagnostics server: its parameter names and open-world annotations over-approximate into static capability edges.",
   "package_name": "@modelcontextprotocol/server-everything",
   "package_version": "2.3.0",
   "protocol_version": "2026-07-28",
@@ -1028,5 +1033,6 @@
       "name": "trigger-elicitation-request-async",
       "title": "Trigger Async Elicitation Request Tool"
     }
-  ]
+  ],
+  "vulnerability_class": "clean_reference_server"
 }

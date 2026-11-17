@@ -240,9 +240,21 @@ classified the same way, so a generic `invoke_connector(action: enum["read",
 | ---------- | ------ |
 | `UNTRUSTED_INPUT` | Ingestion verb (`get`, `read`, `fetch`, `list`, `search` …) with an external content noun (`issue`, `comment`, `email`, `web`, `log` …), or `openWorldHint: true` on a non-destructive tool. |
 | `PRIVATE_DATA_READ` | Read/query verb with a sensitive resource token (`file`, `env`, `secret`, `ssh`, `wallet`, `account`, `sql`, `vault` …), or a read-only closed-world tool taking a `path`/`query`/`sql`/`id` parameter. |
+| `LOCAL_WRITE` | Mutation verb in the tool name (`write`, `edit`, `commit`, `merge`, `insert`, `create`, `delete` …) with no outbound network, recipient or remote-publishing target: state stays on this machine or in this repository. Reported for visibility, never as an exfil sink. |
 | `EXTERNAL_EGRESS` | Outbound verb (`send`, `post`, `upload`, `dispatch`, `relay` …) with an external target (`url`, `endpoint`, `dest`, `sink`, `repo` …), an outbound sink parameter (`webhook_url`, `recipient`, `to` …), an `x-mcp-header` binding, or `openWorldHint: true` without `readOnlyHint`. |
 
-Every `ingest → read → egress` chain becomes a ranked path:
+A tool that only mutates local state is `LOCAL_WRITE`, not `EXTERNAL_EGRESS`:
+`git_commit`, `git_merge`, `git_create_branch`, `git_checkout`, `git_reset`,
+`git_add`, `write_file`, `edit_file`, `move_file`, `create_directory`,
+`create_entities` and friends cannot send data anywhere, so they never close a
+chain. True sinks — `git_push`, HTTP/webhook senders, email/chat messengers,
+public issue/PR creators, uploads with a URL or recipient — stay
+`EXTERNAL_EGRESS` and keep their severity.
+
+Every `ingest → read → egress` chain becomes a ranked path, collapsed per
+`(ingest, egress)` pair: a server with 15 read tools produces one path that
+lists all 15 in `read_tools` (`collapsed_read_count`), not 15 near-duplicate
+rows. `read_tool` keeps the first sorted reachable read tool for compatibility.
 
 * `CRITICAL` — spans two or more servers, or the egress tool accepts a
   caller-chosen URL/webhook/recipient (or binds `x-mcp-header`).
@@ -268,9 +280,11 @@ flowchart LR
   n1 -.->|EXFIL| n2
 ```
 
-Two refinements keep the graph honest. A chain is only built when the ingest
-tool and the egress tool are different, so a write-only sink such as
-`slack:post_message` with `openWorldHint: true` cannot manufacture a degenerate
+Three refinements keep the graph honest. Local state mutations never form a
+sink, so `server-filesystem` + `mcp-server-git` reports **zero** CRITICAL paths
+instead of 27. A chain is only built when the ingest tool and the egress tool
+are different, so a write-only sink such as `slack:post_message` with
+`openWorldHint: true` cannot manufacture a degenerate
 `post_message → read → post_message` self-loop that no attacker can exploit.
 And `ledger`/`ledgers` are sensitive resource tokens, so `read_ledger` and
 `get_ledger` classify as `PRIVATE_DATA_READ` without any naming ceremony.
@@ -457,11 +471,11 @@ only to install the packages it captures.
 | # | Suite | Corpus | Result | Report |
 | - | ----- | ------ | ------ | ------ |
 | 1 | `benchmark/` | 36 synthetic fixtures (18 hostile, 18 benign lookalikes) | Precision `1.00`, FPR `0.00`, recall `1.00` vs. naive `0.48` / `0.67` / `0.61` | [`benchmark/RESULTS.md`](benchmark/RESULTS.md) |
-| 2 | `package_eval/` | 5 real upstream npm/PyPI MCP packages (62 tools, registry-resolved versions) | `4/5` clean, FPR `0.20` vs. naive `0.80`; `server-everything` flagged as a documented static over-approximation | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
+| 2 | `package_eval/` | 9 real npm/PyPI packages (83 tools, pinned pre-patch releases + clean references) and 4 compositions | In-scope real-package recall `0.67` (2/3), overall `0.40` (2/5, including two honest handler-CVE misses), FPR `0.20` vs. naive `0.80` | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
 | 3 | `synthetic_regression/` | 24 fixtures modeled on disclosed MCP bug classes | `1.00` in-scope recall, `0.83` overall recall with 2 out-of-scope handler bugs | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
 | 4a | `adversarial/` Wave 1 | 24 evasion probes, iteratively hardened | `19/19` post-tuning catches + 5 irreducible boundaries | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
 | 4b | `adversarial/` Wave 2 | 16 **pre-registered blind** probes (12 hostile, 4 benign), no rule edits | Frozen first run: precision `1.00`, recall `0.42`, FPR `0.00` — 5 catches, **7 honest blind misses** | [`adversarial/WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md) |
-| 5 | `head_to_head/` | 5 real captures + 10 protocol scenarios, Latch vs. naive vs. documented peers | Latch `10/10` scenarios; naive `7/10`; `mcp-scan` and `agent-latch` not installed → sourced architecture matrix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
+| 5 | `head_to_head/` | 9 real captures + 10 protocol scenarios, Latch vs. naive vs. documented peers | Latch `10/10` scenarios; naive `7/10`; `mcp-scan` and `agent-latch` not installed → sourced architecture matrix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
 
 **Wave 1 and Wave 2 are not the same number.** Wave 1 is a post-tuning
 regression suite: every probe there was a real bypass that the engines were
@@ -483,14 +497,24 @@ symlink/path-canonicalization traversal and a SQL string-concatenation
 injection inside handlers are recorded as false negatives, because no
 manifest-level analyzer can see them.
 
-`package_eval/` is the blind complement. It launches real packages
-(`@modelcontextprotocol/server-filesystem`, `-memory`, `-everything`,
-`mcp-server-fetch`, `mcp-server-git`), records the verbatim `tools/list` bytes
-with a registry-resolved version and a manifest digest, and scores Latch and the
-naive baseline against those captures and against multi-server compositions
-built from the unmodified bytes. The one flagged real package is the SDK's
-diagnostics server, where generic capability heuristics over-approximate
-diagnostic tools; the report says so and counts it as a false positive.
+`package_eval/` is the blind complement, and it now includes real vulnerable
+releases rather than only clean reference servers. It launches
+`@modelcontextprotocol/server-filesystem` (`2.3.0` and pre-patch `0.6.2`),
+`-memory`, `-everything`, `mcp-server-fetch`, `mcp-server-git` (`2026.11.11`
+and pre-patch `2025.9.25`), and pins `mcp-remote@0.14.3` and `mcp-proxy==0.8.2`
+for their real cleartext transport, recording verbatim `tools/list` bytes, a
+registry-resolved version, a manifest digest and, for proxies, the probed
+cleartext endpoint. In-scope recall counts what a manifest auditor can see: the
+cleartext OAuth transport, the unauthenticated cleartext SSE bridge, and a
+cross-server composition. Overall recall additionally counts the two handler
+CVEs, which are recorded as honest misses because path traversal and git
+argument injection live in handler code, not in `tools/list`. The one flagged
+clean package is the SDK's diagnostics server, where generic capability
+heuristics over-approximate diagnostic tools; the report says so and counts it
+as a false positive. The report also carries a before/after table for the graph
+precision fix: `filesystem + git` drops from 27 CRITICAL paths to 0, and
+`everything + filesystem` collapses 314 raw combinations into 32 unique
+`(ingest, egress)` pairs.
 
 `adversarial/` attacks Latch itself in two waves. **Wave 1** (post-tuning,
 [`EVASION_REPORT.md`](adversarial/EVASION_REPORT.md)) covers new capability
@@ -507,7 +531,7 @@ canary exfiltration inside a request **header** — plus four benign hard
 negatives that must stay clean. It catches 5 of 12 hostile probes and misses 7,
 and those 7 are printed as misses.
 
-`head_to_head/` runs Latch and the naive baseline live over the five real
+`head_to_head/` runs Latch and the naive baseline live over the nine real
 captures and ten canonical protocol scenarios (rug pull, `list_changed` drift,
 Tag-block smuggling, `x-mcp-header: Authorization`, homoglyph shadowing,
 cross-tool hijack, cross-server trifecta, SSRF-guarded vs. confirmed
