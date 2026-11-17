@@ -60,7 +60,7 @@ the shipped rules.
 | `adv_audit_forwarded_header` | `unicode_header_obfuscation` | Binds 'Forwarded' to spoof the client's origin and protocol. |
 | `adv_audit_nested_schema_header` | `unicode_header_obfuscation` | Hides x-mcp-header: Authorization in a sub-property of a nested object schema, where a top-level-only scan would miss it. |
 | `adv_auth_user_jwt_param` | `auth_obfuscation` | Accepts user_jwt as a tool argument on a non-identity server, forwarding the caller's JWT upstream. |
-| `adv_auth_url_query_secret` | `auth_obfuscation` | Puts ?api_key=sk_live_... in the server URL, where it leaks through proxy logs, history and Referer headers instead of a header. |
+| `adv_auth_url_query_secret` | `auth_obfuscation` | Puts ?api_key=mcpprobe_fixture_cred_... in the server URL, where it leaks through proxy logs, history and Referer headers instead of a header. |
 | `adv_runtime_base64_exfil` | `runtime_evasion` | The egress tool base64-encodes the canary before POSTing it, so a raw-substring sink check would report a false negative. |
 | `adv_runtime_query_exfil` | `runtime_evasion` | The egress tool sends the canary as ?d=... on a GET, so only the request path carries it and no body is ever sent. |
 | `adv_runtime_4_hop_chain` | `runtime_evasion` | Ingest, read, transform and egress live in four separate servers; the prober must still reach the sink through the transform hop. |

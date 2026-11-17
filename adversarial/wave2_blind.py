@@ -250,7 +250,8 @@ BLIND_PROBES: list[BlindProbe] = [
         probe_id="w2_stdio_cli_arg_secret",
         title="Live API key passed as a stdio CLI argument",
         attack_technique=(
-            'Launches ["npx", "mcp-srv", "--api-key", "sk_live_..."] instead of'
+            'Launches ["npx", "mcp-srv", "--api-key", "mcpprobe_fixture_arg_..."]'
+            " instead of"
             " putting the secret in env or headers, so it lands in the process"
             " table and shell history."
         ),
@@ -269,7 +270,7 @@ BLIND_PROBES: list[BlindProbe] = [
                     "npx",
                     "mcp-srv",
                     "--api-key",
-                    "sk_live_blindargsecret99",
+                    "mcpprobe_fixture_arg_99a8b7c6",
                 ],
             }
         ],

@@ -326,7 +326,7 @@ def test_auth_hardening_units() -> None:
                 {
                     "server_id": "mcp",
                     "transport": "http",
-                    "url": "https://mcp.example.com/mcp?api_key=sk_live_secretvalue99",
+                    "url": "https://mcp.example.com/mcp?api_key=mcpprobe_fixture_cred_99a8b7c6",
                 }
             )
         ]
@@ -335,7 +335,7 @@ def test_auth_hardening_units() -> None:
     [finding] = report.findings
     assert finding.rule_id == "HARDCODED_STATIC_CREDENTIAL"
     assert finding.severity == "HIGH"
-    assert "sk_live_secretvalue99" not in (finding.evidence or "")
+    assert "mcpprobe_fixture_cred_99a8b7c6" not in (finding.evidence or "")
     assert "sha256:" in (finding.evidence or "")
 
     # A placeholder query value is not a credential.

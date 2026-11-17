@@ -22,7 +22,7 @@ from mcpprobe.oauth_audit import (
 )
 
 SECRET = "ghp_supersecretvalue123456"
-OTHER_SECRET = "sk_live_abcdefghijklmnop"
+OTHER_SECRET = "mcpprobe_fixture_other_99a8b7c6"
 
 REMOTE_URL = "https://mcp.example.com/mcp"
 CHALLENGE_URL = "https://mcp.example.com/.well-known/oauth-protected-resource/mcp"

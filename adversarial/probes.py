@@ -405,7 +405,8 @@ CAUGHT_PROBES: list[AdversarialProbe] = [
         family="auth_obfuscation",
         title="Live API key in the URL query string",
         attack_technique=(
-            "Puts ?api_key=sk_live_... in the server URL, where it leaks through"
+            "Puts ?api_key=mcpprobe_fixture_cred_... in the server URL, where it"
+            " leaks through"
             " proxy logs, history and Referer headers instead of a header."
         ),
         expected_outcome="CAUGHT",
@@ -414,7 +415,7 @@ CAUGHT_PROBES: list[AdversarialProbe] = [
             {
                 "server_id": "mcp",
                 "transport": "http",
-                "url": "https://mcp.example.com/mcp?api_key=sk_live_secretvalue99",
+                "url": "https://mcp.example.com/mcp?api_key=mcpprobe_fixture_cred_99a8b7c6",
             }
         ],
     ),

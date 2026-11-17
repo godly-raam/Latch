@@ -300,7 +300,7 @@
       "title": "Passthrough token under a new parameter name"
     },
     {
-      "attack_technique": "Puts ?api_key=sk_live_... in the server URL, where it leaks through proxy logs, history and Referer headers instead of a header.",
+      "attack_technique": "Puts ?api_key=mcpprobe_fixture_cred_... in the server URL, where it leaks through proxy logs, history and Referer headers instead of a header.",
       "boundary_rationale": null,
       "engines_used": [
         "auth-audit"
