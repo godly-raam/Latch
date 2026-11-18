@@ -14,7 +14,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Iterator
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 DEFAULT_INPUT_SCHEMA: dict[str, Any] = {"type": "object"}
 
@@ -78,10 +78,17 @@ class ToolDefinition(BaseModel):
 
     name: str
     title: str | None = None
-    description: str = ""
+    # ``"description": null`` is legal in real manifests; normalize it to "" so
+    # every downstream string consumer keeps working.
+    description: str | None = ""
     inputSchema: dict[str, Any] = Field(default_factory=lambda: dict(DEFAULT_INPUT_SCHEMA))
     outputSchema: dict[str, Any] | None = None
     annotations: dict[str, Any] | None = None
+
+    @field_validator("description", mode="after")
+    @classmethod
+    def _normalize_description(cls, value: str | None) -> str:
+        return value if value is not None else ""
 
 
 class ToolListResult(BaseModel):

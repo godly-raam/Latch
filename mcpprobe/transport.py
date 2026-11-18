@@ -23,6 +23,7 @@ import asyncio
 import json
 import os
 import shlex
+from collections import deque
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any, Literal
@@ -183,7 +184,7 @@ class StdioSession:
 
     def __init__(
         self,
-        command: str,
+        command: str | list[str],
         *,
         timeout: float = DEFAULT_TIMEOUT,
         cwd: str | None = None,
@@ -200,13 +201,18 @@ class StdioSession:
         self._proc: asyncio.subprocess.Process | None = None
         self._next_request_id = 0
         self._notifications: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
-        self._stderr_lines: list[str] = []
+        # Bounded: a chatty server must not grow this list for the life of a watch.
+        self._stderr_lines: deque[str] = deque(maxlen=20)
         self._stderr_task: asyncio.Task[None] | None = None
 
     # -- lifecycle ---------------------------------------------------------
 
     async def start(self) -> None:
-        argv = shlex.split(self.command)
+        argv = (
+            shlex.split(self.command)
+            if isinstance(self.command, str)
+            else list(self.command)
+        )
         if not argv:
             raise ProbeError("empty --stdio command")
         try:
@@ -217,6 +223,9 @@ class StdioSession:
                 stderr=asyncio.subprocess.PIPE,
                 cwd=self._cwd,
                 env=self._env,
+                # The default 64 KiB StreamReader limit makes readline() raise
+                # ValueError on a single large tools/list line.
+                limit=16 * 1024 * 1024,
             )
         except OSError as exc:
             raise ProbeError(f"cannot start MCP server {argv[0]!r}: {exc}") from exc
@@ -236,7 +245,7 @@ class StdioSession:
     def _stderr_context(self) -> str:
         if not self._stderr_lines:
             return ""
-        tail = "".join(self._stderr_lines[-10:]).strip()
+        tail = "".join(list(self._stderr_lines)[-10:]).strip()
         return f"\nserver stderr:\n{tail}" if tail else ""
 
     async def close(self) -> None:
@@ -744,7 +753,7 @@ async def open_mcp_session(
     """
 
     if spec.transport == "stdio":
-        command = shlex.join(spec.command or [])
+        command = list(spec.command or [])
         if not command:
             raise ProbeError(f"server {spec.server_id!r} has no command to launch")
         env = {**os.environ, **(spec.env or {})}
@@ -780,7 +789,7 @@ async def open_mcp_session(
 
 
 async def harvest_stdio(
-    command: str,
+    command: str | list[str],
     *,
     timeout: float = DEFAULT_TIMEOUT,
     env: dict[str, str] | None = None,

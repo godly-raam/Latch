@@ -188,6 +188,10 @@ class ChainVerificationReport(BaseModel):
 
 # -- loopback canary sink ---------------------------------------------------
 
+#: Hard ceiling on a canary-sink request body, so an egress tool cannot exhaust
+#: memory by declaring a huge ``Content-Length``.
+MAX_CANARY_BODY_BYTES = 1024 * 1024
+
 
 class CanarySinkServer:
     """An ephemeral HTTP sink on ``127.0.0.1:0`` that records exfiltration."""
@@ -242,10 +246,18 @@ class CanarySinkServer:
                 headers[name.strip()] = value.strip()
 
         body = b""
+        oversized = False
         length = headers.get("Content-Length") or headers.get("content-length")
         if length and length.isdigit():
-            with contextlib.suppress(asyncio.IncompleteReadError):
-                body = await reader.readexactly(int(length))
+            declared = int(length)
+            if declared > MAX_CANARY_BODY_BYTES:
+                oversized = True
+            else:
+                body = b""
+                with contextlib.suppress(asyncio.IncompleteReadError):
+                    body = await reader.readexactly(
+                        min(max(declared, 0), MAX_CANARY_BODY_BYTES)
+                    )
 
         self.captured_requests.append(
             {
@@ -256,9 +268,16 @@ class CanarySinkServer:
             }
         )
 
-        payload = b'{"ok": true}'
+        if oversized:
+            payload = b'{"error": "content-length exceeds the canary sink limit"}'
+            status = b"413 Payload Too Large"
+        else:
+            payload = b'{"ok": true}'
+            status = b"200 OK"
         writer.write(
-            b"HTTP/1.1 200 OK\r\n"
+            b"HTTP/1.1 "
+            + status
+            + b"\r\n"
             b"Content-Type: application/json\r\n"
             b"Content-Length: "
             + str(len(payload)).encode()
@@ -423,6 +442,8 @@ def _result_text(result: dict[str, Any]) -> str:
         if parts:
             return "\n".join(parts)
     error = result.get("error")
+    if isinstance(error, str) and error.strip():
+        return error.strip()
     return str(error) if isinstance(error, dict) else ""
 
 
@@ -431,8 +452,17 @@ def _error_text(result: dict[str, Any]) -> str:
     return text or "tool returned isError without a message"
 
 
-def _tool_allowed(qualified_name: str, allowed_tools: set[str] | None) -> bool:
-    """True when the ``--allow-tool`` patterns cover a ``server:tool`` name."""
+def _tool_allowed(
+    qualified_name: str,
+    allowed_tools: set[str] | None,
+    server_name: str | None = None,
+) -> bool:
+    """True when the ``--allow-tool`` patterns cover a ``server:tool`` name.
+
+    A bare tool name only matches the path's own target server
+    (``server_name``); naming another server requires ``server:tool`` or
+    ``server:*``.
+    """
 
     if not allowed_tools:
         return True
@@ -446,7 +476,8 @@ def _tool_allowed(qualified_name: str, allowed_tools: set[str] | None) -> bool:
         if raw.endswith(":*") and raw[:-2] == server_id:
             return True
         if ":" not in raw and raw == tool_name:
-            return True
+            if server_name is None or server_name == server_id:
+                return True
     return False
 
 
@@ -536,8 +567,8 @@ async def _probe_path(
         )
 
     if not (
-        _tool_allowed(path.read_tool, allowed_tools)
-        and _tool_allowed(path.egress_tool, allowed_tools)
+        _tool_allowed(path.read_tool, allowed_tools, read_server)
+        and _tool_allowed(path.egress_tool, allowed_tools, egress_server)
     ):
         egress_args, _has_channel = synthesize_egress_args(
             egress_tool, egress_target, f"[read output from {path.read_tool}]"

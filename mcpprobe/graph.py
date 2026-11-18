@@ -915,11 +915,15 @@ def analyze_capability_graph(
     ingest_edges = [edge for edge in edges if edge.stage == "INGEST_TO_READ"]
     read_edges = [edge for edge in edges if edge.stage == "READ_TO_EGRESS"]
 
+    # Index by source: a full ingest x read product is O(E*E) and dominated by
+    # edges that can never join. Appending in edge order keeps it deterministic.
+    read_edges_by_source: dict[str, list[FlowEdge]] = {}
+    for edge in read_edges:
+        read_edges_by_source.setdefault(edge.source, []).append(edge)
+
     candidates: dict[tuple[str, str], dict[str, ToolNode]] = {}
     for first in ingest_edges:
-        for second in read_edges:
-            if second.source != first.target:
-                continue
+        for second in read_edges_by_source.get(first.target, []):
             # A tool cannot be both where untrusted input enters and where it
             # leaves: `post_message -> read -> post_message` is an artifact of
             # one node holding two roles, not an exfiltration chain.

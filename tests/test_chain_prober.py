@@ -13,6 +13,9 @@ from click.testing import CliRunner
 
 from mcpprobe.chain_prober import (
     CanarySinkServer,
+    _error_text,
+    _result_text,
+    _tool_allowed,
     synthesize_egress_args,
     synthesize_read_args,
 )
@@ -707,3 +710,46 @@ def test_egress_rejection_classifier_separates_ssrf_from_allowlist() -> None:
         "destination '127.0.0.1' is not in the *.corp.internal allowlist"
     )
     assert not _is_ssrf_or_loopback_rejection("rate limited, try later")
+
+
+def test_canary_sink_rejects_oversized_content_length() -> None:
+    async def scenario() -> tuple[bytes, str]:
+        async with CanarySinkServer() as sink:
+            reader, writer = await asyncio.open_connection("127.0.0.1", sink.port)
+            writer.write(
+                b"POST /exfil HTTP/1.1\r\n"
+                b"Host: sink\r\n"
+                b"Content-Length: 4194304\r\n"
+                b"\r\n"
+            )
+            await writer.drain()
+            raw = await asyncio.wait_for(reader.read(4096), timeout=5)
+            writer.close()
+            await writer.wait_closed()
+            return raw, sink.captured_requests[0]["body"]
+
+    raw, captured_body = asyncio.run(scenario())
+
+    assert raw.startswith(b"HTTP/1.1 413")
+    assert captured_body == ""
+
+
+def test_allow_tool_bare_name_is_scoped_to_the_path_server() -> None:
+    assert _tool_allowed("alpha:read", {"read"}, "alpha") is True
+    assert _tool_allowed("beta:read", {"read"}, "alpha") is False
+    assert _tool_allowed("beta:read", {"beta:read"}, "alpha") is True
+    assert _tool_allowed("beta:read", {"beta:*"}, "alpha") is True
+    assert _tool_allowed("beta:anything", {"*"}, "alpha") is True
+    assert _tool_allowed("beta:read", None, "alpha") is True
+
+
+def test_result_text_extracts_string_errors() -> None:
+    assert (
+        _result_text({"isError": True, "error": "  permission denied  "})
+        == "permission denied"
+    )
+    assert (
+        _error_text({"isError": True, "error": "permission denied"})
+        == "permission denied"
+    )
+    assert _error_text({"isError": True}) == "tool returned isError without a message"

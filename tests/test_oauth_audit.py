@@ -679,3 +679,41 @@ def test_cli_auth_audit_server_manifest_token_passthrough(tmp_path: Path) -> Non
     payload = json.loads(result.output)
     assert payload["findings"][0]["rule_id"] == "TOKEN_PASSTHROUGH_RISK"
     assert payload["findings"][0]["severity"] == "HIGH"
+
+
+@pytest.mark.parametrize(
+    "advertised",
+    [
+        "http://127.0.0.1:9/probe",
+        "http://169.254.169.254/latest/meta-data",
+    ],
+)
+def test_live_cross_origin_resource_metadata_is_reported_and_never_fetched(
+    advertised: str,
+) -> None:
+    fetched: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        url = str(request.url)
+        if url == REMOTE_URL:
+            return httpx.Response(
+                401,
+                headers={"WWW-Authenticate": f'Bearer resource_metadata="{advertised}"'},
+                json={},
+            )
+        fetched.append(url)
+        if url == CHALLENGE_URL:
+            return httpx.Response(200, json=VALID_METADATA)
+        return httpx.Response(404, json={})
+
+    report = run_auth_audit(
+        [http_spec()], live=True, transport=httpx.MockTransport(handler)
+    )
+
+    assert all(advertised not in url for url in fetched)
+    finding = next(
+        f for f in report.findings if f.rule_id == "CROSS_ORIGIN_RESOURCE_METADATA"
+    )
+    assert finding.severity == "MEDIUM"
+    assert advertised in (finding.evidence or "")
+    assert report.passed is False

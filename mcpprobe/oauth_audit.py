@@ -42,6 +42,7 @@ AuthRuleId = Literal[
     "MISSING_WWW_AUTHENTICATE_PRM",
     "MISSING_PROTECTED_RESOURCE_METADATA",
     "PRM_RESOURCE_MISMATCH",
+    "CROSS_ORIGIN_RESOURCE_METADATA",
 ]
 
 AuthSeverity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
@@ -95,9 +96,6 @@ PASSTHROUGH_PARAM_NAMES = frozenset(
         "bearer",
     }
 )
-
-#: Backwards-compatible alias for the original name.
-TOKEN_PARAMETER_NAMES = PASSTHROUGH_PARAM_NAMES
 
 #: Query-string keys that must never carry a live credential.
 SENSITIVE_QUERY_KEYS = frozenset(
@@ -453,6 +451,12 @@ def _resource_metadata_url(challenge: str) -> str | None:
     return value or None
 
 
+def _same_origin(candidate: str, target: str) -> bool:
+    """True when ``candidate`` shares scheme, host and effective port with ``target``."""
+
+    return _endpoint(candidate)[:3] == _endpoint(target)[:3]
+
+
 def _metadata_candidates(url: str) -> list[str]:
     parts = urlsplit(url)
     origin = f"{parts.scheme}://{parts.netloc}"
@@ -593,6 +597,26 @@ async def probe_http_auth(
                     evidence=f"WWW-Authenticate: {challenge or '<absent>'}",
                 )
             )
+
+        if metadata_url is not None and not _same_origin(metadata_url, url):
+            # The header is server-controlled: following it would make Latch
+            # fetch an arbitrary internal or external URL (SSRF).
+            findings.append(
+                AuthFinding(
+                    rule_id="CROSS_ORIGIN_RESOURCE_METADATA",
+                    severity="MEDIUM",
+                    servers=[spec.server_id],
+                    field_path="WWW-Authenticate",
+                    message=(
+                        f"server '{spec.server_id}' advertises resource_metadata"
+                        f" at '{metadata_url}', a different origin than the audited"
+                        f" server '{url}'; the header is attacker-controlled, so it"
+                        " is reported and never fetched."
+                    ),
+                    evidence=f"advertised {metadata_url} for {url} (not fetched)",
+                )
+            )
+            metadata_url = None
 
         candidates: list[str] = []
         if metadata_url is not None:

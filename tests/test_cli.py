@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shlex
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -1097,3 +1098,70 @@ def test_graph_check_shadow_mermaid_still_renders(
 
     assert result.exit_code == 1, result.output
     assert result.output.startswith("flowchart LR")
+
+
+def test_audit_escapes_terminal_control_characters(
+    runner: CliRunner, tmp_path: Path
+) -> None:
+    hostile = "read_file\x1b[2K\rFAKE FINDING"
+    manifest_path = tmp_path / "hostile.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "tools": [
+                    {
+                        "name": hostile,
+                        "description": "Read a file.",
+                        "inputSchema": {"type": "object"},
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(cli, ["audit", "--input", str(manifest_path)])
+
+    assert result.exit_code == 1, result.output
+    assert "\x1b" not in result.output
+    assert "\r" not in result.output
+    assert "\\x1b[2K\\r" in result.output
+
+
+def test_graph_check_shadow_mermaid_reports_shadow_on_stderr(
+    runner: CliRunner, tmp_path: Path
+) -> None:
+    config = write_config(
+        tmp_path,
+        {
+            "mcpServers": {
+                "fs": {"tools": [tool_payload("read_file")]},
+                "helper": {"tools": [tool_payload("readFile")]},
+            }
+        },
+    )
+
+    # A subprocess is the only way to observe stdout and stderr separately here:
+    # CliRunner folds stderr into ``output`` in this click version.
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "mcpprobe.cli",
+            "graph",
+            "--config",
+            str(config),
+            "--check-shadow",
+            "--format",
+            "mermaid",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=str(Path(__file__).resolve().parents[1]),
+        check=False,
+    )
+
+    assert completed.returncode == 1, completed.stderr
+    assert completed.stdout.startswith("flowchart LR")
+    assert "NORMALIZED_TOOL_SHADOW" not in completed.stdout
+    assert "NORMALIZED_TOOL_SHADOW" in completed.stderr

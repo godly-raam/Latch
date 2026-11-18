@@ -821,3 +821,28 @@ def test_auth_audit_specs_returns_findings_list() -> None:
     spec = ServerSpec(server_id="solo", transport="http", url="https://mcp.example.com/mcp")
 
     assert audit_auth_specs([spec]) == []
+
+
+def test_unicode_variation_selector_maps_to_its_own_rule() -> None:
+    manifest = {
+        "tools": [
+            {
+                "name": "echo",
+                "description": "im\uFE0Fportant",
+                "inputSchema": {"type": "object"},
+            }
+        ]
+    }
+
+    sarif = to_sarif(audits=[audit_manifest(manifest, fail_on="LOW")])
+
+    entry = next(
+        result
+        for result in results(sarif)
+        if result["ruleId"] == "LATCH-AUDIT-UNICODE_VARIATION_SELECTOR"
+    )
+    rule = rules_by_id(sarif)["LATCH-AUDIT-UNICODE_VARIATION_SELECTOR"]
+
+    assert entry["level"] == "error"
+    assert rule["name"] == "UnicodeVariationSelector"
+    assert rule["properties"]["tags"] == ["CWE-116", "CWE-74"]

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterable
 from typing import Any
 
 from .models import ToolDefinition
@@ -54,8 +55,18 @@ def manifest_entries(tools: list[ToolDefinition]) -> list[str]:
     return sorted(f"{tool.name}:{hash_tool(tool)}" for tool in tools)
 
 
+def hash_manifest_entries(entries: Iterable[str]) -> str:
+    """Hash precomputed ``"<name>:<sha256>"`` entries, order-insensitively.
+
+    Callers that already hashed every tool use this instead of re-serializing
+    and re-hashing the whole surface.
+    """
+
+    joined = "\n".join(sorted(entries))
+    return hashlib.sha256(joined.encode("utf-8")).hexdigest()
+
+
 def hash_manifest(tools: list[ToolDefinition]) -> str:
     """Hash the whole tool surface, independent of ``tools`` array order."""
 
-    joined = "\n".join(manifest_entries(tools))
-    return hashlib.sha256(joined.encode("utf-8")).hexdigest()
+    return hash_manifest_entries(manifest_entries(tools))

@@ -171,7 +171,7 @@ Sources: mcpprobe (Latch) — this repository; Invariant / Snyk mcp-scan — htt
 | Cross-tool routing hijack (`cross_tool_hijack`) | `shadowing` | detected | shadow:CROSS_TOOL_HIJACK | detected |
 | Cross-server lethal trifecta (`cross_server_lethal_trifecta`) | `capability_graph` | detected | graph:LETHAL_TRIFECTA | detected |
 | Runtime SSRF-guarded vs confirmed canary exfiltration (`runtime_ssrf_guard_vs_confirmed_exfil`) | `runtime` | detected | probe-chain:CONFIRMED_EXPLOITABLE, probe-chain:UNCONFIRMED_SSRF_GUARD | missed |
-| RFC 9728 protected-resource metadata mismatch (`rfc9728_prm_resource_mismatch`) | `auth` | detected | auth-audit:PRM_RESOURCE_MISMATCH | detected |
+| RFC 9728 protected-resource metadata mismatch (`rfc9728_prm_resource_mismatch`) | `auth` | detected | auth-audit:CROSS_ORIGIN_RESOURCE_METADATA, auth-audit:MISSING_PROTECTED_RESOURCE_METADATA | detected |
 | Cross-server Bearer token reuse (`cross_server_bearer_reuse`) | `auth` | detected | auth-audit:CROSS_SERVER_CREDENTIAL_REUSE, auth-audit:HARDCODED_STATIC_CREDENTIAL | detected |
 
 Feature coverage: Latch fires on 10/10 self-authored scenarios (1.00); the naive baseline fires on 7/10 (0.70).

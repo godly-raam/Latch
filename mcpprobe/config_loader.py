@@ -17,15 +17,13 @@ from __future__ import annotations
 
 import asyncio
 import json
-import os
-import shlex
 from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel
 
 from .models import ManifestError, ToolDefinition, parse_tools_payload
-from .transport import DEFAULT_TIMEOUT, StdioSession, harvest_http
+from .transport import DEFAULT_TIMEOUT, harvest_http, harvest_stdio
 
 CONFIG_CONTAINER_KEYS = ("mcpServers", "servers")
 
@@ -189,24 +187,19 @@ def _live_hint(spec: ServerSpec) -> str:
     )
 
 
-async def _live_stdio_tools(spec: ServerSpec, timeout: float) -> list[ToolDefinition]:
-    command = shlex.join(spec.command or [])
-    env = {**os.environ, **(spec.env or {})}
-    session = StdioSession(command, timeout=timeout, env=env)
-    await session.start()
-    try:
-        harvest = await session.harvest()
-    finally:
-        await session.close()
-    return parse_tools_payload(harvest.tools_payload)
+async def _live_tools(spec: ServerSpec, timeout: float) -> list[ToolDefinition]:
+    """Harvest one live spec through the shared transport helpers."""
 
-
-async def _live_http_tools(spec: ServerSpec, timeout: float) -> list[ToolDefinition]:
-    harvest = await harvest_http(
-        spec.url or "",
-        headers=spec.headers or None,
-        timeout=timeout,
-    )
+    if spec.transport == "stdio":
+        harvest = await harvest_stdio(
+            spec.command or [], timeout=timeout, env=spec.env or None
+        )
+    else:
+        harvest = await harvest_http(
+            spec.url or "",
+            headers=spec.headers or None,
+            timeout=timeout,
+        )
     return parse_tools_payload(harvest.tools_payload)
 
 
@@ -232,9 +225,6 @@ def resolve_server_manifests(
         if not live:
             raise ManifestError(_live_hint(spec))
 
-        if spec.transport == "stdio":
-            resolved[spec.server_id] = asyncio.run(_live_stdio_tools(spec, timeout))
-        else:
-            resolved[spec.server_id] = asyncio.run(_live_http_tools(spec, timeout))
+        resolved[spec.server_id] = asyncio.run(_live_tools(spec, timeout))
 
     return resolved

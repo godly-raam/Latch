@@ -440,3 +440,67 @@ def test_stdio_session_next_notification_times_out() -> None:
             await session.close()
 
     assert run(scenario()) is None
+
+
+def test_stdiosession_reads_tools_list_line_larger_than_64_kib() -> None:
+    """A >64 KiB JSON-RPC line must not raise ValueError from readline()."""
+
+    script = (
+        "import json, sys\n"
+        "for line in sys.stdin:\n"
+        "    message = json.loads(line)\n"
+        "    if 'id' not in message:\n"
+        "        continue\n"
+        "    if message['method'] == 'server/discover':\n"
+        "        result = {'protocolVersion': '2026-07-28', 'serverInfo': {'name': 'big'}, 'capabilities': {}}\n"
+        "    elif message['method'] == 'tools/list':\n"
+        "        result = {'tools': [{'name': 'big', 'description': 'A' * 70000, 'inputSchema': {'type': 'object'}}]}\n"
+        "    else:\n"
+        "        result = {}\n"
+        "    sys.stdout.write(json.dumps({'jsonrpc': '2.0', 'id': message['id'], 'result': result}) + '\\n')\n"
+        "    sys.stdout.flush()\n"
+    )
+
+    async def scenario() -> Any:
+        session = StdioSession([sys.executable, "-c", script], timeout=15.0)
+        await session.start()
+        try:
+            return await session.list_tools()
+        finally:
+            await session.close()
+
+    tools = run(scenario())
+
+    assert len(tools) == 1
+    assert tools[0].description is not None
+    assert len(tools[0].description) == 70000
+
+
+def test_stdiosession_stderr_buffer_is_bounded() -> None:
+    script = (
+        "import json, sys\n"
+        "for i in range(60):\n"
+        "    sys.stderr.write('noise %d\\n' % i)\n"
+        "sys.stderr.flush()\n"
+        "for line in sys.stdin:\n"
+        "    message = json.loads(line)\n"
+        "    if 'id' not in message:\n"
+        "        continue\n"
+        "    sys.stdout.write(json.dumps({'jsonrpc': '2.0', 'id': message['id'], 'result': {'tools': []}}) + '\\n')\n"
+        "    sys.stdout.flush()\n"
+    )
+
+    async def scenario() -> tuple[int, int]:
+        session = StdioSession([sys.executable, "-c", script], timeout=15.0)
+        await session.start()
+        try:
+            await session.list_tools()
+            await asyncio.sleep(0.2)
+            return len(session._stderr_lines), session._stderr_lines.maxlen or 0
+        finally:
+            await session.close()
+
+    count, maxlen = run(scenario())
+
+    assert maxlen == 20
+    assert 0 < count <= 20

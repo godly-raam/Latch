@@ -97,6 +97,16 @@ _RULES: dict[str, dict[str, Any]] = {
         "tags": ["CWE-116"],
         "level": "warning",
     },
+    "LATCH-AUDIT-UNICODE_VARIATION_SELECTOR": {
+        "name": "UnicodeVariationSelector",
+        "short": "Unicode variation selectors",
+        "full": (
+            "Variation selectors can request an alternate glyph or hide a marker, so"
+            " the text an operator reviews and the text a model tokenizes can differ."
+        ),
+        "tags": ["CWE-116", "CWE-74"],
+        "level": "error",
+    },
     "LATCH-AUDIT-HEADER_PRIVILEGED_INJECTION": {
         "name": "PrivilegedHeaderBinding",
         "short": "x-mcp-header bound to a privileged HTTP header",
@@ -230,6 +240,17 @@ _RULES: dict[str, dict[str, Any]] = {
         ),
         "tags": ["security", "CWE-441", "CWE-287"],
         "level": "error",
+    },
+    "LATCH-AUTH-CROSS_ORIGIN_RESOURCE_METADATA": {
+        "name": "CrossOriginResourceMetadata",
+        "short": "resource_metadata points off-origin",
+        "full": (
+            "The 401 challenge advertises a resource_metadata URL on a different"
+            " scheme, host or port than the audited server, so a hostile header"
+            " could steer the client into fetching an arbitrary URL (SSRF)."
+        ),
+        "tags": ["security", "CWE-918", "CWE-441"],
+        "level": "warning",
     },
     "LATCH-AUTH-OPEN_UNAUTHENTICATED_REMOTE_MCP": {
         "name": "OpenUnauthenticatedRemoteMcp",

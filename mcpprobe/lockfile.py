@@ -19,7 +19,12 @@ from .models import (
     ToolDefinition,
     parse_tools_payload,
 )
-from .normalizer import canonicalize_tool, hash_manifest, hash_tool
+from .normalizer import (
+    canonicalize_tool,
+    hash_manifest,
+    hash_manifest_entries,
+    hash_tool,
+)
 
 LOCKFILE_SCHEMA_VERSION = "1.0"
 
@@ -180,6 +185,10 @@ def verify_manifest(manifest_data: dict[str, Any], lockfile: Lockfile) -> Verifi
         server_id=lockfile.server_id,
         schema_version=lockfile.schema_version,
         expected_manifest_sha256=lockfile.manifest_sha256,
-        actual_manifest_sha256=hash_manifest(tools),
+        # Reuse the per-tool digests instead of canonicalizing and hashing every
+        # tool a second time.
+        actual_manifest_sha256=hash_manifest_entries(
+            f"{name}:{sha}" for name, sha in actual.items()
+        ),
         drift=drift,
     )

@@ -110,6 +110,10 @@ def _classify(
 ) -> tuple[Severity, str]:
     segments = path.split(".")
     last = segments[-1]
+    is_input_schema = segments[0] == "inputSchema"
+    is_parameter_root = (
+        len(segments) == 3 and is_input_schema and segments[1] == "properties"
+    )
 
     if change_type != "REMOVED" and _introduces_concealment(old_value, new_value):
         return (
@@ -134,6 +138,21 @@ def _classify(
     if hint_reason is not None:
         return ("HIGH", hint_reason)
 
+    # A parameter literally named ``required`` or ``description`` must be judged as
+    # a parameter, not as the ``required`` list or a description string.
+    if is_parameter_root:
+        if change_type == "ADDED":
+            return (
+                "HIGH",
+                "New parameter added to inputSchema: the tool's LLM-visible input surface grew",
+            )
+        if change_type == "REMOVED":
+            return ("MEDIUM", "Parameter removed from inputSchema: the tool's input surface shrank")
+        return (
+            "MEDIUM",
+            "Parameter schema modified: the declared shape of one parameter changed",
+        )
+
     if path == "description":
         return (
             "HIGH",
@@ -150,19 +169,6 @@ def _classify(
         if change_type == "REMOVED" or _is_relaxed_required(old_value, new_value):
             return ("HIGH", "required list relaxed: previously mandatory parameters are now optional")
         return ("MEDIUM", "required list changed: validation contract for callers changed")
-
-    is_input_schema = segments[0] == "inputSchema"
-    is_parameter_root = (
-        len(segments) == 3 and is_input_schema and segments[1] == "properties"
-    )
-
-    if is_parameter_root and change_type == "ADDED":
-        return (
-            "HIGH",
-            "New parameter added to inputSchema: the tool's LLM-visible input surface grew",
-        )
-    if is_parameter_root and change_type == "REMOVED":
-        return ("MEDIUM", "Parameter removed from inputSchema: the tool's input surface shrank")
 
     if last in DISPLAY_ONLY_FIELDS or segments[0] in DISPLAY_ONLY_FIELDS:
         return ("LOW", "Display-only metadata changed; behaviour and descriptions are unchanged")
@@ -235,9 +241,11 @@ def _walk(pinned: Any, current: Any, path: str, changes: list[FieldChange]) -> N
         _append_change(changes, path, "REMOVED", pinned, None)
         return
 
-    if pinned == current:
+    if type(pinned) is type(current) and pinned == current:
         return
 
+    # ``False == 0`` and ``True == 1`` in Python, so comparing values alone would
+    # report a type-juggled default as "no change" and leave an empty LOW diff.
     _append_change(changes, path, "MODIFIED", pinned, current)
 
 

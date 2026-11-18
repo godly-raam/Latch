@@ -415,3 +415,67 @@ def test_verify_removed_tool_severity_is_low() -> None:
     assert report.drift[0].kind.value == "REMOVED_TOOL"
     assert report.drift[0].severity == "LOW"
     assert report.drift[0].changes == []
+
+
+def test_type_juggled_boolean_default_is_reported_as_drift() -> None:
+    strict = changed(
+        lambda payload: payload["inputSchema"]["properties"].__setitem__(
+            "flag", {"type": "boolean", "default": False}
+        )
+    )
+    juggled = copy.deepcopy(strict)
+    juggled["inputSchema"]["properties"]["flag"]["default"] = 0
+
+    changes, severity = diff_tool_definitions(pinned(strict), tool(juggled))
+
+    change = find(changes, "inputSchema.properties.flag.default")
+    assert change.old_value is False
+    assert change.new_value == 0
+    assert change.severity == "MEDIUM"
+    assert severity == "MEDIUM"
+
+
+def test_parameter_literally_named_required_is_an_added_parameter() -> None:
+    payload = changed(
+        lambda raw: raw["inputSchema"]["properties"].__setitem__(
+            "required", {"type": "string"}
+        )
+    )
+
+    changes, severity = diff_tool_definitions(pinned(), tool(payload))
+
+    change = find(changes, "inputSchema.properties.required", "ADDED")
+    assert change.severity == "HIGH"
+    assert "New parameter added" in change.risk_reason
+    assert severity == "HIGH"
+
+
+def test_parameter_literally_named_description_is_an_added_parameter() -> None:
+    payload = changed(
+        lambda raw: raw["inputSchema"]["properties"].__setitem__(
+            "description", {"type": "string"}
+        )
+    )
+
+    changes, _severity = diff_tool_definitions(pinned(), tool(payload))
+
+    change = find(changes, "inputSchema.properties.description", "ADDED")
+    assert "New parameter added" in change.risk_reason
+
+
+def test_parameter_literally_named_required_is_not_a_relaxed_required_list() -> None:
+    payload = changed(
+        lambda raw: raw["inputSchema"]["properties"].__setitem__(
+            "required", {"type": "string"}
+        )
+    )
+    with_required_param = tool(payload)
+
+    changes, _severity = diff_tool_definitions(
+        canonicalize_tool(with_required_param),
+        tool(base_payload()),
+    )
+
+    change = find(changes, "inputSchema.properties.required", "REMOVED")
+    assert change.severity == "MEDIUM"
+    assert "relaxed" not in change.risk_reason

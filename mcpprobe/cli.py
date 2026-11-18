@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -83,6 +84,35 @@ def _render(value: Any, limit: int = 160) -> str:
     if len(text) > limit:
         text = text[: limit - 3] + "..."
     return text
+
+
+#: C0 controls, DEL and the C1 block: all of them can drive a terminal.
+_CONTROL_CHARS = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+
+_CONTROL_ESCAPES = {
+    "\x00": "\\0",
+    "\r": "\\r",
+    "\n": "\\n",
+    "\t": "\\t",
+    "\x1b": "\\x1b",
+}
+
+
+def _safe_terminal_text(value: Any) -> str:
+    """Render server-controlled text so it cannot escape into the terminal.
+
+    A manifest can carry ``\x1b[2K\r`` in a tool name, which would clear the line
+    and rewrite a finding an operator just read. Control characters are shown as
+    escapes; ``--json`` and SARIF output keep the raw values.
+    """
+
+    text = value if isinstance(value, str) else str(value)
+    return _CONTROL_CHARS.sub(
+        lambda match: _CONTROL_ESCAPES.get(
+            match.group(0), f"\\x{ord(match.group(0)):02x}"
+        ),
+        text,
+    )
 
 
 def _parse_headers(raw_headers: tuple[str, ...]) -> dict[str, str]:
@@ -538,6 +568,11 @@ def graph(
         click.echo(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False))
     elif output_format == "mermaid":
         click.echo(render_mermaid(report), nl=False)
+        if shadow_report is not None and not shadow_report.passed:
+            # Mermaid output is consumed by tooling; keep stdout pure and put the
+            # reason this run exits 1 where an operator will still see it.
+            click.echo("", err=True)
+            _print_shadow_report(shadow_report, err=True)
     else:
         _print_graph_report(report)
         if shadow_report is not None:
@@ -1059,30 +1094,37 @@ def watch(
 
 def _print_drift_items(report: VerificationReport) -> None:
     for item in report.drift:
+        tool_name = _safe_terminal_text(item.tool_name)
         if item.kind is DriftKind.ADDED_TOOL:
             click.echo(
-                f"  + ADDED_TOOL    {item.tool_name} [{item.severity}]"
+                f"  + ADDED_TOOL    {tool_name} [{item.severity}]"
                 f" (sha256 {item.actual_sha256})"
             )
         elif item.kind is DriftKind.REMOVED_TOOL:
             click.echo(
-                f"  - REMOVED_TOOL  {item.tool_name} [{item.severity}]"
+                f"  - REMOVED_TOOL  {tool_name} [{item.severity}]"
                 f" (sha256 {item.expected_sha256})"
             )
         else:
-            click.echo(f"  ~ MODIFIED_TOOL {item.tool_name} [{item.severity}]")
+            click.echo(f"  ~ MODIFIED_TOOL {tool_name} [{item.severity}]")
             click.echo(f"      expected sha256 {item.expected_sha256}")
             click.echo(f"      actual   sha256 {item.actual_sha256}")
             for change in item.changes:
-                click.echo(f"      {change.change_type} {change.path} [{change.severity}]")
+                click.echo(
+                    f"      {change.change_type}"
+                    f" {_safe_terminal_text(change.path)} [{change.severity}]"
+                )
                 click.echo(
                     f"          {_render(change.old_value)} -> {_render(change.new_value)}"
                 )
-                click.echo(f"          reason: {change.risk_reason}")
+                click.echo(f"          reason: {_safe_terminal_text(change.risk_reason)}")
 
 
 def _print_human_report(report: VerificationReport) -> None:
-    click.echo(f"FAILED: {len(report.drift)} drift item(s) for server '{report.server_id}'")
+    click.echo(
+        f"FAILED: {len(report.drift)} drift item(s) for server"
+        f" '{_safe_terminal_text(report.server_id)}'"
+    )
     click.echo(f"  expected manifest sha256: {report.expected_manifest_sha256}")
     click.echo(f"  actual   manifest sha256: {report.actual_manifest_sha256}")
     _print_drift_items(report)
@@ -1101,12 +1143,13 @@ def _print_audit_report(report: AuditReport, fail_on: str) -> None:
         )
     for finding in report.findings:
         click.echo(
-            f"  [{finding.severity}] {finding.rule_id}"
-            f" {finding.tool_name}.{finding.field_path}"
+            f"  [{finding.severity}] {_safe_terminal_text(finding.rule_id)}"
+            f" {_safe_terminal_text(finding.tool_name)}"
+            f".{_safe_terminal_text(finding.field_path)}"
         )
-        click.echo(f"      {finding.message}")
+        click.echo(f"      {_safe_terminal_text(finding.message)}")
         if finding.evidence is not None:
-            click.echo(f"      evidence: {finding.evidence}")
+            click.echo(f"      evidence: {_safe_terminal_text(finding.evidence)}")
 
 
 def _print_graph_report(report: GraphReport) -> None:
@@ -1118,21 +1161,22 @@ def _print_graph_report(report: GraphReport) -> None:
     if report.trusted_servers_excluded:
         click.echo(
             "  trusted servers barred as sources/sinks:"
-            f" {', '.join(report.trusted_servers_excluded)}"
+            f" {_safe_terminal_text(', '.join(report.trusted_servers_excluded))}"
         )
     if report.local_write_tools:
         click.echo(
             "  local-write tools (never an exfil sink):"
-            f" {', '.join(report.local_write_tools)}"
+            f" {_safe_terminal_text(', '.join(report.local_write_tools))}"
         )
 
     click.echo("")
     for node in report.nodes:
         label = ", ".join(node.capabilities) if node.capabilities else "no capability"
-        click.echo(f"  {node.qualified_name}  [{label}]")
+        click.echo(f"  {_safe_terminal_text(node.qualified_name)}  [{label}]")
         for evidence in node.evidence:
             click.echo(
-                f"      - {evidence.tag}: {evidence.detail}"
+                f"      - {_safe_terminal_text(evidence.tag)}:"
+                f" {_safe_terminal_text(evidence.detail)}"
                 f" (signal {evidence.signal}, weight {evidence.weight:g})"
             )
 
@@ -1142,8 +1186,9 @@ def _print_graph_report(report: GraphReport) -> None:
         for index, path in enumerate(report.trifecta_paths, start=1):
             scope = "cross-server" if path.cross_server else "single-server"
             click.echo(
-                f"  {index}. [{path.severity}] {scope} ({', '.join(path.servers)})"
-                f"  {path.path_id}"
+                f"  {index}. [{path.severity}] {scope}"
+                f" ({_safe_terminal_text(', '.join(path.servers))})"
+                f"  {_safe_terminal_text(path.path_id)}"
             )
             collapsed = (
                 f" (+{path.collapsed_read_count - 1} more read tools)"
@@ -1151,10 +1196,12 @@ def _print_graph_report(report: GraphReport) -> None:
                 else ""
             )
             click.echo(
-                f"     {path.ingest_tool} -> {path.read_tool} -> {path.egress_tool}"
+                f"     {_safe_terminal_text(path.ingest_tool)}"
+                f" -> {_safe_terminal_text(path.read_tool)}"
+                f" -> {_safe_terminal_text(path.egress_tool)}"
                 f"{collapsed}"
             )
-            click.echo(f"     {path.attack_narrative}")
+            click.echo(f"     {_safe_terminal_text(path.attack_narrative)}")
         click.echo("")
         click.echo(
             f"RESULT: {len(report.trifecta_paths)} Lethal Trifecta path(s) detected"
@@ -1163,36 +1210,47 @@ def _print_graph_report(report: GraphReport) -> None:
         click.echo("RESULT: no Lethal Trifecta path detected")
 
 
-def _print_shadow_report(report: ShadowReport) -> None:
-    click.echo("Latch cross-server shadow analysis")
+def _print_shadow_report(report: ShadowReport, *, err: bool = False) -> None:
+    click.echo("Latch cross-server shadow analysis", err=err)
     click.echo(
         f"  servers: {report.server_count}   tools: {report.tool_count}"
-        f"   findings: {len(report.findings)}"
+        f"   findings: {len(report.findings)}",
+        err=err,
     )
     if report.trusted_servers_excluded:
         click.echo(
             "  trusted servers:"
-            f" {', '.join(report.trusted_servers_excluded)}"
+            f" {_safe_terminal_text(', '.join(report.trusted_servers_excluded))}",
+            err=err,
         )
 
     for finding in report.findings:
-        click.echo("")
+        click.echo("", err=err)
         click.echo(
-            f"  [{finding.severity}] {finding.rule_id}  {finding.canonical_key}"
+            f"  [{finding.severity}] {_safe_terminal_text(finding.rule_id)}"
+            f"  {_safe_terminal_text(finding.canonical_key)}",
+            err=err,
         )
-        click.echo(f"      {finding.message}")
+        click.echo(f"      {_safe_terminal_text(finding.message)}", err=err)
         click.echo(
-            f"      servers: {', '.join(finding.servers)}"
-            f"   tools: {', '.join(finding.involved_tools)}"
+            f"      servers: {_safe_terminal_text(', '.join(finding.servers))}"
+            f"   tools: {_safe_terminal_text(', '.join(finding.involved_tools))}",
+            err=err,
         )
         if finding.evidence is not None:
-            click.echo(f"      evidence: {finding.evidence}")
+            click.echo(
+                f"      evidence: {_safe_terminal_text(finding.evidence)}", err=err
+            )
 
-    click.echo("")
+    click.echo("", err=err)
     if report.passed:
-        click.echo("RESULT: no tool shadowing or cross-tool hijack detected")
+        click.echo(
+            "RESULT: no tool shadowing or cross-tool hijack detected", err=err
+        )
     else:
-        click.echo(f"RESULT: {len(report.findings)} shadowing finding(s) detected")
+        click.echo(
+            f"RESULT: {len(report.findings)} shadowing finding(s) detected", err=err
+        )
 
 
 def _print_auth_report(report: AuthAuditReport, fail_on: str) -> None:
@@ -1207,11 +1265,14 @@ def _print_auth_report(report: AuthAuditReport, fail_on: str) -> None:
 
     for finding in report.findings:
         click.echo("")
-        click.echo(f"  [{finding.severity}] {finding.rule_id}  {finding.field_path}")
-        click.echo(f"      servers: {', '.join(finding.servers)}")
-        click.echo(f"      {finding.message}")
+        click.echo(
+            f"  [{finding.severity}] {_safe_terminal_text(finding.rule_id)}"
+            f"  {_safe_terminal_text(finding.field_path)}"
+        )
+        click.echo(f"      servers: {_safe_terminal_text(', '.join(finding.servers))}")
+        click.echo(f"      {_safe_terminal_text(finding.message)}")
         if finding.evidence is not None:
-            click.echo(f"      evidence: {finding.evidence}")
+            click.echo(f"      evidence: {_safe_terminal_text(finding.evidence)}")
 
     click.echo("")
     if report.passed:
@@ -1244,16 +1305,20 @@ def _print_chain_report(report: ChainVerificationReport) -> None:
 
     for result in report.results:
         click.echo("")
-        click.echo(f"  [{result.status}] {result.path_id}")
+        click.echo(
+            f"  [{result.status}] {_safe_terminal_text(result.path_id)}"
+        )
         click.echo(
             f"      static severity: {result.static_severity}"
             f"   verified severity: {result.verified_severity}"
         )
         click.echo(
-            f"      {result.ingest_tool} -> {result.read_tool} -> {result.egress_tool}"
+            f"      {_safe_terminal_text(result.ingest_tool)}"
+            f" -> {_safe_terminal_text(result.read_tool)}"
+            f" -> {_safe_terminal_text(result.egress_tool)}"
         )
         if result.canary_token:
-            click.echo(f"      canary: {result.canary_token}")
+            click.echo(f"      canary: {_safe_terminal_text(result.canary_token)}")
         click.echo(
             f"      read observed: {result.read_observed}"
             f"   egress invoked: {result.egress_invoked}"
@@ -1261,16 +1326,22 @@ def _print_chain_report(report: ChainVerificationReport) -> None:
         if result.status in ("DRY_RUN_SKIPPED", "SKIPPED_NOT_ALLOWLISTED"):
             click.echo(
                 "      read args: "
-                + json.dumps(result.read_args or {}, sort_keys=True)
+                + _safe_terminal_text(
+                    json.dumps(result.read_args or {}, sort_keys=True)
+                )
             )
             click.echo(
                 "      egress args: "
-                + json.dumps(result.egress_args or {}, sort_keys=True)
+                + _safe_terminal_text(
+                    json.dumps(result.egress_args or {}, sort_keys=True)
+                )
             )
         if result.sink_request_summary is not None:
-            click.echo(f"      sink: {result.sink_request_summary}")
+            click.echo(
+                f"      sink: {_safe_terminal_text(result.sink_request_summary)}"
+            )
         if result.block_reason is not None:
-            click.echo(f"      block: {result.block_reason}")
+            click.echo(f"      block: {_safe_terminal_text(result.block_reason)}")
 
     click.echo("")
     if report.passed:
@@ -1288,8 +1359,8 @@ def _print_chain_report(report: ChainVerificationReport) -> None:
 
 def _print_watch_report(report: WatchReport) -> None:
     click.echo(
-        f"watching '{report.server_id}' over {report.transport}"
-        f" (protocol {report.protocol_version})"
+        f"watching '{_safe_terminal_text(report.server_id)}' over"
+        f" {report.transport} (protocol {report.protocol_version})"
     )
     for event in report.events:
         if event.verification.passed:
