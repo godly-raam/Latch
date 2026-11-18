@@ -49,12 +49,14 @@ blended into one headline.
 The headline row below is the **Post-Tuning Corpus** stage; the
 nine-package blind baseline is the row above.
 
-| Scanner | Clean-package FPR | In-model real targets | Evidence |
-| ------- | ----------------- | --------------------- | -------- |
-| **mcpprobe (Latch)** | 0.17 (1/6) | 6/6 | measured |
-| Naive keyword/substring baseline | 0.83 (5/6) | not applicable | measured |
-| `mcp-scan` (`snyk-agent-scan`) | n/a | n/a | installed (v0.6.11), requires `SNYK_TOKEN` |
-| `AgentLatch` (`agent-latch`) | n/a | n/a | architecture comparison only (not installed) |
+| Scanner | Stage | Clean-package FPR | In-scope real targets | Evidence |
+| ------- | ----- | ----------------- | --------------------- | -------- |
+| **mcpprobe (Latch)** | Post-tuning | 0.17 (1/6) | 0.88 (7/8) | measured |
+| Naive keyword/substring baseline | Post-tuning | 0.83 (5/6) | not applicable | measured |
+| `mcp-scan` (`snyk-agent-scan`) | Post-tuning | n/a (output shape not recognised) | n/a | ran (v0.6.11), output shape not recognised |
+| `AgentLatch` (`agent-latch`) | Post-tuning | n/a | n/a | architecture comparison only (not installed) |
+
+The `0.88` (`7/8`) denominator is every in-scope target: the six single-capture package targets above plus the two cross-server compositions (`D` detected, `B` missed). Narrowed to package manifests only, the same run is `6/6`. The first-run blind row for that denominator is `0.67` (`2/3`): `mcp-remote` and `mcp-proxy` were caught, `B` was missed then too.
 
 ## Real captured packages
 
@@ -82,13 +84,13 @@ produced a parseable live verdict.
 
 On the 6 clean packages, mcpprobe (Latch) flags 1 (FPR 0.17); the naive baseline flags 5 (FPR 0.83). The Latch flag is the SDK diagnostics server, whose generic read/egress heuristics produce a documented static over-approximation.
 
-In-model real targets detected: `npm-mcp-remote-0-14-3`, `npm-mcp-remote-0-14-3-static-header`, `npm-server-github-2025-4-8`, `npm-server-slack-2025-4-25`, `npm-supergateway-3-1-0`, `pypi-mcp-proxy-0-8-2`. Handler-level CVEs in the corpus are outside a `tools/list` threat model and are scored as misses in [`package_eval/PACKAGE_EVAL_REPORT.md`](../package_eval/PACKAGE_EVAL_REPORT.md).
+In-model package targets detected (the `6/6` subset): `npm-mcp-remote-0-14-3`, `npm-mcp-remote-0-14-3-static-header`, `npm-server-github-2025-4-8`, `npm-server-slack-2025-4-25`, `npm-supergateway-3-1-0`, `pypi-mcp-proxy-0-8-2`. Handler-level CVEs in the corpus are outside a `tools/list` threat model and are scored as misses in [`package_eval/PACKAGE_EVAL_REPORT.md`](../package_eval/PACKAGE_EVAL_REPORT.md).
 
 ## Peer scanner: `mcp-scan` (`snyk-agent-scan`)
 
 - Installed distribution: `snyk-agent-scan` `0.6.11`
-- Exit status: `credentials_required` (`snyk-agent-scan requires SNYK_TOKEN; no token is present`)
-- Exit code: `1`
+- Exit status: `measured_unparsed` (`the scanner ran but its JSON shape was not recognised; no per-package verdict is claimed`)
+- Exit code: `0`
 - Remote analysis required: `True` -> `https://api.snyk.io/hidden/mcp-scan/analysis-machine?version=2026-07-10`
 - Exact invocation:
 
@@ -96,7 +98,7 @@ In-model real targets detected: `npm-mcp-remote-0-14-3`, `npm-mcp-remote-0-14-3-
 snyk-agent-scan scan <temp>/mcp-scan-config.json --json --no-skills --dangerously-run-mcp-servers --suppress-mcpserver-io true --storage-file <temp>/scan-state.json
 ```
 
-This environment could not obtain a **measured** peer verdict. Current `snyk-agent-scan` releases require a `SNYK_TOKEN` account credential and perform deep analysis on Snyk's endpoint, so with no token the CLI stops before scanning and emits no findings. That is recorded exactly as observed instead of being reported as a clean scan or a detection. Set `SNYK_TOKEN` and re-run `python -m head_to_head.run_comparison` to replace this row with measured output; the runner caches the result keyed by scanner version, capture digests and token presence.
+This environment could not obtain a **measured** peer verdict. Current `snyk-agent-scan` releases require a `SNYK_TOKEN` account credential and perform deep analysis on Snyk's endpoint, so with no token the CLI stops before scanning and emits no findings. That is recorded exactly as observed instead of being reported as a clean scan or a detection. Set `SNYK_TOKEN` and re-run `python -m head_to_head.run_comparison --force-refresh` to replace this row with measured output. A `measured` record is reused in token-less environments (CI, a fresh clone) until `--force-refresh` is passed, so the token is only ever needed to produce a measurement, never to read one.
 
 ## Architectural and detection matrix
 

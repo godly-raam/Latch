@@ -18,6 +18,14 @@ The result is cached in ``head_to_head/mcp_scan_measurement.json`` under a
 ``cache_key`` covering the scanner version, the capture digests, the argument
 list and whether a token is present, so a re-run is deterministic and CI does
 not hit the network on every ``pytest``.
+
+Two properties matter for a committed cache file. It must never contain the
+token: every record is scrubbed of the ``SNYK_TOKEN`` value and of token-shaped
+strings (``Bearer ...``, UUIDs) before it is memoised or written. And a
+``measured`` record must survive a token-less environment: its ``reuse_key``
+covers the scanner version and capture digests but not the token, so CI and a
+contributor's clone reuse the real verdict instead of overwriting it with
+``credentials_required``. ``--force-refresh`` is the only way to replace it.
 """
 
 from __future__ import annotations
@@ -25,6 +33,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -127,22 +136,86 @@ def _sha256_json(payload: Any) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def _cache_identity(
+    captures: list[dict[str, Any]], binary: str | None, version: str | None
+) -> dict[str, Any]:
+    """What a measurement is about: the scanner, its version and the bytes."""
+
+    return {
+        "analysis_endpoint": ANALYSIS_ENDPOINT,
+        "binary": Path(binary).name if binary else None,
+        "captures": {
+            capture["slug"]: capture["manifest_sha256"]
+            for capture in captures
+            if capture["slug"] in PACKAGE_SLUGS
+        },
+        "version": version,
+    }
+
+
 def cache_key(
     captures: list[dict[str, Any]], binary: str | None, version: str | None
 ) -> str:
+    """Identity of one live run, including whether a token was present."""
+
     return _sha256_json(
         {
-            "analysis_endpoint": ANALYSIS_ENDPOINT,
-            "binary": Path(binary).name if binary else None,
-            "captures": {
-                capture["slug"]: capture["manifest_sha256"]
-                for capture in captures
-                if capture["slug"] in PACKAGE_SLUGS
-            },
+            **_cache_identity(captures, binary, version),
             "token_present": bool(os.environ.get("SNYK_TOKEN")),
-            "version": version,
         }
     )
+
+
+def reusable_key(
+    captures: list[dict[str, Any]], binary: str | None, version: str | None
+) -> str:
+    """Identity that ignores the token, so a measured record outlives it.
+
+    A ``measured`` record produced in a token environment stays valid in CI and
+    on a contributor's clone, where ``SNYK_TOKEN`` is absent. The record still
+    says which run produced it through its own ``token_present`` field.
+    """
+
+    return _sha256_json(_cache_identity(captures, binary, version))
+
+
+#: Strings that must never reach the committed cache file. The scanner inherits
+#: the caller's environment, so the token can surface in an echoed header, an
+#: error message or a stack trace even though this module never logs it.
+_SECRET_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (
+        re.compile(r"(?i)\bbearer\s+[A-Za-z0-9._~+/=-]{8,}"),
+        "Bearer [REDACTED]",
+    ),
+    (
+        re.compile(
+            r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
+            r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
+        ),
+        "[REDACTED]",
+    ),
+)
+
+
+def scrub_secrets(value: Any, secret: str | None = None) -> Any:
+    """Return ``value`` with the token value and token-shaped strings removed.
+
+    Applied to every measurement before it is memoised or written, so a
+    committed cache file cannot leak ``SNYK_TOKEN`` regardless of what the peer
+    CLI prints.
+    """
+
+    if isinstance(value, dict):
+        return {key: scrub_secrets(item, secret) for key, item in value.items()}
+    if isinstance(value, list):
+        return [scrub_secrets(item, secret) for item in value]
+    if isinstance(value, str):
+        if secret and len(secret) >= 6 and secret in value:
+            value = value.replace(secret, "[REDACTED]")
+        for pattern, replacement in _SECRET_PATTERNS:
+            value = pattern.sub(replacement, value)
+        return value
+    return value
 
 
 def extract_flags(
@@ -248,6 +321,7 @@ def _run(
     version: str | None,
     captures: list[dict[str, Any]],
     key: str,
+    reuse_key: str,
 ) -> dict[str, Any]:
     token_present = bool(os.environ.get("SNYK_TOKEN"))
     row: dict[str, Any] = {
@@ -268,6 +342,7 @@ def _run(
         "flagged_packages": [],
         "clean_false_positive_rate": None,
         "cache_key": key,
+        "reuse_key": reuse_key,
     }
 
     sandbox = tempfile.mkdtemp(prefix="latch-mcp-scan-")
@@ -354,10 +429,14 @@ def run_measurement(
     force: bool = False,
     cache_path: Path | None = None,
 ) -> dict[str, Any]:
-    """Return the cached measurement, running the CLI only when the key moves.
+    """Return the cached measurement, running the CLI only when it is needed.
 
     ``cache_path`` redirects the cache to another file (tests use a temporary
     directory so a plain ``pytest`` run never rewrites the tracked artifact).
+
+    ``force`` (``--force-refresh``) is the only way to replace a matching
+    record: a ``measured`` verdict is reused without a token, because CI and a
+    fresh clone must not trade a real measurement for ``credentials_required``.
     """
 
     global _MEMO, _MEMO_SCOPE
@@ -367,12 +446,27 @@ def run_measurement(
     binary = resolve_binary()
     version = scanner_version(binary) if binary else None
     key = cache_key(captures, binary, version)
+    reuse_key = reusable_key(captures, binary, version)
+    token_present = bool(os.environ.get("SNYK_TOKEN"))
+    secret = os.environ.get("SNYK_TOKEN")
+
+    def _is_reusable(cached: dict[str, Any]) -> bool:
+        """A measured record survives an environment without the token."""
+
+        return (
+            not token_present
+            and cached.get("status") == "measured"
+            and cached.get("reuse_key") == reuse_key
+        )
+
+    def _matches(cached: dict[str, Any]) -> bool:
+        return cached.get("cache_key") == key or _is_reusable(cached)
 
     if (
         not force
         and _MEMO is not None
-        and _MEMO.get("cache_key") == key
         and _MEMO_SCOPE == scope
+        and _matches(_MEMO)
     ):
         return _MEMO
 
@@ -381,13 +475,24 @@ def run_measurement(
             cached = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             cached = None
-        if cached is not None and cached.get("cache_key") == key:
-            _MEMO = cached
+        if cached is not None and _matches(cached):
+            # Scrub on read as well: a record written before this guard existed
+            # must not keep leaking through a reused measurement.
+            cleaned = scrub_secrets(cached, secret)
+            if cleaned != cached:
+                path.write_text(
+                    json.dumps(
+                        cleaned, indent=2, sort_keys=True, ensure_ascii=False
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+            _MEMO = cleaned
             _MEMO_SCOPE = scope
-            return cached
+            return cleaned
 
     if binary is None:
-        row = {
+        row: dict[str, Any] = {
             "tool": "mcp-scan",
             "distribution": "snyk-agent-scan",
             "version": None,
@@ -395,7 +500,7 @@ def run_measurement(
             "packages": list(PACKAGE_SLUGS),
             "analysis_endpoint": ANALYSIS_ENDPOINT,
             "remote_api_required": True,
-            "token_present": bool(os.environ.get("SNYK_TOKEN")),
+            "token_present": token_present,
             "status": "not_installed_in_env",
             "reason": "neither snyk-agent-scan nor mcp-scan is on PATH",
             "exit_code": None,
@@ -405,10 +510,12 @@ def run_measurement(
             "flagged_packages": [],
             "clean_false_positive_rate": None,
             "cache_key": key,
+            "reuse_key": reuse_key,
         }
     else:
-        row = _run(binary, version, captures, key)
+        row = _run(binary, version, captures, key, reuse_key)
 
+    row = scrub_secrets(row, secret)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(row, indent=2, sort_keys=True, ensure_ascii=False) + "\n",

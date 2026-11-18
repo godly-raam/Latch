@@ -474,15 +474,15 @@ Five independent suites keep the engines honest. Every scoring run is offline
 and deterministic; only `package_eval.capture_manifests` uses the network, and
 only to install the packages it captures.
 
-| # | Suite | Corpus | Result | Report |
-| - | ----- | ------ | ------ | ------ |
-| 1 | `benchmark/` | 36 synthetic fixtures (18 hostile, 18 benign lookalikes) | Precision `1.00`, FPR `0.00`, recall `1.00` vs. naive `0.48` / `0.67` / `0.61` | [`benchmark/RESULTS.md`](benchmark/RESULTS.md) |
-| 2 | `package_eval/` | 14 real npm/PyPI packages (124 tools, pinned pre-patch releases + clean references) and 5 compositions | **First-run blind baseline** (9 packages): in-scope recall `0.67` (2/3), FPR `0.20` (1/5). **Post-tuning corpus** (14 packages): in-scope `0.88` (7/8), overall `0.70` (7/10, including two honest handler-CVE misses), FPR `0.17` (1/6) vs. naive `0.83` (5/6) | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
-| 3 | `synthetic_regression/` | 24 fixtures modeled on disclosed MCP bug classes | `1.00` in-scope recall, `0.83` overall recall with 2 out-of-scope handler bugs | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
-| 4a | `adversarial/` Wave 1 | 24 evasion probes, iteratively hardened | `19/19` post-tuning catches + 5 irreducible boundaries | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
-| 4b | `adversarial/` Wave 2 | 16 self-authored blind probes (12 hostile, 4 benign), no rule edits | **Author-blind upper bound** (awaiting independent external submission): precision `1.00`, recall `0.42`, FPR `0.00` — 5 catches, **7 honest misses** | [`adversarial/WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md) |
-| 4c | `adversarial/` external kit | Contributor-authored 10-probe schema, no access to the rules | Schema/scorer validated in CI; **no external submission yet**, so nothing is claimed | [`adversarial/EXTERNAL_BLIND_REPORT.md`](adversarial/EXTERNAL_BLIND_REPORT.md) |
-| 5 | `head_to_head/` | 14 real captures, measured `mcp-scan` run against the 6 clean packages, 10 self-authored scenarios demoted to an appendix | Clean-package FPR `0.17` (1/6) post-tuning vs. `0.20` (1/5) on the 9-package blind baseline, naive `0.83` (5/6); in-model package recall `6/6`, two of them known-class manifest checks rather than generalization proof; `mcp-scan` column measured or explicitly `credentials_required`; `10/10` self-authored feature demo in the appendix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
+| # | Suite | Stage | Corpus | Result | Report |
+| - | ----- | ----- | ------ | ------ | ------ |
+| 1 | `benchmark/` | Post-tuning | 36 synthetic fixtures (18 hostile, 18 benign lookalikes) | Precision `1.00`, FPR `0.00`, recall `1.00` vs. naive `0.48` / `0.67` / `0.61` | [`benchmark/RESULTS.md`](benchmark/RESULTS.md) |
+| 2 | `package_eval/` | First-run blind + post-tuning | 14 real npm/PyPI packages (124 tools, pinned pre-patch releases + clean references) and 5 compositions | **First-run blind baseline** (9 packages): in-scope recall `0.67` (2/3), FPR `0.20` (1/5). **Post-tuning corpus** (14 packages): in-scope `0.88` (7/8), overall `0.70` (7/10, including two honest handler-CVE misses), FPR `0.17` (1/6) vs. naive `0.83` (5/6) | [`package_eval/PACKAGE_EVAL_REPORT.md`](package_eval/PACKAGE_EVAL_REPORT.md) |
+| 3 | `synthetic_regression/` | Post-tuning | 24 fixtures modeled on disclosed MCP bug classes | `1.00` in-scope recall, `0.83` overall recall with 2 out-of-scope handler bugs | [`synthetic_regression/REGRESSION_REPORT.md`](synthetic_regression/REGRESSION_REPORT.md) |
+| 4a | `adversarial/` Wave 1 | Post-tuning | 24 evasion probes, iteratively hardened | `19/19` post-tuning catches + 5 irreducible boundaries | [`adversarial/EVASION_REPORT.md`](adversarial/EVASION_REPORT.md) |
+| 4b | `adversarial/` Wave 2 | Author-blind, pre-tuning | 16 self-authored blind probes (12 hostile, 4 benign), no rule edits | **Author-blind upper bound** (awaiting independent external submission): precision `1.00`, recall `0.42`, FPR `0.00` — 5 catches, **7 honest misses** | [`adversarial/WAVE2_BLIND_REPORT.md`](adversarial/WAVE2_BLIND_REPORT.md) |
+| 4c | `adversarial/` external kit | No submission yet | Contributor-authored 10-probe schema, no access to the rules | Schema/scorer validated in CI; **no external submission yet**, so nothing is claimed | [`adversarial/EXTERNAL_BLIND_REPORT.md`](adversarial/EXTERNAL_BLIND_REPORT.md) |
+| 5 | `head_to_head/` | Post-tuning (+ first-run blind row) | 14 real captures, peer scanner invoked (`snyk-agent-scan` `0.6.11`), unmeasured here (`SNYK_TOKEN` required; refresh with `--force-refresh`), 10 self-authored scenarios demoted to an appendix | Clean-package FPR `0.17` (1/6) post-tuning vs. `0.20` (1/5) on the 9-package blind baseline, naive `0.83` (5/6); in-scope real-target recall `0.88` (7/8; `6/6` on package manifests), two of them known-class manifest checks rather than generalization proof; `mcp-scan` row invoked but unmeasured (`credentials_required`); `10/10` self-authored feature demo in the appendix | [`head_to_head/HEAD_TO_HEAD.md`](head_to_head/HEAD_TO_HEAD.md) |
 
 **Wave 1, Wave 2 and the external kit are three different claims.** Wave 1 is a
 post-tuning regression suite: every probe there was a real bypass that the
@@ -575,13 +575,15 @@ the post-tuning 14-package corpus. The headline row is the post-tuning one, and
 the report marks target D as detected only because `4a089e1` added `navigate` to
 the egress vocabulary. On the same captures the naive keyword baseline flags
 `5/6` (`0.83`). It also
-runs `mcp-scan` — the current `snyk-agent-scan` distribution — live against
-those six clean packages and records the exact invocation, exit code and
-verdict class. That CLI performs deep analysis on a Snyk endpoint and requires
-an account token, so with no `SNYK_TOKEN` in the environment the column is
-reported as `credentials_required` rather than being dressed up as a clean
-scan; the run is cached by scanner version, capture digests and token presence,
-and a token enables a real per-package verdict on the next run. `agent-latch`
+invokes `mcp-scan` — the current `snyk-agent-scan` distribution — against those
+six clean packages, unmeasured here, and records the exact invocation, exit
+code and verdict class. That CLI performs deep analysis on a Snyk endpoint and
+requires an account token, so with no `SNYK_TOKEN` in the environment the run
+is reported as `credentials_required` rather than being dressed up as a clean
+scan; the record is cached by scanner version and capture digests (never by the
+token, which is scrubbed out of it), so a measured verdict survives token-less
+CI and a fresh clone, and `SNYK_TOKEN=… python -m
+head_to_head.run_comparison --force-refresh` produces a new one. `agent-latch`
 remains an `architectural_comparison_only` row because the binary is not
 installed. The ten canonical protocol scenarios (rug pull, `list_changed`
 drift, Tag-block smuggling, `x-mcp-header: Authorization`, homoglyph shadowing,

@@ -1,7 +1,7 @@
 {
   "analysis_endpoint": "https://api.snyk.io/hidden/mcp-scan/analysis-machine?version=2026-07-10",
   "binary": "snyk-agent-scan",
-  "cache_key": "7751819a91baeb92ae39a78f8c9fb9bd443614882a37457e4e71c162a98837bc",
+  "cache_key": "226fdb1772ced31adf4b44e71028a359a2c2817a1db09e025870afc2e8f39a01",
   "clean_false_positive_rate": null,
   "command": [
     "snyk-agent-scan",
@@ -16,7 +16,7 @@
     "<temp>/scan-state.json"
   ],
   "distribution": "snyk-agent-scan",
-  "exit_code": 1,
+  "exit_code": 0,
   "flagged_packages": [],
   "package_flags": {},
   "packages": [
@@ -27,10 +27,11 @@
     "pypi-mcp-server-git"
   ],
   "parsed": false,
-  "reason": "snyk-agent-scan requires SNYK_TOKEN; no token is present",
+  "reason": "the scanner ran but its JSON shape was not recognised; no per-package verdict is claimed",
   "remote_api_required": true,
-  "status": "credentials_required",
-  "token_present": false,
+  "reuse_key": "f8916db1446f893bd55b3c189979af2b44ee72793f4a987527933887dedd71d2",
+  "status": "measured_unparsed",
+  "token_present": true,
   "tool": "mcp-scan",
   "version": "0.6.11"
 }

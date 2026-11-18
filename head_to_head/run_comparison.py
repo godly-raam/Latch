@@ -573,6 +573,7 @@ def compute_results(
     *,
     measurement: dict[str, Any] | None = None,
     cache_path: Path | None = None,
+    force_refresh: bool = False,
 ) -> dict[str, Any]:
     """Recompute the comparison.
 
@@ -580,11 +581,15 @@ def compute_results(
     invoking (or caching) the scanner; ``cache_path`` redirects the cached
     measurement to another file. Tests use both so a plain ``pytest`` run never
     rewrites a tracked artifact and does not depend on an installed peer CLI.
+    ``force_refresh`` runs the peer CLI even when a matching measurement is
+    already cached, including a ``measured`` one from a token environment.
     """
 
     captures = load_captures()
     if measurement is None:
-        measurement = run_measurement(captures, cache_path=cache_path)
+        measurement = run_measurement(
+            captures, force=force_refresh, cache_path=cache_path
+        )
     packages: list[dict[str, Any]] = []
     for capture in captures:
         row = evaluate_package(capture)
@@ -737,6 +742,29 @@ def _peer_status_text(row: dict[str, Any]) -> str:
     return status.replace("_", " ")
 
 
+def _peer_measurement_cell(measurement: dict[str, Any]) -> str:
+    """The peer's measured clean-package FPR, or why there is none.
+
+    A measured run fills the cell with real per-package counts; every other
+    outcome says plainly that no peer verdict exists instead of implying a
+    clean scan.
+    """
+
+    status = measurement.get("status")
+    rate = measurement.get("clean_false_positive_rate")
+    if status == "measured" and rate is not None:
+        flags = measurement.get("package_flags") or {}
+        flagged = measurement.get("flagged_packages") or []
+        if flags:
+            return f"{rate:.2f} ({len(flagged)}/{len(flags)})"
+        return f"{rate:.2f}"
+    if status == "measured_unparsed":
+        return "n/a (output shape not recognised)"
+    if status in {"credentials_required", "not_installed_in_env"}:
+        return "n/a (SNYK_TOKEN required)"
+    return "n/a (see status)"
+
+
 def render_report(results: dict[str, Any]) -> str:
     metrics = results["metrics"]
     measurement = results["mcp_scan_measurement"]
@@ -819,24 +847,35 @@ def render_report(results: dict[str, Any]) -> str:
         "The headline row below is the **Post-Tuning Corpus** stage; the",
         "nine-package blind baseline is the row above.",
         "",
-        "| Scanner | Clean-package FPR | In-model real targets | Evidence |",
-        "| ------- | ----------------- | --------------------- | -------- |",
-        f"| **mcpprobe (Latch)** |"
+        "| Scanner | Stage | Clean-package FPR | In-scope real targets | Evidence |",
+        "| ------- | ----- | ----------------- | --------------------- | -------- |",
+        f"| **mcpprobe (Latch)** | Post-tuning |"
         f" {metrics['latch_package_false_positive_rate']:.2f}"
         f" ({len(metrics['latch_false_positive_packages'])}"
         f"/{metrics['clean_package_count']}) |"
-        f" {len(metrics['latch_in_model_detected'])}"
-        f"/{metrics['in_model_package_count']} | measured |",
-        f"| Naive keyword/substring baseline |"
+        f" {post_tuning['in_scope_recall']:.2f}"
+        f" ({len(post_tuning['in_scope_detected'])}"
+        f"/{len(post_tuning['in_scope_targets'])}) | measured |",
+        f"| Naive keyword/substring baseline | Post-tuning |"
         f" {metrics['naive_package_false_positive_rate']:.2f}"
         f" ({len(metrics['naive_false_positive_packages'])}"
         f"/{metrics['clean_package_count']}) | not applicable | measured |",
-        f"| `mcp-scan` (`snyk-agent-scan`) |"
-        f" {'n/a' if measurement.get('clean_false_positive_rate') is None else format(measurement['clean_false_positive_rate'], '.2f')} |"
-        " n/a |"
+        f"| `mcp-scan` (`snyk-agent-scan`) | Post-tuning |"
+        f" {_peer_measurement_cell(measurement)} | n/a |"
         f" {_peer_status_text({'tool': 'mcp-scan', 'status': metrics['mcp_scan_status'], 'measurement': measurement})} |",
-        "| `AgentLatch` (`agent-latch`) | n/a | n/a |"
+        "| `AgentLatch` (`agent-latch`) | Post-tuning | n/a | n/a |"
         f" {_peer_status_text({'tool': 'agent-latch', 'status': next((row['status'] for row in results['third_party'] if row['tool'] == 'agent-latch'), 'architectural_comparison_only')})} |",
+        "",
+        f"The `{post_tuning['in_scope_recall']:.2f}`"
+        f" (`{len(post_tuning['in_scope_detected'])}"
+        f"/{len(post_tuning['in_scope_targets'])}`) denominator is every"
+        " in-scope target: the six single-capture package targets above plus"
+        " the two cross-server compositions (`D` detected, `B` missed)."
+        " Narrowed to package manifests only, the same run is"
+        f" `{len(metrics['latch_in_model_detected'])}"
+        f"/{metrics['in_model_package_count']}`. The first-run blind row for"
+        " that denominator is `0.67` (`2/3`): `mcp-remote` and `mcp-proxy`"
+        " were caught, `B` was missed then too.",
         "",
         "## Real captured packages",
         "",
@@ -872,7 +911,7 @@ def render_report(results: dict[str, Any]) -> str:
             " is the SDK diagnostics server, whose generic read/egress"
             " heuristics produce a documented static over-approximation.",
             "",
-            "In-model real targets detected: "
+            "In-model package targets detected (the `6/6` subset): "
             + (
                 ", ".join(f"`{slug}`" for slug in metrics["latch_in_model_detected"])
                 or "none"
@@ -904,11 +943,21 @@ def render_report(results: dict[str, Any]) -> str:
     )
 
     if measurement.get("status") == "measured":
+        flags = measurement.get("package_flags") or {}
+        flagged = measurement.get("flagged_packages") or []
         lines.append(
             "The peer scanner ran live and its per-package verdicts are in the"
-            " table above; its clean-package FPR is"
-            f" {measurement.get('clean_false_positive_rate')}."
+            f" table above; it flags {len(flagged)}/{len(flags)} clean packages"
+            f" (FPR {measurement.get('clean_false_positive_rate')}):"
+            " " + (", ".join(f"`{slug}`" for slug in flagged) or "none") + "."
         )
+        lines.append(
+            "That measurement is reused verbatim in an environment without"
+            " `SNYK_TOKEN` -- CI or a fresh clone -- because the cache is keyed"
+            " by scanner version and capture digests, not by the token. Pass"
+            " `--force-refresh` to run the CLI again."
+        )
+        lines.append("")
     else:
         lines.append(
             "This environment could not obtain a **measured** peer verdict."
@@ -917,9 +966,11 @@ def render_report(results: dict[str, Any]) -> str:
             " token the CLI stops before scanning and emits no findings. That is"
             " recorded exactly as observed instead of being reported as a clean"
             " scan or a detection. Set `SNYK_TOKEN` and re-run"
-            " `python -m head_to_head.run_comparison` to replace this row with"
-            " measured output; the runner caches the result keyed by scanner"
-            " version, capture digests and token presence."
+            " `python -m head_to_head.run_comparison --force-refresh` to replace"
+            " this row with measured output. A `measured` record is reused in"
+            " token-less environments (CI, a fresh clone) until"
+            " `--force-refresh` is passed, so the token is only ever needed to"
+            " produce a measurement, never to read one."
         )
         lines.append("")
 
@@ -1106,9 +1157,19 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="store the peer measurement here instead of beside the report",
     )
+    parser.add_argument(
+        "--force-refresh",
+        action="store_true",
+        help=(
+            "run snyk-agent-scan live and overwrite the cached measurement,"
+            " even when a matching record (including a measured one) exists"
+        ),
+    )
     args = parser.parse_args(argv)
 
-    results = compute_results(cache_path=args.cache_path)
+    results = compute_results(
+        cache_path=args.cache_path, force_refresh=args.force_refresh
+    )
     paths = write_results(results, args.output_dir)
     print_summary(results, paths)
     return 0
