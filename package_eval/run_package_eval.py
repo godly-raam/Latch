@@ -74,6 +74,32 @@ FIRST_RUN_TARGET_IDS: tuple[str, ...] = (
     "B",
 )
 
+#: The nine captures that made up the first blind run. Keyed by capture slug,
+#: so ``mcp-remote@0.14.3`` appears in both sets: the cleartext-URL config was
+#: captured for the first run, the static-``--header`` config arrived with the
+#: tuning commit. Together with the five below this partitions the corpus.
+FIRST_RUN_PACKAGE_SLUGS: tuple[str, ...] = (
+    "npm-mcp-remote-0-14-3",
+    "npm-server-everything",
+    "npm-server-filesystem",
+    "npm-server-filesystem-0-6-2",
+    "npm-server-memory",
+    "pypi-mcp-proxy-0-8-2",
+    "pypi-mcp-server-fetch",
+    "pypi-mcp-server-git",
+    "pypi-mcp-server-git-2025-9-25",
+)
+
+#: The five captures ``4a089e1`` added to the corpus. Disjoint from the nine
+#: above by slug; asserted in ``tests/test_package_eval.py``.
+POST_TUNING_ADDED_PACKAGE_SLUGS: tuple[str, ...] = (
+    "npm-mcp-remote-0-14-3-static-header",
+    "npm-server-github-2025-4-8",
+    "npm-server-puppeteer-2025-5-12",
+    "npm-server-slack-2025-4-25",
+    "npm-supergateway-3-1-0",
+)
+
 #: The one blind measurement this project has. Recorded rather than recomputed:
 #: the pre-``4a089e1`` classifier no longer exists in ``mcpprobe/``, so a
 #: derived "before" number would describe rules that cannot be re-run.
@@ -81,6 +107,7 @@ FIRST_RUN_BLIND: dict[str, Any] = {
     "label": "First-Run Blind Baseline",
     "evaluation_stage": "pre-tuning (pre-4a089e1 rules)",
     "package_count": 9,
+    "package_slugs": list(FIRST_RUN_PACKAGE_SLUGS),
     "clean_package_count": 5,
     "clean_false_positive_packages": ["npm-server-everything"],
     "clean_false_positive_rate": 0.2,
@@ -538,10 +565,29 @@ def compute_results() -> dict[str, Any]:
         and row["target_id"] not in FIRST_RUN_TARGET_IDS
     ]
 
+    # Derived from the captures on disk rather than declared, so the two sets
+    # cannot silently stop partitioning the corpus.
+    package_slugs = [row["slug"] for row in packages]
+    first_run_slugs = [
+        slug for slug in package_slugs if slug in FIRST_RUN_PACKAGE_SLUGS
+    ]
+    added_slugs = [
+        slug for slug in package_slugs if slug in POST_TUNING_ADDED_PACKAGE_SLUGS
+    ]
+
     return {
         "evaluation_stage": EVALUATION_STAGE,
         "detector_fingerprint_sha256": detector_fingerprint(),
         "package_count": len(packages),
+        "package_partition": {
+            "first_run_blind": first_run_slugs,
+            "added_post_tuning": added_slugs,
+            "disjoint": set(first_run_slugs).isdisjoint(added_slugs),
+            "covers_corpus": sorted(first_run_slugs + added_slugs)
+            == sorted(package_slugs),
+            "baseline_package_count": len(first_run_slugs),
+            "added_package_count": len(added_slugs),
+        },
         "tool_count": sum(row["tool_count"] for row in packages),
         "packages": packages,
         "compositions": compositions,
@@ -628,6 +674,7 @@ def compute_results() -> dict[str, Any]:
                 else 0.0,
                 "everything_single_server_paths": everything_paths,
                 "everything_with_filesystem_paths": everything_composition_paths,
+                "packages_added_post_tuning": added_slugs,
                 "targets_added_post_tuning": post_tuning_only_targets,
                 "note": (
                     "Recomputed on every run from the engines pinned by"
@@ -773,6 +820,18 @@ def render_report(results: dict[str, Any]) -> str:
             ]
         ),
         "",
+        f"- **Corpus partition.** The {first_run['package_count']} first-run"
+        " captures and the"
+        f" {post_tuning['package_count'] - first_run['package_count']} added"
+        " by `4a089e1` are disjoint and cover all"
+        f" {post_tuning['package_count']} captures"
+        " (`package_partition` in `package_results.json`, asserted in"
+        " `tests/test_package_eval.py`). The nine are five clean servers"
+        " plus four target captures (`mcp-remote` cleartext, `mcp-proxy` and"
+        " the two pre-patch CVE releases); `mcp-server-fetch` is scored"
+        " twice, once as a clean standalone package and once inside"
+        " composition target `B`, which is why the baseline has five clean"
+        " checks and five targets.",
         f"- First-run blind FPR: `0.20` (`1/5`), with",
         "  `@modelcontextprotocol/server-everything` producing `26`",
         "  single-server static paths (`32` beside `server-filesystem`).",

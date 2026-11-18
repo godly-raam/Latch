@@ -15,6 +15,8 @@ from package_eval.capture_manifests import (
     manifest_digest,
 )
 from package_eval.run_package_eval import (
+    FIRST_RUN_PACKAGE_SLUGS,
+    POST_TUNING_ADDED_PACKAGE_SLUGS,
     REPORT_MD,
     RESULTS_JSON,
     compute_results,
@@ -241,6 +243,42 @@ def test_detection_recall_separates_in_scope_from_overall(results: dict) -> None
         "B",
         *HANDLER_CVE_SLUGS,
     }
+
+
+def test_first_run_and_added_captures_partition_the_corpus(results: dict) -> None:
+    """The blind baseline and the tuning commit's additions must not overlap.
+
+    ``mcp-remote@0.14.3`` appears once in each set because two different
+    configurations of it were captured, so the sets are keyed by slug: the
+    cleartext-URL config predates ``4a089e1``, the static-``--header`` config
+    arrived with it.
+    """
+
+    baseline = set(FIRST_RUN_PACKAGE_SLUGS)
+    added = set(POST_TUNING_ADDED_PACKAGE_SLUGS)
+
+    assert baseline.isdisjoint(added)
+    assert len(baseline) == 9
+    assert len(added) == 5
+    assert len(baseline) + len(added) == 14
+    assert baseline | added == REFERENCE_SLUGS
+
+    partition = results["package_partition"]
+    # Compared as sets: the derived lists follow the capture filenames, which
+    # sort a pre-patch release before the plain one (`-0-6-2` < `.`).
+    assert set(partition["first_run_blind"]) == baseline
+    assert len(partition["first_run_blind"]) == len(baseline)
+    assert set(partition["added_post_tuning"]) == added
+    assert len(partition["added_post_tuning"]) == len(added)
+    assert partition["disjoint"] is True
+    assert partition["covers_corpus"] is True
+    assert partition["baseline_package_count"] == 9
+    assert partition["added_package_count"] == 5
+    assert (
+        set(results["stages"]["post_tuning"]["packages_added_post_tuning"])
+        == added
+    )
+    assert "Corpus partition" in REPORT_MD.read_text(encoding="utf-8")
 
 
 def test_everything_is_the_documented_false_positive(results: dict) -> None:

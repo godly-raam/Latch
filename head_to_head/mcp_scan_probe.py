@@ -8,11 +8,16 @@ happened -- including the case where the scanner cannot run here.
 
 Current releases of ``snyk-agent-scan`` (the package ``mcp-scan`` was renamed
 to) require a Snyk API token and send the collected manifest to
-``https://api.snyk.io/hidden/mcp-scan/analysis-machine`` for analysis. Without
-credentials the CLI stops with an ``Unauthorized`` message and no findings, so
-that outcome is recorded as ``credentials_required`` rather than invented as a
-clean scan. With ``SNYK_TOKEN`` set, the run is parsed and stored as
-``measured``.
+``https://api.snyk.io/hidden/mcp-scan/analysis-machine`` for analysis. Version
+``0.6.11`` always exits ``0`` and reports the analysis outcome inside a
+``scan_path_responses`` payload: a ``401 Unauthorized`` or ``429 Too Many
+Requests`` from the API arrives as ``scan_path_responses[].error`` with
+``category: "analysis_error"``, and a completed analysis carries
+``server_risks[].risk_indexes``. ``parse_scan_path_responses`` reads that
+schema natively, so a rejected or rate-limited run is recorded as
+``unauthorized``/``rate_limited`` -- never as a clean scan -- and a real run as
+``measured``. Without a token the CLI raises before contacting the API, which
+is recorded as ``credentials_required``.
 
 The result is cached in ``head_to_head/mcp_scan_measurement.json`` under a
 ``cache_key`` covering the scanner version, the capture digests, the argument
@@ -218,6 +223,203 @@ def scrub_secrets(value: Any, secret: str | None = None) -> Any:
     return value
 
 
+#: Statuses derived from a ``scan_path_responses`` payload. The CLI exits ``0``
+#: even when Snyk's analysis API rejected the request, so the payload -- not the
+#: exit code -- decides the verdict.
+STATUS_MEASURED = "measured"
+STATUS_UNAUTHORIZED = "unauthorized"
+STATUS_RATE_LIMITED = "rate_limited"
+STATUS_API_ERROR = "api_error"
+
+_UNAUTHORIZED_RE = re.compile(
+    r"(?i)\b401\b|\b403\b|\bunauthorized\b|\bforbidden\b|check your snyk_token"
+)
+_RATE_LIMIT_RE = re.compile(
+    r"(?i)\b429\b|too many requests|daily usage limit|rate.?limit"
+)
+_WINDOWS_PATH_RE = re.compile(r"\b[A-Za-z]:\\[^\s\"']+")
+_POSIX_PATH_RE = re.compile(
+    r"(?<![\w:/])/(?:tmp|var|home|Users|private|run|root|opt)/[^\s\"'`,;)]+"
+)
+
+
+def sanitize_text(
+    value: Any, secret: str | None = None, limit: int = 300
+) -> str | None:
+    """A short excerpt of peer CLI text with tokens and local paths removed.
+
+    Exception strings and tracebacks are read only to classify a status; what
+    is recorded is this excerpt, never the raw text.
+    """
+
+    if value is None:
+        return None
+    text = scrub_secrets(str(value), secret)
+    text = _WINDOWS_PATH_RE.sub("<path>", text)
+    text = _POSIX_PATH_RE.sub("<path>", text)
+    text = " ".join(text.split())
+    if len(text) > limit:
+        text = text[:limit].rstrip() + "…"
+    return text or None
+
+
+def _first_failure(entry: dict[str, Any]) -> dict[str, Any] | None:
+    """The first failing error on a scanned path or one of its servers."""
+
+    candidates: list[Any] = [entry.get("error")]
+    server_risks = entry.get("server_risks")
+    if isinstance(server_risks, list):
+        candidates.extend(
+            server.get("error")
+            for server in server_risks
+            if isinstance(server, dict)
+        )
+    for error in candidates:
+        # ``is_failure`` is part of the schema and is ``False`` for benign
+        # conditions such as a config file that does not exist.
+        if (
+            isinstance(error, dict)
+            and error
+            and error.get("is_failure", True) is not False
+        ):
+            return error
+    return None
+
+
+def classify_api_error(
+    error: dict[str, Any], secret: str | None = None
+) -> dict[str, Any]:
+    """Map one ``scan_path_responses[].error`` onto a recorded verdict."""
+
+    text = " ".join(
+        str(error.get(field) or "")
+        for field in ("message", "exception", "server_output")
+    )
+    category = sanitize_text(error.get("category"), secret)
+    message = sanitize_text(error.get("message") or error.get("exception"), secret)
+    if _RATE_LIMIT_RE.search(text):
+        status = STATUS_RATE_LIMITED
+        reason = "429 Daily usage limit reached on Snyk public analysis-machine API"
+    elif _UNAUTHORIZED_RE.search(text):
+        status = STATUS_UNAUTHORIZED
+        reason = "401 Unauthorized from Snyk analysis-machine API"
+    else:
+        status = STATUS_API_ERROR
+        reason = "analysis API error"
+        if category:
+            reason += f" ({category})"
+        if message:
+            reason += f": {message}"
+    return {
+        "status": status,
+        "reason": reason,
+        "parsed": True,
+        "package_flags": {},
+        "flagged_packages": [],
+        "clean_false_positive_rate": None,
+        "clean_package_count": None,
+        "scanned_servers": [],
+        "api_error_category": category,
+        "api_error_message": message,
+    }
+
+
+def _package_slug(label: Any, slugs: tuple[str, ...]) -> str | None:
+    """The configured capture slug a ``server_risks[].name`` refers to."""
+
+    text = str(label or "")
+    if not text:
+        return None
+    if text in slugs:
+        return text
+    for slug in slugs:
+        if slug in text:
+            return slug
+    return None
+
+
+def parse_scan_path_responses(
+    payload: Any,
+    slugs: tuple[str, ...] = PACKAGE_SLUGS,
+    secret: str | None = None,
+) -> dict[str, Any] | None:
+    """Interpret ``snyk-agent-scan`` 0.6.11's ``scan_path_responses`` payload.
+
+    Returns ``None`` -- never a clean verdict -- for any shape this version does
+    not define, so a formatting change cannot be misread as "no findings".
+    """
+
+    if not isinstance(payload, dict):
+        return None
+    responses = payload.get("scan_path_responses")
+    if not isinstance(responses, list):
+        return None
+    entries = [entry for entry in responses if isinstance(entry, dict)]
+    if not entries:
+        return None
+
+    for entry in entries:
+        failure = _first_failure(entry)
+        if failure is not None:
+            return classify_api_error(failure, secret)
+
+    flags: dict[str, bool] = {}
+    scanned: list[str] = []
+    for entry in entries:
+        server_risks = entry.get("server_risks")
+        if not isinstance(server_risks, list):
+            continue
+        for server in server_risks:
+            if not isinstance(server, dict):
+                continue
+            slug = _package_slug(server.get("name"), slugs)
+            if slug is None:
+                continue
+            if slug not in scanned:
+                scanned.append(slug)
+            indexes = server.get("risk_indexes")
+            # The CLI omits ``None`` indexes, so a non-empty mapping is exactly
+            # the peer's own "this server has a risk" condition.
+            risky = isinstance(indexes, dict) and any(
+                value is not None for value in indexes.values()
+            )
+            flags[slug] = flags.get(slug, False) or risky
+    if not flags:
+        return None
+
+    flagged = sorted(slug for slug, hit in flags.items() if hit)
+    return {
+        "status": STATUS_MEASURED,
+        "reason": None,
+        "parsed": True,
+        "package_flags": flags,
+        "flagged_packages": flagged,
+        "clean_false_positive_rate": round(len(flagged) / len(flags), 4),
+        "clean_package_count": len(flags) - len(flagged),
+        "scanned_servers": scanned,
+        "api_error_category": None,
+        "api_error_message": None,
+    }
+
+
+def _load_payload(stdout: str) -> Any:
+    """Parse the CLI's JSON, tolerating a banner line before it."""
+
+    text = stdout.strip()
+    if not text:
+        return None
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    for match in re.finditer(r"(?m)^\{", text):
+        try:
+            return json.loads(text[match.start() :])
+        except json.JSONDecodeError:
+            continue
+    return None
+
+
 def extract_flags(
     payload: Any, slugs: tuple[str, ...] = PACKAGE_SLUGS
 ) -> dict[str, bool]:
@@ -341,6 +543,9 @@ def _run(
         "package_flags": {},
         "flagged_packages": [],
         "clean_false_positive_rate": None,
+        "scanned_servers": [],
+        "api_error_category": None,
+        "api_error_message": None,
         "cache_key": key,
         "reuse_key": reuse_key,
     }
@@ -387,6 +592,18 @@ def _run(
     finally:
         shutil.rmtree(sandbox, ignore_errors=True)
 
+    # The payload is authoritative: 0.6.11 exits 0 for a 401/429 and puts the
+    # reason in ``scan_path_responses[].error``, so parsing first is what keeps
+    # a rejected run from being recorded as "measured".
+    payload = _load_payload(stdout)
+    verdict = parse_scan_path_responses(
+        payload, PACKAGE_SLUGS, os.environ.get("SNYK_TOKEN")
+    )
+    if verdict is not None:
+        row.update(verdict)
+        return row
+
+    # Fallback for an unparseable run or another version's output shape.
     status, reason = classify_run(
         token_present=token_present,
         timed_out=timed_out,
@@ -398,10 +615,6 @@ def _run(
     row["reason"] = reason
 
     if status == "measured":
-        try:
-            payload = json.loads(stdout)
-        except json.JSONDecodeError:
-            payload = None
         flags = extract_flags(payload) if payload is not None else {}
         if flags:
             row["parsed"] = True
@@ -509,6 +722,9 @@ def run_measurement(
             "package_flags": {},
             "flagged_packages": [],
             "clean_false_positive_rate": None,
+            "scanned_servers": [],
+            "api_error_category": None,
+            "api_error_message": None,
             "cache_key": key,
             "reuse_key": reuse_key,
         }

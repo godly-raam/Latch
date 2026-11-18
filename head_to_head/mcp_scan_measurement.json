@@ -1,8 +1,11 @@
 {
   "analysis_endpoint": "https://api.snyk.io/hidden/mcp-scan/analysis-machine?version=2026-07-10",
+  "api_error_category": "analysis_error",
+  "api_error_message": "Daily usage limit reached for the public version of Agent-Scan. Unlock higher limits and enterprise features by contacting us at https://evo.ai.snyk.io/#contact-us.",
   "binary": "snyk-agent-scan",
   "cache_key": "226fdb1772ced31adf4b44e71028a359a2c2817a1db09e025870afc2e8f39a01",
   "clean_false_positive_rate": null,
+  "clean_package_count": null,
   "command": [
     "snyk-agent-scan",
     "scan",
@@ -26,11 +29,12 @@
     "pypi-mcp-server-fetch",
     "pypi-mcp-server-git"
   ],
-  "parsed": false,
-  "reason": "the scanner ran but its JSON shape was not recognised; no per-package verdict is claimed",
+  "parsed": true,
+  "reason": "429 Daily usage limit reached on Snyk public analysis-machine API",
   "remote_api_required": true,
   "reuse_key": "f8916db1446f893bd55b3c189979af2b44ee72793f4a987527933887dedd71d2",
-  "status": "measured_unparsed",
+  "scanned_servers": [],
+  "status": "rate_limited",
   "token_present": true,
   "tool": "mcp-scan",
   "version": "0.6.11"

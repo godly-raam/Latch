@@ -61,6 +61,7 @@ Current detector fingerprint:
 | **First-Run Blind Baseline** (pre-`4a089e1` rules) | 9 packages, 5 clean | 0.20 (1/5) | 0.67 (2/3) | 0.40 (2/5) |
 | **Post-Tuning Corpus** (post-`4a089e1` vocabulary) | 14 packages, 6 clean | 0.17 (1/6) | 0.88 (7/8) | 0.70 (7/10) |
 
+- **Corpus partition.** The 9 first-run captures and the 5 added by `4a089e1` are disjoint and cover all 14 captures (`package_partition` in `package_results.json`, asserted in `tests/test_package_eval.py`). The nine are five clean servers plus four target captures (`mcp-remote` cleartext, `mcp-proxy` and the two pre-patch CVE releases); `mcp-server-fetch` is scored twice, once as a clean standalone package and once inside composition target `B`, which is why the baseline has five clean checks and five targets.
 - First-run blind FPR: `0.20` (`1/5`), with
   `@modelcontextprotocol/server-everything` producing `26`
   single-server static paths (`32` beside `server-filesystem`).

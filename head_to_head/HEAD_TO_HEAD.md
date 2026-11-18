@@ -53,7 +53,7 @@ nine-package blind baseline is the row above.
 | ------- | ----- | ----------------- | --------------------- | -------- |
 | **mcpprobe (Latch)** | Post-tuning | 0.17 (1/6) | 0.88 (7/8) | measured |
 | Naive keyword/substring baseline | Post-tuning | 0.83 (5/6) | not applicable | measured |
-| `mcp-scan` (`snyk-agent-scan`) | Post-tuning | n/a (output shape not recognised) | n/a | ran (v0.6.11), output shape not recognised |
+| `mcp-scan` (`snyk-agent-scan`) | Post-tuning | n/a (429 public API daily limit reached) | n/a | ran (v0.6.11), 429 public API daily limit reached |
 | `AgentLatch` (`agent-latch`) | Post-tuning | n/a | n/a | architecture comparison only (not installed) |
 
 The `0.88` (`7/8`) denominator is every in-scope target: the six single-capture package targets above plus the two cross-server compositions (`D` detected, `B` missed). Narrowed to package manifests only, the same run is `6/6`. The first-run blind row for that denominator is `0.67` (`2/3`): `mcp-remote` and `mcp-proxy` were caught, `B` was missed then too.
@@ -89,7 +89,7 @@ In-model package targets detected (the `6/6` subset): `npm-mcp-remote-0-14-3`, `
 ## Peer scanner: `mcp-scan` (`snyk-agent-scan`)
 
 - Installed distribution: `snyk-agent-scan` `0.6.11`
-- Exit status: `measured_unparsed` (`the scanner ran but its JSON shape was not recognised; no per-package verdict is claimed`)
+- Exit status: `rate_limited` (`429 Daily usage limit reached on Snyk public analysis-machine API`)
 - Exit code: `0`
 - Remote analysis required: `True` -> `https://api.snyk.io/hidden/mcp-scan/analysis-machine?version=2026-07-10`
 - Exact invocation:
@@ -98,7 +98,7 @@ In-model package targets detected (the `6/6` subset): `npm-mcp-remote-0-14-3`, `
 snyk-agent-scan scan <temp>/mcp-scan-config.json --json --no-skills --dangerously-run-mcp-servers --suppress-mcpserver-io true --storage-file <temp>/scan-state.json
 ```
 
-This environment could not obtain a **measured** peer verdict. Current `snyk-agent-scan` releases require a `SNYK_TOKEN` account credential and perform deep analysis on Snyk's endpoint, so with no token the CLI stops before scanning and emits no findings. That is recorded exactly as observed instead of being reported as a clean scan or a detection. Set `SNYK_TOKEN` and re-run `python -m head_to_head.run_comparison --force-refresh` to replace this row with measured output. A `measured` record is reused in token-less environments (CI, a fresh clone) until `--force-refresh` is passed, so the token is only ever needed to produce a measurement, never to read one.
+The peer CLI ran and Snyk's public `analysis-machine` API answered **`429 Too Many Requests`**: the free daily quota is exhausted, so this run produced no per-package verdict. The peer has no local fallback -- `snyk-agent-scan 0.6.11` classifies every package on that remote API, which needs an account and applies a public daily limit, whereas `mcpprobe` (Latch) runs locally with neither credentials nor rate limits. No peer false-positive rate is claimed here. Re-run `python -m head_to_head.run_comparison --force-refresh` once the quota resets to replace this row with measured output.
 
 ## Architectural and detection matrix
 
@@ -123,11 +123,12 @@ Sources: mcpprobe (Latch) — this repository; Invariant / Snyk mcp-scan — htt
 
 ## Honest limits of this comparison
 
-- `mcp-scan` was **invoked, not measured**. Its CLI requires an
-  account token and performs deep analysis on a Snyk endpoint, so the
-  recorded row proves the installation, the version and the exact
-  invocation -- not a false-positive rate. It is neither a clean scan
-  nor a detection.
+- `mcp-scan` is measured only through its own remote classifier:
+  the CLI sends the manifests to Snyk's `analysis-machine` API
+  (account token required, public daily quota) and this report parses
+  that response. A row that says `measured` is the peer's verdict;
+  any other status means no peer verdict exists at all, which is
+  neither a clean scan nor a detection.
 - `agent-latch` was **not exercised at all**: its row is an
   `architectural_comparison_only` documentation comparison, and a
   documentation comparison cannot prove a detection either way.

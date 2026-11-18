@@ -8,8 +8,9 @@ Runs ``mcpprobe (Latch)`` and the naive keyword baseline live against:
 
 ``mcp-scan`` (``snyk-agent-scan``) is installed and *run* against the five
 clean upstream captures in ``mcp_scan_probe``; the report records whether that
-run was ``measured`` or stopped at ``credentials_required``, so the column is
-either real output or an explicit statement of why there is none.
+run was ``measured``, ``rate_limited``, ``unauthorized`` or
+``credentials_required``, so the column is either real output or an explicit
+statement of why there is none.
 ``agent-latch`` is only architecture-compared unless the binary exists.
 
 The real-package comparison is the headline. The ten protocol scenarios are
@@ -727,6 +728,12 @@ def _peer_status_text(row: dict[str, Any]) -> str:
     status = row["status"]
     if status == "measured":
         return f"measured live (v{version})"
+    if status == "rate_limited":
+        return f"ran (v{version}), 429 public API daily limit reached"
+    if status == "unauthorized":
+        return f"ran (v{version}), 401 from the analysis API"
+    if status == "api_error":
+        return f"ran (v{version}), analysis API error"
     if status == "measured_unparsed":
         return f"ran (v{version}), output shape not recognised"
     if status == "credentials_required":
@@ -760,8 +767,17 @@ def _peer_measurement_cell(measurement: dict[str, Any]) -> str:
         return f"{rate:.2f}"
     if status == "measured_unparsed":
         return "n/a (output shape not recognised)"
-    if status in {"credentials_required", "not_installed_in_env"}:
+    if status == "rate_limited":
+        return "n/a (429 public API daily limit reached)"
+    if status in {
+        "credentials_required",
+        "unauthorized",
+        "blocked_unauthorized",
+        "not_installed_in_env",
+    }:
         return "n/a (SNYK_TOKEN required)"
+    if status == "api_error":
+        return "n/a (analysis API error)"
     return "n/a (see status)"
 
 
@@ -942,7 +958,8 @@ def render_report(results: dict[str, Any]) -> str:
         ]
     )
 
-    if measurement.get("status") == "measured":
+    peer_status = measurement.get("status")
+    if peer_status == "measured":
         flags = measurement.get("package_flags") or {}
         flagged = measurement.get("flagged_packages") or []
         lines.append(
@@ -956,6 +973,39 @@ def render_report(results: dict[str, Any]) -> str:
             " `SNYK_TOKEN` -- CI or a fresh clone -- because the cache is keyed"
             " by scanner version and capture digests, not by the token. Pass"
             " `--force-refresh` to run the CLI again."
+        )
+        lines.append("")
+    elif peer_status == "rate_limited":
+        lines.append(
+            "The peer CLI ran and Snyk's public `analysis-machine` API answered"
+            " **`429 Too Many Requests`**: the free daily quota is exhausted, so"
+            " this run produced no per-package verdict. The peer has no local"
+            " fallback -- `snyk-agent-scan 0.6.11` classifies every package on"
+            " that remote API, which needs an account and applies a public daily"
+            " limit, whereas `mcpprobe` (Latch) runs locally with neither"
+            " credentials nor rate limits. No peer false-positive rate is claimed"
+            " here. Re-run `python -m head_to_head.run_comparison"
+            " --force-refresh` once the quota resets to replace this row with"
+            " measured output."
+        )
+        lines.append("")
+    elif peer_status == "unauthorized":
+        lines.append(
+            "The peer CLI ran and Snyk's analysis API rejected the credential"
+            " with **`401 Unauthorized`**, so no per-package verdict exists."
+            " The credential itself is never recorded: the cached measurement"
+            " keeps only this sanitized reason. Set a valid `SNYK_TOKEN` and"
+            " re-run `python -m head_to_head.run_comparison --force-refresh` to"
+            " replace this row with measured output."
+        )
+        lines.append("")
+    elif peer_status == "api_error":
+        lines.append(
+            "Snyk's analysis API returned an error"
+            f" (`{measurement.get('api_error_category') or 'unknown category'}`),"
+            " so no per-package verdict exists:"
+            f" {measurement.get('api_error_message') or 'no message recorded'}."
+            " Re-run with `--force-refresh` to try again."
         )
         lines.append("")
     else:
@@ -1014,11 +1064,12 @@ def render_report(results: dict[str, Any]) -> str:
             "",
             "## Honest limits of this comparison",
             "",
-            "- `mcp-scan` was **invoked, not measured**. Its CLI requires an",
-            "  account token and performs deep analysis on a Snyk endpoint, so the",
-            "  recorded row proves the installation, the version and the exact",
-            "  invocation -- not a false-positive rate. It is neither a clean scan",
-            "  nor a detection.",
+            "- `mcp-scan` is measured only through its own remote classifier:",
+            "  the CLI sends the manifests to Snyk's `analysis-machine` API",
+            "  (account token required, public daily quota) and this report parses",
+            "  that response. A row that says `measured` is the peer's verdict;",
+            "  any other status means no peer verdict exists at all, which is",
+            "  neither a clean scan nor a detection.",
             "- `agent-latch` was **not exercised at all**: its row is an",
             "  `architectural_comparison_only` documentation comparison, and a",
             "  documentation comparison cannot prove a detection either way.",
