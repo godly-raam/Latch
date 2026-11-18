@@ -20,7 +20,11 @@ from typing import Any
 import click
 
 from .auditor import AuditReport, audit_manifest
-from .chain_prober import ChainVerificationReport, verify_trifecta_chains
+from .chain_prober import (
+    ChainVerificationReport,
+    validate_tool_allowlist,
+    verify_trifecta_chains,
+)
 from .config_loader import (
     ServerSpec,
     load_mcp_config,
@@ -930,6 +934,9 @@ def probe_chain(
                     " <server:tool> (or <server>:*) or pass --allow-all-tools."
                 )
 
+        allowed = None if allow_all_tools or not allow_tools else set(allow_tools)
+        validate_tool_allowlist(allowed, [spec.server_id for spec in live_specs])
+
         report = asyncio.run(
             verify_trifecta_chains(
                 live_specs,
@@ -937,9 +944,7 @@ def probe_chain(
                 seed_canary=not no_seed_canary,
                 timeout=timeout,
                 sink_url=sink_url,
-                allowed_tools=(
-                    None if allow_all_tools or not allow_tools else set(allow_tools)
-                ),
+                allowed_tools=allowed,
                 dry_run=dry_run,
             )
         )

@@ -454,7 +454,7 @@
     "overall_recall": 0.7,
     "overall_targets": 10
   },
-  "detector_fingerprint_sha256": "4577c259420b4230c7e9846f038e826dae610b0bd0817b33b92b421a53b3f18f",
+  "detector_fingerprint_sha256": "9f211077305c91b1026397f1402d170aed0297efc0efda872ab9256fc836ed4e",
   "evaluation_stage": "post-tuning (post-4a089e1)",
   "package_count": 14,
   "package_partition": {

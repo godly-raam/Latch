@@ -44,7 +44,7 @@ from pydantic import BaseModel, Field
 
 from .config_loader import ServerSpec
 from .graph import TrifectaPath, analyze_capability_graph
-from .models import ToolDefinition
+from .models import ProbeError, ToolDefinition
 from .transport import DEFAULT_TIMEOUT, open_mcp_session
 
 ChainProbeStatus = Literal[
@@ -196,9 +196,13 @@ MAX_CANARY_BODY_BYTES = 1024 * 1024
 class CanarySinkServer:
     """An ephemeral HTTP sink on ``127.0.0.1:0`` that records exfiltration."""
 
+    #: Keep the earliest requests, so a flood cannot evict an earlier canary hit.
+    MAX_CANARY_REQUESTS = 100
+
     def __init__(self) -> None:
         self.base_url = ""
         self.captured_requests: list[dict[str, Any]] = []
+        self.dropped_request_count = 0
         self._server: asyncio.AbstractServer | None = None
         self._port = 0
 
@@ -259,14 +263,17 @@ class CanarySinkServer:
                         min(max(declared, 0), MAX_CANARY_BODY_BYTES)
                     )
 
-        self.captured_requests.append(
-            {
-                "method": method,
-                "path": path,
-                "headers": headers,
-                "body": body.decode("utf-8", "replace"),
-            }
-        )
+        if len(self.captured_requests) < self.MAX_CANARY_REQUESTS:
+            self.captured_requests.append(
+                {
+                    "method": method,
+                    "path": path,
+                    "headers": headers,
+                    "body": body.decode("utf-8", "replace"),
+                }
+            )
+        else:
+            self.dropped_request_count += 1
 
         if oversized:
             payload = b'{"error": "content-length exceeds the canary sink limit"}'
@@ -452,32 +459,61 @@ def _error_text(result: dict[str, Any]) -> str:
     return text or "tool returned isError without a message"
 
 
-def _tool_allowed(
-    qualified_name: str,
-    allowed_tools: set[str] | None,
-    server_name: str | None = None,
-) -> bool:
-    """True when the ``--allow-tool`` patterns cover a ``server:tool`` name.
+def validate_tool_allowlist(
+    allowed_tools: set[str] | None, mounted_servers: Sequence[str]
+) -> None:
+    """Reject bare ``--allow-tool`` names when more than one server is mounted.
 
-    A bare tool name only matches the path's own target server
-    (``server_name``); naming another server requires ``server:tool`` or
-    ``server:*``.
+    A bare name would match the same tool on every mounted server, so the
+    operator has to say which server they mean.
+    """
+
+    if not allowed_tools or len(mounted_servers) <= 1:
+        return
+    bare = sorted(
+        pattern.strip()
+        for pattern in allowed_tools
+        if ":" not in pattern and pattern.strip() not in ("", "*")
+    )
+    if not bare:
+        return
+    servers = ", ".join(sorted(mounted_servers))
+    raise ProbeError(
+        "ambiguous --allow-tool name(s) "
+        + ", ".join(repr(name) for name in bare)
+        + f" with {len(mounted_servers)} servers mounted ({servers}): a bare tool"
+        " name would match every server. Use <server>:<tool> or <server>:* instead."
+    )
+
+
+def _tool_allowed(
+    target_server: str,
+    target_tool: str,
+    allowed_tools: set[str] | None,
+    *,
+    allow_bare_names: bool,
+) -> bool:
+    """True when the patterns cover the concrete ``(target_server, target_tool)``.
+
+    The allowlist is matched against the server and tool the path will actually
+    call, never against identifiers re-derived from the same string. A bare name
+    is only honoured when a single server is mounted; with more than one,
+    ``validate_tool_allowlist`` has already rejected it.
     """
 
     if not allowed_tools:
         return True
-    server_id, _, tool_name = qualified_name.partition(":")
+    qualified = f"{target_server}:{target_tool}"
     for pattern in allowed_tools:
         raw = pattern.strip()
         if not raw:
             continue
-        if raw in ("*", qualified_name):
+        if raw in ("*", qualified):
             return True
-        if raw.endswith(":*") and raw[:-2] == server_id:
+        if raw.endswith(":*") and raw[:-2] == target_server:
             return True
-        if ":" not in raw and raw == tool_name:
-            if server_name is None or server_name == server_id:
-                return True
+        if allow_bare_names and ":" not in raw and raw == target_tool:
+            return True
     return False
 
 
@@ -513,6 +549,7 @@ async def _probe_path(
     sink_url: str | None = None,
     allowed_tools: set[str] | None = None,
     dry_run: bool = False,
+    allow_bare_names: bool = False,
 ) -> ChainProbeResult:
     canary_token = "" if dry_run else f"LATCH-CANARY-{uuid.uuid4().hex[:16]}"
 
@@ -567,8 +604,15 @@ async def _probe_path(
         )
 
     if not (
-        _tool_allowed(path.read_tool, allowed_tools, read_server)
-        and _tool_allowed(path.egress_tool, allowed_tools, egress_server)
+        _tool_allowed(
+            read_server, read_name, allowed_tools, allow_bare_names=allow_bare_names
+        )
+        and _tool_allowed(
+            egress_server,
+            egress_name,
+            allowed_tools,
+            allow_bare_names=allow_bare_names,
+        )
     ):
         egress_args, _has_channel = synthesize_egress_args(
             egress_tool, egress_target, f"[read output from {path.read_tool}]"
@@ -735,6 +779,8 @@ async def verify_trifecta_chains(
     """
 
     live_specs = [spec for spec in specs if spec.transport in ("stdio", "http")]
+    validate_tool_allowlist(allowed_tools, [spec.server_id for spec in live_specs])
+    allow_bare_names = len(live_specs) == 1
     manifests: dict[str, list[ToolDefinition]] = {}
     sessions: dict[str, Any] = {}
 
@@ -766,6 +812,7 @@ async def verify_trifecta_chains(
                 sink_url=sink_url,
                 allowed_tools=allowed_tools,
                 dry_run=dry_run,
+                allow_bare_names=allow_bare_names,
             )
             for path in graph.trifecta_paths
         ]

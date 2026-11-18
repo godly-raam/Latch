@@ -51,7 +51,7 @@ forces an explicit re-run and re-label instead of a silently stale
 claim.
 
 Current detector fingerprint:
-`4577c259420b4230c7e9846f038e826dae610b0bd0817b33b92b421a53b3f18f`
+`9f211077305c91b1026397f1402d170aed0297efc0efda872ab9256fc836ed4e`
  (evaluation stage: `post-tuning (post-4a089e1)`).
 
 ## Two stages: First-Run Blind Baseline vs. Post-Tuning Corpus

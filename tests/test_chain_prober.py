@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import httpx
+import pytest
 from click.testing import CliRunner
 
 from mcpprobe.chain_prober import (
@@ -18,10 +19,11 @@ from mcpprobe.chain_prober import (
     _tool_allowed,
     synthesize_egress_args,
     synthesize_read_args,
+    validate_tool_allowlist,
 )
 from mcpprobe.cli import cli
 from mcpprobe.graph import analyze_capability_graph
-from mcpprobe.models import ToolDefinition
+from mcpprobe.models import ProbeError, ToolDefinition
 from mcpprobe.sarif import to_sarif
 from mcpprobe.transport import HttpHarvester
 
@@ -734,13 +736,54 @@ def test_canary_sink_rejects_oversized_content_length() -> None:
     assert captured_body == ""
 
 
-def test_allow_tool_bare_name_is_scoped_to_the_path_server() -> None:
-    assert _tool_allowed("alpha:read", {"read"}, "alpha") is True
-    assert _tool_allowed("beta:read", {"read"}, "alpha") is False
-    assert _tool_allowed("beta:read", {"beta:read"}, "alpha") is True
-    assert _tool_allowed("beta:read", {"beta:*"}, "alpha") is True
-    assert _tool_allowed("beta:anything", {"*"}, "alpha") is True
-    assert _tool_allowed("beta:read", None, "alpha") is True
+def test_allow_tool_bare_name_requires_single_server_mode() -> None:
+    assert _tool_allowed("alpha", "read", {"read"}, allow_bare_names=True) is True
+    assert _tool_allowed("beta", "read", {"read"}, allow_bare_names=False) is False
+    assert _tool_allowed("beta", "read", {"beta:read"}, allow_bare_names=False) is True
+    assert _tool_allowed("beta", "read", {"beta:*"}, allow_bare_names=False) is True
+    assert _tool_allowed("beta", "other", {"beta:read"}, allow_bare_names=False) is False
+    assert _tool_allowed("beta", "anything", {"*"}, allow_bare_names=False) is True
+    assert _tool_allowed("beta", "read", None, allow_bare_names=False) is True
+
+
+def test_validate_tool_allowlist_rejects_bare_names_for_multiple_servers() -> None:
+    with pytest.raises(ProbeError, match="ambiguous --allow-tool"):
+        validate_tool_allowlist({"read_ledger"}, ["alpha", "beta"])
+
+    # A single mounted server, an explicit wildcard or a qualified name is fine.
+    validate_tool_allowlist({"read_ledger"}, ["alpha"])
+    validate_tool_allowlist({"*"}, ["alpha", "beta"])
+    validate_tool_allowlist({"alpha:read_ledger"}, ["alpha", "beta"])
+    validate_tool_allowlist(None, ["alpha", "beta"])
+
+
+def test_canary_sink_caps_captured_requests_and_keeps_the_first() -> None:
+    async def scenario() -> tuple[int, int, bool, int]:
+        async with CanarySinkServer() as sink:
+            async with httpx.AsyncClient() as client:
+                await client.post(
+                    f"{sink.base_url}/exfil?marker=LATCH-CANARY-first"
+                )
+                last_status = 0
+                for index in range(119):
+                    response = await client.post(
+                        f"{sink.base_url}/flood", content=f"flood-{index}"
+                    )
+                    last_status = response.status_code
+            return (
+                len(sink.captured_requests),
+                sink.dropped_request_count,
+                sink.find_canary("LATCH-CANARY-first") is not None,
+                last_status,
+            )
+
+    captured, dropped, found, last_status = asyncio.run(scenario())
+
+    assert CanarySinkServer.MAX_CANARY_REQUESTS == 100
+    assert captured == 100
+    assert dropped == 20
+    assert found is True
+    assert last_status == 200
 
 
 def test_result_text_extracts_string_errors() -> None:
@@ -753,3 +796,71 @@ def test_result_text_extracts_string_errors() -> None:
         == "permission denied"
     )
     assert _error_text({"isError": True}) == "tool returned isError without a message"
+
+
+def test_probe_chain_rejects_bare_allow_tool_with_multiple_servers(
+    tmp_path: Path,
+) -> None:
+    config = write_two_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(
+        config,
+        "--allow-tool",
+        "read_ledger",
+        safety=("--i-understand-this-executes-tools",),
+    )
+
+    assert result.exit_code == 2, result.output
+    assert "<server>:<tool>" in result.output
+    assert "alpha" in result.output and "beta" in result.output
+    assert "CONFIRMED_EXPLOITABLE" not in result.output
+
+
+def test_qualified_allow_tool_only_executes_the_named_server(tmp_path: Path) -> None:
+    config = write_two_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(
+        config,
+        "--allow-tool",
+        "alpha:read_ledger",
+        "--allow-tool",
+        "alpha:post_webhook",
+        safety=("--i-understand-this-executes-tools",),
+    )
+
+    assert result.exit_code == 1, result.output
+    payload = json.loads(result.output)
+    confirmed = [
+        probe
+        for probe in payload["results"]
+        if probe["status"] == "CONFIRMED_EXPLOITABLE"
+    ]
+    assert confirmed
+    for probe in confirmed:
+        assert probe["read_tool"].startswith("alpha:")
+        assert probe["egress_tool"].startswith("alpha:")
+    for probe in payload["results"]:
+        if probe["status"] == "SKIPPED_NOT_ALLOWLISTED":
+            assert probe["egress_invoked"] is False
+            assert probe["read_observed"] is False
+    assert payload["skipped_not_allowlisted_count"] >= 1
+
+
+def test_bare_allow_tool_still_works_with_one_server(tmp_path: Path) -> None:
+    config = write_chain_config(tmp_path, "read-open", "egress-open")
+
+    result = run_probe(
+        config,
+        "--allow-tool",
+        "read_ledger",
+        "--allow-tool",
+        "post_webhook",
+        safety=("--i-understand-this-executes-tools",),
+    )
+
+    assert result.exit_code == 1, result.output
+    payload = json.loads(result.output)
+    assert payload["paths_tested"] == 1
+    assert payload["skipped_not_allowlisted_count"] == 0
+    assert payload["results"][0]["read_tool"] == "chain:read_ledger"
+    assert payload["results"][0]["egress_tool"] == "chain:post_webhook"
