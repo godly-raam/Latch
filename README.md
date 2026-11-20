@@ -1,7 +1,5 @@
 # mcpprobe (Latch) — Deterministic MCP & Agentic Protocol Security Verifier
 
-[![M8ven Score](https://m8ven.ai/badge/mcp/godly-raam-latch-ks12kr?v=8b012efb8cc8a773086c012671e9c3e0)](https://m8ven.ai/mcp/godly-raam-latch-ks12kr?s=readme)
-
 **`mcpprobe`** is the project, Python package and CLI name; **`(Latch)`** is its
 subtitle. `mcpprobe (Latch)` is a deterministic security verifier for
 [Model Context Protocol](https://modelcontextprotocol.io) servers and the agents
