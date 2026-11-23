@@ -1,0 +1,18 @@
+{
+  "description": "MCP server for AnalyticDB MySQL via OpenAPI and direct SQL connection",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "adb-mysql-mcp-server==2.0.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "adb-mysql-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/aliyun/alibabacloud-adb-mysql-mcp-server",
+  "slug": "pypi-adb-mysql-mcp-server-2-0-0",
+  "stderr_summary": "from adb_mysql_mcp_server import main\n  File \"<scratch>/uv-cache/archive-v0/y5K2A7YY53cwMJVH/lib/python3.13/site-packages/adb_mysql_mcp_server/__init__.py\", line 1, in <module>\n    from .server import main\n  File \"<scratch>/uv-cache/archive-v0/y5K2A7YY53cwMJVH/lib/python3.13/site-packages/adb_mysql_mcp_server/server.py\", line 34, in <module>\n    from .core.mcp import AdbMCP\n  File \"<scratch>/uv-cache/archive-v0/y5K2A7YY53cwMJVH/lib/python3.13/site-packages/adb_mysql_mcp_server/core/mcp.py\", line 30, in <module>\n    from mcp.server.fastmcp import FastMCP\n  File \"<scratch>/uv-cache/archive-v0/y5K2A7YY53cwMJVH/lib/python3.13/site-packages/mcp/server/fastmcp.py\", line 16, in <module>\n    raise ModuleNotFoundError(_MESSAGE, name=__name__)\nModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp<2' to keep running v1 code.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.0.0"
+}

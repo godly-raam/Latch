@@ -1,0 +1,66 @@
+{
+  "description": "Coinbase Design System - MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@coinbase/cds-mcp-server@9.30.1"
+  ],
+  "manifest_sha256": "0c676e3e800ac75073c9398bbed9b4942359a7088db2b436d82b575c05fb7bcf",
+  "package": "@coinbase/cds-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "ssh://git@github.com/coinbase/cds",
+  "slug": "npm-coinbase-cds-mcp-server-9-30-1",
+  "stderr_summary": "[CDS MCP] 🚀 Starting MCP Server version 9.30.1",
+  "tool_count": 2,
+  "tools": [
+    {
+      "description": "get all cds doc routes",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "platform": {
+            "description": "The CDS package to use for a specific platform. For a browser app this would be 'web' and for a React Native app this would be 'mobile'",
+            "enum": [
+              "web",
+              "mobile"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform"
+        ],
+        "type": "object"
+      },
+      "name": "list-cds-routes"
+    },
+    {
+      "description": "get a specific cds doc route based on the routes available from list-routes",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "route": {
+            "description": "The route to the CDS docs. The path should always have a <platform>/<route> format and end in .txt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "route"
+        ],
+        "type": "object"
+      },
+      "name": "get-cds-doc"
+    }
+  ],
+  "version": "9.30.1"
+}

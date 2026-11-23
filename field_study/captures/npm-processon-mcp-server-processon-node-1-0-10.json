@@ -1,0 +1,50 @@
+{
+  "description": "ProcessOn MCP Server - create mind maps from markdown",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@processon/mcp-server-processon-node@1.0.10"
+  ],
+  "manifest_sha256": "41ce46f8ee48856b3fb664f2cdb9c8a64848cf798f16af0768b759b2d9fd4cff",
+  "package": "@processon/mcp-server-processon-node",
+  "protocol_version": "2024-11-05",
+  "repository_url": null,
+  "slug": "npm-processon-mcp-server-processon-node-1-0-10",
+  "stderr_summary": "npm warn deprecated uuid@9.0.1: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).",
+  "tool_count": 2,
+  "tools": [
+    {
+      "description": "查询用户当前配置apiKey，版本1.0.10",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "check"
+    },
+    {
+      "description": "创建思维导图。根据markdown内容创建思维导图并返回ProcessOn文件链接。",
+      "inputSchema": {
+        "properties": {
+          "content": {
+            "description": "markdown形式的内容",
+            "type": "string"
+          },
+          "title": {
+            "description": "文件名称",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "createProcessOnMind"
+    }
+  ],
+  "version": "1.0.10"
+}

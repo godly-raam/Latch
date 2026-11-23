@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for interacting with Runpod API",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@runpod/mcp-server@5.0.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@runpod/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/runpod/runpod-mcp",
+  "slug": "npm-runpod-mcp-server-5-0-0",
+  "stderr_summary": "RUNPOD_API_KEY environment variable is required",
+  "tool_count": 0,
+  "tools": [],
+  "version": "5.0.0"
+}

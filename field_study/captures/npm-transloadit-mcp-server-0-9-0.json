@@ -1,0 +1,19 @@
+{
+  "description": "Transloadit MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@transloadit/mcp-server@0.9.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@transloadit/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/transloadit/node-sdk",
+  "slug": "npm-transloadit-mcp-server-0-9-0",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.9.0"
+}

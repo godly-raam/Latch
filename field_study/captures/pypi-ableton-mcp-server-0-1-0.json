@@ -1,0 +1,18 @@
+{
+  "description": "MCP server for controlling Ableton Live via Claude Code",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "ableton-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "ableton-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/ldraney/ableton-mcp",
+  "slug": "pypi-ableton-mcp-server-0-1-0",
+  "stderr_summary": "Installed 68 packages in 45ms\nAn executable named `ableton-mcp-server` is not provided by package `ableton-mcp-server`.\nThe following executables are available:\n- ableton-mcp\n\nUse `uvx --from ableton-mcp-server ableton-mcp` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

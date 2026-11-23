@@ -1,0 +1,125 @@
+{
+  "description": "MCP server for interacting with the Scryfall MTG API",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "scryfall-mcp-server@0.1.1"
+  ],
+  "manifest_sha256": "2813f58753a47a67b1d65ce90be1f070098792d64d3107a81587cad2bd11a2b8",
+  "package": "scryfall-mcp-server",
+  "protocol_version": "2024-11-05",
+  "repository_url": null,
+  "slug": "npm-scryfall-mcp-server-0-1-1",
+  "stderr_summary": "npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nScryfall MCP Server running on stdio",
+  "tool_count": 7,
+  "tools": [
+    {
+      "description": "Search for MTG cards by a text query, e.g. 'oracle text includes: draw cards'. Returns a list of matching cards (with basic fields: name, set, collector_number, ID). If no matches are found, returns an error message from Scryfall.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "A full text query, e.g. 't:goblin pow=2 o:haste'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_cards"
+    },
+    {
+      "description": "Retrieve a card by its Scryfall ID (a 36-char UUID). Returns the card data in JSON.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "The Scryfall UUID, e.g. 'c09c71fb-7acb-4ffb-a47b-8961a0cf4990'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_card_by_id"
+    },
+    {
+      "description": "Retrieve a card by its exact English name, e.g. 'Black Lotus'. Returns the card data in JSON. If multiple cards share that exact name, Scryfall returns one (usually the most relevant printing).",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "description": "Exact name of the card, e.g. 'Lightning Bolt'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "get_card_by_name"
+    },
+    {
+      "description": "Retrieve a random Magic card from Scryfall. Returns JSON data for that random card.",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "random_card"
+    },
+    {
+      "description": "Retrieve official rulings for a specified card by Scryfall ID or Oracle ID. Returns an array of rulings. Each ruling has a 'published_at' date and a 'comment' field.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "A Scryfall ID or Oracle ID. Example: 'c09c71fb-7acb-4ffb-a47b-8961a0cf4990'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_rulings"
+    },
+    {
+      "description": "Retrieve price information for a card by its Scryfall ID. Returns JSON with usd, usd_foil, eur, tix, etc.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "Scryfall ID of the card",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_prices_by_id"
+    },
+    {
+      "description": "Retrieve price information for a card by its exact name. Returns JSON with usd, usd_foil, eur, tix, etc.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "description": "Exact card name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "get_prices_by_name"
+    }
+  ],
+  "version": "0.1.1"
+}

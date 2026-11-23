@@ -1,0 +1,787 @@
+{
+  "description": "MCP server for Chelaile realtime bus data",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "chelaile-mcp-server@1.1.0"
+  ],
+  "manifest_sha256": "4e6ae910a30ae5571f9fba7595a6cf5cf682201501dab444fd176c5efe87f151",
+  "package": "chelaile-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": null,
+  "slug": "npm-chelaile-mcp-server-1-1-0",
+  "stderr_summary": "chelaile-mcp-server running on stdio",
+  "tool_count": 15,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List cities supported by the realtime bus data service.\n\nArgs:\n  - hot_only (boolean, default true): return only the upstream's curated 'hot' set (~20 cities). Set false to dump the full ~480-city list (token-heavy, use sparingly).\n  - response_format ('markdown' | 'json'): defaults to 'markdown'\n\nReturns (json):\n  {\n    \"cities\": [\n      { \"cityId\": \"034\", \"cityName\": \"上海\", \"pinyin\": \"ShangHai\", \"supportSubway\": true, \"hot\": true },\n      ...\n    ]\n  }\n\nUse when: the user mentions a city name and you don't have its ID. The hot set covers the top-tier cities the user almost certainly means.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "hot_only": {
+            "default": true,
+            "description": "Default true: return only the upstream-curated 'hot' set (~20 cities). Set false to dump all 480+.",
+            "type": "boolean"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "bus_list_cities",
+      "title": "List supported cities"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get a city's runtime config: max poll interval and \"arriving\" time threshold.\n\nThis is mostly relevant if you are deciding how aggressively to refresh — not for end-user questions about lines or stops.\n\nArgs:\n  - city_id (string, required): e.g. '034' (Shanghai), '027' (Beijing)\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"maxInterval\": 30,\n    \"arrivingStationLimitSeconds\": 180,\n    \"busDisplayConfig\": { \"lineDetail\": \"time#order#distance\", \"other\": \"time#order\" }\n  }",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "description": "City ID, e.g. '034' for Shanghai, '027' for Beijing",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id"
+        ],
+        "type": "object"
+      },
+      "name": "bus_get_city_config",
+      "title": "Get city operating config"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Convert WGS-84 lat/lng to a Chinese postal address (province, city, district, township, formatted address).\n\nUseful when you have raw GPS coordinates and need a human-readable place name, or the citycode/adcode to pass to other tools.\n\nArgs:\n  - lat (string, required): WGS-84 latitude, decimal, e.g. '31.230416'\n  - lng (string, required): WGS-84 longitude, decimal, e.g. '121.473701'\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"formatted\": \"上海市黄浦区...\",\n    \"province\": \"上海市\",\n    \"city\": \"上海市\",\n    \"district\": \"黄浦区\",\n    \"township\": \"南京东路街道\",\n    \"citycode\": \"021\",\n    \"adcode\": \"310101\"\n  }\n\nFor municipalities (Shanghai/Beijing/Tianjin/Chongqing) the upstream emits an empty 'city' value; this tool back-fills it with 'province' so the field is always a usable string.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "lat": {
+            "description": "Latitude, WGS-84, e.g. '31.230416'",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "lng": {
+            "description": "Longitude, WGS-84, e.g. '121.473701'",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "lat",
+          "lng"
+        ],
+        "type": "object"
+      },
+      "name": "bus_reverse_geocode",
+      "title": "Reverse geocode GPS to address"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Resolve the caller's approximate location from their public IP — useful when the user asks something like \"what's near me\" without providing coordinates.\n\n**Precision is city-level (typically a few kilometres).** Good enough to identify the city and seed bus_get_nearby_stops with a starting guess. NOT precise enough to find the user's actual bus stop — for that, ask for a landmark/address and resolve it via bus_search.\n\nCaveats:\n  - Resolves via ip-api.com (free tier; rate-limited but no auth).\n  - VPN / corporate proxy → result reflects the proxy exit IP, not the user.\n  - Cellular IPs often land on a provincial centroid.\n\nArgs:\n  - ip (string, optional): a specific IPv4/IPv6 to look up. Omit to use the mcp server process's own outbound IP (= the caller's machine when running locally).\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"lat\": 31.2222,\n    \"lng\": 121.4581,\n    \"gpsType\": \"wgs\",\n    \"city\": \"上海\",\n    \"region\": \"上海市\",\n    \"country\": \"中国\",\n    \"ip\": \"116.236.0.1\",\n    \"isp\": \"China Telecom\",\n    \"precision\": \"city-level (~10 km); not suitable for stop-level queries\"\n  }\n\n**Suggested workflow**:\n  1. Call this tool to identify the user's city (match 'city' field against bus_list_cities to get a cityId).\n  2. Pass lat/lng into bus_get_nearby_stops for a rough nearby list, OR ask the user to confirm a landmark and use bus_search.pois for sharper coordinates.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "ip": {
+            "description": "Optional override IP to look up. Omit to use the mcp server's own outbound IP (i.e. the caller's machine).",
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "bus_get_my_location",
+      "title": "Get the caller's approximate location via IP"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Search inside a city by keyword. Returns matching lines, stations, and POIs in one call.\n\nUse this as the primary entry point when the user gives a line number, station name, or destination name without IDs.\n\n**Keyword tip**: plain \"71\", \"71路\", \"地铁2号线\", \"陆家嘴\" all work — the upstream is reasonably forgiving. If a short numeric returns empty, try appending \"路\".\n\n**Coordinate systems**:\n  - 'pois' coords are GCJ-02 (use directly with bus_plan_transit)\n  - 'stations' coords are WGS-84 (use with bus_get_nearby_stops / bus_get_line_realtime)\n  Both are also marked with a 'gpsType' field.\n\nArgs:\n  - city_id (string, required): e.g. '034'\n  - keyword (string, required)\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"highlightKey\": \"71路\",\n    \"lines\": [\n      {\n        \"name\": \"71\", \"lineNo\": \"r95817\", \"isSubway\": false,\n        \"directions\": [\n          { \"direction\": 0, \"lineId\": \"21283603183\", \"startSn\": \"延安东路外滩\", \"endSn\": \"申昆路枢纽站\" },\n          { \"direction\": 1, \"lineId\": \"21283603182\", \"startSn\": \"申昆路枢纽站\", \"endSn\": \"延安东路外滩\" }\n        ],\n        // Compat top-level fields mirror directions[0] (or first available).\n        \"lineId\": \"21283603183\", \"direction\": 0, \"startSn\": \"延安东路外滩\", \"endSn\": \"申昆路枢纽站\"\n      },\n      ...\n    ],\n    \"stations\": [{ \"sId\":\"...\", \"sn\":\"西藏中路\", \"lat\":31.231006, \"lng\":121.474316, \"gpsType\":\"wgs\", \"physicalStId\":\"...\", \"namesakeStId\":\"...\", \"isSubway\":false }, ...],\n    \"pois\": [{ \"name\":\"71路\", \"address\":\"...\", \"tag\":\"公交线路\", \"district\":\"黄浦区\", \"lat\":31.233021, \"lng\":121.49073, \"gpsType\":\"gcj\" }, ...]\n  }\n\n**Line folding**: each entry in 'lines' is one logical line (e.g. \"71路\"). The two travel directions live in 'directions[]'. Pick the lineId matching your desired direction.\n\n**Subway hint**: when 'isSubway' is true, the entry carries a 'hint' field — bus_get_line_detail will return empty for these lineIds. Use bus_get_stop_detail (metros field) or bus_plan_transit instead.\n\n**Follow-ups**:\n- directions[i].lineId → bus_get_line_detail (full stop list, first/last/price) — non-subway only\n- stations[*].physicalStId + namesakeStId → bus_get_stop_detail\n  (NOTE: a few stations lack physicalStId — typically metro-only entries with subwayV2=1. For those, use bus_get_nearby_stops to resolve the bus platform IDs nearby.)\n- pois[*].lat/lng (GCJ) → bus_plan_transit as origin/destination",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "description": "City ID, e.g. '034'",
+            "minLength": 1,
+            "type": "string"
+          },
+          "keyword": {
+            "description": "Search keyword. Examples: '71', '71路', '地铁2号线', '陆家嘴', '人民广场'. Plain line numbers like '71' work fine.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "keyword"
+        ],
+        "type": "object"
+      },
+      "name": "bus_search",
+      "title": "Search lines, stations, and POIs"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Paginated 'see more' for one category from bus_search.\n\nArgs:\n  - city_id (string, required)\n  - keyword (string, required): same keyword used in bus_search\n  - type ('1'|'2'|'3'): 1=more lines, 2=more stations, 3=more POIs (default '1')\n  - response_format ('markdown' | 'json')\n\nReturns: same shape as bus_search but only the requested category is populated.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "description": "City ID, e.g. '034'",
+            "minLength": 1,
+            "type": "string"
+          },
+          "keyword": {
+            "description": "Search keyword. Examples: '71', '71路', '地铁2号线', '陆家嘴', '人民广场'. Plain line numbers like '71' work fine.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "type": {
+            "default": "1",
+            "description": "Category: '1' more lines, '2' more stations, '3' more POIs",
+            "enum": [
+              "1",
+              "2",
+              "3"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "keyword"
+        ],
+        "type": "object"
+      },
+      "name": "bus_search_more",
+      "title": "Search more results of one category"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List bus stops near a WGS-84 GPS coordinate, each annotated with the lines that pass through and the realtime buses approaching.\n\n**If you don't have coordinates**: call bus_get_my_location first (city-level precision via IP), or ask the user for a landmark and resolve it via bus_search.pois — the resulting lat/lng goes into this tool's lat/lng args.\n\nArgs:\n  - city_id (string, required): e.g. '034'\n  - lat / lng (string, required): WGS-84 decimal coordinates\n  - limit (number, default 5): how many of the closest stops to return (max 20)\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"stops\": [\n      {\n        \"sId\": \"021-15232\", \"sn\": \"西藏中路\", \"distance\": 87, \"isSubway\": false,\n        \"physicalStId\": \"...\", \"namesakeStId\": \"...\", \"firstLineId\": \"...\",\n        \"lines\": [\n          {\n            \"lineId\": \"...\", \"name\": \"71\", \"direction\": 0, \"endSn\": \"...\",\n            \"status\": \"等待发车\" | \"不在运营时间\" | \"\" (running),\n            \"preArrivalTime\": \"10:10\" | undefined,\n            \"targetOrder\": 2, \"targetStationId\": \"021-15232\",\n            \"buses\": [\n              { \"busId\": \"...\", \"order\": 2, \"arrivalTime\": 1779070466055, \"travelTime\": 25, \"distanceToDest\": 90, \"capacity\": 0 }\n            ]\n          }\n        ],\n        \"subwayLines\": [ { \"name\": \"地铁2号线\", \"shortName\": \"2号线\", \"color\": \"140,194,32\", \"directions\": [{ \"destName\": \"...\", \"firstTime\": \"05:31\", \"lastTime\": \"23:24\" }] } ]\n      }\n    ]\n  }\n\nField notes:\n- buses[].arrivalTime is a ms timestamp; -1 = unknown\n- buses[].travelTime is seconds remaining; -1 = unknown\n- buses[].capacity: 0=light, 1=moderate, 2=crowded\n- If no realtime buses but the line is starting soon, 'preArrivalTime' will hold the next predicted dispatch (\"10:12\")",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "description": "City ID, e.g. '034'",
+            "minLength": 1,
+            "type": "string"
+          },
+          "lat": {
+            "description": "WGS-84 latitude",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "limit": {
+            "default": 5,
+            "description": "How many of the nearest stops to return. Default 5 — the upstream may return 15+ and most callers only care about the closest few.",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "lng": {
+            "description": "WGS-84 longitude",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "lat",
+          "lng"
+        ],
+        "type": "object"
+      },
+      "name": "bus_get_nearby_stops",
+      "title": "Get nearby bus stops"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Full detail for a stop: precise WGS-84 coordinates, every line that passes through (with first/last/price), realtime buses, and nearby metro lines.\n\nArgs:\n  - city_id (string, required)\n  - physical_st_id (string, required): from bus_get_nearby_stops / bus_search\n  - namesake_st_id (string, optional): recommended; from the same source\n  - first_line_id (string, optional): a line to highlight\n  - lat / lng (string, optional): caller's WGS-84 location, used to populate 'distance'\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"stations\": [\n      { \"sId\": \"...\", \"sn\": \"...\", \"lat\": ..., \"lng\": ..., \"distance\": ...,\n        \"lines\": [{ \"lineId\": \"...\", \"name\": \"71\", \"direction\": 0, \"startSn\": \"...\", \"endSn\": \"...\", \"firstTime\": \"05:30\", \"lastTime\": \"23:30\", \"price\": \"2元\", \"targetOrder\": 2, \"buses\": [...] }],\n        \"metros\": [{ \"name\": \"地铁14号线\", \"lineNo\": \"14号线\", \"color\": \"97,96,32\" }] }\n    ]\n  }\n\nMultiple entries in stations[] mean the stop name maps to several physical platforms.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "first_line_id": {
+            "description": "Optional hint of a line you want highlighted",
+            "type": "string"
+          },
+          "lat": {
+            "description": "Caller's WGS-84 latitude — used to populate 'distance'",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "lng": {
+            "description": "Caller's WGS-84 longitude",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "namesake_st_id": {
+            "description": "namesakeStId of the stop, optional",
+            "type": "string"
+          },
+          "physical_st_id": {
+            "description": "physicalStId of the stop (from bus_get_nearby_stops or bus_search)",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "physical_st_id"
+        ],
+        "type": "object"
+      },
+      "name": "bus_get_stop_detail",
+      "title": "Get stop detail with all lines"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Full info for a line: rider-facing fields (name, first/last/price, stationsNum), the full ordered station list, the reverse-direction lineId, and every bus currently on the line.\n\n**Use this — not bus_get_timetable — to answer \"is line X still running\" or \"first/last bus time\" questions.** The timetable tool only has data for a small minority of lines.\n\n**Subway lines are NOT supported.** If bus_search returned a line with isSubway=true (e.g. lineId=1057 for 地铁2号线), this endpoint returns an empty payload — the response will carry `empty: true` and a `hint` field pointing at bus_get_nearby_stops / bus_plan_transit. Don't retry; route to those tools instead.\n\nArgs:\n  - city_id (string, required)\n  - line_id (string, required): from bus_search.lines[*].lineId\n  - lat / lng (string, optional): caller's WGS-84 coordinates\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"line\": { \"lineId\":\"...\", \"name\":\"71\", \"lineNo\":\"r95817\", \"direction\":0, \"startSn\":\"...\", \"endSn\":\"...\", \"firstTime\":\"05:30\", \"lastTime\":\"23:30\", \"price\":\"2元\", \"stationsNum\":24 },\n    \"stations\": [{ \"order\":1, \"sId\":\"...\", \"sn\":\"...\", \"wgsLat\":..., \"wgsLng\":..., \"physicalStId\":\"...\", \"namesakeStId\":\"...\", \"metros\":[{\"name\":\"地铁14号线\",\"lineNo\":\"14号线\",\"color\":\"97,96,32\"}] }, ...],\n    \"buses\": [{ \"busId\":\"...\", \"order\":2, \"lat\":..., \"lng\":..., \"speed\":5.7, \"capacity\":0, \"distanceToWaitStn\":...}],\n    \"reverseDirection\": { \"lineId\":\"...\", \"startSn\":\"...\", \"endSn\":\"...\", \"firstTime\":\"04:30\", \"lastTime\":\"22:30\", \"price\":\"2元\" } | null,\n    \"depDesc\": \"...\", \"preArrivalTime\": \"...\", \"targetOrder\": 24,\n    \"empty\": true, \"hint\": \"...\"   // present only when upstream returned no data (subway / retired line)\n  }\n\nEach station carries:\n- 'order' → feed into bus_get_line_realtime / bus_list_line_buses as target_order\n- 'sId' → feed into bus_get_line_realtime as station_id (NOT into bus_get_stop_detail!)\n- 'physicalStId' + 'namesakeStId' → feed into bus_get_stop_detail to see every line through that stop",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "lat": {
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "line_id": {
+            "description": "lineId from bus_search.lines / bus_get_nearby_stops.lines",
+            "minLength": 1,
+            "type": "string"
+          },
+          "lng": {
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "line_id"
+        ],
+        "type": "object"
+      },
+      "name": "bus_get_line_detail",
+      "title": "Get full line detail (stops + live buses)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Polyline coordinates for drawing a line on a map. Points with 'stopOrder' are actual stops; others are shape points between stops.\n\nArgs:\n  - city_id (string, required)\n  - line_id (string, required)\n  - include_shape (boolean, default false): false returns only stop markers (~25 points); true returns all shape points (~400-500). Skip unless you actually need to draw the line.\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"pointCount\": 480,           // total shape points upstream returned\n    \"stopCount\": 23,             // stop markers among them\n    \"points\": [{ \"lat\":..., \"lng\":..., \"stopOrder\":1 }, ...]\n  }\n'points' is the filtered list — stops only by default, full polyline when include_shape=true.\n\n**Known caveat**: upstream sometimes omits the terminus stop from the polyline, so 'stopCount' may be one less than bus_get_line_detail's 'stationsNum' (e.g. 23 vs 24). Trust bus_get_line_detail for the authoritative station list; line_route is just for drawing.\n\nMarkdown mode only summarises counts; request JSON to read coordinates.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "include_shape": {
+            "default": false,
+            "description": "If true, include all polyline shape points (often 400-500 per line). Default false returns only stop-marker points.",
+            "type": "boolean"
+          },
+          "line_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "line_id"
+        ],
+        "type": "object"
+      },
+      "name": "bus_get_line_route",
+      "title": "Get line polyline coordinates"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Canonical \"when will my bus arrive\" tool. Returns every bus currently on the line, with the nearest one carrying an ETA to the waiting stop.\n\n**Important**: the upstream predicts an ETA for only the nearest bus heading to your stop. Buses farther up the route are returned (with position/speed/capacity) but their `eta` field is null. That's not a bug.\n\n**Args**:\n  - city_id (string, required)\n  - line_id (string, required): from bus_search\n  - target_order (string, required): the waiting stop's order on the line. Source: bus_get_line_detail.stations[i].order, or bus_get_nearby_stops.stops[].lines[].targetOrder.\n  - station_id (string, required): sId of the waiting stop\n  - lat / lng (string, required): WGS-84 — the user's location is best; if unavailable, use the waiting stop's wgsLat/wgsLng (from line_detail.stations[i]).\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"line\": { \"lineId\":\"...\", \"name\":\"71\", \"direction\":0, \"endSn\":\"...\" },\n    \"targetOrder\": 2,\n    \"realData\": true,\n    \"buses\": [\n      { \"busId\":\"...\", \"licence\":\"...\", \"order\":2, \"lat\":..., \"lng\":..., \"speed\":5.7, \"capacity\":0, \"distanceToWaitStn\":90, \"eta\":{\"travelTime\":25,\"arrivalTime\":1779070466055,\"displayTime\":\"10:14\"} },\n      { \"busId\":\"...\", \"order\":3, \"lat\":..., \"lng\":..., \"speed\":3, \"capacity\":0, \"eta\":null },\n      ...\n    ],\n    \"note\": \"...\"\n  }\n\nField notes:\n- The 'line' sub-object intentionally omits startSn — upstream does not return it on this endpoint. Read it from bus_get_line_detail if needed.\n- eta.travelTime is seconds remaining\n- eta.arrivalTime is a ms timestamp\n- eta.displayTime is a \"HH:MM\" hint from upstream\n- capacity: 0=light, 1=moderate, 2=crowded",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "lat": {
+            "description": "WGS-84 latitude. If the user's location is unknown, fall back to the waiting stop's lat (from line_detail.stations[].wgsLat).",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "line_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "lng": {
+            "description": "WGS-84 longitude. Fallback to the stop's wgsLng if unknown.",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "station_id": {
+            "description": "sId of the waiting stop",
+            "minLength": 1,
+            "type": "string"
+          },
+          "target_order": {
+            "description": "Order index of the waiting stop on the line. Get it from bus_get_line_detail.stations[].order or bus_get_nearby_stops.stops[].lines[].targetOrder.",
+            "pattern": "^\\d+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "line_id",
+          "target_order",
+          "station_id",
+          "lat",
+          "lng"
+        ],
+        "type": "object"
+      },
+      "name": "bus_get_line_realtime",
+      "title": "Get realtime buses for a (line, stop) pair"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Returns the nearest bus heading to the anchor stop, with ETA and the bus's next stop name.\n\n**This is narrower than the name suggests.** Despite the upstream endpoint being called \"busList\", in practice it returns at most 1-2 buses (the imminent ones). For the FULL roster of every bus currently on the line, call **bus_get_line_detail** — its 'buses' array lists all live vehicles with positions.\n\nUse this tool when you want a quick \"what's about to arrive\" answer for a specific stop.\n\nArgs:\n  - city_id (string, required)\n  - line_id (string, required)\n  - target_order (string, required): the waiting stop's order on the line\n  - station_name (string, required): display name of that anchor stop\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"targetOrder\": 2,\n    \"buses\": [\n      { \"busId\":\"...\", \"licence\":\"...\", \"order\":2, \"lat\":..., \"lng\":..., \"speed\":8.2, \"capacity\":0, \"nextStop\":\"西藏中路\", \"eta\":{\"travelTime\":214,\"arrivalTime\":..., \"displayTime\":\"10:14\"} }\n    ]\n  }",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "line_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "station_name": {
+            "description": "Display name of the target stop",
+            "minLength": 1,
+            "type": "string"
+          },
+          "target_order": {
+            "pattern": "^\\d+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "line_id",
+          "target_order",
+          "station_name"
+        ],
+        "type": "object"
+      },
+      "name": "bus_list_line_buses",
+      "title": "Get the nearest approaching bus on a line"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Per-trip departure schedule for a line. The upstream returns one of three modes via `mode`:\n  - 'scheduled' (timeTableType=1): an explicit `timetable` array of trips\n  - 'interval' (timeTableType=2): the line runs at a fixed headway — NO per-trip times are returned\n  - 'special' / 'unknown' (timeTableType=3 or other)\n\n**Most lines in Shanghai are 'interval'**, so this tool is rarely the right one. To answer \"first/last bus\", \"is the line still running\", or \"what's the next departure\", call **bus_get_line_detail** instead — it always returns firstTime / lastTime / price / live buses.\n\nArgs:\n  - city_id (string, required)\n  - line_id (string, required)\n  - line_no (string, required): rider-facing short name from bus_search.lines[].name (e.g. '71'). Do NOT pass the internal lineNo like 'r95817'.\n  - direction ('0'|'1'): the line direction\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"line\": { \"lineId\":\"...\", \"name\":\"71\", \"direction\":0, \"startSn\":\"...\", \"endSn\":\"...\" },\n    \"timeTableType\": 2,\n    \"mode\": \"interval\",\n    \"timetable\": null,\n    \"note\": \"This line runs at a fixed interval — ...\"\n  }",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "0",
+              "1"
+            ],
+            "type": "string"
+          },
+          "line_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "line_no": {
+            "description": "Rider-facing short name (search.lines[].name), e.g. '71'. NOT the internal lineNo like 'r95817'.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "line_id",
+          "line_no",
+          "direction"
+        ],
+        "type": "object"
+      },
+      "name": "bus_get_timetable",
+      "title": "Get a line's per-trip schedule (rarely useful)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Refresh realtime bus info for several (line, stop) pairs in one round-trip. Useful for a 'favourites' dashboard.\n\nArgs:\n  - city_id (string, required)\n  - line_stn (string, required): semicolon-separated quadruples\n      Format: lineId,stopId,nextId,targetOrder;lineId,stopId,nextId,targetOrder;...\n      'nextId' may be empty between the two commas.\n  - response_format ('markdown' | 'json')\n\nExample: '21283603183,021-15232,,2;21283604388,021-8685,,4'\n\nReturns (json):\n  {\n    \"lines\": [\n      {\n        \"line\": { \"lineId\":\"...\", \"name\":\"71\", \"direction\":0, \"endSn\":\"...\" },\n        \"depDesc\": \"...\",\n        \"buses\": [\n          { \"busId\":\"...\", \"order\":2, \"capacity\":0, \"distanceToDest\":881, \"eta\":{\"travelTime\":221,\"arrivalTime\":...} }\n        ]\n      }\n    ]\n  }\n\nSoft cap: up to 10 quadruples per call.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "line_stn": {
+            "description": "Quadruple list: lineId,stopId,nextId,targetOrder; separated by ';'. nextId may be empty.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "line_stn"
+        ],
+        "type": "object"
+      },
+      "name": "bus_refresh_lines",
+      "title": "Batch refresh realtime info for multiple (line, stop) pairs"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Plan a public-transit (bus + metro) route between two points. Returns alternative plans sorted by recommendation, each broken into walking and ride segments.\n\n**Coordinate system**: this tool expects GCJ-02. The easiest source is bus_search.pois[*].lat/lng — those are already GCJ-02 and carry a name. If you only have WGS-84 (e.g. from a phone GPS), convert it before calling.\n\nArgs:\n  - city_id (string, required)\n  - origin_name, origin_lat, origin_lng (string, required): origin in GCJ-02\n  - dest_name, dest_lat, dest_lng (string, required): destination in GCJ-02\n  - strategy ('0'|'1'|'2'|'3'): 0=recommended (default; surfaces metro), 1=fewest transfers, 2=least walking, 3=shortest time (BUS-ONLY — upstream often drops metro plans here, so for general \"fastest route\" questions use 0)\n  - response_format ('markdown' | 'json')\n\nReturns (json):\n  {\n    \"origin\": \"lng,lat\",\n    \"destination\": \"lng,lat\",\n    \"distance\": 17982,\n    \"plans\": [\n      {\n        \"duration\": 3056, \"walkingDistance\": 1466, \"distance\": 19086, \"tag\": \"直达\", \"transitCount\": 1,\n        \"segments\": [\n          { \"type\": \"walking\", \"distance\": 837, \"duration\": 717 },\n          { \"type\": \"bus\", \"name\": \"地铁2号线\", \"lineType\": 1, \"departureStop\": \"人民广场\", \"arrivalStop\": \"虹桥2号航站楼\", \"viaStops\": 8, \"duration\": 1800, \"distance\": 17620, \"startTime\": \"05:37\", \"endTime\": \"23:30\" }\n        ]\n      }\n    ]\n  }\nlineType: 0=bus, 1=metro. Durations in seconds, distances in meters.\n\nA top-level 'note' field is emitted when the response shape is suspicious — e.g. strategy=3 returned no metro plans despite this being a likely metro trip.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "city_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "dest_lat": {
+            "description": "Destination latitude in GCJ-02",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "dest_lng": {
+            "description": "Destination longitude in GCJ-02",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "dest_name": {
+            "description": "Destination display name",
+            "minLength": 1,
+            "type": "string"
+          },
+          "origin_lat": {
+            "description": "Origin latitude in GCJ-02",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "origin_lng": {
+            "description": "Origin longitude in GCJ-02",
+            "pattern": "^-?\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "origin_name": {
+            "description": "Origin display name",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "default": "markdown",
+            "description": "Output format: 'markdown' for human-readable text, 'json' for full structured data",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "strategy": {
+            "default": "0",
+            "description": "Routing strategy: 0=recommended (default; surfaces metro), 1=fewest transfers, 2=least walking, 3=shortest time among BUS-ONLY candidates (upstream often excludes metro from this strategy — when in doubt, use 0). For most user questions, 0 is the right choice.",
+            "enum": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "city_id",
+          "origin_name",
+          "origin_lat",
+          "origin_lng",
+          "dest_name",
+          "dest_lat",
+          "dest_lng"
+        ],
+        "type": "object"
+      },
+      "name": "bus_plan_transit",
+      "title": "Plan a public-transit route"
+    }
+  ],
+  "version": "1.1.0"
+}

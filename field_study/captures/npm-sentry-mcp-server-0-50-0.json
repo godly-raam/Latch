@@ -1,0 +1,19 @@
+{
+  "description": "Sentry MCP server over stdio: the CLI's `sentry mcp` server, bundled without the rest of the CLI",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@sentry/mcp-server@0.50.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@sentry/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/getsentry/toolkit",
+  "slug": "npm-sentry-mcp-server-0-50-0",
+  "stderr_summary": "Error: Not authenticated. Run 'npx -y @sentry/mcp-server auth login' first.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.50.0"
+}

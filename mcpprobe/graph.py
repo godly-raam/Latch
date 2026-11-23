@@ -291,15 +291,12 @@ LOCAL_OBJECT_TOKENS = frozenset(
     }
 )
 
-#: Verbs that publish outward. Used only to veto a local-write classification
-#: (``publish_post`` publishes; it does not merely write local state); making a
-#: remote sink is still decided by the destination/sink rules below.
-REMOTE_PUBLISH_VERBS = frozenset(
+#: Verbs that name the act of sending data somewhere.
+OUTBOUND_SEND_VERBS = frozenset(
     {
         "send",
         "post",
         "put",
-        "patch",
         "upload",
         "publish",
         "push",
@@ -313,7 +310,31 @@ REMOTE_PUBLISH_VERBS = frozenset(
         "pay",
         "dispatch",
         "relay",
-        "emit",
+    }
+)
+
+#: Verbs that publish outward. Used only to veto a local-write classification
+#: (``publish_post`` publishes; it does not merely write local state); making a
+#: remote sink is still decided by the destination/sink rules below.
+#: ``patch``/``emit`` are here but not in ``OUTBOUND_SEND_VERBS``: a SaaS
+#: ``patch`` writes the vendor's row, so it must not look like a local edit.
+REMOTE_PUBLISH_VERBS = OUTBOUND_SEND_VERBS | frozenset({"patch", "emit"})
+
+#: Verbs that, on their own, assert that a call leaves this process: sending,
+#: publishing, or firing a request at a caller-chosen destination (``navigate``,
+#: ``curl``). Generic mutation verbs (``create``, ``update``, ``execute``,
+#: ``run``) are deliberately absent -- a SaaS CRUD call writes a row in the
+#: vendor's own database, which is not an attacker-chosen destination. These
+#: verbs only gate the *annotation* signal: an identifier or schema sink is
+#: still evidence in its own right.
+EXPLICIT_OUTBOUND_VERBS = OUTBOUND_SEND_VERBS | frozenset(
+    {
+        "email",
+        "mail",
+        "curl",
+        "http",
+        "request",
+        "navigate",
     }
 )
 
@@ -347,6 +368,17 @@ REMOTE_TARGET_TOKENS = frozenset(
     }
 )
 
+#: Destination nouns that make an outbound verb an exfiltration sink.
+#:
+#: Three everyday API words are deliberately absent:
+#:
+#: * ``to`` -- a preposition in parameter names (``save_to``, ``grantAccessTo``,
+#:   Heroku's ``pipelines_promote(to=...)`` stage selector), not a sink.
+#: * ``external`` -- a field qualifier (Salesforce ``externalId``, Bitwarden
+#:   ``externalId``), which names a data attribute, not a destination.
+#: * ``comment`` -- content being posted, not a place it is posted to.
+#:
+#: Each of them produced a week-2 field-study false positive.
 EXTERNAL_TARGETS = frozenset(
     {
         "url",
@@ -356,22 +388,18 @@ EXTERNAL_TARGETS = frozenset(
         "http",
         "https",
         "recipient",
-        "to",
         "cc",
         "bcc",
-        "email",
         "channel",
         "slack",
         "discord",
         "issue",
-        "comment",
         "pr",
         "pull",
         "gist",
         "repo",
         "bucket",
         "s3",
-        "external",
         "remote",
         "dest",
         "destination",
@@ -419,21 +447,104 @@ NETWORK_TARGET_TOKENS = frozenset(
     }
 )
 
+#: Parameters that are protocol plumbing rather than content: a pagination
+#: cursor is not a page of untrusted HTML, and a continuation token is not a
+#: credential. Without this, every paginated ``list_*`` reader is classified as
+#: both an ingest and a private-data read (week-2 field-study false positive).
+#:
+#: Stored separator-free (see ``_normalized_param``), so ``pageToken``,
+#: ``page_token`` and ``idempotency-key`` all match one entry.
+PROTOCOL_PARAMS = frozenset(
+    {
+        "pagetoken",
+        "nextpagetoken",
+        "pagesize",
+        "startcursor",
+        "cursor",
+        "continuationtoken",
+        "maxresults",
+        "limit",
+        "offset",
+        "idempotencykey",
+    }
+)
+
+#: Verbs whose position at the *start* of a tool name make it a reader.
+#: ``list_alert_slack_channels`` reads configured channels; the ``alert`` token
+#: must not turn it into a publisher. ``navigate``/``fetch`` are absent: those
+#: issue a request to a caller-chosen destination.
+READER_PREFIX_VERBS = frozenset(
+    {
+        "get",
+        "list",
+        "read",
+        "search",
+        "find",
+        "query",
+        "inspect",
+        "view",
+        "show",
+        "cat",
+        "dump",
+        "export",
+        "browse",
+        "load",
+        "pull",
+        "receive",
+        "harvest",
+        "extract",
+    }
+)
+
+#: Parameters that name a *destination the caller controls*. ``to`` is absent:
+#: it is a preposition far more often than a sink (see ``EXTERNAL_TARGETS``).
 OUTBOUND_SINK_PARAMS = frozenset(
     {
         "webhook",
         "webhook_url",
+        "callback",
         "callback_url",
         "recipient",
-        "to",
-        "cc",
-        "bcc",
+        "recipients",
+        "email_to",
         "target_url",
         "destination_url",
     }
 )
 
+#: Recipient parameters that are also ordinary record fields or prepositions
+#: (a CRM contact's ``cc``, Heroku's ``pipelines_promote(to=...)`` stage). They
+#: only name a destination on a tool that is itself a messaging/mail/HTTP
+#: sender, so a bare ``to`` never counts (week-2 field-study false positive).
+CONTEXTUAL_RECIPIENT_PARAMS = frozenset({"to", "cc", "bcc"})
+
+MESSAGING_CONTEXT_TOKENS = frozenset(
+    {
+        "email",
+        "mail",
+        "message",
+        "messages",
+        "slack",
+        "discord",
+        "chat",
+        "sms",
+        "notify",
+        "notification",
+        "send",
+        "reply",
+        "forward",
+        "invite",
+        "webhook",
+        "channel",
+        "http",
+        "https",
+    }
+)
+
 #: Parameters that let a caller choose *where* data goes (used for severity).
+#: ``to``/``cc``/``bcc`` are absent: ``to`` is a preposition far more often
+#: than a destination, and the recipient fields are handled as sinks only in a
+#: messaging context (``CONTEXTUAL_RECIPIENT_PARAMS``).
 ARBITRARY_DESTINATION_PARAMS = frozenset(
     {
         "url",
@@ -445,9 +556,55 @@ ARBITRARY_DESTINATION_PARAMS = frozenset(
         "target_url",
         "destination_url",
         "recipient",
-        "to",
-        "cc",
-        "bcc",
+    }
+)
+
+#: Destination-shaped *parameter* names, compared separator-free and
+#: case-insensitively (``targetUrl`` matches ``target_url``). A target noun is
+#: evidence only from the tool name, an action enum, or one of these exact
+#: parameter names -- never from any parameter that merely tokenizes to a target
+#: noun (``reportUrl`` and ``s3Bucket`` are record fields, not sinks).
+TARGET_PARAM_NAMES = frozenset(
+    {
+        "url",
+        "uri",
+        "endpoint",
+        "webhook",
+        "webhookurl",
+        "callback",
+        "callbackurl",
+        "recipient",
+        "recipients",
+        "emailto",
+        "targeturl",
+        "destinationurl",
+        "bucket",
+        "s3",
+        "number",
+    }
+)
+
+#: Destination nouns that still name a destination inside a longer parameter
+#: name: ``issue_key``, ``pull_request``, ``recipient_email`` and ``channel_id``
+#: are all places data goes, whatever the spelling. ``url``, ``bucket``, ``s3``
+#: and ``number`` are absent because they are ordinary record fields when
+#: embedded, so those only count as exact parameter names above.
+EMBEDDED_TARGET_NOUNS = frozenset(
+    {
+        "issue",
+        "pull",
+        "pr",
+        "recipient",
+        "recipients",
+        "channel",
+        "channels",
+        "phone",
+        "thread",
+        "remote",
+        "dest",
+        "destination",
+        "sink",
+        "gist",
     }
 )
 
@@ -575,11 +732,62 @@ def _enum_value_tokens(tool: ToolDefinition) -> set[str]:
     return tokens
 
 
+def _normalized_param(name: str) -> str:
+    """A parameter name with separators and case removed, for vocabulary sets."""
+
+    return _SPLIT_RE.sub("", name.lower())
+
+
 def _tool_tokens(tool: ToolDefinition) -> set[str]:
     tokens = set(tokenize_identifier(tool.name))
     for parameter in _parameter_names(tool):
+        if _normalized_param(parameter) in PROTOCOL_PARAMS:
+            continue
         tokens.update(tokenize_identifier(parameter))
     tokens.update(_enum_value_tokens(tool))
+    return tokens
+
+
+#: Enum-bearing parameters that describe *what the call does* rather than what
+#: its data is. A dispatcher's capability lives here (``action: ["read",
+#: "upload"]``); an ``entity`` or ``type`` enum (``["case","run"]``,
+#: ``["Text","Url"]``) names data, and reading it as a verb/target turned two
+#: week-2 SaaS CRUD tools into exfiltration sinks.
+ACTION_PARAM_NAMES = frozenset({"action", "operation", "method", "op", "command"})
+
+
+def _action_enum_tokens(tool: ToolDefinition) -> set[str]:
+    """Tokens from ``enum`` values on action-shaped parameters only."""
+
+    tokens: set[str] = set()
+    properties = tool.inputSchema.get("properties")
+    if not isinstance(properties, dict):
+        return tokens
+    for name, schema in properties.items():
+        if str(name).lower() not in ACTION_PARAM_NAMES:
+            continue
+        if not isinstance(schema, dict):
+            continue
+        values = schema.get("enum")
+        if not isinstance(values, list):
+            continue
+        for value in values:
+            if isinstance(value, str):
+                tokens.update(tokenize_identifier(value))
+    return tokens
+
+
+def _destination_param_tokens(tool: ToolDefinition) -> set[str]:
+    """Tokens from parameters that declare a caller-chosen destination."""
+
+    tokens: set[str] = set()
+    for parameter in _parameter_names(tool):
+        parameter_tokens = set(tokenize_identifier(parameter))
+        if (
+            _normalized_param(parameter) in TARGET_PARAM_NAMES
+            or parameter_tokens & EMBEDDED_TARGET_NOUNS
+        ):
+            tokens.update(parameter_tokens)
     return tokens
 
 
@@ -619,6 +827,8 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
 
     tokens = _tool_tokens(tool)
     params = _lowered_params(tool)
+    name_token_list = tokenize_identifier(tool.name)
+    name_tokens = set(name_token_list)
     annotations = tool.annotations or {}
 
     capabilities: list[CapabilityTag] = []
@@ -639,7 +849,16 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
         )
 
     open_world = annotations.get("openWorldHint") is True
-    if open_world and annotations.get("destructiveHint") is not True:
+    # ``openWorldHint`` says the tool talks to a third-party service. It does
+    # not say that service's output is untrusted input: a CRUD or analytics
+    # call against a SaaS API is open-world too, and calling it an ingest makes
+    # every vendor integration look like an exfiltration source. Require a noun
+    # naming content that actually arrives from outside.
+    if (
+        open_world
+        and annotations.get("destructiveHint") is not True
+        and content_nouns
+    ):
         _add(
             capabilities,
             evidence,
@@ -684,7 +903,6 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
     # ``git_commit`` into an outbound sender) and vetoed by any real outbound
     # signal: a destination/recipient parameter, a header binding, or an
     # open-world non-read-only annotation.
-    name_tokens = set(tokenize_identifier(tool.name))
     strong_local_verbs = sorted(name_tokens & LOCAL_MUTATION_VERBS)
     generic_local_verbs = sorted(name_tokens & GENERIC_MUTATION_VERBS)
     local_objects = sorted(name_tokens & LOCAL_OBJECT_TOKENS)
@@ -728,9 +946,29 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
         or (tokens & LOCAL_PROTOCOL_VERBS and not tokens & NETWORK_TARGET_TOKENS)
     )
 
-    outbound_verbs = sorted(tokens & OUTBOUND_VERBS)
-    external_targets = sorted(tokens & EXTERNAL_TARGETS)
-    if outbound_verbs and external_targets and not local_write and not local_protocol_callback:
+    # A reader is not a sink: ``list_alert_slack_channels`` reads configured
+    # channels, so the ``alert``/``slack`` tokens in its name must not turn it
+    # into a publisher.
+    leads_with_reader = bool(name_token_list) and (
+        name_token_list[0] in READER_PREFIX_VERBS
+    )
+
+    # Verbs come from the name and action-shaped enums; targets from the name
+    # and destination-shaped parameters. A record field called ``reportUrl`` or
+    # ``s3Bucket`` tokenizes to a target noun without being somewhere data can
+    # be sent, and a ``type``/``entity`` enum names data rather than an action.
+    outbound_verbs = sorted((name_tokens | _action_enum_tokens(tool)) & OUTBOUND_VERBS)
+    external_targets = sorted(
+        (name_tokens | _destination_param_tokens(tool)) & EXTERNAL_TARGETS
+    )
+    identifier_egress = bool(
+        outbound_verbs
+        and external_targets
+        and not leads_with_reader
+        and not local_write
+        and not local_protocol_callback
+    )
+    if identifier_egress:
         _add(
             capabilities,
             evidence,
@@ -741,18 +979,24 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
             f" {external_targets}",
         )
 
-    sinks = sorted(params & OUTBOUND_SINK_PARAMS)
-    if sinks:
+    # ``to``/``cc``/``bcc`` are also prepositions or ordinary contact fields (a
+    # CRM contact's ``cc``), so they only name a destination on a tool that is
+    # itself a messaging sender; every other sink parameter stands on its own.
+    sink_params = set(params & OUTBOUND_SINK_PARAMS)
+    if params & CONTEXTUAL_RECIPIENT_PARAMS and tokens & MESSAGING_CONTEXT_TOKENS:
+        sink_params |= params & CONTEXTUAL_RECIPIENT_PARAMS
+    if sink_params:
         _add(
             capabilities,
             evidence,
             "EXTERNAL_EGRESS",
             "schema.outbound_sink",
             0.9,
-            f"inputSchema declares an outbound sink parameter {sinks}",
+            f"inputSchema declares an outbound sink parameter {sorted(sink_params)}",
         )
 
-    if has_header_binding(tool):
+    header_binding = has_header_binding(tool)
+    if header_binding:
         _add(
             capabilities,
             evidence,
@@ -762,10 +1006,67 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
             "parameter values are bound to an HTTP header via x-mcp-header",
         )
 
+    # A caller-chosen URL/endpoint beside a payload is a sink even with no
+    # sending verb in the name (``fetch_page(url, body)``). Sink parameters
+    # (webhooks, callbacks, recipients) are already covered above, so they are
+    # excluded here rather than producing a second entry for one parameter.
+    payload_params = sorted(params & PAYLOAD_PARAMS)
+    url_params = sorted((params & ARBITRARY_DESTINATION_PARAMS) - sink_params)
+    destination_payload = bool(
+        url_params and payload_params and not local_protocol_callback
+    )
+    if destination_payload:
+        _add(
+            capabilities,
+            evidence,
+            "EXTERNAL_EGRESS",
+            "schema.arbitrary_destination_payload",
+            0.7,
+            f"inputSchema accepts a caller-chosen destination {url_params} and a"
+            f" payload {payload_params} to send",
+        )
+
+    # A sender named for the act, carrying a payload and declaring that it
+    # reaches outside, is a sink even with no destination parameter
+    # (``send_payload``): the destination is the service the tool exists to
+    # call. The outbound verb must *govern* the name (``send_payload``), not
+    # trail it: Bitwarden's ``create_text_send`` creates a stored Send item and
+    # has no recipient at all, so only the leading token counts. Reader verbs
+    # are disjoint from ``EXPLICIT_OUTBOUND_VERBS``, so a ``list_*``/``get_*``
+    # reader can never qualify. Generic mutation verbs do not either --
+    # ``create_asset`` is a CRUD write -- and neither does an undeclared tool:
+    # without an annotation there is no evidence data leaves the process.
+    outbound_payload = bool(
+        open_world
+        and name_token_list
+        and name_token_list[0] in EXPLICIT_OUTBOUND_VERBS
+        and payload_params
+        and not local_write
+        and not local_protocol_callback
+    )
+    if outbound_payload:
+        _add(
+            capabilities,
+            evidence,
+            "EXTERNAL_EGRESS",
+            "schema.outbound_payload",
+            0.7,
+            f"openWorldHint=true and leading outbound verb {name_token_list[0]}"
+            f" with payload parameter(s) {payload_params}",
+        )
+
+    # ``openWorldHint=true`` without ``readOnlyHint`` says the tool *can* reach
+    # an external system. It does not say the caller chooses that system, so on
+    # its own it is a capability note, not an exfiltration sink: a 3D-generation
+    # or cost-analytics API is external and fixed. Keep the signal only beside
+    # destination evidence -- an external target, a schema sink, a header
+    # binding, or a caller-chosen URL/verb carrying a payload -- which is exactly
+    # the ``EXTERNAL_EGRESS`` capability recorded above.
     if (
         open_world
         and annotations.get("readOnlyHint") is not True
         and not local_protocol_callback
+        and "EXTERNAL_EGRESS" in capabilities
     ):
         _add(
             capabilities,
@@ -774,20 +1075,6 @@ def classify_tool(server_id: str, tool: ToolDefinition) -> ToolNode:
             "annotation.openWorldEgress",
             0.8,
             "openWorldHint=true without readOnlyHint: the tool can reach external systems",
-        )
-
-    if (
-        params & ARBITRARY_DESTINATION_PARAMS
-        and params & PAYLOAD_PARAMS
-        and not local_protocol_callback
-    ):
-        _add(
-            capabilities,
-            evidence,
-            "EXTERNAL_EGRESS",
-            "schema.arbitrary_destination_payload",
-            0.7,
-            "inputSchema accepts both a caller-chosen destination and a payload to send",
         )
 
     capabilities.sort(key=CAPABILITY_ORDER.index)

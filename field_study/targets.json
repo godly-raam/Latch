@@ -1,0 +1,940 @@
+{
+  "counts": {
+    "npm": 70,
+    "pypi": 30,
+    "total": 100
+  },
+  "excluded_package_eval": {
+    "capture_slugs": [
+      "npm-mcp-remote-0-14-3",
+      "npm-mcp-remote-0-14-3-static-header",
+      "npm-server-everything",
+      "npm-server-filesystem",
+      "npm-server-filesystem-0-6-2",
+      "npm-server-github-2025-4-8",
+      "npm-server-memory",
+      "npm-server-puppeteer-2025-5-12",
+      "npm-server-slack-2025-4-25",
+      "npm-supergateway-3-1-0",
+      "pypi-mcp-proxy-0-8-2",
+      "pypi-mcp-server-fetch",
+      "pypi-mcp-server-git",
+      "pypi-mcp-server-git-2025-9-25"
+    ],
+    "package_names": [
+      "@modelcontextprotocol/server-everything",
+      "@modelcontextprotocol/server-filesystem",
+      "@modelcontextprotocol/server-github",
+      "@modelcontextprotocol/server-memory",
+      "@modelcontextprotocol/server-puppeteer",
+      "@modelcontextprotocol/server-slack",
+      "mcp-proxy",
+      "mcp-remote",
+      "mcp-server-fetch",
+      "mcp-server-git",
+      "supergateway"
+    ]
+  },
+  "targets": [
+    {
+      "description": "Aikido MCP server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@aikidosec/mcp",
+      "repository_url": null,
+      "slug": "npm-aikidosec-mcp-1-0-35",
+      "version": "1.0.35"
+    },
+    {
+      "description": "An ElevenLabs MCP server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@angelogiacco/elevenlabs-mcp-server",
+      "repository_url": "https://github.com/angelogiacco/elevenlabs-mcp",
+      "slug": "npm-angelogiacco-elevenlabs-mcp-server-1-0-4",
+      "version": "1.0.4"
+    },
+    {
+      "description": "Apify MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@apify/actors-mcp-server",
+      "repository_url": "https://github.com/apify/apify-mcp-server",
+      "slug": "npm-apify-actors-mcp-server-0-22-0",
+      "version": "0.22.0"
+    },
+    {
+      "description": "MCP server for interacting with Azure DevOps",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@azure-devops/mcp",
+      "repository_url": "https://github.com/microsoft/azure-devops-mcp",
+      "slug": "npm-azure-devops-mcp-2-11-0",
+      "version": "2.11.0"
+    },
+    {
+      "description": "Azure MCP Server - Model Context Protocol implementation for Azure",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@azure/mcp",
+      "repository_url": "https://github.com/microsoft/mcp",
+      "slug": "npm-azure-mcp-4-0-0-beta-10",
+      "version": "4.0.0-beta.10"
+    },
+    {
+      "description": "MCP server for interacting with MySQL databases with write operations support",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@benborla29/mcp-server-mysql",
+      "repository_url": "https://github.com/benborla/mcp-server-mysql",
+      "slug": "npm-benborla29-mcp-server-mysql-2-0-9",
+      "version": "2.0.9"
+    },
+    {
+      "description": "Bitwarden MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@bitwarden/mcp-server",
+      "repository_url": "https://github.com/bitwarden/mcp-server",
+      "slug": "npm-bitwarden-mcp-server-2026-7-0",
+      "version": "2026.7.0"
+    },
+    {
+      "description": "Brave Search MCP Server: web results, images, videos, rich results, AI summaries, and more.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@brave/brave-search-mcp-server",
+      "repository_url": "https://github.com/brave/brave-search-mcp-server",
+      "slug": "npm-brave-brave-search-mcp-server-2-2-0",
+      "version": "2.2.0"
+    },
+    {
+      "description": "BrowserStack's Official MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@browserstack/mcp-server",
+      "repository_url": "https://github.com/browserstack/mcp-server",
+      "slug": "npm-browserstack-mcp-server-2-6-11",
+      "version": "2.6.11"
+    },
+    {
+      "description": "Model Context Protocol (MCP) server for AI-assisted development of CAP applications.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@cap-js/mcp-server",
+      "repository_url": "https://github.com/cap-js/mcp-server",
+      "slug": "npm-cap-js-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "Coinbase Design System - MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@coinbase/cds-mcp-server",
+      "repository_url": "ssh://git@github.com/coinbase/cds",
+      "slug": "npm-coinbase-cds-mcp-server-9-30-1",
+      "version": "9.30.1"
+    },
+    {
+      "description": "Contentful MCP Server - Model Context Protocol server for Contentful",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@contentful/mcp-server",
+      "repository_url": "https://github.com/contentful/contentful-mcp-server",
+      "slug": "npm-contentful-mcp-server-1-24-9",
+      "version": "1.24.9"
+    },
+    {
+      "description": "Currents MCP server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@currents/mcp",
+      "repository_url": "https://github.com/currents-dev/currents-mcp",
+      "slug": "npm-currents-mcp-2-8-0",
+      "version": "2.8.0"
+    },
+    {
+      "description": "DoiT official MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@doitintl/doit-mcp-server",
+      "repository_url": "https://github.com/doitintl/doit-mcp-server",
+      "slug": "npm-doitintl-doit-mcp-server-5-1-0",
+      "version": "5.1.0"
+    },
+    {
+      "description": "MCP server for searching Hero Design System components",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@ehrocks/fe-mcp-server",
+      "repository_url": "https://github.com/thinkei/fe-mcp-service",
+      "slug": "npm-ehrocks-fe-mcp-server-1-0-10",
+      "version": "1.0.10"
+    },
+    {
+      "description": "A Model Context Protocol (MCP) server for DuckDuckGo web and news search",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@ericthered926/duckduckgo-mcp-server",
+      "repository_url": "https://github.com/ericthered926/duckduckgo-mcp-server",
+      "slug": "npm-ericthered926-duckduckgo-mcp-server-0-6-0",
+      "version": "0.6.0"
+    },
+    {
+      "description": "MCP server for ESLint",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@eslint/mcp",
+      "repository_url": "https://github.com/eslint/rewrite",
+      "slug": "npm-eslint-mcp-0-3-17",
+      "version": "0.3.17"
+    },
+    {
+      "description": "Heroku Platform MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@heroku/mcp-server",
+      "repository_url": "https://github.com/heroku/heroku-mcp-server",
+      "slug": "npm-heroku-mcp-server-1-2-15",
+      "version": "1.2.15"
+    },
+    {
+      "description": "MCP server for Hostinger API",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@hostinger/mcp",
+      "repository_url": "https://github.com/hostinger/api-mcp-server",
+      "slug": "npm-hostinger-mcp-4-20-0",
+      "version": "4.20.0"
+    },
+    {
+      "description": "MCP Server for developers building HubSpot Apps",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@hubspot/mcp-server",
+      "repository_url": null,
+      "slug": "npm-hubspot-mcp-server-0-4-0",
+      "version": "0.4.0"
+    },
+    {
+      "description": "MCP server for ioBroker",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@iobroker/mcp-server",
+      "repository_url": "https://github.com/ioBroker/mcp-package",
+      "slug": "npm-iobroker-mcp-server-1-10-0",
+      "version": "1.10.0"
+    },
+    {
+      "description": "An MCP server that exposes OpenAPI endpoints as resources",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@ivotoby/openapi-mcp-server",
+      "repository_url": "https://github.com/ivo-toby/mcp-openapi-server",
+      "slug": "npm-ivotoby-openapi-mcp-server-1-18-0",
+      "version": "1.18.0"
+    },
+    {
+      "description": "MCP server for Mantine documentation",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@mantine/mcp-server",
+      "repository_url": "https://github.com/mantinedev/mantine",
+      "slug": "npm-mantine-mcp-server-9-8-2",
+      "version": "9.8.2"
+    },
+    {
+      "description": "Mapbox MCP server.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@mapbox/mcp-server",
+      "repository_url": "https://github.com/mapbox/mcp-server",
+      "slug": "npm-mapbox-mcp-server-0-18-1",
+      "version": "0.18.1"
+    },
+    {
+      "description": "MCP server for Meshy AI 3D generation platform",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@meshy-ai/meshy-mcp-server",
+      "repository_url": "https://github.com/meshy-dev/meshy-mcp-server",
+      "slug": "npm-meshy-ai-meshy-mcp-server-0-6-12",
+      "version": "0.6.12"
+    },
+    {
+      "description": "The official MCP server for Microsoft Clarity",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@microsoft/clarity-mcp-server",
+      "repository_url": "https://github.com/microsoft/clarity-mcp-server",
+      "slug": "npm-microsoft-clarity-mcp-server-3-0-0",
+      "version": "3.0.0"
+    },
+    {
+      "description": "MCP server for sequential thinking and problem solving",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@modelcontextprotocol/server-sequential-thinking",
+      "repository_url": "https://github.com/modelcontextprotocol/servers",
+      "slug": "npm-modelcontextprotocol-server-sequential-thinking-2-2-0",
+      "version": "2.2.0"
+    },
+    {
+      "description": "MUI MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@mui/mcp",
+      "repository_url": "https://github.com/mui/mui-x",
+      "slug": "npm-mui-mcp-0-1-10",
+      "version": "0.1.10"
+    },
+    {
+      "description": "Official MCP server for Notion API",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@notionhq/notion-mcp-server",
+      "repository_url": "ssh://git@github.com/makenotion/notion-mcp-server",
+      "slug": "npm-notionhq-notion-mcp-server-2-6-1",
+      "version": "2.6.1"
+    },
+    {
+      "description": "MCP server for Panda CSS AI assistants",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@pandacss/mcp",
+      "repository_url": "https://github.com/chakra-ui/panda",
+      "slug": "npm-pandacss-mcp-2-6-0",
+      "version": "2.6.0"
+    },
+    {
+      "description": "MCP Server for Phantom Wallet",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@phantom/mcp-server",
+      "repository_url": "https://github.com/phantom/phantom-connect-sdk",
+      "slug": "npm-phantom-mcp-server-1-2-12",
+      "version": "1.2.12"
+    },
+    {
+      "description": "ProcessOn MCP Server - create mind maps from markdown",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@processon/mcp-server-processon-node",
+      "repository_url": null,
+      "slug": "npm-processon-mcp-server-processon-node-1-0-10",
+      "version": "1.0.10"
+    },
+    {
+      "description": "Official MCP server for Qase Test Management Platform",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@qase/mcp-server",
+      "repository_url": "https://github.com/qase-tms/qase-mcp-server",
+      "slug": "npm-qase-mcp-server-3-2-1",
+      "version": "3.2.1"
+    },
+    {
+      "description": "MCP Server for Asana",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@roychri/mcp-server-asana",
+      "repository_url": "https://github.com/roychri/mcp-server-asana",
+      "slug": "npm-roychri-mcp-server-asana-1-8-0",
+      "version": "1.8.0"
+    },
+    {
+      "description": "MCP server for interacting with Runpod API",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@runpod/mcp-server",
+      "repository_url": "https://github.com/runpod/runpod-mcp",
+      "slug": "npm-runpod-mcp-server-5-0-0",
+      "version": "5.0.0"
+    },
+    {
+      "description": "SAP Fiori - Model Context Protocol (MCP) server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@sap-ux/fiori-mcp-server",
+      "repository_url": "https://github.com/SAP/open-ux-tools",
+      "slug": "npm-sap-ux-fiori-mcp-server-1-17-0",
+      "version": "1.17.0"
+    },
+    {
+      "description": "Sentry MCP server over stdio: the CLI's `sentry mcp` server, bundled without the rest of the CLI",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@sentry/mcp-server",
+      "repository_url": "https://github.com/getsentry/toolkit",
+      "slug": "npm-sentry-mcp-server-0-50-0",
+      "version": "0.50.0"
+    },
+    {
+      "description": "MCP server for interacting with Slack",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@sigmacomputing/slack-mcp-server",
+      "repository_url": "https://github.com/sigmacomputing/slack-mcp-server",
+      "slug": "npm-sigmacomputing-slack-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": " A Model Context Protocol (MCP) server for interacting with Microsoft 365 and Office services through the Graph API",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@softeria/ms-365-mcp-server",
+      "repository_url": "https://github.com/Softeria/ms-365-mcp-server",
+      "slug": "npm-softeria-ms-365-mcp-server-0-190-5",
+      "version": "0.190.5"
+    },
+    {
+      "description": "MCP server for interacting with Supabase",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@supabase/mcp-server-supabase",
+      "repository_url": "https://github.com/supabase/mcp",
+      "slug": "npm-supabase-mcp-server-supabase-0-19-0",
+      "version": "0.19.0"
+    },
+    {
+      "description": "Superblocks MCP server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@superblocksteam/mcp-server",
+      "repository_url": "https://github.com/superblocksteam/superblocks",
+      "slug": "npm-superblocksteam-mcp-server-2-0-183",
+      "version": "2.0.183"
+    },
+    {
+      "description": "Theia - MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@theia/ai-mcp-server",
+      "repository_url": "https://github.com/eclipse-theia/theia",
+      "slug": "npm-theia-ai-mcp-server-1-77-0",
+      "version": "1.77.0"
+    },
+    {
+      "description": "Kibana MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@tocharianou/mcp-server-kibana",
+      "repository_url": "https://github.com/TocharianOU/mcp-server-kibana",
+      "slug": "npm-tocharianou-mcp-server-kibana-0-12-1",
+      "version": "0.12.1"
+    },
+    {
+      "description": "Transloadit MCP server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@transloadit/mcp-server",
+      "repository_url": "https://github.com/transloadit/node-sdk",
+      "slug": "npm-transloadit-mcp-server-0-9-0",
+      "version": "0.9.0"
+    },
+    {
+      "description": "A Salesforce connector MCP Server.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@tsmztech/mcp-server-salesforce",
+      "repository_url": "https://github.com/tsmztech/mcp-server-salesforce",
+      "slug": "npm-tsmztech-mcp-server-salesforce-0-0-8",
+      "version": "0.0.8"
+    },
+    {
+      "description": "MCP server for SAPUI5/OpenUI5 development",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@ui5/mcp-server",
+      "repository_url": "https://github.com/UI5/mcp-server",
+      "slug": "npm-ui5-mcp-server-0-3-3",
+      "version": "0.3.3"
+    },
+    {
+      "description": "Unthread MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@unthread-io/mcp-server",
+      "repository_url": "https://github.com/unthread-io/mcp-server",
+      "slug": "npm-unthread-io-mcp-server-1-3-1",
+      "version": "1.3.1"
+    },
+    {
+      "description": "MCP server for Context7",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@upstash/context7-mcp",
+      "repository_url": "https://github.com/upstash/context7",
+      "slug": "npm-upstash-context7-mcp-4-7-3",
+      "version": "4.7.3"
+    },
+    {
+      "description": "MCP server for Upstash",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@upstash/mcp-server",
+      "repository_url": "https://github.com/upstash/mcp-server",
+      "slug": "npm-upstash-mcp-server-0-4-1",
+      "version": "0.4.1"
+    },
+    {
+      "description": "MCP server for interacting with Datadog API",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@winor30/mcp-server-datadog",
+      "repository_url": "https://github.com/winor30/mcp-server-datadog",
+      "slug": "npm-winor30-mcp-server-datadog-1-8-0",
+      "version": "1.8.0"
+    },
+    {
+      "description": "MCP server for terminal operations and file editing",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@wonderwhy-er/desktop-commander",
+      "repository_url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+      "slug": "npm-wonderwhy-er-desktop-commander-0-3-4",
+      "version": "0.3.4"
+    },
+    {
+      "description": "MCP server implementation for Xero integration",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@xeroapi/xero-mcp-server",
+      "repository_url": "git://github.com/XeroAPI/xero-mcp-server",
+      "slug": "npm-xeroapi-xero-mcp-server-0-0-18",
+      "version": "0.0.18"
+    },
+    {
+      "description": "MCP Server for Z.AI - A Model Context Protocol server that provides AI capabilities",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@z_ai/mcp-server",
+      "repository_url": null,
+      "slug": "npm-z-ai-mcp-server-0-1-6",
+      "version": "0.1.6"
+    },
+    {
+      "description": "MCP server for interacting with Slack",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "@zencoderai/slack-mcp-server",
+      "repository_url": "https://github.com/zencoderai/slack-mcp-server",
+      "slug": "npm-zencoderai-slack-mcp-server-0-0-1",
+      "version": "0.0.1"
+    },
+    {
+      "description": "Axe DevTools accessibility analysis and remediation MCP Server for AI coding agents",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "axe-mcp-server",
+      "repository_url": "https://github.com/dequelabs/axe-mcp-server-public",
+      "slug": "npm-axe-mcp-server-1-9-1",
+      "version": "1.9.1"
+    },
+    {
+      "description": "Bailian MCP server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "bailian-mcp-server",
+      "repository_url": null,
+      "slug": "npm-bailian-mcp-server-0-0-4",
+      "version": "0.0.4"
+    },
+    {
+      "description": "MCP server for Chelaile realtime bus data",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "chelaile-mcp-server",
+      "repository_url": null,
+      "slug": "npm-chelaile-mcp-server-1-1-0",
+      "version": "1.1.0"
+    },
+    {
+      "description": "MCP server for Chrome DevTools",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "chrome-devtools-mcp",
+      "repository_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "slug": "npm-chrome-devtools-mcp-1-13-0",
+      "version": "1.13.0"
+    },
+    {
+      "description": "MCP server for Hostinger API",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "hostinger-api-mcp",
+      "repository_url": "https://github.com/hostinger/api-mcp-server",
+      "slug": "npm-hostinger-api-mcp-4-20-0",
+      "version": "4.20.0"
+    },
+    {
+      "description": "jira-mcp-server MCP server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "jira-mcp-server",
+      "repository_url": null,
+      "slug": "npm-jira-mcp-server-0-0-1",
+      "version": "0.0.1"
+    },
+    {
+      "description": "Model Context Protocol (MCP) server for Kubernetes and OpenShift",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "kubernetes-mcp-server",
+      "repository_url": "https://github.com/containers/kubernetes-mcp-server",
+      "slug": "npm-kubernetes-mcp-server-0-1-3",
+      "version": "0.1.3"
+    },
+    {
+      "description": "A deliberately malicious MCP server for E2E testing purposes",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "malicious-mcp-server",
+      "repository_url": "https://github.com/anysource-AI/malicious-mcp-server",
+      "slug": "npm-malicious-mcp-server-1-5-0",
+      "version": "1.5.0"
+    },
+    {
+      "description": "A simple Hello World MCP server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "mcp-hello-world",
+      "repository_url": "https://github.com/lobehub/mcp-hello-world",
+      "slug": "npm-mcp-hello-world-1-1-2",
+      "version": "1.1.2"
+    },
+    {
+      "description": "mcp server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "mcp-server",
+      "repository_url": "https://github.com/sandy-mount/mcp-server",
+      "slug": "npm-mcp-server-0-0-9",
+      "version": "0.0.9"
+    },
+    {
+      "description": "MCP server for interacting with Kubernetes clusters via kubectl",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "mcp-server-kubernetes",
+      "repository_url": "https://github.com/Flux159/mcp-server-kubernetes",
+      "slug": "npm-mcp-server-kubernetes-4-2-3",
+      "version": "4.2.3"
+    },
+    {
+      "description": "MCP server for whisper integration",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "mcp-server-whisper",
+      "repository_url": "https://github.com/hlos-ai/mcp-servers",
+      "slug": "npm-mcp-server-whisper-0-0-1",
+      "version": "0.0.1"
+    },
+    {
+      "description": "Next.js development tools MCP server with stdio transport",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "next-devtools-mcp",
+      "repository_url": "https://github.com/vercel/next-devtools-mcp",
+      "slug": "npm-next-devtools-mcp-0-4-0",
+      "version": "0.4.0"
+    },
+    {
+      "description": "MCP server for interacting with the Scryfall MTG API",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "scryfall-mcp-server",
+      "repository_url": null,
+      "slug": "npm-scryfall-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "Minimal MCP server over HTTP built on tiny-stdio-mcp-server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "tiny-http-mcp-server",
+      "repository_url": "https://github.com/poe-platform/poe-code",
+      "slug": "npm-tiny-http-mcp-server-0-1-132",
+      "version": "0.1.132"
+    },
+    {
+      "description": "MCP server for TouchDesigner",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "npm",
+      "package": "touchdesigner-mcp-server",
+      "repository_url": "https://github.com/8beeeaaat/touchdesigner-mcp",
+      "slug": "npm-touchdesigner-mcp-server-2-2-0",
+      "version": "2.2.0"
+    },
+    {
+      "description": "MCP server for natural-language querying of 3DCityDB v5 semantic city models",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "3dcitydb-mcp-server",
+      "repository_url": "https://github.com/tum-gis/3dcitydb-mcp-server",
+      "slug": "pypi-3dcitydb-mcp-server-1-2-2",
+      "version": "1.2.2"
+    },
+    {
+      "description": "Query and execute robotic processes through standardized tool calls.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "Ai_Indeed_mcp_server",
+      "repository_url": null,
+      "slug": "pypi-ai-indeed-mcp-server-1-0-0",
+      "version": "1.0.0"
+    },
+    {
+      "description": "A Model Context Protocol (MCP) server that provides product search, price history tracking, and specification search capabilities.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "BigGo-MCP-Server",
+      "repository_url": "https://github.com/Funmula-Corp/BigGo-MCP-Server",
+      "slug": "pypi-biggo-mcp-server-0-2-0",
+      "version": "0.2.0"
+    },
+    {
+      "description": "MCP server for ELF600 docs, public sample decks, and motor-design Python facade contracts: run queues, efficiency maps, dq/MTPA, PWM harmonics, NGSolve validation, RunResult parsing, optimization loops, drawing/BOM handoffs, and release-quality audits.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "ELF-mcp-server",
+      "repository_url": "https://github.com/ksugahar/ELF-mcp-server",
+      "slug": "pypi-elf-mcp-server-1-61-0",
+      "version": "1.61.0"
+    },
+    {
+      "description": "MCP server for Things 3 with read/write support for tasks, projects, areas and tags.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "Things3-MCP-server",
+      "repository_url": "https://github.com/rossshannon/things-fastmcp",
+      "slug": "pypi-things3-mcp-server-2-0-7",
+      "version": "2.0.7"
+    },
+    {
+      "description": "A股实时行情MCP服务器 - 基于Model Context Protocol的A股数据查询工具",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "a-stock-mcp-server",
+      "repository_url": "https://github.com/Llldmiao/a-stock-mcp-server",
+      "slug": "pypi-a-stock-mcp-server-1-1-1",
+      "version": "1.1.1"
+    },
+    {
+      "description": "A bridge server that connects Model Context Protocol (MCP) with Agent-to-Agent (A2A) protocol",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "a2a-mcp-server",
+      "repository_url": "https://github.com/GongRzhe/A2A-MCP-Server",
+      "slug": "pypi-a2a-mcp-server-0-1-5",
+      "version": "0.1.5"
+    },
+    {
+      "description": "Bridge MCP with Google Agent2Agent Protocol — agent discovery, task delegation, A2A communication",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "a2a-protocol-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/a2a-protocol-mcp-server",
+      "slug": "pypi-a2a-protocol-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "MCP server for A3M Router — parallel multi-LLM execution for AI agents",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "a3m-mcp-server",
+      "repository_url": "https://github.com/Das-rebel/a3m-router",
+      "slug": "pypi-a3m-mcp-server-1-0-0",
+      "version": "1.0.0"
+    },
+    {
+      "description": "MCP server for read-only American Airlines AAdvantage account access — direct API calls via session cookies extracted from a Chromium login",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "aa-mcp-server",
+      "repository_url": "https://github.com/thehesiod/aa-mcp",
+      "slug": "pypi-aa-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "An MCP server that provides APK analysis capabilities using the Android Asset Packaging Tool (aapt)",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "aapt-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-aapt-mcp-server-1-0-0",
+      "version": "1.0.0"
+    },
+    {
+      "description": "Open-source MCP server for AAS (Asset Administration Shell) APIs using OpenAPI",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "aas-mcp-server",
+      "repository_url": "https://github.com/SAP/aas-mcp-server",
+      "slug": "pypi-aas-mcp-server-0-3-0",
+      "version": "0.3.0"
+    },
+    {
+      "description": "Abacum MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "abacum-mcp-server",
+      "repository_url": "https://abacum.ai",
+      "slug": "pypi-abacum-mcp-server-0-1-7-post1",
+      "version": "0.1.7.post1"
+    },
+    {
+      "description": "MCP Server for Ableton Live",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "ableton-live-mcp-server",
+      "repository_url": "https://github.com/mrmos/ableton-live-mcp-server",
+      "slug": "pypi-ableton-live-mcp-server-0-2-1",
+      "version": "0.2.1"
+    },
+    {
+      "description": "MCP server for controlling Ableton Live via Claude Code",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "ableton-mcp-server",
+      "repository_url": "https://github.com/ldraney/ableton-mcp",
+      "slug": "pypi-ableton-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "A comprehensive MCP server for AbraFlexi integration",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "abraflexi-mcp-server",
+      "repository_url": "https://github.com/VitexSoftware/abraflexi-mcp-server",
+      "slug": "pypi-abraflexi-mcp-server-1-2-4",
+      "version": "1.2.4"
+    },
+    {
+      "description": "Official ActiveCampaign MCP Server",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "ac-mcp-server",
+      "repository_url": "https://activecampaign.com",
+      "slug": "pypi-ac-mcp-server-0-12-0",
+      "version": "0.12.0"
+    },
+    {
+      "description": "MCP-Server fuer Web-Accessibility-Checks: WCAG 2.1/2.2 Pruefung, Kontrast, ARIA, Formular-Validierung",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "accessibility-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/accessibility-mcp-server",
+      "slug": "pypi-accessibility-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "MCP Server for Accounting Subject Analysis Method - 提供根据科目/指标名称获取分析方法和输出样例的工具",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "accounting-subject-analysis-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-accounting-subject-analysis-mcp-server-0-1-4",
+      "version": "0.1.4"
+    },
+    {
+      "description": "AceFlow MCP Server - AI-Driven Intelligent Workflow System with Contract-First Development, Memory Management, and 25 MCP Tools (4 Contract + 21 Workflow)",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "aceflow-mcp-server",
+      "repository_url": "https://github.com/aceflow-pateoas/aceflow-ai",
+      "slug": "pypi-aceflow-mcp-server-3-0-2",
+      "version": "3.0.2"
+    },
+    {
+      "description": "ACE-X MCP Server - Model Context Protocol server for ACE-X",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "acex-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-acex-mcp-server-1-1-1",
+      "version": "1.1.1"
+    },
+    {
+      "description": "MCP server that wraps the Atlassian CLI (acli) into generic tools",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "acli-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-acli-mcp-server-0-1-4",
+      "version": "0.1.4"
+    },
+    {
+      "description": "Bridge server connecting Agent Communication Protocol (ACP) agents with Model Context Protocol (MCP) clients",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "acp-mcp-server",
+      "repository_url": "https://github.com/GongRzhe/ACP-MCP-Server",
+      "slug": "pypi-acp-mcp-server-0-0-5",
+      "version": "0.0.5"
+    },
+    {
+      "description": "MCP server somente leitura para a API do Action1 (patches, vulnerabilidades e inventário)",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "action1-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-action1-mcp-server-1-0-0",
+      "version": "1.0.0"
+    },
+    {
+      "description": "A Lambda-based MCP (Model Context Protocol) server implementation",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "actvalue.lambda-mcp-server",
+      "repository_url": "https://github.com/yourusername/lambda-mcp-server",
+      "slug": "pypi-actvalue-lambda-mcp-server-2-0-0",
+      "version": "2.0.0"
+    },
+    {
+      "description": "A server implementation for handling ADB (Android Debug Bridge) communications using the Message Control Protocol (MCP)",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "adb-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-adb-mcp-server-1-0-0",
+      "version": "1.0.0"
+    },
+    {
+      "description": "MCP server for AnalyticDB MySQL via OpenAPI and direct SQL connection",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "adb-mysql-mcp-server",
+      "repository_url": "https://github.com/aliyun/alibabacloud-adb-mysql-mcp-server",
+      "slug": "pypi-adb-mysql-mcp-server-2-0-0",
+      "version": "2.0.0"
+    },
+    {
+      "description": "AnalyticDB PostgreSQL MCP Server serves as a universal interface between AI Agents and AnalyticDB PostgreSQL databases. It enables seamless communication between AI Agents and AnalyticDB PostgreSQL, helping AI Agents retrieve database metadata and execute SQL operations.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "adbpg-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-adbpg-mcp-server-2-0-3",
+      "version": "2.0.3"
+    },
+    {
+      "description": "A custom MCP Server example for PyPI.",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "add-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-add-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "Add your description here",
+      "discovered_at_utc": "2026-11-23T18:27:41Z",
+      "ecosystem": "pypi",
+      "package": "add-stdio-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-add-stdio-mcp-server-0-1-0",
+      "version": "0.1.0"
+    }
+  ]
+}

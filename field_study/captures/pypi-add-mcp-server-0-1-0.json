@@ -1,0 +1,18 @@
+{
+  "description": "A custom MCP Server example for PyPI.",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "add-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "add-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-add-mcp-server-0-1-0",
+  "stderr_summary": "Installed 1 package in 3ms\nAn executable named `add-mcp-server` is not provided by package `add-mcp-server`.\nThe following executables are available:\n- your-mcp-server\n\nUse `uvx --from add-mcp-server your-mcp-server` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

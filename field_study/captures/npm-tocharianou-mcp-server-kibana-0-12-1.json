@@ -1,0 +1,794 @@
+{
+  "description": "Kibana MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@tocharianou/mcp-server-kibana@0.12.1"
+  ],
+  "manifest_sha256": "897ef888349c38c07438350f8e847a7722e04aacd2f6606c4a6225a74152f037",
+  "package": "@tocharianou/mcp-server-kibana",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/TocharianOU/mcp-server-kibana",
+  "slug": "npm-tocharianou-mcp-server-kibana-0-12-1",
+  "stderr_summary": "Starting Kibana MCP Server in Stdio mode for space: default",
+  "tool_count": 17,
+  "tools": [
+    {
+      "description": "Get Kibana server status with multi-space support",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_status"
+    },
+    {
+      "description": "Execute a custom API request for Kibana with multi-space support.\n\nFor Elasticsearch document or log searches, use search_elasticsearch instead.\nDo not use /api/console/proxy for Elasticsearch searches: that Console endpoint\ncan require Dev Tools privileges even when the configured user can read the\ntarget indices. Do not use this generic tool to rediscover an Elasticsearch\nsearch route when search_elasticsearch already provides the supported workflow.\n\nRETRY SAFETY: this tool can reach any write endpoint. A POST retried after a\ntimeout or dropped response can create a duplicate — prefer a caller-chosen\nstable id (or the vl_* tool for that object type, which documents the safe\npattern) over letting the server auto-generate one.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "body": {},
+          "break_token_rule": {
+            "default": false,
+            "description": "Set to true to bypass token limits in critical situations. Use sparingly to avoid context overflow.",
+            "type": "boolean"
+          },
+          "method": {
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE"
+            ],
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "path": {
+            "type": "string"
+          },
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "path"
+        ],
+        "type": "object"
+      },
+      "name": "execute_kb_api"
+    },
+    {
+      "description": "Search documented Kibana OpenAPI endpoints by keyword. This index does not necessarily contain Kibana internal routes. Do not use this tool to discover how to search Elasticsearch documents or logs; use search_elasticsearch for that.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "search": {
+            "description": "Search keyword for filtering API endpoints",
+            "type": "string"
+          }
+        },
+        "required": [
+          "search"
+        ],
+        "type": "object"
+      },
+      "name": "search_kibana_api_paths"
+    },
+    {
+      "description": "List all Kibana API endpoints as a resource list",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_all_kibana_api_paths"
+    },
+    {
+      "description": "Get details for a specific Kibana API endpoint",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "method": {
+            "description": "HTTP method, e.g. GET, POST, PUT, DELETE",
+            "type": "string"
+          },
+          "path": {
+            "description": "API path, e.g. /api/actions/connector_types",
+            "type": "string"
+          },
+          "raw": {
+            "description": "If true, return raw JSON schema instead of simplified TypeScript interface",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "method",
+          "path"
+        ],
+        "type": "object"
+      },
+      "name": "get_kibana_api_detail"
+    },
+    {
+      "description": "Get all available Kibana spaces with current context",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "include_details": {
+            "default": true,
+            "description": "Include detailed space information (name, description, etc.)",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_available_spaces"
+    },
+    {
+      "description": "Search for Kibana saved objects using Elasticsearch query syntax. This is a universal tool that can search across all saved object types (dashboard, visualization, index-pattern, search, config, lens, map, tag, canvas-workpad, canvas-element, etc.). IMPORTANT: You must specify the 'types' parameter - it is required by the Kibana API. PERFORMANCE TIPS: Always use 'fields' parameter to specify only needed fields (e.g., ['title', 'description']) for faster responses. Use 'perPage' 5-20 for optimal speed. PAGINATION: To get all results, make multiple requests with incrementing 'page' numbers (page=1, page=2, etc.) until you receive fewer results than 'perPage'. Don't stop at the first page - iterate through all pages for complete data. Returns formatted saved object information including type, title, description, and timestamps.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "aggs": {
+            "description": "Aggregation structure, serialized as a string. Use for advanced analytics on saved objects.",
+            "type": "string"
+          },
+          "break_token_rule": {
+            "default": false,
+            "description": "Set to true to bypass token limits in critical situations. Use sparingly to avoid context overflow.",
+            "type": "boolean"
+          },
+          "defaultSearchOperator": {
+            "description": "Default operator for simple_query_string (OR/AND, default: OR)",
+            "type": "string"
+          },
+          "fields": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "description": "PERFORMANCE OPTIMIZATION: Specify which fields to return in the attributes key. Examples: ['title', 'description'] for basic info, ['title', 'description', 'updated_at'] for metadata. IMPORTANT: Using this parameter dramatically improves response speed and reduces data size. Without it, all object data is returned which can be very slow for large objects."
+          },
+          "filter": {
+            "description": "KQL string filter (e.g., 'dashboard.attributes.title: \"My Dashboard\"')",
+            "type": "string"
+          },
+          "hasNoReference": {
+            "description": "Filter to objects that do not have a relationship with the type and identifier combination. Example: {type: 'index-pattern', id: 'my-pattern-id'}"
+          },
+          "hasNoReferenceOperator": {
+            "description": "Operator for has_no_reference parameter (OR/AND, default: OR)",
+            "type": "string"
+          },
+          "hasReference": {
+            "description": "Filter to objects that have a relationship with the type and ID combination. Example: {type: 'index-pattern', id: 'my-pattern-id'}"
+          },
+          "hasReferenceOperator": {
+            "description": "Operator for has_reference parameter (OR/AND, default: OR)",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number to return (starts from 1). Use with perPage for pagination. Example: page=1 gets first 20 results, page=2 gets results 21-40, etc. IMPORTANT: To get all results, you need to make multiple requests with incrementing page numbers until you receive fewer results than perPage. Don't stop at page 1 - iterate through all pages to get complete data.",
+            "type": "number"
+          },
+          "perPage": {
+            "description": "Number of saved objects per page (default: 20). PERFORMANCE TIP: Use 5-20 for faster responses. Large values (>50) can be slow and may timeout. Always combine with 'fields' parameter to limit data when using large perPage values.",
+            "type": "number"
+          },
+          "search": {
+            "description": "Search query to filter saved objects. Supports boolean operators (AND, OR), wildcards (*), and phrases in quotes. Example: 'nginx AND logs' or 'web*'.",
+            "type": "string"
+          },
+          "sortField": {
+            "description": "Field to sort by: 'updated_at', 'created_at' or 'type'. Kibana returns results in ascending order only (oldest first for dates); its API has no option for descending order. Titles cannot be sorted on (they are full-text fields in Kibana's index).",
+            "type": "string"
+          },
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space)",
+            "type": "string"
+          },
+          "types": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "description": "REQUIRED: Saved object types to include. Common types: 'dashboard', 'visualization', 'index-pattern', 'search', 'config', 'lens', 'map', 'tag', 'canvas-workpad', 'canvas-element'. Use ['dashboard', 'visualization'] to search both types. You must specify at least one type."
+          }
+        },
+        "required": [
+          "types"
+        ],
+        "type": "object"
+      },
+      "name": "vl_search_saved_objects"
+    },
+    {
+      "description": "Get a single Kibana saved object by type and ID. This is a universal tool that can retrieve any type of saved object (dashboard, visualization, index-pattern, search, config, lens, map, tag, canvas-workpad, canvas-element, etc.) by its exact type and ID. Use this when you know the specific object you want to retrieve. PERFORMANCE: This is much faster than searching when you have the exact type and ID.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "break_token_rule": {
+            "default": false,
+            "description": "Set to true to bypass token limits in critical situations. Use sparingly to avoid context overflow.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "REQUIRED: The saved object ID. This is the unique identifier for the specific object you want to retrieve.",
+            "type": "string"
+          },
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space)",
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "description": "REQUIRED: The saved object type. Common types: 'dashboard', 'visualization', 'index-pattern', 'search', 'config', 'lens', 'map', 'tag', 'canvas-workpad', 'canvas-element'. Supports multiple formats: single string 'dashboard', array ['dashboard'], JSON string '[\"dashboard\"]', or comma-separated 'dashboard,visualization' (will use first type for single object retrieval)."
+          },
+          "useResolve": {
+            "description": "Use resolve API instead of get API. The resolve API can handle legacy URL aliases from object ID migrations. Use this if you're having trouble finding an object that may have had its ID changed during Kibana upgrades. Default: false.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "vl_get_saved_object"
+    },
+    {
+      "description": "Bulk delete multiple Kibana saved objects by type and ID. This is a destructive operation that permanently removes saved objects (dashboard, visualization, index-pattern, search, config, lens, map, tag, canvas-workpad, canvas-element, etc.). WARNING: Deleted objects cannot be recovered. Use with caution. IMPORTANT: Objects that exist in multiple namespaces require the 'force' parameter to be deleted.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "force": {
+            "description": "Force deletion of objects that exist in multiple namespaces. Set to true if you get an error about objects existing in multiple namespaces. WARNING: This also deletes legacy URL aliases and can place heavy load on Kibana. Default: false.",
+            "type": "boolean"
+          },
+          "objects": {
+            "description": "REQUIRED: Array of objects to delete. Each object must have 'type' and 'id' fields. Minimum 1 object required.",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "REQUIRED: The saved object ID. This is the unique identifier for the specific object you want to delete.",
+                  "type": "string"
+                },
+                "type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "description": "REQUIRED: The saved object type. Common types: 'dashboard', 'visualization', 'index-pattern', 'search', 'config', 'lens', 'map', 'tag', 'canvas-workpad', 'canvas-element'. Supports multiple formats: single string 'dashboard', array ['dashboard'], JSON string '[\"dashboard\"]', or comma-separated 'dashboard,visualization' (will use first type for single object deletion)."
+                }
+              },
+              "required": [
+                "type",
+                "id"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "objects"
+        ],
+        "type": "object"
+      },
+      "name": "vl_bulk_delete_saved_objects"
+    },
+    {
+      "description": "Create a new Kibana saved object (dashboard, visualization, index-pattern, search, config, lens, map, tag, canvas-workpad, canvas-element, etc.). This is a universal tool that can create any type of saved object by specifying the type and attributes. Each object type has specific attribute requirements. IMPORTANT: The 'title' field is required for most object types. Complex fields like panelsJSON, visState should be JSON strings.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "attributes": {
+            "additionalProperties": {},
+            "description": "REQUIRED: Object containing the saved object attributes. Structure varies by type. Common fields: 'title' (required for most types), 'description'. Dashboard: 'panelsJSON', 'timeRestore'. Visualization: 'visState', 'uiStateJSON'. Index-pattern: 'timeFieldName'. All JSON fields should be strings.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "id": {
+            "description": "OPTIONAL: Specific ID for the saved object. If not provided, Kibana will auto-generate a unique ID. Use this when you need a predictable ID or when recreating objects. RETRY SAFETY: if this call is retried after a timeout or dropped response without an id, Kibana creates a SECOND object with a new auto-generated id -- there is no way to detect that after the fact. Kibana's own POST-with-id endpoint (used when id is set) already rejects a duplicate create with a 409 unless overwrite is also true, so passing a stable, caller-chosen id here is what makes a retry safe. Do not derive it from the object's attributes alone (e.g. title) -- two different legitimate objects can share the same title, and colliding them would silently discard one.",
+            "type": "string"
+          },
+          "initialNamespaces": {
+            "description": "OPTIONAL: Array of initial namespaces for the object. Used for multi-tenant setups. If not specified, object will be created in the default namespace.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "overwrite": {
+            "description": "OPTIONAL: Whether to overwrite an existing object with the same ID. Only relevant when 'id' is specified. Default: false. Set to true to replace existing objects.",
+            "type": "boolean"
+          },
+          "references": {
+            "description": "OPTIONAL: Array of references to other saved objects. Used to link objects together (e.g., dashboard panels referencing visualizations). Each reference needs id, type, and name.",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "ID of the referenced object",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Reference name used in the object",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type of the referenced object",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "type",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space)",
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "description": "REQUIRED: The saved object type. Common types: 'dashboard', 'visualization', 'index-pattern', 'search', 'config', 'lens', 'map', 'tag', 'canvas-workpad', 'canvas-element'. Supports multiple formats but will use first type for single object creation."
+          }
+        },
+        "required": [
+          "type",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "name": "vl_create_saved_object"
+    },
+    {
+      "description": "Update a single Kibana saved object by type and ID. This performs a partial update - only the specified attributes will be changed, other attributes remain unchanged. Supports all saved object types (dashboard, visualization, index-pattern, search, config, lens, map, tag, canvas-workpad, canvas-element, etc.). IMPORTANT: Use version parameter for optimistic concurrency control to prevent conflicts.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "attributes": {
+            "additionalProperties": {},
+            "description": "REQUIRED: Object containing the attributes to update. Only specified attributes will be changed (partial update). Common fields: 'title', 'description'. Type-specific fields: Dashboard: 'panelsJSON', 'timeRestore'. Visualization: 'visState', 'uiStateJSON'. All JSON fields should be strings.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "id": {
+            "description": "REQUIRED: The saved object ID. This is the unique identifier for the object you want to update.",
+            "type": "string"
+          },
+          "references": {
+            "description": "OPTIONAL: Array of references to other saved objects. Updates the object's references. Each reference needs id, type, and name.",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "ID of the referenced object",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Reference name used in the object",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type of the referenced object",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "type",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space)",
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "description": "REQUIRED: The saved object type. Common types: 'dashboard', 'visualization', 'index-pattern', 'search', 'config', 'lens', 'map', 'tag', 'canvas-workpad', 'canvas-element'. Supports multiple formats but will use first type for single object update."
+          },
+          "upsert": {
+            "additionalProperties": {},
+            "description": "OPTIONAL: Attributes to use if the object doesn't exist (will create object if not found). Useful for create-or-update scenarios.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "version": {
+            "description": "OPTIONAL: Version string for optimistic concurrency control. Use this to prevent conflicts when multiple processes update the same object. Get the version from a previous get/search operation.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "name": "vl_update_saved_object"
+    },
+    {
+      "description": "Update multiple Kibana saved objects in a single operation. Each object can be of different types and will be partially updated (only specified attributes changed). Supports all saved object types (dashboard, visualization, index-pattern, search, config, lens, map, tag, canvas-workpad, canvas-element, etc.). PERFORMANCE: More efficient than multiple single updates. Each object can have individual version control.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "objects": {
+            "description": "REQUIRED: Array of objects to update. Each object must have 'type', 'id', and 'attributes' fields. Minimum 1 object required.",
+            "items": {
+              "properties": {
+                "attributes": {
+                  "additionalProperties": {},
+                  "description": "REQUIRED: Object containing the attributes to update. Only specified attributes will be changed (partial update).",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "description": "REQUIRED: The saved object ID. This is the unique identifier for the object you want to update.",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "OPTIONAL: Specific namespace for this object (overrides space parameter).",
+                  "type": "string"
+                },
+                "references": {
+                  "description": "OPTIONAL: Array of references to other saved objects for this specific object.",
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "description": "ID of the referenced object",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Reference name used in the object",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "Type of the referenced object",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "name"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "description": "REQUIRED: The saved object type. Common types: 'dashboard', 'visualization', 'index-pattern', 'search', 'config', 'lens', 'map', 'tag', 'canvas-workpad', 'canvas-element'. Supports multiple formats but will use first type."
+                },
+                "version": {
+                  "description": "OPTIONAL: Version string for optimistic concurrency control for this specific object.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "id",
+                "attributes"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "objects"
+        ],
+        "type": "object"
+      },
+      "name": "vl_bulk_update_saved_objects"
+    },
+    {
+      "description": "Analyze dependency tree for a Kibana saved object (Dashboard, Visualization, etc.)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "id": {
+            "description": "Saved object ID",
+            "type": "string"
+          },
+          "max_depth": {
+            "default": 5,
+            "description": "Maximum depth to traverse (default: 5)",
+            "type": "number"
+          },
+          "space": {
+            "description": "Kibana space (optional)",
+            "type": "string"
+          },
+          "type": {
+            "description": "Saved object type (e.g., dashboard, visualization, lens, index-pattern)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "analyze_object_dependencies"
+    },
+    {
+      "description": "Analyze the impact of deleting or modifying a saved object (what will be affected)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "id": {
+            "description": "Saved object ID to analyze",
+            "type": "string"
+          },
+          "space": {
+            "description": "Kibana space (optional)",
+            "type": "string"
+          },
+          "type": {
+            "description": "Saved object type (e.g., visualization, lens, index-pattern)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "analyze_deletion_impact"
+    },
+    {
+      "description": "Perform health check on a Dashboard to detect broken references, performance issues, etc.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "check_indices": {
+            "default": false,
+            "description": "Also check if referenced Elasticsearch indices exist (requires additional permissions)",
+            "type": "boolean"
+          },
+          "dashboard_id": {
+            "description": "Dashboard ID to check",
+            "type": "string"
+          },
+          "space": {
+            "description": "Kibana space (optional)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dashboard_id"
+        ],
+        "type": "object"
+      },
+      "name": "check_dashboard_health"
+    },
+    {
+      "description": "Scan health status of all Dashboards in a space (returns summary report)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "max_dashboards": {
+            "default": 50,
+            "description": "Maximum number of dashboards to scan (default: 50)",
+            "type": "number"
+          },
+          "space": {
+            "description": "Kibana space (optional)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "scan_all_dashboards_health"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Search Elasticsearch"
+      },
+      "description": "Search Elasticsearch documents, logs, and aggregations through Kibana using Elasticsearch Query DSL.\n\nUSE THIS TOOL whenever the task is to find or inspect Elasticsearch data. Do\nnot first search Kibana API paths and do not call /api/console/proxy through\nexecute_kb_api for Elasticsearch searches. The Console proxy can require the\nKibana Dev Tools privilege even when the configured user is allowed to read the\ntarget indices. This tool uses the user's existing Elasticsearch permissions.\n\nSEARCH STRATEGY FOR LOGS:\n1. Start with the narrowest known index pattern and a small time window.\n2. Set size explicitly (usually 10-50; maximum 100).\n3. Request only useful _source fields when exploring high-volume logs.\n4. Sort by the timestamp field if chronology matters.\n5. After finding a trace/correlation id, narrow follow-up searches to that id\n   and a small surrounding time window.\n6. Prefer exact term/keyword filters when the field mapping supports them; use\n   match/query_string only when text analysis is intended.\n\nThe body is Elasticsearch Query DSL, not Kibana KQL. If the user describes a\nfilter in KQL terms, translate the intent to Query DSL before calling the tool.\n\nA wildcard-only index segment ('*', '**', '_all'), an empty body, and\nbody.size > 100 are rejected.\nAvoid broad match_all searches. Aggregations are supported through the same\nbody. The returned hits preserve the original _source, including dynamic/custom\nproperties.\n\nThis uses Kibana's internal /internal/search/es endpoint, so its contract can\nchange between Kibana versions.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "body": {
+            "additionalProperties": {},
+            "description": "REQUIRED: Elasticsearch _search request body using Query DSL, not Kibana KQL. Translate KQL-style user intent into Query DSL before calling this tool. For logs, normally include: a small size (for example 20), a range filter on the timestamp field, useful _source fields only, and sort by timestamp when order matters. Example: {\"size\":20,\"_source\":[\"@timestamp\",\"message\",\"trace.id\"],\"sort\":[{\"@timestamp\":\"desc\"}],\"query\":{\"bool\":{\"filter\":[{\"range\":{\"@timestamp\":{\"gte\":\"2025-01-15T10:00:00Z\",\"lt\":\"2025-01-15T11:00:00Z\"}}}]}}}. After finding a trace or correlation id, prefer a second narrow search for that id and a small time window instead of repeatedly scanning a broad range.",
+            "properties": {
+              "size": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "break_token_rule": {
+            "default": false,
+            "description": "Emergency only: bypass the response token limit. Prefer reducing body.size, narrowing the time range, or limiting _source fields.",
+            "type": "boolean"
+          },
+          "index": {
+            "description": "REQUIRED: Elasticsearch index or bounded index pattern, for example 'application-logs-*'. Wildcard-only segments such as '*', '**', or '_all' are not allowed.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "space": {
+            "description": "Target Kibana space (optional, defaults to configured space).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "body"
+        ],
+        "type": "object"
+      },
+      "name": "search_elasticsearch"
+    }
+  ],
+  "version": "0.12.1"
+}

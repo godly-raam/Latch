@@ -312,7 +312,9 @@ def test_graph_precision_fix_collapses_paths(results: dict) -> None:
     assert "npm-server-filesystem:write_file" in git["local_write_tools"]
 
     everything = compositions["everything-plus-filesystem"]
-    assert everything["trifecta_path_count"] == 11
+    # 11 after the sampling/elicitation fix, 4 after the week-3 hardening,
+    # which stopped the annotation grid from inventing egress per tool.
+    assert everything["trifecta_path_count"] == 4
     assert everything["legacy_path_count"] == 314
     assert everything["trifecta_path_count"] < everything["legacy_path_count"]
     # Every emitted path stands for several read tools instead of one row each.
@@ -529,8 +531,11 @@ def test_report_separates_first_run_blind_from_post_tuning(results: dict) -> Non
     assert post_tuning["clean_false_positive_rate"] == 0.1667
     assert post_tuning["in_scope_recall"] == 0.875
     assert post_tuning["overall_recall"] == 0.7
-    assert post_tuning["everything_single_server_paths"] == 9
-    assert post_tuning["everything_with_filesystem_paths"] == 11
+    # Week-3 hardening: the annotation grid and the ambiguous destination
+    # tokens are gone, so the same surface now yields 3 and 4 paths instead of
+    # 9 and 11. Every target keeps its verdict; only path counts fell.
+    assert post_tuning["everything_single_server_paths"] == 3
+    assert post_tuning["everything_with_filesystem_paths"] == 4
     assert "D" in post_tuning["targets_added_post_tuning"]
 
 
@@ -543,7 +548,8 @@ def test_before_after_table_matches_the_recorded_measurements(results: dict) -> 
 
     everything = rows["everything-plus-filesystem"]
     assert everything["before_paths"] == 314
-    # MCP sampling/elicitation callbacks no longer become egress sinks, which
-    # removed 21 of the 32 paths this composition used to produce.
-    assert everything["after_paths"] == 11
+    # MCP sampling/elicitation callbacks no longer become egress sinks (32 ->
+    # 11 paths), and the week-3 hardening removed the annotation-only egress
+    # side of ``npm-server-everything`` (11 -> 4).
+    assert everything["after_paths"] == 4
     assert everything["after_paths"] < everything["before_paths"]

@@ -1,0 +1,19 @@
+{
+  "description": "Bailian MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "bailian-mcp-server@0.0.4"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "bailian-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-bailian-mcp-server-0-0-4",
+  "stderr_summary": "Error: DASHSCOPE_API_KEY environment variable is required",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.0.4"
+}

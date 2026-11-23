@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for whisper integration",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "mcp-server-whisper@0.0.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "mcp-server-whisper",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/hlos-ai/mcp-servers",
+  "slug": "npm-mcp-server-whisper-0-0-1",
+  "stderr_summary": "npm error could not determine executable to run\nnpm error A complete log of this run can be found in: <scratch>/npm-cache/_logs/2026-11-23T18_46_24_318Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.0.1"
+}

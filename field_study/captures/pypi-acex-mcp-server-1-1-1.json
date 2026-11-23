@@ -1,0 +1,18 @@
+{
+  "description": "ACE-X MCP Server - Model Context Protocol server for ACE-X",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "acex-mcp-server==1.1.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "acex-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-acex-mcp-server-1-1-1",
+  "stderr_summary": "Downloaded burner-redis\n Downloaded pydantic-core\n Downloaded lupa\nInstalled 83 packages in 44ms\nAn executable named `acex-mcp-server` is not provided by package `acex-mcp-server`.\nThe following executables are available:\n- acex-mcp\n\nUse `uvx --from acex-mcp-server acex-mcp` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.1.1"
+}

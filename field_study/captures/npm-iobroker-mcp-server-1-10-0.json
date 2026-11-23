@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for ioBroker",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@iobroker/mcp-server@1.10.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@iobroker/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/ioBroker/mcp-package",
+  "slug": "npm-iobroker-mcp-server-1-10-0",
+  "stderr_summary": "npm error could not determine executable to run\nnpm error A complete log of this run can be found in: <scratch>/npm-cache/_logs/2026-11-23T18_39_49_872Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.10.0"
+}

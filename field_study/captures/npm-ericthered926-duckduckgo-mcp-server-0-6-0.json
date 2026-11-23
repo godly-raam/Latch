@@ -1,0 +1,127 @@
+{
+  "description": "A Model Context Protocol (MCP) server for DuckDuckGo web and news search",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@ericthered926/duckduckgo-mcp-server@0.6.0"
+  ],
+  "manifest_sha256": "3387acd9c45d8ddd4a1bf8499bcb998641b3039bdcf78b9eaa08d6fcad297f1b",
+  "package": "@ericthered926/duckduckgo-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/ericthered926/duckduckgo-mcp-server",
+  "slug": "npm-ericthered926-duckduckgo-mcp-server-0-6-0",
+  "stderr_summary": "[INFO] DuckDuckGo MCP Server v0.3.0 running on stdio\n[INFO] Rate limits: 1/sec, 15000/month\n[INFO] Token config: max_results=3, snippet_len=150, full_content=false\n[INFO] Log level: info",
+  "tool_count": 2,
+  "tools": [
+    {
+      "description": "Web search via DuckDuckGo. Returns max 3 results with 150-char snippets. Use 'limit' param to override (1-20). Supports region/time filters.",
+      "inputSchema": {
+        "properties": {
+          "count": {
+            "description": "[DEPRECATED: use 'limit'] Number of results",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "number"
+          },
+          "limit": {
+            "description": "Override default result limit (1-20, default: 3)",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "number"
+          },
+          "query": {
+            "description": "Search query (max 400 chars)",
+            "maxLength": 400,
+            "type": "string"
+          },
+          "region": {
+            "default": "wt-wt",
+            "description": "Region for localized results. Examples: 'us-en' (US), 'uk-en' (UK), 'de-de' (Germany), 'wt-wt' (worldwide, default)",
+            "type": "string"
+          },
+          "safeSearch": {
+            "default": "moderate",
+            "description": "Content filtering level",
+            "enum": [
+              "strict",
+              "moderate",
+              "off"
+            ],
+            "type": "string"
+          },
+          "time": {
+            "default": "all",
+            "description": "Time range filter for results",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year",
+              "all"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "duckduckgo_web_search"
+    },
+    {
+      "description": "News search via DuckDuckGo. Returns max 3 articles with 150-char excerpts. Use 'limit' param to override (1-20).",
+      "inputSchema": {
+        "properties": {
+          "count": {
+            "description": "[DEPRECATED: use 'limit'] Number of results",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "number"
+          },
+          "limit": {
+            "description": "Override default result limit (1-20, default: 3)",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "number"
+          },
+          "query": {
+            "description": "News search query (max 400 chars)",
+            "maxLength": 400,
+            "type": "string"
+          },
+          "safeSearch": {
+            "default": "moderate",
+            "description": "Content filtering level",
+            "enum": [
+              "strict",
+              "moderate",
+              "off"
+            ],
+            "type": "string"
+          },
+          "time": {
+            "default": "all",
+            "description": "Time range for news articles",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year",
+              "all"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "duckduckgo_news_search"
+    }
+  ],
+  "version": "0.6.0"
+}

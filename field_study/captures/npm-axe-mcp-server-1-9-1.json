@@ -1,0 +1,19 @@
+{
+  "description": "Axe DevTools accessibility analysis and remediation MCP Server for AI coding agents",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "axe-mcp-server@1.9.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "axe-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/dequelabs/axe-mcp-server-public",
+  "slug": "npm-axe-mcp-server-1-9-1",
+  "stderr_summary": "Configuration error: AXE_API_KEY, AXE_MOBILE_API_KEY or AXE_ACCESS_TOKEN: No credential was found, so the server cannot sign in to the axe backend. Set one of these before starting it:\n    AXE_API_KEY         an API key for axe DevTools (web scanning)\n    AXE_MOBILE_API_KEY  an API key for axe DevTools Mobile (device scanning; not supported in Docker)\n    AXE_ACCESS_TOKEN    an OAuth token, which covers whichever products your account is entitled to\n  Set both API keys if your account has both products. API keys come from the axe Account Portal; an OAuth token comes from `npx @deque/axe-auth login`.\n\nSetup guide: https://docs.deque.com/devtools-server/4.0.0/en/axe-mcp-server#getting-started\n{\"level\":\"error\",\"message\":\"Configuration error\",\"problems\":[{\"detail\":\"AXE_API_KEY, AXE_MOBILE_API_KEY or AXE_ACCESS_TOKEN: No credential was found, so the server cannot sign in to the axe backend. Set one of these before starting it:\\n  AXE_API_KEY         an API key for axe DevTools (web scanning)\\n  AXE_MOBILE_API_KEY  an API key for axe DevTools Mobile (device scanning; not supported in Docker)\\n  AXE_ACCESS_TOKEN    an OAuth token, which covers whichever products your account is entitled t",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.9.1"
+}

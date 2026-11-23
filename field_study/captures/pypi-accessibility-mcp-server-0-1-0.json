@@ -1,0 +1,18 @@
+{
+  "description": "MCP-Server fuer Web-Accessibility-Checks: WCAG 2.1/2.2 Pruefung, Kontrast, ARIA, Formular-Validierung",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "accessibility-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "accessibility-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/accessibility-mcp-server",
+  "slug": "pypi-accessibility-mcp-server-0-1-0",
+  "stderr_summary": "Installed 43 packages in 31ms\nTraceback (most recent call last):\n  File \"<scratch>/uv-cache/archive-v0/8bwNoapEKpBlIgEs/bin/accessibility-mcp-server\", line 6, in <module>\n    from src.server import main\n  File \"<scratch>/uv-cache/archive-v0/8bwNoapEKpBlIgEs/lib/python3.12/site-packages/src/server.py\", line 3, in <module>\n    from mcp.server.fastmcp import FastMCP\n  File \"<scratch>/uv-cache/archive-v0/8bwNoapEKpBlIgEs/lib/python3.12/site-packages/mcp/server/fastmcp.py\", line 16, in <module>\n    raise ModuleNotFoundError(_MESSAGE, name=__name__)\nModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp<2' to keep running v1 code.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

@@ -1,0 +1,18 @@
+{
+  "description": "A股实时行情MCP服务器 - 基于Model Context Protocol的A股数据查询工具",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "a-stock-mcp-server==1.1.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "a-stock-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/Llldmiao/a-stock-mcp-server",
+  "slug": "pypi-a-stock-mcp-server-1-1-1",
+  "stderr_summary": "Downloading lxml (5.0MiB)\nDownloading numpy (17.1MiB)\nDownloading mini-racer (21.2MiB)\nDownloading akshare (1.1MiB)\nDownloading pandas (11.8MiB)\n Downloaded akshare\n Downloaded lxml\n Downloaded curl-cffi\n Downloaded numpy\n Downloaded pandas",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.1.1"
+}

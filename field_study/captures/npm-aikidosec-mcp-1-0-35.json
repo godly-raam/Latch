@@ -1,0 +1,19 @@
+{
+  "description": "Aikido MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@aikidosec/mcp@1.0.35"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@aikidosec/mcp",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-aikidosec-mcp-1-0-35",
+  "stderr_summary": "{\"level\":30,\"time\":\"2026-11-23T18:36:22.167Z\",\"msg\":\"MCP server is running...\"}",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.0.35"
+}

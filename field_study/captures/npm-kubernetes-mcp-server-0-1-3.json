@@ -1,0 +1,19 @@
+{
+  "description": "Model Context Protocol (MCP) server for Kubernetes and OpenShift",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "kubernetes-mcp-server@0.1.3"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "kubernetes-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/containers/kubernetes-mcp-server",
+  "slug": "npm-kubernetes-mcp-server-0-1-3",
+  "stderr_summary": "# start a Streamable HTTP server reading the TOML config from stdin\n  echo 'port = \"8080\"' | kubernetes-mcp-server --config -\n\nFlags:\n      --config string          Path of the config file, or - to read it from stdin (HTTP mode only).\n      --config-dir string      Directory of lexical .toml files. Usable alone or with --config. Omitted means no drop-ins. Relative paths are resolved against the working directory.\n  -h, --help[=true|false]      help for kubernetes-mcp-server\n      --version[=true|false]   Print version information and quit",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.3"
+}

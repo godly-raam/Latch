@@ -1,0 +1,18 @@
+{
+  "description": "A comprehensive MCP server for AbraFlexi integration",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "abraflexi-mcp-server==1.2.4"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "abraflexi-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/VitexSoftware/abraflexi-mcp-server",
+  "slug": "pypi-abraflexi-mcp-server-1-2-4",
+  "stderr_summary": "Installed 69 packages in 48ms\nAn executable named `abraflexi-mcp-server` is not provided by package `abraflexi-mcp-server`.\nThe following executables are available:\n- abraflexi-mcp\n\nUse `uvx --from abraflexi-mcp-server abraflexi-mcp` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.2.4"
+}

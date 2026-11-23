@@ -621,6 +621,175 @@ def test_mermaid_for_empty_graph_is_valid() -> None:
     assert "subgraph" not in diagram
 
 
+# -- week-2 field-study false positives ------------------------------------
+
+
+def open_world(**extra: Any) -> dict[str, Any]:
+    return {"readOnlyHint": False, "openWorldHint": True, "destructiveHint": False, **extra}
+
+
+def test_open_world_annotation_alone_is_not_a_capability() -> None:
+    """A SaaS generation/analytics call is open-world without ingest or egress."""
+
+    node = classify_tool(
+        "meshy",
+        tool("meshy_text_to_3d", {"prompt": {"type": "string"}}, annotations=open_world()),
+    )
+
+    assert node.capabilities == []
+    assert node.evidence == []
+
+
+def test_open_world_crud_grid_has_no_trifecta() -> None:
+    servers = {
+        "analytics": [
+            tool("list_billing_records", {"accountId": {"type": "string"}}),
+            tool(
+                "list_reports",
+                {"pageToken": {"type": "string"}, "maxResults": {"type": "integer"}},
+                annotations=open_world(readOnlyHint=True),
+            ),
+            tool("post_insight_result", {"title": {"type": "string"}}, annotations=open_world()),
+            tool("send_datahub_events", {"events": {"type": "array"}}, annotations=open_world()),
+            tool("invite_user", {"email": {"type": "string"}}, annotations=open_world()),
+            tool("create_asset", {"rootEmail": {"type": "string"}}, annotations=open_world()),
+        ]
+    }
+
+    report = analyze_capability_graph(servers)
+
+    assert report.trifecta_paths == []
+    assert all(
+        entry.signal != "annotation.openWorldEgress"
+        for node in report.nodes
+        for entry in node.evidence
+    )
+
+
+def test_session_login_annotations_do_not_form_a_trifecta() -> None:
+    """``login``/``logout`` reach a service; they neither ingest nor exfiltrate."""
+
+    assert classify_tool("clarity", tool("login", {}, annotations=open_world())).capabilities == []
+    assert classify_tool("clarity", tool("logout", {}, annotations=open_world())).capabilities == []
+
+    servers = {
+        "clarity": [
+            tool("login", {}, annotations=open_world()),
+            tool("logout", {}, annotations=open_world()),
+            tool(
+                "list-session-recordings",
+                {"id": {"type": "string"}},
+                annotations={"readOnlyHint": True, "openWorldHint": False},
+            ),
+        ]
+    }
+
+    assert analyze_capability_graph(servers).trifecta_paths == []
+
+
+def test_pagination_cursor_is_neither_content_nor_a_secret() -> None:
+    node = classify_tool(
+        "analytics",
+        tool(
+            "list_reports",
+            {"pageToken": {"type": "string"}, "maxResults": {"type": "integer"}},
+            annotations=open_world(readOnlyHint=True),
+        ),
+    )
+
+    assert node.capabilities == []
+
+
+def test_ambiguous_destination_tokens_are_not_sinks() -> None:
+    heroku = classify_tool(
+        "heroku",
+        tool("pipelines_promote", {"app": {"type": "string"}, "to": {"type": "string"}}),
+    )
+    bitwarden = classify_tool(
+        "bitwarden",
+        tool(
+            "create_org_collection",
+            {"name": {"type": "string"}, "externalId": {"type": "string"}},
+        ),
+    )
+    notion = classify_tool(
+        "notion",
+        tool(
+            "API-create-a-comment",
+            {"parent": {"type": "object"}, "rich_text": {"type": "array"}},
+        ),
+    )
+
+    for node in (heroku, bitwarden, notion):
+        assert "EXTERNAL_EGRESS" not in node.capabilities, node.qualified_name
+
+
+def test_data_type_enum_is_not_a_destination() -> None:
+    node = classify_tool(
+        "salesforce",
+        tool(
+            "salesforce_manage_field",
+            {
+                "externalId": {"type": "boolean"},
+                "grantAccessTo": {"type": "array"},
+                "operation": {"type": "string", "enum": ["create", "update"]},
+                "type": {"type": "string", "enum": ["Text", "Url", "Email"]},
+            },
+        ),
+    )
+
+    assert "EXTERNAL_EGRESS" not in node.capabilities
+
+
+def test_reader_with_a_publishing_noun_is_not_a_sink() -> None:
+    node = classify_tool(
+        "doit",
+        tool(
+            "list_alert_slack_channels",
+            {"customerContext": {"type": "object"}, "pageToken": {"type": "string"}},
+            annotations=open_world(readOnlyHint=True),
+        ),
+    )
+
+    assert "EXTERNAL_EGRESS" not in node.capabilities
+
+
+def test_product_noun_send_differs_from_a_leading_send_verb() -> None:
+    stored = classify_tool(
+        "bitwarden", tool("create_text_send", {"name": {"type": "string"}, "text": {"type": "string"}})
+    )
+    sender = classify_tool(
+        "hooks", tool("send_payload", {"payload": {"type": "string"}}, annotations=open_world())
+    )
+
+    assert "EXTERNAL_EGRESS" not in stored.capabilities
+    assert "EXTERNAL_EGRESS" in sender.capabilities
+
+
+def test_browser_console_to_navigation_still_completes_a_trifecta() -> None:
+    servers = {
+        "browser": [
+            tool("list_console_messages", {"pageId": {"type": "string"}}),
+            tool("get_network_request", {"requestFilePath": {"type": "string"}}),
+            tool("navigate_page", {"url": {"type": "string"}, "type": {"type": "string"}}),
+        ]
+    }
+
+    report = analyze_capability_graph(servers)
+
+    assert report.passed is False
+    # ``navigate_page`` is both an ingest and the sink, so its self-pair is the
+    # degenerate chain the analyzer drops; the console reader supplies the path.
+    assert "browser:list_console_messages" in {
+        path.ingest_tool for path in report.trifecta_paths
+    }
+    assert {path.read_tool for path in report.trifecta_paths} == {
+        "browser:get_network_request"
+    }
+    assert {path.egress_tool for path in report.trifecta_paths} == {"browser:navigate_page"}
+    assert report.trifecta_paths[0].severity == "CRITICAL"
+
+
 def test_mermaid_escapes_quotes_in_labels() -> None:
     report = analyze_capability_graph({"weird": [tool('say"hi', {})]})
 

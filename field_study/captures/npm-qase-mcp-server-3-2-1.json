@@ -1,0 +1,3137 @@
+{
+  "description": "Official MCP server for Qase Test Management Platform",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@qase/mcp-server@3.2.1"
+  ],
+  "manifest_sha256": "fe528276da2a79ab81dac294b9d7b55e921a6dcd3263d690444277865ed42146",
+  "package": "@qase/mcp-server",
+  "protocol_version": "2026-07-28",
+  "repository_url": "https://github.com/qase-tms/qase-mcp-server",
+  "slug": "npm-qase-mcp-server-3-2-1",
+  "stderr_summary": "[RequestState] QASE_MCP_REQUEST_STATE_KEY is not set — generating a per-process key. Multi-round-trip confirmations will fail across replicas; set the variable to a shared value of at least 32 bytes before running more than one.\n✓ Server started successfully\n✓ Transport: stdio\n✓ Ready to receive requests\n\nNote: This server uses stdio transport for communication.\n      It is designed to be run by MCP clients (Claude, Cursor, etc.)\n\n[Server] Listing 42 tools",
+  "tool_count": 42,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Call any Qase REST endpoint directly, for the few things no dedicated tool covers: method, a /v1/… path on the configured host, optional body or query. Prefer a dedicated tool where one exists — they normalize enums and validate before spending a call. JSON only; uploads go through qase_attachment_upload. A DELETE asks for confirmation like the dedicated delete tools. Cost: one API call, 0.3-1.5s.",
+      "inputSchema": {
+        "properties": {
+          "body": {
+            "additionalProperties": {},
+            "description": "Request body for POST/PUT/PATCH",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "method": {
+            "default": "GET",
+            "description": "HTTP method",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ],
+            "type": "string"
+          },
+          "path": {
+            "description": "API path starting with a version segment (e.g., \"/v1/project/DEMO/run\")",
+            "pattern": "^\\/v\\d+\\/\\S*$",
+            "type": "string"
+          },
+          "query": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Query parameters",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "name": "qase_api",
+      "title": "Call Qase API"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete an attachment by its hash (from qase_attachment_upload). Anything referencing it keeps the reference but the file is gone; this cannot be undone. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "hash": {
+            "description": "Attachment hash identifier",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "hash"
+        ],
+        "type": "object"
+      },
+      "name": "qase_attachment_delete",
+      "title": "Delete attachment"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Upload files and get back the hashes other tools reference them by. Pass `file_base64` plus `filename` for one file, or `files` for several in one request; `file_path` only works when the server runs on the same machine as the file — never on the hosted connector. The hash must then be passed in an `attachments` field; uploading alone attaches nothing. This is the only tool that sends multipart/form-data, which is why qase_api cannot send files. Cost: one API call per request, dominated by size.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "file": {
+            "description": "Deprecated: use file_base64 or file_path. Accepts an absolute path or base64 content.",
+            "type": "string"
+          },
+          "file_base64": {
+            "description": "Single-file form. File content, base64 encoded. Use this unless the server runs on the same machine as the file.",
+            "type": "string"
+          },
+          "file_path": {
+            "description": "Single-file form. Absolute path on the machine running THIS server; a remote server cannot see it — send file_base64 instead.",
+            "type": "string"
+          },
+          "filename": {
+            "description": "Original filename with extension. Required for the single-file form.",
+            "type": "string"
+          },
+          "files": {
+            "description": "Several files in one request, each entry with its own filename plus file_base64 or file_path. One round trip, hashes returned in the same order. Limits and sizing are in qase_tool_help.",
+            "items": {
+              "properties": {
+                "file_base64": {
+                  "description": "File content, base64 encoded. The only option on a remote server.",
+                  "type": "string"
+                },
+                "file_path": {
+                  "description": "Absolute path to a file on the machine running THIS server.",
+                  "type": "string"
+                },
+                "filename": {
+                  "description": "Original filename with extension",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "filename"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "qase_attachment_upload",
+      "title": "Upload attachment"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create up to 100 test cases in one request — the batch form of qase_case_upsert, and the right tool whenever more than one case is being written. Same fields and enum handling as qase_case_upsert; creates only, update through qase_case_upsert with `id`. Cost: one API call regardless of batch size — ten cases measured 1.2s against 5.6s as ten separate calls.",
+      "inputSchema": {
+        "$defs": {
+          "parameter": {
+            "properties": {
+              "title": {
+                "description": "Parameter name, e.g. \"browser\"",
+                "minLength": 1,
+                "type": "string"
+              },
+              "values": {
+                "description": "Its values, e.g. [\"chrome\", \"firefox\"]",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "title",
+              "values"
+            ],
+            "type": "object"
+          },
+          "step": {
+            "properties": {
+              "action": {
+                "description": "Step action (classic steps). Not needed when `shared` is set.",
+                "type": "string"
+              },
+              "attachments": {
+                "description": "Hashes from qase_attachment_upload",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "data": {
+                "description": "Test data",
+                "type": "string"
+              },
+              "expected_result": {
+                "description": "Expected result",
+                "type": "string"
+              },
+              "shared": {
+                "description": "Hash from `qase_shared_step_upsert` to reuse here; then `action` is not needed.",
+                "type": "string"
+              },
+              "shared_step_hash": {
+                "description": "Alias for `shared`, the spelling a case reads back.",
+                "type": "string"
+              },
+              "steps": {
+                "description": "Nested substeps, nesting further if needed.",
+                "items": {
+                  "$ref": "#/$defs/step"
+                },
+                "type": "array"
+              },
+              "value": {
+                "description": "Gherkin scenario text (when steps_type is \"gherkin\")",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "cases": {
+            "description": "Test cases to create, 1 to 100 per call",
+            "items": {
+              "properties": {
+                "attachments": {
+                  "description": "Hashes from qase_attachment_upload",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "automation": {
+                  "description": "Automation: 0=Manual, 1=To be automated, 2=Automated (label or ID)",
+                  "type": "string"
+                },
+                "behavior": {
+                  "description": "Behavior label or numeric ID",
+                  "type": "string"
+                },
+                "custom_field": {
+                  "additionalProperties": {},
+                  "description": "Custom fields by ID, e.g. { \"12\": \"value\" }",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "description": {
+                  "description": "Free-form description of what the case covers",
+                  "type": "string"
+                },
+                "is_flaky": {
+                  "description": "Is flaky: 0=No, 1=Yes; a boolean works too.",
+                  "type": "string"
+                },
+                "layer": {
+                  "description": "Layer label or numeric ID",
+                  "type": "string"
+                },
+                "milestone_id": {
+                  "description": "ID of the milestone the case belongs to",
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "parameters": {
+                  "description": "Test case parameters: {title, values}, a group {items: [...]}, or {shared_id}. Replaces the whole list: send every parameter to keep, [] to clear, omit to leave as is.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/parameter"
+                      },
+                      {
+                        "properties": {
+                          "items": {
+                            "description": "Parameters whose values go together; the API needs at least two",
+                            "items": {
+                              "$ref": "#/$defs/parameter"
+                            },
+                            "minItems": 2,
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "items"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "shared_id": {
+                            "description": "ID of a shared parameter (qase_api GET /v1/shared_parameter)",
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "shared_id"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                "postconditions": {
+                  "description": "State to restore or verify after the steps run",
+                  "type": "string"
+                },
+                "preconditions": {
+                  "description": "State the system must be in before the steps run",
+                  "type": "string"
+                },
+                "priority": {
+                  "description": "Priority label or numeric ID (0=not set, 1=high, 2=medium, 3=low)",
+                  "type": "string"
+                },
+                "severity": {
+                  "description": "Severity label or numeric ID",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Status label or numeric ID",
+                  "type": "string"
+                },
+                "steps": {
+                  "description": "Ordered test steps; omit for a case without steps",
+                  "items": {
+                    "$ref": "#/$defs/step"
+                  },
+                  "type": "array"
+                },
+                "steps_type": {
+                  "description": "Step style: \"classic\" action/expected, or \"gherkin\" scenario text",
+                  "enum": [
+                    "classic",
+                    "gherkin"
+                  ],
+                  "type": "string"
+                },
+                "suite_id": {
+                  "description": "ID of the suite that holds the case",
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "tags": {
+                  "description": "Tag names, e.g. [\"smoke\", \"billing\"]",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "description": "Test case title",
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type label or numeric ID",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "title"
+              ],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "cases"
+        ],
+        "type": "object"
+      },
+      "name": "qase_case_bulk_create",
+      "title": "Bulk create test cases"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a test case by project code and ID. Its execution history goes with it and this cannot be undone; consider marking it deprecated through qase_case_upsert instead. No bulk delete — one call each, each asking the user for confirmation. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_case_delete",
+      "title": "Delete test case"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a single test case: with `id` it updates, without it creates. Enum fields accept a label such as \"high\" or the project's numeric ID. Writing more than one case? Use qase_case_bulk_create — one request instead of one per case. If the project has \"Test case review\" enabled, writes may need a review — run qase_discover_tools with \"review\". Cost: one API call, about 0.6s to create, 0.4s to update.",
+      "inputSchema": {
+        "$defs": {
+          "parameter": {
+            "properties": {
+              "title": {
+                "description": "Parameter name, e.g. \"browser\"",
+                "minLength": 1,
+                "type": "string"
+              },
+              "values": {
+                "description": "Its values, e.g. [\"chrome\", \"firefox\"]",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "title",
+              "values"
+            ],
+            "type": "object"
+          },
+          "step": {
+            "properties": {
+              "action": {
+                "description": "Step action (classic steps). Not needed when `shared` is set.",
+                "type": "string"
+              },
+              "attachments": {
+                "description": "Hashes from qase_attachment_upload",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "data": {
+                "description": "Test data",
+                "type": "string"
+              },
+              "expected_result": {
+                "description": "Expected result",
+                "type": "string"
+              },
+              "shared": {
+                "description": "Hash from `qase_shared_step_upsert` to reuse here; then `action` is not needed.",
+                "type": "string"
+              },
+              "shared_step_hash": {
+                "description": "Alias for `shared`, the spelling a case reads back.",
+                "type": "string"
+              },
+              "steps": {
+                "description": "Nested substeps, nesting further if needed.",
+                "items": {
+                  "$ref": "#/$defs/step"
+                },
+                "type": "array"
+              },
+              "value": {
+                "description": "Gherkin scenario text (when steps_type is \"gherkin\")",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "attachments": {
+            "description": "Hashes from qase_attachment_upload",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "automation": {
+            "description": "Automation: 0=Manual, 1=To be automated, 2=Automated (label or ID)",
+            "type": "string"
+          },
+          "behavior": {
+            "description": "Behavior label or numeric ID",
+            "type": "string"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "custom_field": {
+            "additionalProperties": {},
+            "description": "Custom fields by ID, e.g. { \"12\": \"value\" }",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "description": {
+            "description": "Free-form description of what the case covers",
+            "type": "string"
+          },
+          "id": {
+            "description": "Case ID — if provided, updates the case; if omitted, creates a new one",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "is_flaky": {
+            "description": "Is flaky: 0=No, 1=Yes; a boolean works too.",
+            "type": "string"
+          },
+          "layer": {
+            "description": "Layer label or numeric ID",
+            "type": "string"
+          },
+          "milestone_id": {
+            "description": "ID of the milestone the case belongs to",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "parameters": {
+            "description": "Test case parameters: {title, values}, a group {items: [...]}, or {shared_id}. Replaces the whole list: send every parameter to keep, [] to clear, omit to leave as is.",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/parameter"
+                },
+                {
+                  "properties": {
+                    "items": {
+                      "description": "Parameters whose values go together; the API needs at least two",
+                      "items": {
+                        "$ref": "#/$defs/parameter"
+                      },
+                      "minItems": 2,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "properties": {
+                    "shared_id": {
+                      "description": "ID of a shared parameter (qase_api GET /v1/shared_parameter)",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "shared_id"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "postconditions": {
+            "description": "State to restore or verify after the steps run",
+            "type": "string"
+          },
+          "preconditions": {
+            "description": "State the system must be in before the steps run",
+            "type": "string"
+          },
+          "priority": {
+            "description": "Priority label or numeric ID (0=not set, 1=high, 2=medium, 3=low)",
+            "type": "string"
+          },
+          "severity": {
+            "description": "Severity label or numeric ID",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status label or numeric ID",
+            "type": "string"
+          },
+          "steps": {
+            "description": "Ordered test steps; omit for a case without steps",
+            "items": {
+              "$ref": "#/$defs/step"
+            },
+            "type": "array"
+          },
+          "steps_type": {
+            "description": "Step style: \"classic\" action/expected, or \"gherkin\" scenario text",
+            "enum": [
+              "classic",
+              "gherkin"
+            ],
+            "type": "string"
+          },
+          "suite_id": {
+            "description": "ID of the suite that holds the case",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "tags": {
+            "description": "Tag names, e.g. [\"smoke\", \"billing\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Test case title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": {
+            "description": "Type label or numeric ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_case_upsert",
+      "title": "Create or update test case"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Report a whole finished CI run in one call: creates the run, records every result, completes it. Use qase_result_record instead when the run already exists and results arrive in stages. Each result needs a numeric `case_id` and a status; batches over 200 are split for you, up to 2000. Cost: three API operations behind one call, about 0.7s for a small run.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "complete": {
+            "default": true,
+            "description": "Complete the run after recording results (default: true)",
+            "type": "boolean"
+          },
+          "environment_id": {
+            "description": "ID of the environment the build ran against",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "is_autotest": {
+            "default": true,
+            "description": "Mark as automated run (default: true)",
+            "type": "boolean"
+          },
+          "results": {
+            "description": "Test results to record, 1 to 2000 per call",
+            "items": {
+              "properties": {
+                "attachments": {
+                  "description": "Hashes from qase_attachment_upload",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "case_id": {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "comment": {
+                  "type": "string"
+                },
+                "defect": {
+                  "type": "boolean"
+                },
+                "stacktrace": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "passed",
+                    "failed",
+                    "blocked",
+                    "skipped",
+                    "invalid"
+                  ],
+                  "type": "string"
+                },
+                "time_ms": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "case_id",
+                "status"
+              ],
+              "type": "object"
+            },
+            "maxItems": 2000,
+            "minItems": 1,
+            "type": "array"
+          },
+          "title": {
+            "description": "Run title (e.g., \"CI Build #1234\")",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title",
+          "results"
+        ],
+        "type": "object"
+      },
+      "name": "qase_ci_report",
+      "title": "Report CI results"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a custom field by ID. Reach is workspace-wide: it disappears from every project, with the values entered for it, and this cannot be undone. To remove it from one project only, edit `projects_codes` with qase_custom_field_upsert. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_custom_field_delete",
+      "title": "Delete custom field"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a custom field. On create, `entity` (case, run, defect) and `type` are required and fixed forever — the update endpoint cannot change them. Fields are workspace-wide; scope with `projects_codes` or is_enabled_for_all_projects. Read existing fields with qase_project_context or qase_get. Cost: one call to create, two to update, 0.5-0.9s.",
+      "inputSchema": {
+        "properties": {
+          "default_value": {
+            "description": "Value a new entity gets when none is entered",
+            "type": "string"
+          },
+          "entity": {
+            "description": "What the field is attached to. Required when creating; cannot be changed later",
+            "enum": [
+              "case",
+              "run",
+              "defect"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Custom field ID — if provided, updates; if omitted, creates",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "is_enabled_for_all_projects": {
+            "description": "Apply to every project in the workspace, instead of only those in projects_codes",
+            "type": "boolean"
+          },
+          "is_filterable": {
+            "description": "Whether the field can be used as a filter",
+            "type": "boolean"
+          },
+          "is_required": {
+            "description": "Whether a value must be given on create",
+            "type": "boolean"
+          },
+          "is_visible": {
+            "description": "Whether the field is shown on the entity",
+            "type": "boolean"
+          },
+          "placeholder": {
+            "description": "Hint shown in the empty field",
+            "type": "string"
+          },
+          "projects_codes": {
+            "description": "Projects the field applies to. Ignored when is_enabled_for_all_projects is true",
+            "items": {
+              "description": "Project code, e.g. DEMO",
+              "maxLength": 10,
+              "minLength": 2,
+              "pattern": "^[A-Z0-9_]+$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Field title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": {
+            "description": "Field type. Required when creating; cannot be changed later",
+            "enum": [
+              "number",
+              "string",
+              "text",
+              "selectbox",
+              "checkbox",
+              "radio",
+              "multiselect",
+              "url",
+              "user",
+              "datetime"
+            ],
+            "type": "string"
+          },
+          "value": {
+            "description": "Option titles — required for selectbox, radio and multiselect",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_custom_field_upsert",
+      "title": "Create or update custom field"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a defect by project code and ID; its links to results go with it and this cannot be undone. Usually resolving it through qase_defect_upsert with `id` is the right move, so the record survives. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_defect_delete",
+      "title": "Delete defect"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a defect: with `id` it updates, without it creates, and then `title`, `actual_result` and `severity` are required. Severity and status are labels (\"blocker\", \"open\"…), mapped for you. For a defect born from a specific test failure use qase_triage_defect; search with qql_search before filing a duplicate. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "actual_result": {
+            "description": "What actually happened — required when creating a defect",
+            "type": "string"
+          },
+          "attachments": {
+            "description": "Hashes from qase_attachment_upload",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "custom_field": {
+            "additionalProperties": {},
+            "description": "Custom fields by ID, e.g. { \"12\": \"value\" }",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "id": {
+            "description": "Defect ID — if provided, updates; if omitted, creates",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "severity": {
+            "description": "How bad the defect is — required when creating a defect",
+            "enum": [
+              "undefined",
+              "blocker",
+              "critical",
+              "major",
+              "normal",
+              "minor",
+              "trivial"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Set to \"resolved\" to resolve the defect",
+            "enum": [
+              "open",
+              "in_progress",
+              "resolved",
+              "invalid"
+            ],
+            "type": "string"
+          },
+          "tags": {
+            "description": "Tag names, e.g. [\"regression\", \"payments\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Defect title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_defect_upsert",
+      "title": "Create or update defect"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search the tool catalogue by what you are trying to do — \"delete\", \"milestone\", \"review\", \"custom field\" — and get back the matching tools with their descriptions. Every tool is already listed and callable; use this when you do not know which one fits, rather than re-reading the whole list. Cost: no API call, matching happens in memory, about 3ms.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Filter by tool category",
+            "enum": [
+              "read",
+              "write",
+              "delete",
+              "composite",
+              "all"
+            ],
+            "type": "string"
+          },
+          "query": {
+            "description": "Search query to find tools by name or description. Examples: \"delete\", \"milestone\", \"attachment\", \"suite\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "qase_discover_tools",
+      "title": "Discover more tools"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete an environment by project code and ID. Runs that referenced it lose the attribution, so filtering history by that environment stops working; this cannot be undone. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_environment_delete",
+      "title": "Delete environment"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update an environment — a named target such as staging or production that runs are attributed to. With `id` it updates, without it creates. Existing environments come back from qase_project_context. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "description": {
+            "description": "Free-form description of the environment",
+            "type": "string"
+          },
+          "host": {
+            "description": "Environment host/URL",
+            "type": "string"
+          },
+          "id": {
+            "description": "Environment ID — if provided, updates; if omitted, creates",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "slug": {
+            "description": "URL-friendly identifier",
+            "type": "string"
+          },
+          "title": {
+            "description": "Environment title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_environment_upsert",
+      "title": "Create or update environment"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Link or unlink test cases and runs to issues in Jira Cloud or Jira Server — the only trackers supported. A case may link several issues; a run holds one, and a new link replaces it. Read links back with qase_get. Cost: one API call for the whole set of links, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "attach creates the link, detach removes it (for runs, clears the single link)",
+            "enum": [
+              "attach",
+              "detach"
+            ],
+            "type": "string"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "entity": {
+            "description": "Entity to link — test case or test run",
+            "enum": [
+              "case",
+              "run"
+            ],
+            "type": "string"
+          },
+          "links": {
+            "description": "Entities to link, processed in a single API request",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "Test case ID (entity=\"case\") or test run ID (entity=\"run\")",
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "issues": {
+                  "description": "External issue keys, e.g. [\"PROJ-1234\"]. Required for cases (attach and detach) and for attaching to a run — a run accepts exactly one issue. Omit when detaching a run.",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "type": {
+            "description": "Issue tracker integration configured for the project",
+            "enum": [
+              "jira-cloud",
+              "jira-server"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "entity",
+          "action",
+          "type",
+          "links"
+        ],
+        "type": "object"
+      },
+      "name": "qase_external_issue_link",
+      "title": "Link external issue"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Fetch one known record by type and ID — case, suite, run, result, plan, defect, milestone, environment, shared_step, review, custom_field and more. Use it only when you already have the ID and want that one record; for several, anything filtered, or a loop over IDs, use qql_search — one search returns the whole page. Cost: one API call, 0.3-0.5s; ten in sequence measured 5.3s against 1.2s for one qql_search.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code (required for most entities)",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "entity": {
+            "description": "Entity type to fetch",
+            "enum": [
+              "case",
+              "suite",
+              "run",
+              "result",
+              "plan",
+              "defect",
+              "milestone",
+              "environment",
+              "shared_step",
+              "shared_parameter",
+              "configuration",
+              "attachment",
+              "author",
+              "user",
+              "review",
+              "custom_field"
+            ],
+            "type": "string"
+          },
+          "fields": {
+            "description": "Optional field projection — only return these top-level fields. Pass [\"*\"] for all fields.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "description": "Entity ID",
+                "exclusiveMinimum": 0,
+                "type": "integer"
+              },
+              {
+                "description": "Hash identifier",
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              }
+            ],
+            "description": "Entity ID (number) or hash (string)"
+          },
+          "include": {
+            "description": "Comma-separated list of related entities to include in the response. Cases and runs already request their external issue links by default (\"external_issues\" / \"external_issue\"); pass this only to override that.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_get",
+      "title": "Get record"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a milestone by project code and ID. Runs and cases keep existing but lose the association, so release reporting built on it stops working; this cannot be undone. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_milestone_delete",
+      "title": "Delete milestone"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a milestone — a dated marker, typically a release, that runs and cases are grouped under. With `id` it updates, without it creates. Existing milestones come back from qase_project_context. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "description": {
+            "description": "Free-form description of the milestone",
+            "type": "string"
+          },
+          "due_date": {
+            "description": "Due date as Unix timestamp",
+            "type": "number"
+          },
+          "id": {
+            "description": "Milestone ID — if provided, updates; if omitted, creates",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "status": {
+            "description": "active (default) or completed",
+            "enum": [
+              "active",
+              "completed"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "Milestone title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_milestone_upsert",
+      "title": "Create or update milestone"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a test plan by project code and ID. Only the plan goes — its cases and the runs made from it stay — but anything launching it by ID breaks; this cannot be undone. To change its cases use qase_plan_upsert instead. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_plan_delete",
+      "title": "Delete test plan"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a test plan — a named, reusable set of case IDs such as a smoke or regression pack. With `id` it updates, without it creates. qase_regression_run turns a plan into a run in one call. Cost: one API call, about 0.5s, growing with the number of cases.",
+      "inputSchema": {
+        "properties": {
+          "cases": {
+            "description": "Case IDs to include",
+            "items": {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "description": {
+            "description": "Free-form description of the plan",
+            "type": "string"
+          },
+          "id": {
+            "description": "Plan ID — if provided, updates; if omitted, creates",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "title": {
+            "description": "Test plan title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_plan_upsert",
+      "title": "Create or update test plan"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Seed everything about a project in one call: details, the full suite tree, milestones, environments, custom fields and users — make it first when starting on a project. Each collection returns its first 100; check `coverage` and pass `full: true` to page. For one record by ID qase_get is cheaper; for filtered questions use qql_search. Cost: six API calls behind one, 0.5-1.3s cold, cached 5 minutes.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "full": {
+            "description": "Page through every collection instead of the first 100 of each (default: false). Use it when `coverage` reports one truncated; see qase_tool_help for what it costs.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "qase_project_context",
+      "title": "Project context"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a project. The code must be unique in the workspace, and there is no update endpoint afterwards — title, code and access cannot be changed through the API, so choose them deliberately. Read an existing project with qase_project_context. Cost: one API call, about 1.5s.",
+      "inputSchema": {
+        "properties": {
+          "access": {
+            "description": "Who can access the project: everyone, a team group, or nobody but the owner",
+            "enum": [
+              "all",
+              "group",
+              "none"
+            ],
+            "type": "string"
+          },
+          "code": {
+            "description": "Project code — unique per workspace, 2 to 10 characters of uppercase letters, digits or underscores",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "description": {
+            "description": "Free-form description of the project",
+            "type": "string"
+          },
+          "group": {
+            "description": "Team group hash — required when access is \"group\"",
+            "type": "string"
+          },
+          "settings": {
+            "additionalProperties": {},
+            "description": "Additional project settings",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": {
+            "description": "Project title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "qase_project_create",
+      "title": "Create project"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete an entire project by code — every case, suite, run, result, defect and milestone in it, with no trash to recover from; this cannot be undone. The most destructive call in the API; confirm the code with qase_project_context first. Asks the user for confirmation and does not proceed without it. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "qase_project_delete",
+      "title": "Delete project"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Build and start a test run from a suite, a plan, or an explicit list of case IDs, in one step — it resolves the cases itself. It opens a run, it does not close one: for a finished pipeline use qase_ci_report; to assemble a run by hand use qase_run_upsert. Cost: two API calls behind one, about 1s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "description": {
+            "description": "What this regression run covers",
+            "type": "string"
+          },
+          "environment_id": {
+            "description": "ID of the environment the run executes against",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "include_cases": {
+            "description": "Explicit case IDs to include",
+            "items": {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "milestone_id": {
+            "description": "ID of the milestone the run belongs to",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "plan_id": {
+            "description": "Create run from an existing test plan",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "suite_ids": {
+            "description": "Include cases from these suites",
+            "items": {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Run title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_regression_run",
+      "title": "Build regression run"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete one result from a run, by run ID and result hash. The case and the rest of the run are untouched; pass rates shift and this cannot be undone. To discard a whole run use qase_run_delete. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "hash": {
+            "description": "Result hash to delete",
+            "minLength": 1,
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "run_id",
+          "hash"
+        ],
+        "type": "object"
+      },
+      "name": "qase_result_delete",
+      "title": "Delete test result"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Record up to 200 results into an existing run — status, duration, comment, stacktrace, attachments — in one call, not one per test. Status is a label only: passed, failed, blocked, skipped, invalid. If the run does not exist yet and the job is finished, qase_ci_report creates, records and completes in one call. Cost: one API call for the whole list, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "results": {
+            "description": "Results to record, 1 to 200 per call",
+            "items": {
+              "properties": {
+                "attachments": {
+                  "description": "Hashes from qase_attachment_upload",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "case_id": {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "comment": {
+                  "type": "string"
+                },
+                "custom_field": {
+                  "additionalProperties": {},
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "defect": {
+                  "type": "boolean"
+                },
+                "stacktrace": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "passed",
+                    "failed",
+                    "blocked",
+                    "skipped",
+                    "invalid"
+                  ],
+                  "type": "string"
+                },
+                "steps": {
+                  "items": {
+                    "properties": {
+                      "attachments": {
+                        "description": "Hashes from qase_attachment_upload",
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "comment": {
+                        "type": "string"
+                      },
+                      "position": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "status": {
+                        "enum": [
+                          "passed",
+                          "failed",
+                          "blocked",
+                          "skipped"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "position",
+                      "status"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "time_ms": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "status"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "type": "array"
+          },
+          "run_id": {
+            "description": "Run ID to record results into",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "run_id",
+          "results"
+        ],
+        "type": "object"
+      },
+      "name": "qase_result_record",
+      "title": "Record test results"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Open several test case reviews in one request — the batch form of qase_review_create, for proposing more than one change. Same fields as qase_review_create; `case_id` for an edit review, omitted for a create review. The API has no endpoints for approving, merging or declining — those are UI-only; read status with qase_review_list. Cost: one API call regardless of batch size.",
+      "inputSchema": {
+        "$defs": {
+          "parameter": {
+            "properties": {
+              "title": {
+                "description": "Parameter name, e.g. \"browser\"",
+                "minLength": 1,
+                "type": "string"
+              },
+              "values": {
+                "description": "Its values, e.g. [\"chrome\", \"firefox\"]",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "title",
+              "values"
+            ],
+            "type": "object"
+          },
+          "step": {
+            "properties": {
+              "action": {
+                "description": "Step action (classic steps). Not needed when `shared` is set.",
+                "type": "string"
+              },
+              "attachments": {
+                "description": "Hashes from qase_attachment_upload",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "data": {
+                "description": "Test data",
+                "type": "string"
+              },
+              "expected_result": {
+                "description": "Expected result",
+                "type": "string"
+              },
+              "shared": {
+                "description": "Hash from `qase_shared_step_upsert` to reuse here; then `action` is not needed.",
+                "type": "string"
+              },
+              "shared_step_hash": {
+                "description": "Alias for `shared`, the spelling a case reads back.",
+                "type": "string"
+              },
+              "steps": {
+                "description": "Nested substeps, nesting further if needed.",
+                "items": {
+                  "$ref": "#/$defs/step"
+                },
+                "type": "array"
+              },
+              "value": {
+                "description": "Gherkin scenario text (when steps_type is \"gherkin\")",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "reviews": {
+            "description": "Reviews to open. Validated as a whole: if any item is invalid, NOTHING is created. Once valid, each item is processed individually and reported separately.",
+            "items": {
+              "properties": {
+                "attachments": {
+                  "description": "Hashes from qase_attachment_upload",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "automation": {
+                  "description": "Automation: 0=Manual, 1=To be automated, 2=Automated (label or ID)",
+                  "type": "string"
+                },
+                "behavior": {
+                  "description": "Behavior label or numeric ID",
+                  "type": "string"
+                },
+                "case_id": {
+                  "description": "Omit for a new-case draft (\"create\" review)",
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "custom_field": {
+                  "additionalProperties": {},
+                  "description": "Custom fields by ID, e.g. { \"12\": \"value\" }",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "description": {
+                  "description": "Free-form description of what the case covers",
+                  "type": "string"
+                },
+                "is_flaky": {
+                  "description": "Is flaky: 0=No, 1=Yes; a boolean works too.",
+                  "type": "string"
+                },
+                "layer": {
+                  "description": "Layer label or numeric ID",
+                  "type": "string"
+                },
+                "milestone_id": {
+                  "description": "ID of the milestone the case belongs to",
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "parameters": {
+                  "description": "Test case parameters: {title, values}, a group {items: [...]}, or {shared_id}. Replaces the whole list: send every parameter to keep, [] to clear, omit to leave as is.",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/parameter"
+                      },
+                      {
+                        "properties": {
+                          "items": {
+                            "description": "Parameters whose values go together; the API needs at least two",
+                            "items": {
+                              "$ref": "#/$defs/parameter"
+                            },
+                            "minItems": 2,
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "items"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "shared_id": {
+                            "description": "ID of a shared parameter (qase_api GET /v1/shared_parameter)",
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "shared_id"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                "postconditions": {
+                  "description": "State to restore or verify after the steps run",
+                  "type": "string"
+                },
+                "preconditions": {
+                  "description": "State the system must be in before the steps run",
+                  "type": "string"
+                },
+                "priority": {
+                  "description": "Priority label or numeric ID (0=not set, 1=high, 2=medium, 3=low)",
+                  "type": "string"
+                },
+                "reviewers": {
+                  "description": "Reviewers: AUTHOR UUIDs (see qase_get { entity: \"author\" }) or emails, which resolve to them. Not user IDs. The token owner authors the review and cannot review their own review. Omit to assign them later in the UI.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "severity": {
+                  "description": "Severity label or numeric ID",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Status label or numeric ID",
+                  "type": "string"
+                },
+                "steps": {
+                  "description": "Ordered test steps; omit for a case without steps",
+                  "items": {
+                    "$ref": "#/$defs/step"
+                  },
+                  "type": "array"
+                },
+                "steps_type": {
+                  "description": "Step style: \"classic\" action/expected, or \"gherkin\" scenario text",
+                  "enum": [
+                    "classic",
+                    "gherkin"
+                  ],
+                  "type": "string"
+                },
+                "suite_id": {
+                  "description": "ID of the suite that holds the case",
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "tags": {
+                  "description": "Tag names, e.g. [\"smoke\", \"billing\"]",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "description": "Test case title",
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type label or numeric ID",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "code",
+          "reviews"
+        ],
+        "type": "object"
+      },
+      "name": "qase_review_bulk_create",
+      "title": "Bulk create case reviews"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Open a test case review — the pull-request flow for cases. Pass `case_id` to propose changes to an existing case (send only the fields that change), or omit it to propose a new one. Several at once? Use qase_review_bulk_create. The API has no endpoints for approving, merging or declining — those are UI-only; read status with qase_review_list. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "$defs": {
+          "parameter": {
+            "properties": {
+              "title": {
+                "description": "Parameter name, e.g. \"browser\"",
+                "minLength": 1,
+                "type": "string"
+              },
+              "values": {
+                "description": "Its values, e.g. [\"chrome\", \"firefox\"]",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "title",
+              "values"
+            ],
+            "type": "object"
+          },
+          "step": {
+            "properties": {
+              "action": {
+                "description": "Step action (classic steps). Not needed when `shared` is set.",
+                "type": "string"
+              },
+              "attachments": {
+                "description": "Hashes from qase_attachment_upload",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "data": {
+                "description": "Test data",
+                "type": "string"
+              },
+              "expected_result": {
+                "description": "Expected result",
+                "type": "string"
+              },
+              "shared": {
+                "description": "Hash from `qase_shared_step_upsert` to reuse here; then `action` is not needed.",
+                "type": "string"
+              },
+              "shared_step_hash": {
+                "description": "Alias for `shared`, the spelling a case reads back.",
+                "type": "string"
+              },
+              "steps": {
+                "description": "Nested substeps, nesting further if needed.",
+                "items": {
+                  "$ref": "#/$defs/step"
+                },
+                "type": "array"
+              },
+              "value": {
+                "description": "Gherkin scenario text (when steps_type is \"gherkin\")",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "attachments": {
+            "description": "Hashes from qase_attachment_upload",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "automation": {
+            "description": "Automation: 0=Manual, 1=To be automated, 2=Automated (label or ID)",
+            "type": "string"
+          },
+          "behavior": {
+            "description": "Behavior label or numeric ID",
+            "type": "string"
+          },
+          "case_id": {
+            "description": "Test case to propose changes to. With it, an \"edit\" review is created and only the fields being changed need to be sent. Without it, a \"create\" review is opened for a brand-new case draft and `title` is required.",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "custom_field": {
+            "additionalProperties": {},
+            "description": "Custom fields by ID, e.g. { \"12\": \"value\" }",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "description": {
+            "description": "Free-form description of what the case covers",
+            "type": "string"
+          },
+          "is_flaky": {
+            "description": "Is flaky: 0=No, 1=Yes; a boolean works too.",
+            "type": "string"
+          },
+          "layer": {
+            "description": "Layer label or numeric ID",
+            "type": "string"
+          },
+          "milestone_id": {
+            "description": "ID of the milestone the case belongs to",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "parameters": {
+            "description": "Test case parameters: {title, values}, a group {items: [...]}, or {shared_id}. Replaces the whole list: send every parameter to keep, [] to clear, omit to leave as is.",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/parameter"
+                },
+                {
+                  "properties": {
+                    "items": {
+                      "description": "Parameters whose values go together; the API needs at least two",
+                      "items": {
+                        "$ref": "#/$defs/parameter"
+                      },
+                      "minItems": 2,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "properties": {
+                    "shared_id": {
+                      "description": "ID of a shared parameter (qase_api GET /v1/shared_parameter)",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "shared_id"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "postconditions": {
+            "description": "State to restore or verify after the steps run",
+            "type": "string"
+          },
+          "preconditions": {
+            "description": "State the system must be in before the steps run",
+            "type": "string"
+          },
+          "priority": {
+            "description": "Priority label or numeric ID (0=not set, 1=high, 2=medium, 3=low)",
+            "type": "string"
+          },
+          "reviewers": {
+            "description": "Reviewers: AUTHOR UUIDs (see qase_get { entity: \"author\" }) or emails, which resolve to them. Not user IDs. The token owner authors the review and cannot review their own review. Omit to assign them later in the UI.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "severity": {
+            "description": "Severity label or numeric ID",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status label or numeric ID",
+            "type": "string"
+          },
+          "steps": {
+            "description": "Ordered test steps; omit for a case without steps",
+            "items": {
+              "$ref": "#/$defs/step"
+            },
+            "type": "array"
+          },
+          "steps_type": {
+            "description": "Step style: \"classic\" action/expected, or \"gherkin\" scenario text",
+            "enum": [
+              "classic",
+              "gherkin"
+            ],
+            "type": "string"
+          },
+          "suite_id": {
+            "description": "ID of the suite that holds the case",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "tags": {
+            "description": "Tag names, e.g. [\"smoke\", \"billing\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Test case title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": {
+            "description": "Type label or numeric ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "qase_review_create",
+      "title": "Create case review"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a review by ID. This removes the proposal entirely — it does not decline it, and declining is UI-only — and merged reviews cannot be deleted; the referenced case is untouched. Cannot be undone; asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Review ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_review_delete",
+      "title": "Delete case review"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List a project's reviews with their current state — the only way to learn what happened to a review you opened, since the API has no endpoints for approving or merging — those are UI-only. Filter by status to see what is still open. For one review by ID, qase_get is cheaper. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "author_uuid": {
+            "description": "Only reviews opened by this author UUID",
+            "type": "string"
+          },
+          "case_id": {
+            "description": "Only reviews of this test case",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Default 25, max 100",
+            "exclusiveMinimum": 0,
+            "maximum": 100,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Skip this many reviews, for paging",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "reviewer_uuid": {
+            "description": "Only reviews this author UUID is a reviewer on",
+            "type": "string"
+          },
+          "search": {
+            "description": "Substring match on the review title",
+            "type": "string"
+          },
+          "status": {
+            "description": "Only reviews in this state",
+            "enum": [
+              "open",
+              "merged",
+              "declined"
+            ],
+            "type": "string"
+          },
+          "type": {
+            "description": "\"create\" proposes a new case, \"edit\" proposes changes to an existing one",
+            "enum": [
+              "create",
+              "edit"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "qase_review_list",
+      "title": "List case reviews"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Update an open review: the proposed case fields, the reviewers, or both, by review ID. IMPORTANT: changing the proposal RESETS every approval already given; updating only `reviewers` keeps them. The API has no endpoints for approving, merging or declining — those are UI-only; read status with qase_review_list. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "$defs": {
+          "parameter": {
+            "properties": {
+              "title": {
+                "description": "Parameter name, e.g. \"browser\"",
+                "minLength": 1,
+                "type": "string"
+              },
+              "values": {
+                "description": "Its values, e.g. [\"chrome\", \"firefox\"]",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "title",
+              "values"
+            ],
+            "type": "object"
+          },
+          "step": {
+            "properties": {
+              "action": {
+                "description": "Step action (classic steps). Not needed when `shared` is set.",
+                "type": "string"
+              },
+              "attachments": {
+                "description": "Hashes from qase_attachment_upload",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "data": {
+                "description": "Test data",
+                "type": "string"
+              },
+              "expected_result": {
+                "description": "Expected result",
+                "type": "string"
+              },
+              "shared": {
+                "description": "Hash from `qase_shared_step_upsert` to reuse here; then `action` is not needed.",
+                "type": "string"
+              },
+              "shared_step_hash": {
+                "description": "Alias for `shared`, the spelling a case reads back.",
+                "type": "string"
+              },
+              "steps": {
+                "description": "Nested substeps, nesting further if needed.",
+                "items": {
+                  "$ref": "#/$defs/step"
+                },
+                "type": "array"
+              },
+              "value": {
+                "description": "Gherkin scenario text (when steps_type is \"gherkin\")",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "attachments": {
+            "description": "Hashes from qase_attachment_upload",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "automation": {
+            "description": "Automation: 0=Manual, 1=To be automated, 2=Automated (label or ID)",
+            "type": "string"
+          },
+          "behavior": {
+            "description": "Behavior label or numeric ID",
+            "type": "string"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "custom_field": {
+            "additionalProperties": {},
+            "description": "Custom fields by ID, e.g. { \"12\": \"value\" }",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "description": {
+            "description": "Free-form description of what the case covers",
+            "type": "string"
+          },
+          "id": {
+            "description": "Review ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "is_flaky": {
+            "description": "Is flaky: 0=No, 1=Yes; a boolean works too.",
+            "type": "string"
+          },
+          "layer": {
+            "description": "Layer label or numeric ID",
+            "type": "string"
+          },
+          "milestone_id": {
+            "description": "ID of the milestone the case belongs to",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "parameters": {
+            "description": "Test case parameters: {title, values}, a group {items: [...]}, or {shared_id}. Replaces the whole list: send every parameter to keep, [] to clear, omit to leave as is.",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/parameter"
+                },
+                {
+                  "properties": {
+                    "items": {
+                      "description": "Parameters whose values go together; the API needs at least two",
+                      "items": {
+                        "$ref": "#/$defs/parameter"
+                      },
+                      "minItems": 2,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "properties": {
+                    "shared_id": {
+                      "description": "ID of a shared parameter (qase_api GET /v1/shared_parameter)",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "shared_id"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "postconditions": {
+            "description": "State to restore or verify after the steps run",
+            "type": "string"
+          },
+          "preconditions": {
+            "description": "State the system must be in before the steps run",
+            "type": "string"
+          },
+          "priority": {
+            "description": "Priority label or numeric ID (0=not set, 1=high, 2=medium, 3=low)",
+            "type": "string"
+          },
+          "reviewers": {
+            "description": "Replaces the current reviewer list; an empty array removes everyone. Omit to leave it unchanged. Author UUIDs or emails. Changing ONLY reviewers keeps existing approvals.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "severity": {
+            "description": "Severity label or numeric ID",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status label or numeric ID",
+            "type": "string"
+          },
+          "steps": {
+            "description": "Ordered test steps; omit for a case without steps",
+            "items": {
+              "$ref": "#/$defs/step"
+            },
+            "type": "array"
+          },
+          "steps_type": {
+            "description": "Step style: \"classic\" action/expected, or \"gherkin\" scenario text",
+            "enum": [
+              "classic",
+              "gherkin"
+            ],
+            "type": "string"
+          },
+          "suite_id": {
+            "description": "ID of the suite that holds the case",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "tags": {
+            "description": "Tag names, e.g. [\"smoke\", \"billing\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Test case title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": {
+            "description": "Type label or numeric ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_review_update",
+      "title": "Update case review"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Mark a test run complete so it reports as finished. It is a reporting state, not a lock — results recorded afterwards still land and change its counts. If all results are in hand at once, qase_ci_report does this as its final step. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_run_complete",
+      "title": "Complete test run"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a test run by project code and ID, together with every result in it; this cannot be undone. Rarely what you want: to stop accepting results use qase_run_complete, to fix one result use qase_result_delete. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_run_delete",
+      "title": "Delete test run"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a test run — the container results are recorded into, so open it before qase_result_record. Scope it to a milestone, environment, plan or case list. To build one from a suite or plan use qase_regression_run; for a finished CI job use qase_ci_report, which opens, records and closes in one call. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "cases": {
+            "description": "Case IDs to include",
+            "items": {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "custom_field": {
+            "additionalProperties": {},
+            "description": "Custom fields by ID, e.g. { \"12\": \"value\" }",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "description": {
+            "description": "What this run covers",
+            "type": "string"
+          },
+          "end_time": {
+            "description": "RFC3339 end time",
+            "type": "string"
+          },
+          "environment_id": {
+            "description": "ID of the environment the run executes against",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "id": {
+            "description": "Run ID — if provided, this is an update (note: Qase API has limited run update support)",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "is_autotest": {
+            "description": "True when the run is produced by automation rather than a person",
+            "type": "boolean"
+          },
+          "milestone_id": {
+            "description": "ID of the milestone the run belongs to",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "plan_id": {
+            "description": "Test plan to base run on",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "start_time": {
+            "description": "RFC3339 start time",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Tag names, e.g. [\"nightly\", \"smoke\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Run title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_run_upsert",
+      "title": "Create or update test run"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a shared step by project code and hash. Every case referencing it loses those steps, so the reach is far wider than one record; check references first. Cannot be undone; to change content use qase_shared_step_upsert instead. Asks the user for confirmation first. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "hash": {
+            "description": "Shared step hash identifier",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "hash"
+        ],
+        "type": "object"
+      },
+      "name": "qase_shared_step_delete",
+      "title": "Delete shared step"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a shared step — a block of steps written once and reused across cases. With `hash` it updates, without it creates; shared steps are identified by hash, which qase_case_upsert takes in a step's `shared` field. Updating changes every referencing case. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "hash": {
+            "description": "Shared step hash — if provided, updates; if omitted, creates",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "steps": {
+            "description": "Array of step definitions",
+            "items": {
+              "properties": {
+                "action": {
+                  "description": "Step action description",
+                  "type": "string"
+                },
+                "attachments": {
+                  "description": "Hashes from qase_attachment_upload",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "data": {
+                  "description": "Test data",
+                  "type": "string"
+                },
+                "expected_result": {
+                  "description": "Expected result",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "action"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Shared step title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_shared_step_upsert",
+      "title": "Create or update shared step"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a test suite by project code and ID. WARNING: the cases inside, and any child suites, are deleted with it along with their history, and `delete_cases` currently has no effect. Read the tree from qase_project_context and move what matters first. Asks the user for confirmation. Cost: one API call, about 0.4s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "delete_cases": {
+            "description": "Has no effect today: the server sends a field this endpoint does not accept, so the cases are deleted either way. Kept so existing callers do not break.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Entity ID",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "qase_suite_delete",
+      "title": "Delete suite"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a test suite — the folder cases live in. With `id` it updates, without it creates; nest with `parent_id`. The existing tree comes back from qase_project_context, so read it rather than guess parent IDs. Cost: one API call, about 0.5s.",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "description": {
+            "description": "What this suite groups — shown under the suite title in the tree",
+            "type": "string"
+          },
+          "id": {
+            "description": "Suite ID — if provided, updates; if omitted, creates",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "parent_id": {
+            "description": "Parent suite ID for nesting",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "preconditions": {
+            "description": "Setup every case in this suite assumes, inherited by its child suites",
+            "type": "string"
+          },
+          "title": {
+            "description": "Suite title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "qase_suite_upsert",
+      "title": "Create or update suite"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read the full documentation of one tool before calling it for the first time in a session. Every description in the tool list is deliberately short — what the tool is for and what it costs — and the details that prevent a wrong first call live here: argument semantics, limits, what cannot be undone, and which tool to use instead. Pass the tool name exactly as listed. Cost: no API call, static text, about 1ms. Cheaper than one rejected call.",
+      "inputSchema": {
+        "properties": {
+          "tool": {
+            "description": "The tool name, exactly as it appears in the tool list",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool"
+        ],
+        "type": "object"
+      },
+      "name": "qase_tool_help",
+      "title": "Tool documentation"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a defect from a test failure with the context written into it; `title`, `actual_result` and `severity` are required. The API has no way to attach runs or results to a defect — reference them in actual_result. For a defect unrelated to a failure use qase_defect_upsert. Cost: one API call, about 0.5s; file one defect per distinct cause.",
+      "inputSchema": {
+        "properties": {
+          "actual_result": {
+            "description": "Observed behavior. Required by the API",
+            "type": "string"
+          },
+          "attachments": {
+            "description": "Hashes from qase_attachment_upload",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "code": {
+            "description": "Project code, e.g. DEMO",
+            "maxLength": 10,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "custom_field": {
+            "additionalProperties": {},
+            "description": "Custom fields by ID, e.g. { \"12\": \"value\" }",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "description": {
+            "description": "Extra context beyond the observed behavior",
+            "type": "string"
+          },
+          "severity": {
+            "description": "Required by the API",
+            "enum": [
+              "undefined",
+              "blocker",
+              "critical",
+              "major",
+              "normal",
+              "minor",
+              "trivial"
+            ],
+            "type": "string"
+          },
+          "tags": {
+            "description": "Tag names, e.g. [\"regression\", \"payments\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Defect title",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title",
+          "severity",
+          "actual_result"
+        ],
+        "type": "object"
+      },
+      "name": "qase_triage_defect",
+      "title": "Triage failure into defect"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read the QQL reference before writing a query. Pass a `topic`: overview, syntax, entities, operators, functions, examples, aggregation or enumValues. Field names differ per entity and from the write tools, and a query naming an unknown attribute is rejected — read `entities` first. Cost: no API call, about 2ms; cheaper than one rejected qql_search.",
+      "inputSchema": {
+        "properties": {
+          "topic": {
+            "description": "Which section to return (required — one section per call):\n- overview: what QQL is, overall query structure, subscription requirement\n- syntax: structure, ordering, custom fields, case-sensitivity, boolean and date fields\n- entities: the fields available on each entity — field names are NOT uniform across entities, so read this before writing a query against an unfamiliar one\n- operators: comparison, matching, set, null, and logical operators\n- functions: currentUser, activeUsers, and the now/startOf*/endOf* date functions\n- examples: ready-made queries for common questions\n- aggregation: SELECT (COUNT/MIN/MAX/AVG/SUM/FIRST/LAST), GROUP BY, HAVING — use this to count or summarise instead of paging through rows\n- enumValues: the valid values for priority, severity, and the per-entity status fields",
+            "enum": [
+              "overview",
+              "syntax",
+              "entities",
+              "operators",
+              "functions",
+              "examples",
+              "aggregation",
+              "enumValues"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "name": "qql_help",
+      "title": "QQL syntax help"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search any entity with Qase Query Language — filtering, cross-project, sorting, aggregation — and the right way to fetch many records at once instead of looping over qase_get. Call qql_help first for syntax, fields and enum values. Use qase_get when you already know the one ID you want. Cost: one API call, 0.5-0.9s per page; ten records here cost 1.2s against 5.3s as ten qase_get calls.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Maximum number of results to return (default: 10, max: 100)",
+            "exclusiveMinimum": 0,
+            "maximum": 100,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Number of results to skip for pagination",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "query": {
+            "description": "QQL query expression. Examples:\n- entity = \"case\" and project = \"DEMO\" and status = \"Actual\"\n- entity = \"defect\" and severity = \"blocker\" and status = \"open\"\n- entity = \"result\" and status = \"failed\" and ended >= now(\"-7d\")\n- entity = \"run\" and milestone ~ \"Sprint 12\"\nSee QQL documentation for full syntax and examples.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "qql_search",
+      "title": "Search with QQL"
+    }
+  ],
+  "version": "3.2.1"
+}

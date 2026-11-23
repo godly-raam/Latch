@@ -1,0 +1,18 @@
+{
+  "description": "Open-source MCP server for AAS (Asset Administration Shell) APIs using OpenAPI",
+  "ecosystem": "pypi",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "uvx",
+    "aas-mcp-server==0.3.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "aas-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/SAP/aas-mcp-server",
+  "slug": "pypi-aas-mcp-server-0-3-0",
+  "stderr_summary": "Installed 73 packages in 44ms\nusage: aas-mcp-server [-h] --component COMPONENT [--base-url BASE_URL]\n                      [--config CONFIG]\n                      [--transport {stdio,http,sse,streamable-http}]\n                      [--host HOST] [--port PORT] [--enable-writes]\n                      [--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}]\naas-mcp-server: error: the following arguments are required: --component",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.3.0"
+}

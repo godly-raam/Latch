@@ -1,0 +1,588 @@
+{
+  "description": "Bridge server connecting Agent Communication Protocol (ACP) agents with Model Context Protocol (MCP) clients",
+  "ecosystem": "pypi",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "uvx",
+    "acp-mcp-server==0.0.5"
+  ],
+  "manifest_sha256": "7a558a55efdf1d62b8b6a2feba0080d4e780a8bf0aafc62fa6691affdf3dbbb2",
+  "package": "acp-mcp-server",
+  "protocol_version": "2026-07-28",
+  "repository_url": "https://github.com/GongRzhe/ACP-MCP-Server",
+  "slug": "pypi-acp-mcp-server-0-0-5",
+  "stderr_summary": "│                                                                              │\n│                 🖥  Server:      ACP-MCP Bridge Server, 4.2.5                 │\n│                 🚀 Deploy free: https://horizon.prefect.io                   │\n│                                                                              │\n╰──────────────────────────────────────────────────────────────────────────────╯\n\n\n[11/23/26 18:48:46] INFO     Starting MCP server 'ACP-MCP       transport.py:241\n                             Bridge Server' with transport                      \n                             'stdio'",
+  "tool_count": 16,
+  "tools": [
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Get information about the ACP-MCP bridge server",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_server_info",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Get Server Info"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Discover all available ACP agents and register them as resources",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "discover_acp_agents",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Discover Acp Agents"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Get detailed information about a specific ACP agent",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_name"
+        ],
+        "type": "object"
+      },
+      "name": "get_agent_info",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Get Agent Info"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Convert ACP message format to MCP-compatible format",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "acp_message_json": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "acp_message_json"
+        ],
+        "type": "object"
+      },
+      "name": "convert_acp_message",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Convert Acp Message"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Analyze the content types and structure of an ACP message",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "acp_message_json": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "acp_message_json"
+        ],
+        "type": "object"
+      },
+      "name": "analyze_message_content",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Analyze Message Content"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Execute an ACP agent with specified mode",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_name": {
+            "type": "string"
+          },
+          "input_text": {
+            "type": "string"
+          },
+          "mode": {
+            "default": "sync",
+            "type": "string"
+          },
+          "session_id": {
+            "default": null,
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_name",
+          "input_text"
+        ],
+        "type": "object"
+      },
+      "name": "run_acp_agent",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Run Acp Agent"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Get the result of an asynchronous run",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_async_run_result",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Get Async Run Result"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "List all active runs",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_active_runs",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "List Active Runs"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Intelligently route a request to the best ACP agent",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "input_text": {
+            "type": "string"
+          },
+          "mode": {
+            "default": "sync",
+            "type": "string"
+          },
+          "session_id": {
+            "default": null,
+            "type": "string"
+          },
+          "strategy": {
+            "default": "default",
+            "type": "string"
+          }
+        },
+        "required": [
+          "input_text"
+        ],
+        "type": "object"
+      },
+      "name": "smart_route_request",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Smart Route Request"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Add a new routing rule to a strategy",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_name": {
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "type": "string"
+          },
+          "keywords": {
+            "type": "string"
+          },
+          "priority": {
+            "default": 5,
+            "type": "integer"
+          },
+          "strategy_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_name",
+          "keywords",
+          "agent_name"
+        ],
+        "type": "object"
+      },
+      "name": "add_routing_rule",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Add Routing Rule"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "List all available routing strategies and their rules",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_routing_strategies",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "List Routing Strategies"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Test routing without executing - shows which agent would be selected",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "input_text": {
+            "type": "string"
+          },
+          "strategy": {
+            "default": "default",
+            "type": "string"
+          }
+        },
+        "required": [
+          "input_text"
+        ],
+        "type": "object"
+      },
+      "name": "test_routing",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Test Routing"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Start an interactive ACP agent that may require user input",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_name": {
+            "type": "string"
+          },
+          "initial_input": {
+            "type": "string"
+          },
+          "session_id": {
+            "default": null,
+            "type": "string"
+          },
+          "timeout_minutes": {
+            "default": 5,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agent_name",
+          "initial_input"
+        ],
+        "type": "object"
+      },
+      "name": "start_interactive_agent",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Start Interactive Agent"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Provide user input to resume a waiting interactive agent",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "user_input": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "user_input"
+        ],
+        "type": "object"
+      },
+      "name": "provide_user_input",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Provide User Input"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "List all pending interactive agents waiting for input",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_pending_interactions",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "List Pending Interactions"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Cancel a pending interactive agent",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "type": "object"
+      },
+      "name": "cancel_interaction",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "Cancel Interaction"
+    }
+  ],
+  "version": "0.0.5"
+}

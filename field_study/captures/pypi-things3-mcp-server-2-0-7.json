@@ -1,0 +1,18 @@
+{
+  "description": "MCP server for Things 3 with read/write support for tasks, projects, areas and tags.",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "Things3-MCP-server==2.0.7"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "Things3-MCP-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/rossshannon/things-fastmcp",
+  "slug": "pypi-things3-mcp-server-2-0-7",
+  "stderr_summary": "Installed 41 packages in 27ms\nTraceback (most recent call last):\n  File \"<scratch>/uv-cache/archive-v0/iISL1HwkwwMRQJTn/bin/Things3-MCP-server\", line 6, in <module>\n    from things3_mcp.fast_server import run_things_mcp_server\n  File \"<scratch>/uv-cache/archive-v0/iISL1HwkwwMRQJTn/lib/python3.12/site-packages/things3_mcp/fast_server.py\", line 8, in <module>\n    from mcp.server.fastmcp import FastMCP\n  File \"<scratch>/uv-cache/archive-v0/iISL1HwkwwMRQJTn/lib/python3.12/site-packages/mcp/server/fastmcp.py\", line 16, in <module>\n    raise ModuleNotFoundError(_MESSAGE, name=__name__)\nModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp<2' to keep running v1 code.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.0.7"
+}

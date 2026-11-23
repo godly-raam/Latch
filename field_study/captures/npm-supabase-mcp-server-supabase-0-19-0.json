@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for interacting with Supabase",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@supabase/mcp-server-supabase@0.19.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@supabase/mcp-server-supabase",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/supabase/mcp",
+  "slug": "npm-supabase-mcp-server-supabase-0-19-0",
+  "stderr_summary": "Please provide a personal access token (PAT) with the --access-token flag or set the SUPABASE_ACCESS_TOKEN environment variable",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.19.0"
+}

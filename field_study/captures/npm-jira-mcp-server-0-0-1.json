@@ -1,0 +1,19 @@
+{
+  "description": "jira-mcp-server MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "jira-mcp-server@0.0.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "jira-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-jira-mcp-server-0-0-1",
+  "stderr_summary": "<scratch>/npm-cache/_npx/018b7bbcefff8c69/node_modules/.bin/jira-mcp-server: 1: import: not found\n<scratch>/npm-cache/_npx/018b7bbcefff8c69/node_modules/.bin/jira-mcp-server: 2: Syntax error: \"(\" unexpected",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.0.1"
+}

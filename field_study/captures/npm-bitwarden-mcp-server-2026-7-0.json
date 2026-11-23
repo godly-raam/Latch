@@ -1,0 +1,2037 @@
+{
+  "description": "Bitwarden MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@bitwarden/mcp-server@2026.7.0"
+  ],
+  "manifest_sha256": "88b611b5bd5faa50f9ac6f224b371dcc7ad27d9f5e75132489c456d1d26081d2",
+  "package": "@bitwarden/mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/bitwarden/mcp-server",
+  "slug": "npm-bitwarden-mcp-server-2026-7-0",
+  "stderr_summary": "Bitwarden MCP Server running on stdio",
+  "tool_count": 59,
+  "tools": [
+    {
+      "description": "Lock the vault",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "lock"
+    },
+    {
+      "description": "Unlock the Bitwarden vault. Takes no parameters. Prompts the user for their master password through a native OS dialog; the password is never exposed to the MCP protocol or the LLM. Not supported in headless or non-interactive environments — run \"bw unlock --raw\" manually and set BW_SESSION in that case.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "unlock"
+    },
+    {
+      "description": "Sync vault data from the Bitwarden server",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "sync"
+    },
+    {
+      "description": "Check the status of the Bitwarden CLI",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "status"
+    },
+    {
+      "description": "List items from your vault or organization",
+      "inputSchema": {
+        "properties": {
+          "collectionid": {
+            "description": "Filter items by collection ID (items only, supports \"null\" and \"notnull\" literals)",
+            "type": "string"
+          },
+          "folderid": {
+            "description": "Filter items by folder ID (items only, supports \"null\" and \"notnull\" literals)",
+            "type": "string"
+          },
+          "organizationid": {
+            "description": "Organization ID (required for org-collections and org-members)",
+            "type": "string"
+          },
+          "search": {
+            "description": "Optional search term to filter results",
+            "type": "string"
+          },
+          "trash": {
+            "description": "Filter for items in trash (items only)",
+            "type": "boolean"
+          },
+          "type": {
+            "description": "Type of items to list (items, folders, collections, organizations, org-collections, org-members)",
+            "enum": [
+              "items",
+              "folders",
+              "collections",
+              "organizations",
+              "org-collections",
+              "org-members"
+            ],
+            "type": "string"
+          },
+          "url": {
+            "description": "Filter items by URL (items only, supports \"null\" and \"notnull\" literals)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "list"
+    },
+    {
+      "description": "Get a specific item from your vault or organization",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "ID or search term for the object (use \"me\" for your own fingerprint, or filename for attachment)",
+            "type": "string"
+          },
+          "itemid": {
+            "description": "Item ID (required for attachment)",
+            "type": "string"
+          },
+          "object": {
+            "description": "Type of object to retrieve",
+            "enum": [
+              "item",
+              "username",
+              "password",
+              "uri",
+              "totp",
+              "notes",
+              "exposed",
+              "attachment",
+              "folder",
+              "collection",
+              "organization",
+              "org-collection",
+              "fingerprint"
+            ],
+            "type": "string"
+          },
+          "organizationid": {
+            "description": "Organization ID (required for org-collection)",
+            "type": "string"
+          },
+          "output": {
+            "description": "Output directory path for downloading attachment (optional, should end with /)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "object",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get"
+    },
+    {
+      "description": "Generate a secure password or passphrase",
+      "inputSchema": {
+        "properties": {
+          "capitalize": {
+            "description": "Capitalize the first letter of each word in the passphrase",
+            "type": "boolean"
+          },
+          "length": {
+            "description": "Length of the password (minimum 5)",
+            "minimum": 5,
+            "type": "number"
+          },
+          "lowercase": {
+            "description": "Include lowercase characters",
+            "type": "boolean"
+          },
+          "number": {
+            "description": "Include numeric characters",
+            "type": "boolean"
+          },
+          "passphrase": {
+            "description": "Generate a passphrase instead of a password",
+            "type": "boolean"
+          },
+          "separator": {
+            "description": "Character that separates words in the passphrase",
+            "type": "string"
+          },
+          "special": {
+            "description": "Include special characters",
+            "type": "boolean"
+          },
+          "uppercase": {
+            "description": "Include uppercase characters",
+            "type": "boolean"
+          },
+          "words": {
+            "description": "Number of words in the passphrase",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "generate"
+    },
+    {
+      "description": "Create a new item (login, secure note, card, or identity) in your vault",
+      "inputSchema": {
+        "properties": {
+          "card": {
+            "description": "Card information (required for type 3 - card items)",
+            "properties": {
+              "brand": {
+                "description": "Card brand (Visa, Mastercard, Amex, Discover, etc.)",
+                "type": "string"
+              },
+              "cardholderName": {
+                "description": "Cardholder name",
+                "type": "string"
+              },
+              "code": {
+                "description": "Security code (CVV)",
+                "type": "string"
+              },
+              "expMonth": {
+                "description": "Expiration month (MM)",
+                "type": "string"
+              },
+              "expYear": {
+                "description": "Expiration year (YYYY)",
+                "type": "string"
+              },
+              "number": {
+                "description": "Card number",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "folderId": {
+            "description": "Folder ID to assign the item to",
+            "type": "string"
+          },
+          "identity": {
+            "description": "Identity information (required for type 4 - identity items)",
+            "properties": {
+              "address1": {
+                "description": "Address line 1",
+                "type": "string"
+              },
+              "address2": {
+                "description": "Address line 2",
+                "type": "string"
+              },
+              "address3": {
+                "description": "Address line 3",
+                "type": "string"
+              },
+              "city": {
+                "description": "City",
+                "type": "string"
+              },
+              "company": {
+                "description": "Company name",
+                "type": "string"
+              },
+              "country": {
+                "description": "Country",
+                "type": "string"
+              },
+              "email": {
+                "description": "Email address",
+                "type": "string"
+              },
+              "firstName": {
+                "description": "First name",
+                "type": "string"
+              },
+              "lastName": {
+                "description": "Last name",
+                "type": "string"
+              },
+              "licenseNumber": {
+                "description": "License number",
+                "type": "string"
+              },
+              "middleName": {
+                "description": "Middle name",
+                "type": "string"
+              },
+              "passportNumber": {
+                "description": "Passport number",
+                "type": "string"
+              },
+              "phone": {
+                "description": "Phone number",
+                "type": "string"
+              },
+              "postalCode": {
+                "description": "Postal code",
+                "type": "string"
+              },
+              "ssn": {
+                "description": "Social Security Number",
+                "type": "string"
+              },
+              "state": {
+                "description": "State or province",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title (Mr, Mrs, Ms, Dr, etc.)",
+                "type": "string"
+              },
+              "username": {
+                "description": "Username",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "login": {
+            "description": "Login information (required for type 1 - login items)",
+            "properties": {
+              "password": {
+                "description": "Password for the login",
+                "type": "string"
+              },
+              "totp": {
+                "description": "TOTP secret for the login",
+                "type": "string"
+              },
+              "uris": {
+                "description": "List of URIs associated with the login",
+                "items": {
+                  "properties": {
+                    "match": {
+                      "description": "URI match type (0: Domain, 1: Host, 2: Starts With, 3: Exact, 4: Regular Expression, 5: Never)",
+                      "enum": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                      ],
+                      "type": "number"
+                    },
+                    "uri": {
+                      "description": "URI for the login (e.g., https://example.com)",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "uri"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "username": {
+                "description": "Username for the login",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "description": "Name of the item",
+            "type": "string"
+          },
+          "notes": {
+            "description": "Notes for the item",
+            "type": "string"
+          },
+          "secureNote": {
+            "description": "Secure note information (required for type 2 - secure note items)",
+            "properties": {
+              "type": {
+                "description": "Type of secure note (0: Generic)",
+                "enum": [
+                  0
+                ],
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "type": {
+            "description": "Type of item to create (1: Login, 2: Secure Note, 3: Card, 4: Identity)",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "create_item"
+    },
+    {
+      "description": "Create a new folder in your vault",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "description": "Name of the folder",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_folder"
+    },
+    {
+      "description": "Edit an existing item (login, secure note, card, or identity) in your vault",
+      "inputSchema": {
+        "properties": {
+          "card": {
+            "description": "Card information to update",
+            "properties": {
+              "brand": {
+                "description": "Card brand (Visa, Mastercard, Amex, Discover, etc.)",
+                "type": "string"
+              },
+              "cardholderName": {
+                "description": "Cardholder name",
+                "type": "string"
+              },
+              "code": {
+                "description": "Security code (CVV)",
+                "type": "string"
+              },
+              "expMonth": {
+                "description": "Expiration month (MM)",
+                "type": "string"
+              },
+              "expYear": {
+                "description": "Expiration year (YYYY)",
+                "type": "string"
+              },
+              "number": {
+                "description": "Card number",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "folderId": {
+            "description": "New folder ID to assign the item to",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID of the item to edit",
+            "type": "string"
+          },
+          "identity": {
+            "description": "Identity information to update",
+            "properties": {
+              "address1": {
+                "description": "Address line 1",
+                "type": "string"
+              },
+              "address2": {
+                "description": "Address line 2",
+                "type": "string"
+              },
+              "address3": {
+                "description": "Address line 3",
+                "type": "string"
+              },
+              "city": {
+                "description": "City",
+                "type": "string"
+              },
+              "company": {
+                "description": "Company name",
+                "type": "string"
+              },
+              "country": {
+                "description": "Country",
+                "type": "string"
+              },
+              "email": {
+                "description": "Email address",
+                "type": "string"
+              },
+              "firstName": {
+                "description": "First name",
+                "type": "string"
+              },
+              "lastName": {
+                "description": "Last name",
+                "type": "string"
+              },
+              "licenseNumber": {
+                "description": "License number",
+                "type": "string"
+              },
+              "middleName": {
+                "description": "Middle name",
+                "type": "string"
+              },
+              "passportNumber": {
+                "description": "Passport number",
+                "type": "string"
+              },
+              "phone": {
+                "description": "Phone number",
+                "type": "string"
+              },
+              "postalCode": {
+                "description": "Postal code",
+                "type": "string"
+              },
+              "ssn": {
+                "description": "Social Security Number",
+                "type": "string"
+              },
+              "state": {
+                "description": "State or province",
+                "type": "string"
+              },
+              "title": {
+                "description": "Title (Mr, Mrs, Ms, Dr, etc.)",
+                "type": "string"
+              },
+              "username": {
+                "description": "Username",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "login": {
+            "description": "Login information to update",
+            "properties": {
+              "password": {
+                "description": "New password for the login",
+                "type": "string"
+              },
+              "totp": {
+                "description": "TOTP secret for the login",
+                "type": "string"
+              },
+              "uris": {
+                "description": "List of URIs associated with the login",
+                "items": {
+                  "properties": {
+                    "match": {
+                      "description": "URI match type (0: Domain, 1: Host, 2: Starts With, 3: Exact, 4: Regular Expression, 5: Never)",
+                      "enum": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                      ],
+                      "type": "number"
+                    },
+                    "uri": {
+                      "description": "URI for the login (e.g., https://example.com)",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "uri"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "username": {
+                "description": "New username for the login",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "name": {
+            "description": "New name for the item",
+            "type": "string"
+          },
+          "notes": {
+            "description": "New notes for the item",
+            "type": "string"
+          },
+          "secureNote": {
+            "description": "Secure note information to update",
+            "properties": {
+              "type": {
+                "description": "Type of secure note (0: Generic)",
+                "enum": [
+                  0
+                ],
+                "type": "number"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "edit_item"
+    },
+    {
+      "description": "Edit an existing folder in your vault",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "ID of the folder to edit",
+            "type": "string"
+          },
+          "name": {
+            "description": "New name for the folder",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "edit_folder"
+    },
+    {
+      "description": "Delete an item from your vault",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "ID of the object to delete",
+            "type": "string"
+          },
+          "object": {
+            "description": "Type of object to delete",
+            "enum": [
+              "item",
+              "attachment",
+              "folder",
+              "org-collection"
+            ],
+            "type": "string"
+          },
+          "permanent": {
+            "description": "Permanently delete the item instead of moving to trash",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "object",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "delete"
+    },
+    {
+      "description": "Confirm an invited organization member who has accepted their invitation",
+      "inputSchema": {
+        "properties": {
+          "memberId": {
+            "description": "Member ID (user identifier) to confirm",
+            "type": "string"
+          },
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId",
+          "memberId"
+        ],
+        "type": "object"
+      },
+      "name": "confirm"
+    },
+    {
+      "description": "Create a new organization collection",
+      "inputSchema": {
+        "properties": {
+          "externalId": {
+            "description": "External ID for the collection (optional)",
+            "type": "string"
+          },
+          "groups": {
+            "description": "Array of group IDs with access to this collection",
+            "items": {
+              "properties": {
+                "hidePasswords": {
+                  "description": "Whether passwords are hidden from the group",
+                  "type": "boolean"
+                },
+                "id": {
+                  "description": "Group ID",
+                  "type": "string"
+                },
+                "readOnly": {
+                  "description": "Whether the group has read-only access",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Name of the collection",
+            "type": "string"
+          },
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_org_collection"
+    },
+    {
+      "description": "Edit an existing organization collection",
+      "inputSchema": {
+        "properties": {
+          "collectionId": {
+            "description": "Collection ID to edit",
+            "type": "string"
+          },
+          "externalId": {
+            "description": "External ID for the collection (optional)",
+            "type": "string"
+          },
+          "groups": {
+            "description": "Array of group IDs with access to this collection",
+            "items": {
+              "properties": {
+                "hidePasswords": {
+                  "description": "Whether passwords are hidden from the group",
+                  "type": "boolean"
+                },
+                "id": {
+                  "description": "Group ID",
+                  "type": "string"
+                },
+                "readOnly": {
+                  "description": "Whether the group has read-only access",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "New name for the collection",
+            "type": "string"
+          },
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId",
+          "collectionId"
+        ],
+        "type": "object"
+      },
+      "name": "edit_org_collection"
+    },
+    {
+      "description": "Edit which collections an item belongs to",
+      "inputSchema": {
+        "properties": {
+          "collectionIds": {
+            "description": "Array of collection IDs the item should belong to",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "itemId": {
+            "description": "Item ID to edit collections for",
+            "type": "string"
+          },
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "itemId",
+          "organizationId",
+          "collectionIds"
+        ],
+        "type": "object"
+      },
+      "name": "edit_item_collections"
+    },
+    {
+      "description": "Move (share) a vault item to an organization (formerly the share command)",
+      "inputSchema": {
+        "properties": {
+          "collectionIds": {
+            "description": "Array of collection IDs the item should be added to in the organization",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "itemId": {
+            "description": "Item ID to move to organization",
+            "type": "string"
+          },
+          "organizationId": {
+            "description": "Organization ID to move the item to",
+            "type": "string"
+          }
+        },
+        "required": [
+          "itemId",
+          "organizationId",
+          "collectionIds"
+        ],
+        "type": "object"
+      },
+      "name": "move"
+    },
+    {
+      "description": "List all pending device approval requests for an organization",
+      "inputSchema": {
+        "properties": {
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "type": "object"
+      },
+      "name": "device_approval_list"
+    },
+    {
+      "description": "Approve a pending device authorization request",
+      "inputSchema": {
+        "properties": {
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          },
+          "requestId": {
+            "description": "Device approval request ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId",
+          "requestId"
+        ],
+        "type": "object"
+      },
+      "name": "device_approval_approve"
+    },
+    {
+      "description": "Approve all current pending device authorization requests",
+      "inputSchema": {
+        "properties": {
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "type": "object"
+      },
+      "name": "device_approval_approve_all"
+    },
+    {
+      "description": "Deny a pending device authorization request",
+      "inputSchema": {
+        "properties": {
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          },
+          "requestId": {
+            "description": "Device approval request ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId",
+          "requestId"
+        ],
+        "type": "object"
+      },
+      "name": "device_approval_deny"
+    },
+    {
+      "description": "Deny all pending device authorization requests",
+      "inputSchema": {
+        "properties": {
+          "organizationId": {
+            "description": "Organization ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "type": "object"
+      },
+      "name": "device_approval_deny_all"
+    },
+    {
+      "description": "Restore an item from trash",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "ID of the object to restore",
+            "type": "string"
+          },
+          "object": {
+            "description": "Type of object to restore",
+            "enum": [
+              "item"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "object",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "restore"
+    },
+    {
+      "description": "Create a new Bitwarden Send for securely sharing text",
+      "inputSchema": {
+        "properties": {
+          "deletionDate": {
+            "description": "Deletion date in ISO 8601 format",
+            "type": "string"
+          },
+          "expirationDate": {
+            "description": "Expiration date in ISO 8601 format",
+            "type": "string"
+          },
+          "hidden": {
+            "description": "Hide text content (requires visibility toggle)",
+            "type": "boolean"
+          },
+          "maxAccessCount": {
+            "description": "Maximum number of times the Send can be accessed",
+            "type": "number"
+          },
+          "name": {
+            "description": "Name of the Send",
+            "type": "string"
+          },
+          "notes": {
+            "description": "Private notes (not shared with recipient)",
+            "type": "string"
+          },
+          "password": {
+            "description": "Access password for the Send",
+            "type": "string"
+          },
+          "text": {
+            "description": "Text content to share",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "create_text_send"
+    },
+    {
+      "description": "Create a new Bitwarden Send for securely sharing a file",
+      "inputSchema": {
+        "properties": {
+          "deletionDate": {
+            "description": "Deletion date in ISO 8601 format",
+            "type": "string"
+          },
+          "expirationDate": {
+            "description": "Expiration date in ISO 8601 format",
+            "type": "string"
+          },
+          "filePath": {
+            "description": "Path to the file to share",
+            "type": "string"
+          },
+          "maxAccessCount": {
+            "description": "Maximum number of times the Send can be accessed",
+            "type": "number"
+          },
+          "name": {
+            "description": "Name of the Send",
+            "type": "string"
+          },
+          "notes": {
+            "description": "Private notes (not shared with recipient)",
+            "type": "string"
+          },
+          "password": {
+            "description": "Access password for the Send",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "filePath"
+        ],
+        "type": "object"
+      },
+      "name": "create_file_send"
+    },
+    {
+      "description": "List all Bitwarden Sends",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_send"
+    },
+    {
+      "description": "Get details of a specific Bitwarden Send",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "ID of the Send to retrieve",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_send"
+    },
+    {
+      "description": "Edit an existing Bitwarden Send",
+      "inputSchema": {
+        "properties": {
+          "deletionDate": {
+            "description": "New deletion date in ISO 8601 format",
+            "type": "string"
+          },
+          "disabled": {
+            "description": "Disable the Send",
+            "type": "boolean"
+          },
+          "expirationDate": {
+            "description": "New expiration date in ISO 8601 format",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID of the Send to edit",
+            "type": "string"
+          },
+          "maxAccessCount": {
+            "description": "New maximum access count",
+            "type": "number"
+          },
+          "name": {
+            "description": "New name for the Send",
+            "type": "string"
+          },
+          "notes": {
+            "description": "New private notes",
+            "type": "string"
+          },
+          "password": {
+            "description": "New access password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "edit_send"
+    },
+    {
+      "description": "Delete a Bitwarden Send",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "ID of the Send to delete",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_send"
+    },
+    {
+      "description": "Remove the access password from a Bitwarden Send",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "ID of the Send to remove password from",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "remove_send_password"
+    },
+    {
+      "description": "Attach a file to an existing vault item",
+      "inputSchema": {
+        "properties": {
+          "filePath": {
+            "description": "Path to the file to attach",
+            "type": "string"
+          },
+          "itemId": {
+            "description": "ID of the vault item to attach the file to",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filePath",
+          "itemId"
+        ],
+        "type": "object"
+      },
+      "name": "create_attachment"
+    },
+    {
+      "description": "List all collections",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_org_collections"
+    },
+    {
+      "description": "Retrieve a collection",
+      "inputSchema": {
+        "properties": {
+          "collectionId": {
+            "description": "ID of the collection",
+            "type": "string"
+          }
+        },
+        "required": [
+          "collectionId"
+        ],
+        "type": "object"
+      },
+      "name": "get_org_collection"
+    },
+    {
+      "description": "Update a collection",
+      "inputSchema": {
+        "properties": {
+          "collectionId": {
+            "description": "ID of the collection",
+            "type": "string"
+          },
+          "externalId": {
+            "description": "External identifier for reference or linking this collection to another system",
+            "maxLength": 300,
+            "type": "string"
+          },
+          "groups": {
+            "description": "The associated groups that this collection is assigned to",
+            "items": {
+              "properties": {
+                "hidePasswords": {
+                  "description": "When true, the hide passwords permission will not allow the user or group to view passwords",
+                  "type": "boolean"
+                },
+                "id": {
+                  "description": "The associated object's unique identifier",
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "manage": {
+                  "description": "When true, the manage permission allows a user to both edit the ciphers within a collection and edit the users/groups that are assigned to the collection",
+                  "type": "boolean"
+                },
+                "readOnly": {
+                  "description": "When true, the read only permission will not allow the user or group to make changes to items",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "readOnly"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "collectionId"
+        ],
+        "type": "object"
+      },
+      "name": "update_org_collection"
+    },
+    {
+      "description": "Delete a collection",
+      "inputSchema": {
+        "properties": {
+          "collectionId": {
+            "description": "ID of the collection",
+            "type": "string"
+          }
+        },
+        "required": [
+          "collectionId"
+        ],
+        "type": "object"
+      },
+      "name": "delete_org_collection"
+    },
+    {
+      "description": "List all members",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_org_members"
+    },
+    {
+      "description": "Retrieve a member",
+      "inputSchema": {
+        "properties": {
+          "memberId": {
+            "description": "ID of the member",
+            "type": "string"
+          }
+        },
+        "required": [
+          "memberId"
+        ],
+        "type": "object"
+      },
+      "name": "get_org_member"
+    },
+    {
+      "description": "Retrieve a member's group ids",
+      "inputSchema": {
+        "properties": {
+          "memberId": {
+            "description": "ID of the member",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "memberId"
+        ],
+        "type": "object"
+      },
+      "name": "get_org_member_groups"
+    },
+    {
+      "description": "Create a member",
+      "inputSchema": {
+        "properties": {
+          "collections": {
+            "description": "Array of collection IDs the member has access to",
+            "items": {
+              "properties": {
+                "hidePasswords": {
+                  "description": "Whether to hide passwords",
+                  "type": "boolean"
+                },
+                "id": {
+                  "description": "Collection ID",
+                  "type": "string"
+                },
+                "manage": {
+                  "description": "Whether the member can manage the collection",
+                  "type": "boolean"
+                },
+                "readOnly": {
+                  "description": "Whether access is read-only",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "email": {
+            "description": "Email address to invite",
+            "format": "email",
+            "maxLength": 256,
+            "type": "string"
+          },
+          "externalId": {
+            "description": "External ID for the member (optional)",
+            "maxLength": 300,
+            "type": "string"
+          },
+          "groups": {
+            "description": "Array of group IDs the member belongs to",
+            "items": {
+              "description": "Group ID",
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "permissions": {
+            "description": "Custom permissions if the member has a Custom role",
+            "properties": {
+              "accessEventLogs": {
+                "type": "boolean"
+              },
+              "accessImportExport": {
+                "type": "boolean"
+              },
+              "accessReports": {
+                "type": "boolean"
+              },
+              "createNewCollections": {
+                "type": "boolean"
+              },
+              "deleteAnyCollection": {
+                "type": "boolean"
+              },
+              "editAnyCollection": {
+                "type": "boolean"
+              },
+              "manageGroups": {
+                "type": "boolean"
+              },
+              "managePolicies": {
+                "type": "boolean"
+              },
+              "manageResetPassword": {
+                "type": "boolean"
+              },
+              "manageScim": {
+                "type": "boolean"
+              },
+              "manageSso": {
+                "type": "boolean"
+              },
+              "manageUsers": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "type": {
+            "description": "User type (0: Owner, 1: Admin, 2: User, 4: Custom)",
+            "enum": [
+              0,
+              1,
+              2,
+              4
+            ],
+            "type": "number"
+          }
+        },
+        "required": [
+          "email",
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "invite_org_member"
+    },
+    {
+      "description": "Update a member",
+      "inputSchema": {
+        "properties": {
+          "collections": {
+            "description": "Array of collection IDs the member has access to",
+            "items": {
+              "properties": {
+                "hidePasswords": {
+                  "description": "Whether to hide passwords",
+                  "type": "boolean"
+                },
+                "id": {
+                  "description": "Collection ID",
+                  "type": "string"
+                },
+                "manage": {
+                  "description": "Whether the member can manage the collection",
+                  "type": "boolean"
+                },
+                "readOnly": {
+                  "description": "Whether access is read-only",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "externalId": {
+            "description": "External ID for the member (optional)",
+            "maxLength": 300,
+            "type": "string"
+          },
+          "groups": {
+            "description": "Array of group IDs the member belongs to",
+            "items": {
+              "description": "Group ID",
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "memberId": {
+            "description": "ID of the member",
+            "format": "uuid",
+            "type": "string"
+          },
+          "permissions": {
+            "description": "Custom permissions if the member has a Custom role",
+            "properties": {
+              "accessEventLogs": {
+                "type": "boolean"
+              },
+              "accessImportExport": {
+                "type": "boolean"
+              },
+              "accessReports": {
+                "type": "boolean"
+              },
+              "createNewCollections": {
+                "type": "boolean"
+              },
+              "deleteAnyCollection": {
+                "type": "boolean"
+              },
+              "editAnyCollection": {
+                "type": "boolean"
+              },
+              "manageGroups": {
+                "type": "boolean"
+              },
+              "managePolicies": {
+                "type": "boolean"
+              },
+              "manageResetPassword": {
+                "type": "boolean"
+              },
+              "manageScim": {
+                "type": "boolean"
+              },
+              "manageSso": {
+                "type": "boolean"
+              },
+              "manageUsers": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "type": {
+            "description": "User type (0: Owner, 1: Admin, 2: User, 4: Custom)",
+            "enum": [
+              0,
+              1,
+              2,
+              4
+            ],
+            "type": "number"
+          }
+        },
+        "required": [
+          "memberId",
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "update_org_member"
+    },
+    {
+      "description": "Update a member's groups",
+      "inputSchema": {
+        "properties": {
+          "groupIds": {
+            "description": "Array of group IDs that the member should belong to",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "memberId": {
+            "description": "ID of the member",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "memberId",
+          "groupIds"
+        ],
+        "type": "object"
+      },
+      "name": "update_org_member_groups"
+    },
+    {
+      "description": "Remove a member",
+      "inputSchema": {
+        "properties": {
+          "memberId": {
+            "description": "ID of the member",
+            "type": "string"
+          }
+        },
+        "required": [
+          "memberId"
+        ],
+        "type": "object"
+      },
+      "name": "remove_org_member"
+    },
+    {
+      "description": "Re-invite a member",
+      "inputSchema": {
+        "properties": {
+          "memberId": {
+            "description": "ID of the member to re-invite",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "memberId"
+        ],
+        "type": "object"
+      },
+      "name": "reinvite_org_member"
+    },
+    {
+      "description": "Revoke a member's access to an organization",
+      "inputSchema": {
+        "properties": {
+          "memberId": {
+            "description": "ID of the member to revoke",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "memberId"
+        ],
+        "type": "object"
+      },
+      "name": "revoke_org_member"
+    },
+    {
+      "description": "Restore a previously revoked member",
+      "inputSchema": {
+        "properties": {
+          "memberId": {
+            "description": "ID of the member to restore",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "memberId"
+        ],
+        "type": "object"
+      },
+      "name": "restore_org_member"
+    },
+    {
+      "description": "List all groups",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_org_groups"
+    },
+    {
+      "description": "Retrieve a group",
+      "inputSchema": {
+        "properties": {
+          "groupId": {
+            "description": "ID of the group",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "groupId"
+        ],
+        "type": "object"
+      },
+      "name": "get_org_group"
+    },
+    {
+      "description": "Retrieve a group's member ids",
+      "inputSchema": {
+        "properties": {
+          "groupId": {
+            "description": "ID of the group",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "groupId"
+        ],
+        "type": "object"
+      },
+      "name": "get_org_group_members"
+    },
+    {
+      "description": "Create a group",
+      "inputSchema": {
+        "properties": {
+          "collections": {
+            "description": "Array of collection IDs the group has access to",
+            "items": {
+              "properties": {
+                "hidePasswords": {
+                  "description": "Whether to hide passwords",
+                  "type": "boolean"
+                },
+                "id": {
+                  "description": "Collection ID",
+                  "type": "string"
+                },
+                "manage": {
+                  "description": "Whether the group can manage the collection",
+                  "type": "boolean"
+                },
+                "readOnly": {
+                  "description": "Whether access is read-only",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "externalId": {
+            "description": "External ID for the group (optional)",
+            "maxLength": 300,
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the group",
+            "maxLength": 100,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_org_group"
+    },
+    {
+      "description": "Update a group",
+      "inputSchema": {
+        "properties": {
+          "collections": {
+            "description": "Array of collection IDs the group has access to",
+            "items": {
+              "properties": {
+                "hidePasswords": {
+                  "description": "Whether to hide passwords",
+                  "type": "boolean"
+                },
+                "id": {
+                  "description": "Collection ID",
+                  "type": "string"
+                },
+                "manage": {
+                  "description": "Whether the group can manage the collection",
+                  "type": "boolean"
+                },
+                "readOnly": {
+                  "description": "Whether access is read-only",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "externalId": {
+            "description": "External ID for the group (optional)",
+            "type": "string"
+          },
+          "groupId": {
+            "description": "ID of the group",
+            "type": "string"
+          },
+          "name": {
+            "description": "New name for the group",
+            "type": "string"
+          }
+        },
+        "required": [
+          "groupId",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "update_org_group"
+    },
+    {
+      "description": "Delete a group",
+      "inputSchema": {
+        "properties": {
+          "groupId": {
+            "description": "ID of the group",
+            "type": "string"
+          }
+        },
+        "required": [
+          "groupId"
+        ],
+        "type": "object"
+      },
+      "name": "delete_org_group"
+    },
+    {
+      "description": "Update a group's members",
+      "inputSchema": {
+        "properties": {
+          "groupId": {
+            "description": "ID of the group",
+            "type": "string"
+          },
+          "memberIds": {
+            "description": "Array of member IDs to add to the group",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "groupId",
+          "memberIds"
+        ],
+        "type": "object"
+      },
+      "name": "update_org_group_members"
+    },
+    {
+      "description": "List all policies",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_org_policies"
+    },
+    {
+      "description": "Retrieve a policy",
+      "inputSchema": {
+        "properties": {
+          "policyType": {
+            "description": "Type of the policy (0=TwoFactorAuthentication, 1=MasterPassword, 2=PasswordGenerator, 3=SingleOrg, 4=RequireSso, 5=OrganizationDataOwnership, 6=DisableSend, 7=SendOptions, 8=ResetPassword, 9=MaximumVaultTimeout, 10=DisablePersonalVaultExport, 11=ActivateAutofill, 12=AutomaticAppLogIn, 13=FreeFamiliesSponsorshipPolicy, 14=RemoveUnlockWithPin, 15=RestrictedItemTypesPolicy)",
+            "maximum": 15,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "policyType"
+        ],
+        "type": "object"
+      },
+      "name": "get_org_policy"
+    },
+    {
+      "description": "Update a policy",
+      "inputSchema": {
+        "properties": {
+          "data": {
+            "description": "Policy configuration data",
+            "type": "object"
+          },
+          "enabled": {
+            "description": "Whether the policy is enabled",
+            "type": "boolean"
+          },
+          "policyType": {
+            "description": "Type of the policy (0=TwoFactorAuthentication, 1=MasterPassword, 2=PasswordGenerator, 3=SingleOrg, 4=RequireSso, 5=OrganizationDataOwnership, 6=DisableSend, 7=SendOptions, 8=ResetPassword, 9=MaximumVaultTimeout, 10=DisablePersonalVaultExport, 11=ActivateAutofill, 12=AutomaticAppLogIn, 13=FreeFamiliesSponsorshipPolicy, 14=RemoveUnlockWithPin, 15=RestrictedItemTypesPolicy)",
+            "maximum": 15,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "policyType",
+          "enabled"
+        ],
+        "type": "object"
+      },
+      "name": "update_org_policy"
+    },
+    {
+      "description": "List all events",
+      "inputSchema": {
+        "properties": {
+          "actingUserId": {
+            "description": "Filter by acting user ID (optional)",
+            "type": "string"
+          },
+          "collectionId": {
+            "description": "Filter by collection ID (optional)",
+            "type": "string"
+          },
+          "end": {
+            "description": "End date for events (ISO 8601 format)",
+            "type": "string"
+          },
+          "groupId": {
+            "description": "Filter by group ID (optional)",
+            "type": "string"
+          },
+          "itemId": {
+            "description": "Filter by item ID (optional)",
+            "type": "string"
+          },
+          "memberId": {
+            "description": "Filter by member ID (optional)",
+            "type": "string"
+          },
+          "policyId": {
+            "description": "Filter by policy ID (optional)",
+            "type": "string"
+          },
+          "start": {
+            "description": "Start date for events (ISO 8601 format)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "type": "object"
+      },
+      "name": "get_org_events"
+    },
+    {
+      "description": "Retrieve the subscription details for the current organization",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_org_subscription"
+    },
+    {
+      "description": "Update the organization's current subscription for Password Manager and/or Secrets Manager",
+      "inputSchema": {
+        "properties": {
+          "passwordManager": {
+            "description": "Password Manager subscription details",
+            "properties": {
+              "maxAutoScaleSeats": {
+                "description": "Maximum auto-scale seats for Password Manager",
+                "type": "integer"
+              },
+              "seats": {
+                "description": "Number of Password Manager seats",
+                "type": "integer"
+              },
+              "storage": {
+                "description": "Storage in GB",
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "secretsManager": {
+            "description": "Secrets Manager subscription details",
+            "properties": {
+              "maxAutoScaleSeats": {
+                "description": "Maximum auto-scale seats for Secrets Manager",
+                "type": "integer"
+              },
+              "maxAutoScaleServiceAccounts": {
+                "description": "Maximum auto-scale service accounts",
+                "type": "integer"
+              },
+              "seats": {
+                "description": "Number of Secrets Manager seats",
+                "type": "integer"
+              },
+              "serviceAccounts": {
+                "description": "Number of Secrets Manager service accounts",
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "update_org_subscription"
+    },
+    {
+      "description": "Import members and groups from an external system",
+      "inputSchema": {
+        "properties": {
+          "groups": {
+            "description": "Groups to import",
+            "items": {
+              "properties": {
+                "externalId": {
+                  "description": "External ID for the group",
+                  "maxLength": 300,
+                  "type": "string"
+                },
+                "memberExternalIds": {
+                  "description": "External IDs of members in this group",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "description": "Name of the group",
+                  "maxLength": 100,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "externalId"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "largeImport": {
+            "default": false,
+            "description": "Indicates an import of over 2000 users and/or groups is expected",
+            "type": "boolean"
+          },
+          "members": {
+            "description": "Members to import",
+            "items": {
+              "properties": {
+                "deleted": {
+                  "default": false,
+                  "description": "Whether this member should be removed from the organization",
+                  "type": "boolean"
+                },
+                "email": {
+                  "description": "Email address (required for non-deleted users)",
+                  "format": "email",
+                  "maxLength": 256,
+                  "type": "string"
+                },
+                "externalId": {
+                  "description": "External ID for the member",
+                  "maxLength": 300,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "externalId"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "overwriteExisting": {
+            "default": false,
+            "description": "Whether to overwrite existing data or append to it",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "overwriteExisting"
+        ],
+        "type": "object"
+      },
+      "name": "import_org_users_and_groups"
+    }
+  ],
+  "version": "2026.7.0"
+}

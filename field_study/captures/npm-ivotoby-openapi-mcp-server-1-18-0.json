@@ -1,0 +1,19 @@
+{
+  "description": "An MCP server that exposes OpenAPI endpoints as resources",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@ivotoby/openapi-mcp-server@1.18.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@ivotoby/openapi-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/ivo-toby/mcp-openapi-server",
+  "slug": "npm-ivotoby-openapi-mcp-server-1-18-0",
+  "stderr_summary": "Failed to start server: Error: OpenAPI spec is required. Use one of: --openapi-spec, --spec-from-stdin, or --spec-inline\n    at loadConfig (file://<scratch>/npm-cache/_npx/5b31becc1d5f6bcb/node_modules/@ivotoby/openapi-mcp-server/dist/cli.js:26137:11)\n    at main (file://<scratch>/npm-cache/_npx/5b31becc1d5f6bcb/node_modules/@ivotoby/openapi-mcp-server/dist/cli.js:26893:20)\n    at file://<scratch>/npm-cache/_npx/5b31becc1d5f6bcb/node_modules/@ivotoby/openapi-mcp-server/dist/cli.js:26939:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.18.0"
+}

@@ -194,9 +194,9 @@
       "audit_findings": [
         "ANNOTATION_CONTRADICTION (get-header-params)"
       ],
-      "collapsed_read_tools": 108,
+      "collapsed_read_tools": 39,
       "composition_id": "everything-plus-filesystem",
-      "cross_server_path_count": 11,
+      "cross_server_path_count": 4,
       "detected_rule_ids": [],
       "expected_positive": false,
       "expected_rule_ids": [],
@@ -226,12 +226,12 @@
         "npm-server-filesystem"
       ],
       "severity_counts": {
-        "CRITICAL": 11
+        "CRITICAL": 4
       },
       "shadow_findings": [],
       "target_id": null,
       "tool_count": 38,
-      "trifecta_path_count": 11,
+      "trifecta_path_count": 4,
       "trifecta_paths": [
         {
           "collapsed_read_count": 10,
@@ -257,8 +257,8 @@
         {
           "collapsed_read_count": 10,
           "cross_server": true,
-          "egress_tool": "npm-server-everything:gzip-file-as-resource",
-          "ingest_tool": "npm-server-everything:get-annotated-message",
+          "egress_tool": "npm-server-everything:get-header-params",
+          "ingest_tool": "npm-server-everything:gzip-file-as-resource",
           "path_id": "trifecta-002",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -279,7 +279,7 @@
           "collapsed_read_count": 10,
           "cross_server": true,
           "egress_tool": "npm-server-everything:get-header-params",
-          "ingest_tool": "npm-server-everything:gzip-file-as-resource",
+          "ingest_tool": "npm-server-everything:trigger-url-elicitation",
           "path_id": "trifecta-003",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -297,10 +297,10 @@
           "severity": "CRITICAL"
         },
         {
-          "collapsed_read_count": 10,
+          "collapsed_read_count": 9,
           "cross_server": true,
           "egress_tool": "npm-server-everything:get-header-params",
-          "ingest_tool": "npm-server-everything:trigger-sampling-request",
+          "ingest_tool": "npm-server-filesystem:search_files",
           "path_id": "trifecta-004",
           "read_tool": "npm-server-everything:get-env",
           "read_tools": [
@@ -312,92 +312,7 @@
             "npm-server-filesystem:read_file",
             "npm-server-filesystem:read_media_file",
             "npm-server-filesystem:read_multiple_files",
-            "npm-server-filesystem:read_text_file",
-            "npm-server-filesystem:search_files"
-          ],
-          "severity": "CRITICAL"
-        },
-        {
-          "collapsed_read_count": 10,
-          "cross_server": true,
-          "egress_tool": "npm-server-everything:gzip-file-as-resource",
-          "ingest_tool": "npm-server-everything:trigger-sampling-request",
-          "path_id": "trifecta-005",
-          "read_tool": "npm-server-everything:get-env",
-          "read_tools": [
-            "npm-server-everything:get-env",
-            "npm-server-filesystem:directory_tree",
-            "npm-server-filesystem:get_file_info",
-            "npm-server-filesystem:list_directory",
-            "npm-server-filesystem:list_directory_with_sizes",
-            "npm-server-filesystem:read_file",
-            "npm-server-filesystem:read_media_file",
-            "npm-server-filesystem:read_multiple_files",
-            "npm-server-filesystem:read_text_file",
-            "npm-server-filesystem:search_files"
-          ],
-          "severity": "CRITICAL"
-        },
-        {
-          "collapsed_read_count": 10,
-          "cross_server": true,
-          "egress_tool": "npm-server-everything:get-header-params",
-          "ingest_tool": "npm-server-everything:trigger-sampling-request-async",
-          "path_id": "trifecta-006",
-          "read_tool": "npm-server-everything:get-env",
-          "read_tools": [
-            "npm-server-everything:get-env",
-            "npm-server-filesystem:directory_tree",
-            "npm-server-filesystem:get_file_info",
-            "npm-server-filesystem:list_directory",
-            "npm-server-filesystem:list_directory_with_sizes",
-            "npm-server-filesystem:read_file",
-            "npm-server-filesystem:read_media_file",
-            "npm-server-filesystem:read_multiple_files",
-            "npm-server-filesystem:read_text_file",
-            "npm-server-filesystem:search_files"
-          ],
-          "severity": "CRITICAL"
-        },
-        {
-          "collapsed_read_count": 10,
-          "cross_server": true,
-          "egress_tool": "npm-server-everything:gzip-file-as-resource",
-          "ingest_tool": "npm-server-everything:trigger-sampling-request-async",
-          "path_id": "trifecta-007",
-          "read_tool": "npm-server-everything:get-env",
-          "read_tools": [
-            "npm-server-everything:get-env",
-            "npm-server-filesystem:directory_tree",
-            "npm-server-filesystem:get_file_info",
-            "npm-server-filesystem:list_directory",
-            "npm-server-filesystem:list_directory_with_sizes",
-            "npm-server-filesystem:read_file",
-            "npm-server-filesystem:read_media_file",
-            "npm-server-filesystem:read_multiple_files",
-            "npm-server-filesystem:read_text_file",
-            "npm-server-filesystem:search_files"
-          ],
-          "severity": "CRITICAL"
-        },
-        {
-          "collapsed_read_count": 10,
-          "cross_server": true,
-          "egress_tool": "npm-server-everything:get-header-params",
-          "ingest_tool": "npm-server-everything:trigger-url-elicitation",
-          "path_id": "trifecta-008",
-          "read_tool": "npm-server-everything:get-env",
-          "read_tools": [
-            "npm-server-everything:get-env",
-            "npm-server-filesystem:directory_tree",
-            "npm-server-filesystem:get_file_info",
-            "npm-server-filesystem:list_directory",
-            "npm-server-filesystem:list_directory_with_sizes",
-            "npm-server-filesystem:read_file",
-            "npm-server-filesystem:read_media_file",
-            "npm-server-filesystem:read_multiple_files",
-            "npm-server-filesystem:read_text_file",
-            "npm-server-filesystem:search_files"
+            "npm-server-filesystem:read_text_file"
           ],
           "severity": "CRITICAL"
         }
@@ -454,7 +369,7 @@
     "overall_recall": 0.7,
     "overall_targets": 10
   },
-  "detector_fingerprint_sha256": "9f211077305c91b1026397f1402d170aed0297efc0efda872ab9256fc836ed4e",
+  "detector_fingerprint_sha256": "d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4",
   "evaluation_stage": "post-tuning (post-4a089e1)",
   "package_count": 14,
   "package_partition": {
@@ -626,7 +541,7 @@
       "ecosystem": "npm",
       "expected_positive": false,
       "expected_rule_ids": [],
-      "finding_count": 10,
+      "finding_count": 4,
       "findings": [
         {
           "engine": "audit",
@@ -650,46 +565,10 @@
           "engine": "graph",
           "rule_id": "LETHAL_TRIFECTA",
           "severity": "CRITICAL",
-          "tool": "npm-server-everything:trigger-sampling-request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:trigger-sampling-request-async"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "CRITICAL",
-          "tool": "npm-server-everything:trigger-url-elicitation"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-everything:get-annotated-message"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-everything:trigger-sampling-request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-everything:trigger-sampling-request-async"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
           "tool": "npm-server-everything:trigger-url-elicitation"
         }
       ],
-      "graph_path_count": 9,
+      "graph_path_count": 3,
       "in_latch_threat_model": false,
       "kind": "stdio_tools",
       "label": "`@modelcontextprotocol/server-everything` 2.3.0",
@@ -720,8 +599,7 @@
         "LETHAL_TRIFECTA"
       ],
       "severity_counts": {
-        "CRITICAL": 5,
-        "HIGH": 4,
+        "CRITICAL": 3,
         "MEDIUM": 1
       },
       "slug": "npm-server-everything",
@@ -875,7 +753,7 @@
       "expected_rule_ids": [
         "LETHAL_TRIFECTA"
       ],
-      "finding_count": 163,
+      "finding_count": 66,
       "findings": [
         {
           "engine": "graph",
@@ -899,78 +777,6 @@
           "engine": "graph",
           "rule_id": "LETHAL_TRIFECTA",
           "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
-          "tool": "npm-server-github-2025-4-8:create_pull_request_review"
-        },
-        {
-          "engine": "graph",
-          "rule_id": "LETHAL_TRIFECTA",
-          "severity": "HIGH",
           "tool": "npm-server-github-2025-4-8:create_pull_request_review"
         },
         {
@@ -996,9 +802,81 @@
           "rule_id": "LETHAL_TRIFECTA",
           "severity": "HIGH",
           "tool": "npm-server-github-2025-4-8:get_issue"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_issue"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_issue"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request_comments"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request_comments"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request_comments"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request_comments"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request_files"
+        },
+        {
+          "engine": "graph",
+          "rule_id": "LETHAL_TRIFECTA",
+          "severity": "HIGH",
+          "tool": "npm-server-github-2025-4-8:get_pull_request_files"
         }
       ],
-      "graph_path_count": 163,
+      "graph_path_count": 66,
       "in_latch_threat_model": true,
       "kind": "stdio_tools",
       "label": "`@modelcontextprotocol/server-github` 2025.4.8",
@@ -1022,7 +900,7 @@
         "LETHAL_TRIFECTA"
       ],
       "severity_counts": {
-        "HIGH": 163
+        "HIGH": 66
       },
       "slug": "npm-server-github-2025-4-8",
       "target_id": "npm-server-github-2025-4-8",
@@ -1602,11 +1480,11 @@
       "composition_id": "puppeteer-plus-filesystem"
     },
     {
-      "after_critical": 11,
-      "after_paths": 11,
+      "after_critical": 4,
+      "after_paths": 4,
       "before_critical": 302,
       "before_paths": 314,
-      "collapsed_read_tools": 108,
+      "collapsed_read_tools": 39,
       "composition_id": "everything-plus-filesystem"
     }
   ],
@@ -1658,8 +1536,8 @@
       "clean_false_positive_rate": 0.1667,
       "clean_package_count": 6,
       "evaluation_stage": "post-tuning (post-4a089e1)",
-      "everything_single_server_paths": 9,
-      "everything_with_filesystem_paths": 11,
+      "everything_single_server_paths": 3,
+      "everything_with_filesystem_paths": 4,
       "in_scope_detected": [
         "npm-mcp-remote-0-14-3-static-header",
         "npm-mcp-remote-0-14-3",

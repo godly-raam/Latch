@@ -1,0 +1,62 @@
+{
+  "description": "MCP server for searching Hero Design System components",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@ehrocks/fe-mcp-server@1.0.10"
+  ],
+  "manifest_sha256": "b0970b388b8e08612030a65e33dbd73c8e061007f73c1a9f6e618078b0577762",
+  "package": "@ehrocks/fe-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/thinkei/fe-mcp-service",
+  "slug": "npm-ehrocks-fe-mcp-server-1-0-10",
+  "stderr_summary": "",
+  "tool_count": 1,
+  "tools": [
+    {
+      "_meta": {
+        "anthropic/alwaysLoad": true
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search Hero Design Component Examples"
+      },
+      "description": "Retrieve Hero Design System examples, patterns, and references using natural language.\n\nDescribe the UI behavior, component, or pattern you need. Covers component selection guidance, JSX code examples, design patterns, and use cases across @hero-design/react. Not a prop API reference — use the component library docs for precise prop signatures.\n\nCommon queries: button loading state, form validation error, dropdown with search, empty state, date picker range, modal confirmation dialog, toast notification.\n\nReturns for each match:\n- Component name and similarity score\n- Component and example descriptions\n- Code example (JSX)\n- Technical details, design patterns, and props context when available",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": "5",
+            "description": "Maximum number of distinct component examples to return (1–5)",
+            "type": "string"
+          },
+          "query": {
+            "description": "The search query describing what you're looking for in the component examples. Be specific about what aspects you're interested in (code, usage, props, patterns, etc.)",
+            "minLength": 1,
+            "type": "string"
+          },
+          "threshold": {
+            "default": "0.4",
+            "description": "Minimum similarity score (0.0 to 0.99) for returned examples. Lower values return more results but might be less relevant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_hero_design_component_examples"
+    }
+  ],
+  "version": "1.0.10"
+}

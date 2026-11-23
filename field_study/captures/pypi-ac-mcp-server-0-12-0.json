@@ -1,0 +1,18 @@
+{
+  "description": "Official ActiveCampaign MCP Server",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "ac-mcp-server==0.12.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "ac-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://activecampaign.com",
+  "slug": "pypi-ac-mcp-server-0-12-0",
+  "stderr_summary": "File \"<scratch>/uv-cache/archive-v0/7GK79hS-5JEsNMPs/lib/python3.12/site-packages/ac_mcp_server/__init__.py\", line 1, in <module>\n    from .server import main\n  File \"<scratch>/uv-cache/archive-v0/7GK79hS-5JEsNMPs/lib/python3.12/site-packages/ac_mcp_server/server.py\", line 9, in <module>\n    mcp = FastMCP(\n          ^^^^^^^^\n  File \"<scratch>/uv-cache/archive-v0/7GK79hS-5JEsNMPs/lib/python3.12/site-packages/fastmcp/server/server.py\", line 522, in __init__\n    _check_removed_kwargs(kwargs)\n  File \"<scratch>/uv-cache/archive-v0/7GK79hS-5JEsNMPs/lib/python3.12/site-packages/fastmcp/server/server.py\", line 302, in _check_removed_kwargs\n    raise TypeError(\nTypeError: FastMCP() no longer accepts `log_level`. Pass `log_level` to `run_http_async()`, or set FASTMCP_LOG_LEVEL.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.12.0"
+}

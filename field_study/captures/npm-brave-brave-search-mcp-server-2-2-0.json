@@ -1,0 +1,19 @@
+{
+  "description": "Brave Search MCP Server: web results, images, videos, rich results, AI summaries, and more.",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@brave/brave-search-mcp-server@2.2.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@brave/brave-search-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/brave/brave-search-mcp-server",
+  "slug": "npm-brave-brave-search-mcp-server-2-2-0",
+  "stderr_summary": "Error: A Brave API key is required via --brave-api-key, BRAVE_API_KEY, --brave-api-key-file, or BRAVE_API_KEY_FILE. You can get one at https://brave.com/search/api/.\nInvalid configuration",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.2.0"
+}

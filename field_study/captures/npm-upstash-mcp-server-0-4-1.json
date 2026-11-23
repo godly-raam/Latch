@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for Upstash",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@upstash/mcp-server@0.4.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@upstash/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/upstash/mcp-server",
+  "slug": "npm-upstash-mcp-server-0-4-1",
+  "stderr_summary": "Missing required credentials. Provide --email and --api-key (or set UPSTASH_EMAIL and UPSTASH_API_KEY) for Redis, QStash and Workflow tools, or --box-api-key alone to use only the Upstash Box tools.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.4.1"
+}

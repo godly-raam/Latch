@@ -1,0 +1,19 @@
+{
+  "description": "MCP Server for developers building HubSpot Apps",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@hubspot/mcp-server@0.4.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@hubspot/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-hubspot-mcp-server-0-4-0",
+  "stderr_summary": "Error: HubSpot access token is required. Set PRIVATE_APP_ACCESS_TOKEN in your environment variables and retry.\n    at new HubSpotClient (file://<scratch>/npm-cache/_npx/9f29830f7ca8731c/node_modules/@hubspot/mcp-server/dist/utils/client.js:12:19)\n    at new UserCredentialsTool (file://<scratch>/npm-cache/_npx/9f29830f7ca8731c/node_modules/@hubspot/mcp-server/dist/tools/oauth/getUserDetailsTool.js:35:23)\n    at file://<scratch>/npm-cache/_npx/9f29830f7ca8731c/node_modules/@hubspot/mcp-server/dist/tools/toolsRegistry.js:26:14\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\n\nNode.js v22.23.5",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.4.0"
+}

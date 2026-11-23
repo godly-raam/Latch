@@ -1,0 +1,45 @@
+{
+  "description": "MCP server for ESLint",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@eslint/mcp@0.3.17"
+  ],
+  "manifest_sha256": "f49c688e980daa437ea7e9d29e184732e312ef8b86b471ef8e9c84144c646fc6",
+  "package": "@eslint/mcp",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/eslint/rewrite",
+  "slug": "npm-eslint-mcp-0-3-17",
+  "stderr_summary": "ESLint MCP server is running. cwd: /work",
+  "tool_count": 1,
+  "tools": [
+    {
+      "description": "Lint files using ESLint. You must provide a list of absolute file paths to the files you want to lint. The absolute file paths should be in the correct format for your operating system (e.g., forward slashes on Unix-like systems, backslashes on Windows).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "filePaths": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "filePaths"
+        ],
+        "type": "object"
+      },
+      "name": "lint-files"
+    }
+  ],
+  "version": "0.3.17"
+}

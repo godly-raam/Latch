@@ -1,0 +1,18 @@
+{
+  "description": "Abacum MCP Server",
+  "ecosystem": "pypi",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "uvx",
+    "abacum-mcp-server==0.1.7.post1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "abacum-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://abacum.ai",
+  "slug": "pypi-abacum-mcp-server-0-1-7-post1",
+  "stderr_summary": "Downloading numpy (15.0MiB)\nDownloading pandas (11.5MiB)\n Downloaded pandas\n Downloaded numpy\nInstalled 69 packages in 56ms\n❌ ERROR: Abacum API credentials not found. Please set ABACUM_API_CLIENT_ID and ABACUM_API_CLIENT_SECRET environment variables.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.7.post1"
+}

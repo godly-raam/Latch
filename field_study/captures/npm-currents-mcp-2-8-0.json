@@ -1,0 +1,19 @@
+{
+  "description": "Currents MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@currents/mcp@2.8.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@currents/mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/currents-dev/currents-mcp",
+  "slug": "npm-currents-mcp-2-8-0",
+  "stderr_summary": "[18:39:05.191] ERROR (265): CURRENTS_API_KEY is not set. Add your Currents API key to the environment (for example: export CURRENTS_API_KEY=<your-key>).",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.8.0"
+}

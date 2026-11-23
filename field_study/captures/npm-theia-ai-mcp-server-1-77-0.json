@@ -1,0 +1,19 @@
+{
+  "description": "Theia - MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@theia/ai-mcp-server@1.77.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@theia/ai-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/eclipse-theia/theia",
+  "slug": "npm-theia-ai-mcp-server-1-77-0",
+  "stderr_summary": "npm error could not determine executable to run\nnpm error A complete log of this run can be found in: <scratch>/npm-cache/_logs/2026-11-23T18_43_07_809Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.77.0"
+}

@@ -1,0 +1,199 @@
+{
+  "description": "MUI MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@mui/mcp@0.1.10"
+  ],
+  "manifest_sha256": "e4b5f530353c1ded3211310188cc7687bf88fc3ecc10e776b7367914bc897b14",
+  "package": "@mui/mcp",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/mui/mui-x",
+  "slug": "npm-mui-mcp-0-1-10",
+  "stderr_summary": "",
+  "tool_count": 2,
+  "tools": [
+    {
+      "description": "generates React + Material UI code from a natural-language prompt (optionally grounded in a Figma frame). Returns the generated files plus a short explanation. Requires `MUI_RECIPES_API_KEY`. Pass `threadId` back on subsequent calls to keep multi-turn conversations on the same chat. Pass `muiPairing` to target a specific MUI / MUI X major.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "designContext": {
+            "description": "Design tool context. Use the `figma` variant when the host has a Figma frame in scope; `opaque` is the escape hatch for other tools (Penpot, Sketch, screenshots).",
+            "oneOf": [
+              {
+                "properties": {
+                  "fileUrl": {
+                    "type": "string"
+                  },
+                  "node": {},
+                  "nodeId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "thumbnailDataUrl": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "figma",
+                    "type": "string"
+                  },
+                  "variables": {}
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "payload": {},
+                  "type": {
+                    "const": "opaque",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "model": {
+            "description": "Optional model override; otherwise the backend default.",
+            "type": "string"
+          },
+          "muiPairing": {
+            "description": "Target MUI / MUI X version pairing. Detect from the project's `package.json` (`@mui/material` and `@mui/x-data-grid` ranges) and pass accordingly. Omit to default to the latest stable pairing (currently Material UI v9 + MUI X v9).",
+            "properties": {
+              "material": {
+                "description": "Material UI major version. v8 was skipped; valid values are v5, v6, v7, v9.",
+                "enum": [
+                  "v5",
+                  "v6",
+                  "v7",
+                  "v9"
+                ],
+                "type": "string"
+              },
+              "muiX": {
+                "description": "MUI X products major version.",
+                "enum": [
+                  "v5",
+                  "v6",
+                  "v7",
+                  "v8",
+                  "v9"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "material",
+              "muiX"
+            ],
+            "type": "object"
+          },
+          "prompt": {
+            "description": "Natural-language brief for the codegen run.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "threadId": {
+            "description": "Continue an existing conversation. Must be owned by the caller. Omit to start a new thread.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generateReactCode",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "explanation": {
+            "type": "string"
+          },
+          "files": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "contents": {
+                  "type": "string"
+                },
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "filename",
+                "contents"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "muiPairing": {
+            "additionalProperties": false,
+            "properties": {
+              "material": {
+                "type": "string"
+              },
+              "muiX": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "material",
+              "muiX"
+            ],
+            "type": "object"
+          },
+          "threadId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "threadId",
+          "files",
+          "explanation"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Fetch documentation for one or more URLs extracted from previous tool calls responses. The URLs should be passed as an array in the \"urls\" argument.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "urls": {
+            "description": "The list of URLs to fetch documentation from",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "urls"
+        ],
+        "type": "object"
+      },
+      "name": "fetchDocs"
+    }
+  ],
+  "version": "0.1.10"
+}

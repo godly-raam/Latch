@@ -1,0 +1,18 @@
+{
+  "description": "AnalyticDB PostgreSQL MCP Server serves as a universal interface between AI Agents and AnalyticDB PostgreSQL databases. It enables seamless communication between AI Agents and AnalyticDB PostgreSQL, helping AI Agents retrieve database metadata and execute SQL operations.",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "adbpg-mcp-server==2.0.3"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "adbpg-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-adbpg-mcp-server-2-0-3",
+  "stderr_summary": "from adbpg_mcp_server.__main__ import main\n  File \"<scratch>/uv-cache/archive-v0/5fszIbv00mL8lpvE/lib/python3.13/site-packages/adbpg_mcp_server/__main__.py\", line 4, in <module>\n    from .server_http import run_http_server\n  File \"<scratch>/uv-cache/archive-v0/5fszIbv00mL8lpvE/lib/python3.13/site-packages/adbpg_mcp_server/server_http.py\", line 16, in <module>\n    from .adbpg import DatabaseManager\n  File \"<scratch>/uv-cache/archive-v0/5fszIbv00mL8lpvE/lib/python3.13/site-packages/adbpg_mcp_server/adbpg.py\", line 6, in <module>\n    from .adbpg_config import AppConfig\n  File \"<scratch>/uv-cache/archive-v0/5fszIbv00mL8lpvE/lib/python3.13/site-packages/adbpg_mcp_server/adbpg_config.py\", line 4, in <module>\n    from dotenv import load_dotenv\nModuleNotFoundError: No module named 'dotenv'",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.0.3"
+}

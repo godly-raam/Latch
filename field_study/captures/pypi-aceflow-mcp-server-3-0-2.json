@@ -1,0 +1,18 @@
+{
+  "description": "AceFlow MCP Server - AI-Driven Intelligent Workflow System with Contract-First Development, Memory Management, and 25 MCP Tools (4 Contract + 21 Workflow)",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "aceflow-mcp-server==3.0.2"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "aceflow-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/aceflow-pateoas/aceflow-ai",
+  "slug": "pypi-aceflow-mcp-server-3-0-2",
+  "stderr_summary": "^^^^^^\n  File \"<scratch>/uv-cache/archive-v0/oW2dc-uv64-lJw-2/lib/python3.12/site-packages/aceflow_mcp_server/mcp_stdio_server.py\", line 361, in main\n    server = MCPStdioServer()\n             ^^^^^^^^^^^^^^^^\n  File \"<scratch>/uv-cache/archive-v0/oW2dc-uv64-lJw-2/lib/python3.12/site-packages/aceflow_mcp_server/mcp_stdio_server.py\", line 84, in __init__\n    self.setup_handlers()\n  File \"<scratch>/uv-cache/archive-v0/oW2dc-uv64-lJw-2/lib/python3.12/site-packages/aceflow_mcp_server/mcp_stdio_server.py\", line 198, in setup_handlers\n    @self.server.list_tools()\n     ^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'Server' object has no attribute 'list_tools'",
+  "tool_count": 0,
+  "tools": [],
+  "version": "3.0.2"
+}

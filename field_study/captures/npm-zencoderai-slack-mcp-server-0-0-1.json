@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for interacting with Slack",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@zencoderai/slack-mcp-server@0.0.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@zencoderai/slack-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/zencoderai/slack-mcp-server",
+  "slug": "npm-zencoderai-slack-mcp-server-0-0-1",
+  "stderr_summary": "Please set SLACK_BOT_TOKEN and SLACK_TEAM_ID environment variables",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.0.1"
+}

@@ -1,0 +1,180 @@
+{
+  "description": "MCP server for Mantine documentation",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@mantine/mcp-server@9.8.2"
+  ],
+  "manifest_sha256": "9d7684c8b6f7ccc302861ab86ed03264be2728514b53103fbadeab5e174075da",
+  "package": "@mantine/mcp-server",
+  "protocol_version": "2026-07-28",
+  "repository_url": "https://github.com/mantinedev/mantine",
+  "slug": "npm-mantine-mcp-server-9-8-2",
+  "stderr_summary": "",
+  "tool_count": 5,
+  "tools": [
+    {
+      "description": "Search all Mantine documentation — components, hooks, @mantine/form, styling, theming, guides and FAQ. Returns ranked matches; a match may point at a specific section, which can then be fetched with get_item_doc.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "kind": {
+            "enum": [
+              "component",
+              "hook",
+              "guide",
+              "faq"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of results (default 20, max 100)",
+            "type": "number"
+          },
+          "package": {
+            "description": "Filter by package, e.g. \"@mantine/form\"",
+            "type": "string"
+          },
+          "query": {
+            "description": "Free text query, e.g. \"validate a form with zod\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_docs",
+      "title": "Search Mantine documentation"
+    },
+    {
+      "description": "Get documentation for a Mantine component, hook, guide or FAQ page. Without a section it returns an outline (description plus section list) — pass a section to fetch just that part, or full:true for the whole page.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "full": {
+            "description": "Return the entire page; can be very large",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "component",
+              "hook",
+              "guide",
+              "faq"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Item name or id, e.g. \"useForm\", \"Button\", \"form-validation\"",
+            "minLength": 1,
+            "type": "string"
+          },
+          "section": {
+            "description": "Section slug from the outline, e.g. \"zod\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "get_item_doc",
+      "title": "Get Mantine documentation"
+    },
+    {
+      "description": "Get props for a Mantine component, or the TypeScript signature for a hook. Pages documenting an API in prose point at the relevant section instead.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "kind": {
+            "enum": [
+              "component",
+              "hook",
+              "guide",
+              "faq"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "get_item_props",
+      "title": "Get Mantine props or signature"
+    },
+    {
+      "description": "List Mantine documentation items, filtered by kind, nav group, category, package or a text query.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "group": {
+            "enum": [
+              "gettingStarted",
+              "theming",
+              "hooks",
+              "components",
+              "extensions",
+              "form"
+            ],
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "component",
+              "hook",
+              "guide",
+              "faq"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of results (default 30, max 500)",
+            "type": "number"
+          },
+          "package": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_items",
+      "title": "List Mantine documentation items"
+    },
+    {
+      "description": "Resolve a Mantine symbol (useForm, useDisclosure, UseFormReturnType) to its TypeScript signature and exported types, without knowing which page documents it.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "symbol": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "get_api",
+      "title": "Resolve a Mantine symbol"
+    }
+  ],
+  "version": "9.8.2"
+}

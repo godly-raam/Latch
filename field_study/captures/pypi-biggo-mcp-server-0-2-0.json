@@ -1,0 +1,18 @@
+{
+  "description": "A Model Context Protocol (MCP) server that provides product search, price history tracking, and specification search capabilities.",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "BigGo-MCP-Server==0.2.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "BigGo-MCP-Server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/Funmula-Corp/BigGo-MCP-Server",
+  "slug": "pypi-biggo-mcp-server-0-2-0",
+  "stderr_summary": "Downloaded aiohttp\nInstalled 52 packages in 32ms\nTraceback (most recent call last):\n  File \"<scratch>/uv-cache/archive-v0/5QZ7iivU2Gm4os32/bin/BigGo-MCP-Server\", line 6, in <module>\n    from biggo_mcp_server import main\n  File \"<scratch>/uv-cache/archive-v0/5QZ7iivU2Gm4os32/lib/python3.12/site-packages/biggo_mcp_server/__init__.py\", line 3, in <module>\n    from .types.setting import BigGoMCPSetting\n  File \"<scratch>/uv-cache/archive-v0/5QZ7iivU2Gm4os32/lib/python3.12/site-packages/biggo_mcp_server/types/setting.py\", line 3, in <module>\n    from pydantic_settings import BaseSettings, SettingsConfigDict\nModuleNotFoundError: No module named 'pydantic_settings'",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.2.0"
+}

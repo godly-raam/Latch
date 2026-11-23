@@ -1,0 +1,18 @@
+{
+  "description": "MCP Server for Ableton Live",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "ableton-live-mcp-server==0.2.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "ableton-live-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/mrmos/ableton-live-mcp-server",
+  "slug": "pypi-ableton-live-mcp-server-0-2-1",
+  "stderr_summary": "Installed 64 packages in 44ms\nAn executable named `ableton-live-mcp-server` is not provided by package `ableton-live-mcp-server`.\nThe following executables are available:\n- ableton-mcp-server\n- ableton-osc-daemon\n\nUse `uvx --from ableton-live-mcp-server <EXECUTABLE-NAME>` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.2.1"
+}

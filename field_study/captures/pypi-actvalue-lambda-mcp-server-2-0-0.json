@@ -1,0 +1,18 @@
+{
+  "description": "A Lambda-based MCP (Model Context Protocol) server implementation",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "actvalue.lambda-mcp-server==2.0.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "actvalue.lambda-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/yourusername/lambda-mcp-server",
+  "slug": "pypi-actvalue-lambda-mcp-server-2-0-0",
+  "stderr_summary": "Downloading botocore (16.1MiB)\n Downloaded botocore\nInstalled 12 packages in 55ms\nPackage `actvalue-lambda-mcp-server` does not provide any executables.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.0.0"
+}

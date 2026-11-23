@@ -1,0 +1,578 @@
+{
+  "description": "MCP server for TouchDesigner",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "touchdesigner-mcp-server@2.2.0"
+  ],
+  "manifest_sha256": "bcc659b5c331a4863f4f5c3adee9b97acade08fbfc4ea92893e21e4aa587084d",
+  "package": "touchdesigner-mcp-server",
+  "protocol_version": "2026-07-28",
+  "repository_url": "https://github.com/8beeeaaat/touchdesigner-mcp",
+  "slug": "npm-touchdesigner-mcp-server-2-2-0",
+  "stderr_summary": "MCP server started in stdio mode",
+  "tool_count": 14,
+  "tools": [
+    {
+      "description": "Get server information from TouchDesigner",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_td_info"
+    },
+    {
+      "description": "Execute a Python script in TouchDesigner (detailLevel=minimal|summary|detailed, responseFormat=json|yaml|markdown)",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          },
+          "script": {
+            "description": "e.g., \"op('/project1/text_over_image').outputConnectors[0].connect(op('/project1/out1'))\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "script"
+        ],
+        "type": "object"
+      },
+      "name": "execute_python_script"
+    },
+    {
+      "description": "List nodes under a path with token-optimized output (detailLevel+limit supported)",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "includeProperties": {
+            "default": false,
+            "description": "Whether to include full node properties in the response (default false for better performance)",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Maximum number of items to include in formatted output",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "parentPath": {
+            "description": "Parent path  e.g., \"/project1\"",
+            "type": "string"
+          },
+          "pattern": {
+            "default": "*",
+            "description": "Pattern to match against node names e.g., \"null*\"",
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "parentPath"
+        ],
+        "type": "object"
+      },
+      "name": "get_td_nodes"
+    },
+    {
+      "description": "Get node parameters with concise/detailed formatting (detailLevel+limit supported)",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of items to include in formatted output",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "nodePath": {
+            "description": "Node path. e.g., \"/project1/textTOP\"",
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodePath"
+        ],
+        "type": "object"
+      },
+      "name": "get_td_node_parameters"
+    },
+    {
+      "description": "Check errors and warnings on a node and its descendants. TouchDesigner reports missing files, dangling operator references and shader compile failures as warnings, so do not treat hasErrors=false as a healthy node. Reads the operator errors and warnings streams only: an exception raised inside a Script OP callback, a scriptCHOP onCook for example, lands on neither and is reported nowhere here, so an empty report is not evidence the node cooked",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of items to include in formatted output",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "nodePath": {
+            "description": "Absolute path to the node to inspect. e.g., \"/project1/text1\"",
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodePath"
+        ],
+        "type": "object"
+      },
+      "name": "get_td_node_errors"
+    },
+    {
+      "description": "Create a new node in TouchDesigner",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "nodeName": {
+            "description": "Name of the new node (optional)",
+            "type": "string"
+          },
+          "nodeType": {
+            "description": "Type of the node to create (e.g., textTop)",
+            "type": "string"
+          },
+          "parentPath": {
+            "description": "Path to the parent node (e.g., /project1)",
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "parentPath",
+          "nodeType"
+        ],
+        "type": "object"
+      },
+      "name": "create_td_node"
+    },
+    {
+      "description": "Update parameters of a specific node in TouchDesigner",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "nodePath": {
+            "description": "Path to the node (e.g., /project1/null1)",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodePath",
+          "properties"
+        ],
+        "type": "object"
+      },
+      "name": "update_td_node_parameters"
+    },
+    {
+      "description": "Delete an existing node in TouchDesigner",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "nodePath": {
+            "description": "Path to the node to delete. e.g., \"/project1/geo1\"",
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodePath"
+        ],
+        "type": "object"
+      },
+      "name": "delete_td_node"
+    },
+    {
+      "description": "Execute a method on a specific node in TouchDesigner",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "args": {
+            "description": "List of arguments for the method call",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "type": "array"
+          },
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "kwargs": {
+            "additionalProperties": {},
+            "description": "Keyword arguments for the method call",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "method": {
+            "description": "Name of the method to call",
+            "type": "string"
+          },
+          "nodePath": {
+            "description": "Path to the node (e.g., /project1/null1)",
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodePath",
+          "method"
+        ],
+        "type": "object"
+      },
+      "name": "exec_node_method"
+    },
+    {
+      "description": "List TouchDesigner Python classes/modules (detailLevel+limit supported)",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of items to include in formatted output",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_td_classes"
+    },
+    {
+      "description": "Get information about a TouchDesigner class/module (detailLevel+limit supported)",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "className": {
+            "description": "Name of the class or module. e.g., \"textTOP\"",
+            "type": "string"
+          },
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of items to include in formatted output",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "className"
+        ],
+        "type": "object"
+      },
+      "name": "get_td_class_details"
+    },
+    {
+      "description": "Retrieve Python help() text for a TouchDesigner module or class",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "moduleName": {
+            "description": "Module or class name (e.g., \"noiseCHOP\", \"td.noiseCHOP\", \"tdu\").",
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "moduleName"
+        ],
+        "type": "object"
+      },
+      "name": "get_td_module_help"
+    },
+    {
+      "description": "Capture the current output of a TOP node as an image so it can be viewed directly (maxSize optionally downscales the longer side)",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "maxSize": {
+            "description": "Maximum length of the image's longer side in pixels. The TOP is downscaled (aspect ratio preserved) only if it exceeds this value; omit to capture at native resolution.",
+            "exclusiveMinimum": 0,
+            "maximum": 4096,
+            "type": "integer"
+          },
+          "nodePath": {
+            "description": "Path to the TOP node to capture, e.g. '/project1/moviefilein1'",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodePath"
+        ],
+        "type": "object"
+      },
+      "name": "get_top_image"
+    },
+    {
+      "description": "Generate a filesystem-oriented manifest of available TouchDesigner tools",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "detailLevel": {
+            "description": "Response detail level for tool output (minimal, summary, or detailed)",
+            "enum": [
+              "minimal",
+              "summary",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "filter": {
+            "description": "Optional keyword to filter by tool name, module path, or parameter description",
+            "minLength": 1,
+            "type": "string"
+          },
+          "responseFormat": {
+            "description": "Structured output format for formatted responses",
+            "enum": [
+              "json",
+              "yaml",
+              "markdown"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "describe_td_tools"
+    }
+  ],
+  "version": "2.2.0"
+}

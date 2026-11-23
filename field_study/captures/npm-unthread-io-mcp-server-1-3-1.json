@@ -1,0 +1,19 @@
+{
+  "description": "Unthread MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@unthread-io/mcp-server@1.3.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@unthread-io/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/unthread-io/mcp-server",
+  "slug": "npm-unthread-io-mcp-server-1-3-1",
+  "stderr_summary": "at new UnthreadClient (<scratch>/npm-cache/_npx/532e1a9bd600a84a/node_modules/@unthread-io/node/build/index.js:103:40)\n      at createBaseUnthreadMcpServer (<scratch>/npm-cache/_npx/532e1a9bd600a84a/node_modules/@unthread-io/mcp-server/build/common.js:7:28)\n      at main (<scratch>/npm-cache/_npx/532e1a9bd600a84a/node_modules/@unthread-io/mcp-server/build/index.js:47:68)\n      at Object.<anonymous> (<scratch>/npm-cache/_npx/532e1a9bd600a84a/node_modules/@unthread-io/mcp-server/build/index.js:58:5)\n      at Module._compile (node:internal/modules/cjs/loader:1781:14)\n      at Object..js (node:internal/modules/cjs/loader:1913:10)\n      at Module.load (node:internal/modules/cjs/loader:1505:32)\n      at Function._load (node:internal/modules/cjs/loader:1309:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n}",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.3.1"
+}

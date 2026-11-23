@@ -51,7 +51,7 @@ forces an explicit re-run and re-label instead of a silently stale
 claim.
 
 Current detector fingerprint:
-`9f211077305c91b1026397f1402d170aed0297efc0efda872ab9256fc836ed4e`
+`d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4`
  (evaluation stage: `post-tuning (post-4a089e1)`).
 
 ## Two stages: First-Run Blind Baseline vs. Post-Tuning Corpus
@@ -65,7 +65,7 @@ Current detector fingerprint:
 - First-run blind FPR: `0.20` (`1/5`), with
   `@modelcontextprotocol/server-everything` producing `26`
   single-server static paths (`32` beside `server-filesystem`).
-- Post-tuning FPR: `0.17` (`1/6`). The same package now produces `9` single-server paths (`11` beside `server-filesystem`) after `sampling`, `elicitation` and `trigger` tools without an external target stopped counting as `EXTERNAL_EGRESS`.
+- Post-tuning FPR: `0.17` (`1/6`). The same package now produces `3` single-server paths (`4` beside `server-filesystem`) after `sampling`, `elicitation` and `trigger` tools without an external target stopped counting as `EXTERNAL_EGRESS`.
 - First-run in-scope recall: `0.67` (`2/3`) -- `mcp-remote@0.14.3` and
   `mcp-proxy==0.8.2` caught, the `fetch + filesystem` composition
   missed statically. First-run overall recall: `0.40` (`2/5`), because
@@ -158,10 +158,10 @@ collapses every read tool feeding the same `(ingest, egress)` pair.
 | `filesystem-plus-git` | 27 | 27 | 0 | 0 | 0 |
 | `filesystem-plus-fetch` | 0 | 0 | 0 | 0 | 0 |
 | `puppeteer-plus-filesystem` | 0 | 0 | 1 | 1 | 8 |
-| `everything-plus-filesystem` | 314 | 302 | 11 | 11 | 108 |
+| `everything-plus-filesystem` | 314 | 302 | 4 | 4 | 39 |
 
 - `filesystem-plus-git`: **27 CRITICAL** paths become **0 CRITICAL** paths. `git_commit`, `git_merge`, `git_create_branch`, `git_checkout`, `git_reset` and `git_add` are local state mutations; there is no network sink in that configuration, so no exfiltration path exists.
-- `everything-plus-filesystem`: 314 raw combinations collapse to 11 unique `(ingest, egress)` pairs (28.5x fewer rows), each listing up to 9 read tools in `read_tools`.
+- `everything-plus-filesystem`: 314 raw combinations collapse to 4 unique `(ingest, egress)` pairs (78.5x fewer rows), each listing up to 9 read tools in `read_tools`.
 
 ## Multi-server compositions from unmodified captures
 
@@ -171,7 +171,7 @@ collapses every read tool feeding the same `(ingest, egress)` pair.
 | `filesystem-plus-git` | `npm-server-filesystem`, `pypi-mcp-server-git` | 30 | 0 | no | true_negative | flagged |
 | `filesystem-plus-fetch` | `npm-server-filesystem`, `pypi-mcp-server-fetch` | 17 | 0 | yes | missed | flagged |
 | `puppeteer-plus-filesystem` | `npm-server-puppeteer-2025-5-12`, `npm-server-filesystem` | 23 | 1 | yes | detected | flagged |
-| `everything-plus-filesystem` | `npm-server-everything`, `npm-server-filesystem` | 38 | 11 | no | false_positive | flagged |
+| `everything-plus-filesystem` | `npm-server-everything`, `npm-server-filesystem` | 38 | 4 | no | false_positive | flagged |
 
 - `filesystem-plus-memory`: Local file read plus local knowledge-graph memory: every write is local state, so there is no outbound sink.
   - no ingest -> read -> egress path
@@ -185,14 +185,9 @@ collapses every read tool feeding the same `(ingest, egress)` pair.
   - post-tuning only: `navigate` added to the egress vocabulary in `4a089e1`; first-run outcome `missed`
 - `everything-plus-filesystem`: The SDK's everything server (the largest captured surface) mounted beside the filesystem server. Its diagnostics tools have no third-party sink, so any path is over-approximation.
   - CRITICAL path trifecta-001: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
-  - CRITICAL path trifecta-002: `npm-server-everything:get-annotated-message` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:gzip-file-as-resource`
-  - CRITICAL path trifecta-003: `npm-server-everything:gzip-file-as-resource` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
-  - CRITICAL path trifecta-004: `npm-server-everything:trigger-sampling-request` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
-  - CRITICAL path trifecta-005: `npm-server-everything:trigger-sampling-request` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:gzip-file-as-resource`
-  - CRITICAL path trifecta-006: `npm-server-everything:trigger-sampling-request-async` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
-  - CRITICAL path trifecta-007: `npm-server-everything:trigger-sampling-request-async` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:gzip-file-as-resource`
-  - CRITICAL path trifecta-008: `npm-server-everything:trigger-url-elicitation` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
-  - +3 more paths (see `package_results.json`)
+  - CRITICAL path trifecta-002: `npm-server-everything:gzip-file-as-resource` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
+  - CRITICAL path trifecta-003: `npm-server-everything:trigger-url-elicitation` -> `npm-server-everything:get-env` (+9 more read tools) -> `npm-server-everything:get-header-params`
+  - CRITICAL path trifecta-004: `npm-server-filesystem:search_files` -> `npm-server-everything:get-env` (+8 more read tools) -> `npm-server-everything:get-header-params`
 
 ## What the real-package findings are telling us
 
@@ -242,13 +237,7 @@ collapses every read tool feeding the same `(ingest, egress)` pair.
 - Latch `audit` finding: `ANNOTATION_CONTRADICTION` [MEDIUM] on `get-header-params`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [CRITICAL] on `npm-server-everything:get-annotated-message`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [CRITICAL] on `npm-server-everything:gzip-file-as-resource`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [CRITICAL] on `npm-server-everything:trigger-sampling-request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [CRITICAL] on `npm-server-everything:trigger-sampling-request-async`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [CRITICAL] on `npm-server-everything:trigger-url-elicitation`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-everything:get-annotated-message`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-everything:trigger-sampling-request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-everything:trigger-sampling-request-async`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-everything:trigger-url-elicitation`
 - Naive baseline matched: `secret`, `token`, `pass`, `ignore`, `instead`, `before`, `x-mcp-header`
 
 ### `@modelcontextprotocol/server-filesystem` 0.6.2 (9 tools, `stdio_tools`)
@@ -275,24 +264,24 @@ collapses every read tool feeding the same `(ingest, egress)` pair.
 - Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
-- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:create_pull_request_review`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_issue`
 - Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_issue`
-- +143 more findings (see `package_results.json`)
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_issue`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_issue`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request_comments`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request_comments`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request_comments`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request_comments`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request_files`
+- Latch `graph` finding: `LETHAL_TRIFECTA` [HIGH] on `npm-server-github-2025-4-8:get_pull_request_files`
+- +46 more findings (see `package_results.json`)
 - Naive baseline matched: `http://`
 
 ### `@modelcontextprotocol/server-memory` 2.1.1 (9 tools, `stdio_tools`)

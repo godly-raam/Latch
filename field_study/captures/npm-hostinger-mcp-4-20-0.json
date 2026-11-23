@@ -1,0 +1,114 @@
+{
+  "description": "MCP server for Hostinger API",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@hostinger/mcp@4.20.0"
+  ],
+  "manifest_sha256": "0f49698d766a4ea98931fc047a37c17f867891dcdd0fb315f04d2b92c3df7ec7",
+  "package": "@hostinger/mcp",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/hostinger/api-mcp-server",
+  "slug": "npm-hostinger-mcp-4-20-0",
+  "stderr_summary": "Loaded 468 operations\nMCP Server starting on stdio transport\nRegistered 3 tools\n[INFO] MCP Server with stdio transport started successfully with 3 tools",
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "readOnlyHint": true,
+        "title": "Search API operations"
+      },
+      "description": "Find API operations by keyword. Returns the best matches, each with its operation name, hints and inputSchema. Pass a result's operation and params matching its inputSchema to execute or multi-execute.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 5,
+            "description": "Maximum number of results.",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Keywords, e.g. \"list vps\" or \"dns records\".",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search",
+      "title": "Search API operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "readOnlyHint": false,
+        "title": "Execute an API operation"
+      },
+      "description": "Run one API operation found with search. params is a flat object holding the operation's path, query and body parameters as described by its inputSchema.",
+      "inputSchema": {
+        "properties": {
+          "operation": {
+            "description": "Operation name returned by search.",
+            "type": "string"
+          },
+          "params": {
+            "description": "Parameters matching the operation inputSchema.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "operation"
+        ],
+        "type": "object"
+      },
+      "name": "execute",
+      "title": "Execute an API operation"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "readOnlyHint": false,
+        "title": "Execute API operations in sequence"
+      },
+      "description": "Run up to 20 API operations in order, stopping at the first failure. A params value that is exactly \"$steps.<i>.<path>\" is replaced by that value from the result of earlier step <i> (dot-separated keys; numbers index arrays), e.g. \"$steps.0.0.id\".",
+      "inputSchema": {
+        "properties": {
+          "steps": {
+            "items": {
+              "properties": {
+                "operation": {
+                  "description": "Operation name returned by search.",
+                  "type": "string"
+                },
+                "params": {
+                  "description": "Parameters; may contain \"$steps.<i>.<path>\" references.",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "operation"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "steps"
+        ],
+        "type": "object"
+      },
+      "name": "multi-execute",
+      "title": "Execute API operations in sequence"
+    }
+  ],
+  "version": "4.20.0"
+}

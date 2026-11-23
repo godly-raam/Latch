@@ -1,0 +1,18 @@
+{
+  "description": "MCP server for ELF600 docs, public sample decks, and motor-design Python facade contracts: run queues, efficiency maps, dq/MTPA, PWM harmonics, NGSolve validation, RunResult parsing, optimization loops, drawing/BOM handoffs, and release-quality audits.",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "ELF-mcp-server==1.61.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "ELF-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/ksugahar/ELF-mcp-server",
+  "slug": "pypi-elf-mcp-server-1-61-0",
+  "stderr_summary": "Downloading elf-mcp-server (4.7MiB)\n Downloaded elf-mcp-server\nInstalled 30 packages in 83ms\nAn executable named `ELF-mcp-server` is not provided by package `elf-mcp-server`.\nThe following executables are available:\n- elf-mcp-policy-lint\n- elf-mcp-server",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.61.0"
+}

@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for Panda CSS AI assistants",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@pandacss/mcp@2.6.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@pandacss/mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/chakra-ui/panda",
+  "slug": "npm-pandacss-mcp-2-6-0",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.6.0"
+}

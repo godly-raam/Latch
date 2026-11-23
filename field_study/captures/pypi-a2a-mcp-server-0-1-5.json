@@ -1,0 +1,258 @@
+{
+  "description": "A bridge server that connects Model Context Protocol (MCP) with Agent-to-Agent (A2A) protocol",
+  "ecosystem": "pypi",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "uvx",
+    "a2a-mcp-server==0.1.5"
+  ],
+  "manifest_sha256": "4167fbe46cfdd0d6809175fb197bfc8af64509a80529ab96b50f55a060bd5d97",
+  "package": "a2a-mcp-server",
+  "protocol_version": "2026-07-28",
+  "repository_url": "https://github.com/GongRzhe/A2A-MCP-Server",
+  "slug": "pypi-a2a-mcp-server-0-1-5",
+  "stderr_summary": "│                            https://gofastmcp.com                             │\n│                                                                              │\n│                  🖥  Server:      A2A Bridge Server, 4.2.5                    │\n│                  🚀 Deploy free: https://horizon.prefect.io                  │\n│                                                                              │\n╰──────────────────────────────────────────────────────────────────────────────╯\n\n\n[11/23/26 18:47:43] INFO     Starting MCP server 'A2A Bridge    transport.py:241\n                             Server' with transport 'stdio'",
+  "tool_count": 7,
+  "tools": [
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Register an A2A agent with the bridge server.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "URL of the A2A agent",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "register_agent",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Register Agent"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "List all registered A2A agents.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_agents",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object",
+        "x-fastmcp-wrap-result": true
+      },
+      "title": "List Agents"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Unregister an A2A agent from the bridge server.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "URL of the A2A agent to unregister",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "unregister_agent",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Unregister Agent"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Send a message to an A2A agent.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_url": {
+            "description": "URL of the A2A agent",
+            "type": "string"
+          },
+          "message": {
+            "description": "Message to send",
+            "type": "string"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional session ID for multi-turn conversations"
+          }
+        },
+        "required": [
+          "agent_url",
+          "message"
+        ],
+        "type": "object"
+      },
+      "name": "send_message",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Send Message"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Retrieve the result of a task from an A2A agent.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "history_length": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional number of history items to include (null for all)"
+          },
+          "task_id": {
+            "description": "ID of the task to retrieve",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_task_result",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Get Task Result"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Cancel a running task on an A2A agent.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "task_id": {
+            "description": "ID of the task to cancel",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "cancel_task",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Cancel Task"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Send a message to an A2A agent and stream the response.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_url": {
+            "description": "URL of the A2A agent",
+            "type": "string"
+          },
+          "message": {
+            "description": "Message to send",
+            "type": "string"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional session ID for multi-turn conversations"
+          }
+        },
+        "required": [
+          "agent_url",
+          "message"
+        ],
+        "type": "object"
+      },
+      "name": "send_message_stream",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Send Message Stream"
+    }
+  ],
+  "version": "0.1.5"
+}

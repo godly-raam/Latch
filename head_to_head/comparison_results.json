@@ -77,10 +77,10 @@
       ],
       "clean_false_positive_rate": 0.1667,
       "clean_package_count": 6,
-      "detector_fingerprint_sha256": "9f211077305c91b1026397f1402d170aed0297efc0efda872ab9256fc836ed4e",
+      "detector_fingerprint_sha256": "d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4",
       "evaluation_stage": "post-tuning (post-4a089e1)",
-      "everything_single_server_paths": 9,
-      "everything_with_filesystem_paths": 11,
+      "everything_single_server_paths": 3,
+      "everything_with_filesystem_paths": 4,
       "in_scope_detected": [
         "npm-mcp-remote-0-14-3-static-header",
         "npm-mcp-remote-0-14-3",
@@ -290,7 +290,7 @@
       "in_latch_threat_model": false,
       "kind": "stdio_tools",
       "latch_flagged": true,
-      "latch_rule_count": 10,
+      "latch_rule_count": 4,
       "latch_rules": [
         "ANNOTATION_CONTRADICTION",
         "LETHAL_TRIFECTA"

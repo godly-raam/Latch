@@ -607,6 +607,35 @@ python -m adversarial.run_external_blind --check-template  # schema/scorer check
 python -m head_to_head.run_comparison
 ```
 
+### Unseen-Package Field Study (npm & PyPI)
+
+To test `mcpprobe` outside its development corpus, we discovered **100 unseen MCP
+server packages** (`70` npm, `30` PyPI, excluding all `package_eval` targets) in
+`field_study/targets.json` and harvested manifests inside an isolated container
+without supplying API credentials (`field_study/FIELD_STUDY_REPORT.md`):
+
+- **Harvest funnel:** `31` servers returned `tools/list` without credentials
+  (`35` startup/runtime errors, `21` timeouts, `13` exited requesting required
+  API keys).
+- **Pre-hardening (`9f211077…`):** `11 / 31` servers flagged (`21,248`
+  `LETHAL_TRIFECTA` paths + `1` `manifest_error`). Hand triage identified `8`
+  servers triggered by over-broad `openWorldHint` annotations and generic
+  parameter tokens (`to`, `external`, `comment`, `pageToken`).
+- **Post-hardening (`d7c7ff0c…`):** `3 / 31` servers flagged (`70`
+  `LETHAL_TRIFECTA` paths + `1` `manifest_error`), `28 / 31` clean, with **zero
+  recall loss** across `package_eval` (`7/8` in-scope) and
+  `adversarial/wave2_frozen_baseline.json` (`TP=5, FP=0`):
+  - `chrome-devtools-mcp@1.13.0` (`4` CRITICAL `LETHAL_TRIFECTA` paths — browser
+    DOM/console ingest + `navigate_page` sink, triaged
+    `true_positive_informational`)
+  - `@doitintl/doit-mcp-server@5.1.0` (`66` HIGH `LETHAL_TRIFECTA` paths —
+    billing/anomaly readers + `recipients` alert egress, triaged
+    `true_positive_informational`)
+  - `@angelogiacco/elevenlabs-mcp-server@1.0.4` (`1` MEDIUM `manifest_error` —
+    `6` duplicate tool names with conflicting schemas in `tools/list`; logged in
+    `field_study/DISCLOSURE_LOG.md` as `closed_upstream_archived` after verifying
+    upstream deprecation)
+
 ## GitHub Actions
 
 `action.yml` is a composite action: it installs Latch, runs one engine, and
