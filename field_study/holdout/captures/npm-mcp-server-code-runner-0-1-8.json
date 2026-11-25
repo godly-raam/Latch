@@ -1,0 +1,85 @@
+{
+  "description": "Code Runner MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "mcp-server-code-runner@0.1.8"
+  ],
+  "manifest_sha256": "41c2213d4260be266a8c8abffb2903744fe2535af3eed47b148c631e5ef6c194",
+  "package": "mcp-server-code-runner",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/formulahendry/mcp-server-code-runner",
+  "slug": "npm-mcp-server-code-runner-0-1-8",
+  "stderr_summary": "",
+  "tool_count": 1,
+  "tools": [
+    {
+      "description": "Run code snippet and return the result.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "description": "Code Snippet",
+            "type": "string"
+          },
+          "languageId": {
+            "description": "Language ID",
+            "enum": [
+              "javascript",
+              "php",
+              "python",
+              "perl",
+              "perl6",
+              "ruby",
+              "go",
+              "lua",
+              "groovy",
+              "powershell",
+              "bat",
+              "shellscript",
+              "fsharp",
+              "csharp",
+              "vbscript",
+              "typescript",
+              "coffeescript",
+              "scala",
+              "swift",
+              "julia",
+              "crystal",
+              "ocaml",
+              "r",
+              "applescript",
+              "clojure",
+              "racket",
+              "scheme",
+              "ahk",
+              "autoit",
+              "dart",
+              "haskell",
+              "nim",
+              "lisp",
+              "kit",
+              "v",
+              "sass",
+              "scss"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "languageId"
+        ],
+        "type": "object"
+      },
+      "name": "run-code"
+    }
+  ],
+  "version": "0.1.8"
+}

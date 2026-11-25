@@ -611,7 +611,7 @@ python -m head_to_head.run_comparison
 
 To test `mcpprobe` outside its development corpus, we discovered **100 unseen MCP
 server packages** (`70` npm, `30` PyPI, excluding all `package_eval` targets) in
-`field_study/targets.json` and harvested manifests inside an isolated container
+`field_study/round1/targets.json` and harvested manifests inside an isolated container
 without supplying API credentials (`field_study/FIELD_STUDY_REPORT.md`):
 
 - **Harvest funnel:** `31` servers returned `tools/list` without credentials
@@ -622,9 +622,10 @@ without supplying API credentials (`field_study/FIELD_STUDY_REPORT.md`):
   servers triggered by over-broad `openWorldHint` annotations and generic
   parameter tokens (`to`, `external`, `comment`, `pageToken`).
 - **Post-hardening (`d7c7ff0c…`):** `3 / 31` servers flagged (`70`
-  `LETHAL_TRIFECTA` paths + `1` `manifest_error`), `28 / 31` clean, with **zero
-  recall loss** across `package_eval` (`7/8` in-scope) and
-  `adversarial/wave2_frozen_baseline.json` (`TP=5, FP=0`):
+  `LETHAL_TRIFECTA` paths + `1` `manifest_error`), `27 / 31` clean plus `1`
+  named out-of-scope miss, with **zero recall loss** across `package_eval`
+  (`7/8` in-scope) and `adversarial/wave2_frozen_baseline.json`
+  (`TP=5, FP=0`):
   - `chrome-devtools-mcp@1.13.0` (`4` CRITICAL `LETHAL_TRIFECTA` paths — browser
     DOM/console ingest + `navigate_page` sink, triaged
     `true_positive_informational`)
@@ -635,6 +636,30 @@ without supplying API credentials (`field_study/FIELD_STUDY_REPORT.md`):
     `6` duplicate tool names with conflicting schemas in `tools/list`; logged in
     `field_study/DISCLOSURE_LOG.md` as `closed_upstream_archived` after verifying
     upstream deprecation)
+- **Compositions (`525` sets):** `shadow` needs a second server before a name
+  can collide and the trifecta is a property of the mounted tool set, so a
+  per-server scan can only ever report zero for `shadow`. Re-running the frozen
+  detectors over every pair of harvested servers plus each server beside
+  `filesystem+fetch`, `filesystem+git` and `fetch+github` flags **`136`**
+  compositions: `2,937` of `5,113` `LETHAL_TRIFECTA` paths are cross-server and
+  `shadow` contributes `186` findings. `auth-audit` stays at `0` because every
+  capture is a stdio manifest with no HTTP/OAuth transport to audit — an
+  untested engine there, not a pass.
+- **Known miss:** `malicious-mcp-server@1.5.0` is labelled
+  `known_out_of_scope_miss`, not clean. Its surface is hostile by intent
+  (`tokenInputReceiver` collects API keys and DB passwords,
+  `customerDataProvider` is PII-shaped, `promptGuardTriggerer` wraps untrusted
+  content), but the malice is in runtime responses and handlers, which
+  `tools/list` does not carry.
+- **Holdout (`d7c7ff0c…`, rules frozen):** the numbers above are in-sample, so
+  the same detectors were re-run on a **disjoint** 100-package sample from the
+  next slice of the same registry queries (no package in common with round 1):
+  `18` returned a surface (`112` tools) and **`0` of `18` flagged** — no false
+  positives out of sample. Eighteen surfaces bounds the per-server
+  false-positive rate at roughly `17%` (rule of three), not at zero.
+  Compositions on the same sample: `37` of `207` flag, with `675` of `1,401`
+  `LETHAL_TRIFECTA` paths cross-server and `21` `shadow` findings. Method,
+  funnel and artifacts: `field_study/HOLDOUT.md`.
 
 ## GitHub Actions
 

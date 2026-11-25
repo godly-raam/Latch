@@ -1,0 +1,110 @@
+{
+  "description": "Transcend MCP Server — Documentation lookup tools.",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@transcend-io/mcp-server-docs@0.6.1"
+  ],
+  "manifest_sha256": "0e4b7adaeda9b33285cfb5fd5ff07244fe1c46eeb38497e7231c43dfbd7397f5",
+  "package": "@transcend-io/mcp-server-docs",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/transcend-io/tools",
+  "slug": "npm-transcend-io-mcp-server-docs-0-6-1",
+  "stderr_summary": "npm WARN EBADENGINE Unsupported engine {\nnpm WARN EBADENGINE   package: '@sindresorhus/is@8.1.0',\nnpm WARN EBADENGINE   required: { node: '>=22' },\nnpm WARN EBADENGINE   current: { node: 'v20.19.2', npm: '9.2.0' }\nnpm WARN EBADENGINE }\n{\"level\":\"info\",\"message\":\"Registered 3 tools\",\"data\":{\"toolCount\":3},\"timestamp\":\"2026-11-24T18:12:04.500Z\"}\n{\"level\":\"info\",\"message\":\"Starting transcend-mcp-docs v0.6.1...\",\"data\":{\"toolCount\":3,\"promptCount\":0},\"timestamp\":\"2026-11-24T18:12:04.509Z\"}\n{\"level\":\"info\",\"message\":\"transcend-mcp-docs started successfully\",\"data\":{\"sombraUrl\":\"(lazy GraphQL resolve)\",\"graphqlUrl\":\"https://api.transcend.io\",\"dashboardUrl\":\"https://app.transcend.io\",\"tools\":3},\"timestamp\":\"2026-11-24T18:12:04.509Z\"}\n{\"level\":\"info\",\"message\":\"MCP client connected\",\"data\":{\"host\":\"unknown\",\"clientName\":\"latch\",\"clientVersion\":\"0.1.0\",\"capabilities\":[]},\"timestamp\":\"2026-11-24T18:12:04.528Z\"}\n{\"level\":\"info\",\"message\":\"Returning 3 tools\",\"timestamp\":\"2026-11-24T18:12:04.535Z\"}",
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List or search Transcend documentation. Prefer route for a Dashboard page, product for a product area, or query for full-text search. Rows may include a one-line index description. section lists one llms.txt section; omit arguments for section names. Then call docs_fetch with a url.",
+      "inputSchema": {
+        "properties": {
+          "integration": {
+            "description": "Public integration guides for this catalog integrationName. Catalog depth needs docs_integration_lookup when signed in.",
+            "type": "string"
+          },
+          "product": {
+            "description": "List docs for one product, overview pages first. One of: Assessments, Classification, Consent Management, Data Inventory, DSR Automation, Platform, Preference Management, Privacy Center, System Discovery, Web Auditor (case-insensitive). Can combine with query. Not with section or route.",
+            "enum": [
+              "Assessments",
+              "Classification",
+              "Consent Management",
+              "Data Inventory",
+              "DSR Automation",
+              "Platform",
+              "Preference Management",
+              "Privacy Center",
+              "System Discovery",
+              "Web Auditor"
+            ],
+            "type": "string"
+          },
+          "query": {
+            "description": "Full-text search terms (prefer 2–3 distinctive words). At most 20 results; no paging.",
+            "type": "string"
+          },
+          "route": {
+            "description": "Admin Dashboard route pattern, path, or app URL. Returns linked pages, then product docs. Combine with query. Not with section or product.",
+            "type": "string"
+          },
+          "section": {
+            "description": "List the articles in this llms.txt section (exact match). Omit both arguments to see the available section names.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "docs_list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Fetch full markdown content for a Transcend documentation article by URL. Use urls returned by docs_list.",
+      "inputSchema": {
+        "properties": {
+          "url": {
+            "description": "Absolute https URL of a docs.transcend.io article (.md) from docs_list.",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "docs_fetch"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Signed-in catalog docs for one integration (connection, datapoints, actions). Pass integrationName or title; near miss returns close names. Public guides: docs_list.",
+      "inputSchema": {
+        "properties": {
+          "integration": {
+            "description": "Catalog integrationName (e.g. `salesforce`) or title. Near miss returns close names.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "integration"
+        ],
+        "type": "object"
+      },
+      "name": "docs_integration_lookup"
+    }
+  ],
+  "version": "0.6.1"
+}

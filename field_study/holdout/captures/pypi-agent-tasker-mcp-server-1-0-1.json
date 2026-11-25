@@ -1,0 +1,346 @@
+{
+  "description": "Minimal stdio MCP server for parallel task execution by AI agents",
+  "ecosystem": "pypi",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "uvx",
+    "agent-tasker-mcp-server==1.0.1"
+  ],
+  "manifest_sha256": "f3af381f06de8791418aa1dcace40907e1f18a5ee669f62e45ce93e63642ee37",
+  "package": "agent-tasker-mcp-server",
+  "protocol_version": "2025-06-18",
+  "repository_url": "https://github.com/S3bRR/agent-tasker-mcp",
+  "slug": "pypi-agent-tasker-mcp-server-1-0-1",
+  "stderr_summary": "Installed 1 package in 4ms",
+  "tool_count": 2,
+  "tools": [
+    {
+      "description": "Run one task and return its result.",
+      "inputSchema": {
+        "properties": {
+          "body": {
+            "description": "Request body",
+            "type": "string"
+          },
+          "code": {
+            "description": "Python code",
+            "type": "string"
+          },
+          "command": {
+            "description": "Command",
+            "type": "string"
+          },
+          "content": {
+            "description": "File content",
+            "type": "string"
+          },
+          "extract_headings": {
+            "description": "Include headings",
+            "type": "boolean"
+          },
+          "extract_links": {
+            "description": "Include links",
+            "type": "boolean"
+          },
+          "fetch_max_chars": {
+            "description": "Chars per fetched page",
+            "type": "integer"
+          },
+          "fetch_top_results": {
+            "description": "Fetch top result pages",
+            "type": "integer"
+          },
+          "headers": {
+            "description": "Headers",
+            "type": "object"
+          },
+          "include_html": {
+            "description": "Include raw HTML",
+            "type": "boolean"
+          },
+          "link_include_pattern": {
+            "description": "Regex for kept links",
+            "type": "string"
+          },
+          "max_body_bytes": {
+            "description": "Max response bytes",
+            "type": "integer"
+          },
+          "max_links": {
+            "description": "Max links",
+            "type": "integer"
+          },
+          "max_results": {
+            "description": "Max results",
+            "type": "integer"
+          },
+          "max_text_chars": {
+            "description": "Max extracted chars",
+            "type": "integer"
+          },
+          "method": {
+            "description": "HTTP method",
+            "enum": [
+              "DELETE",
+              "GET",
+              "HEAD",
+              "OPTIONS",
+              "PATCH",
+              "POST",
+              "PUT"
+            ],
+            "type": "string"
+          },
+          "mode": {
+            "description": "w or a",
+            "enum": [
+              "w",
+              "a"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Task name",
+            "type": "string"
+          },
+          "output_mode": {
+            "default": "compact",
+            "description": "full or compact",
+            "enum": [
+              "full",
+              "compact"
+            ],
+            "type": "string"
+          },
+          "path": {
+            "description": "File path",
+            "type": "string"
+          },
+          "providers": {
+            "description": "Discovery providers",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "query": {
+            "description": "Search query",
+            "type": "string"
+          },
+          "retries": {
+            "description": "Retry count",
+            "type": "integer"
+          },
+          "retry_backoff_seconds": {
+            "description": "Retry backoff seconds",
+            "type": "integer"
+          },
+          "task_type": {
+            "description": "Task type",
+            "enum": [
+              "python_code",
+              "http_request",
+              "discovery_search",
+              "web_scrape",
+              "shell_command",
+              "file_read",
+              "file_write"
+            ],
+            "type": "string"
+          },
+          "timeout": {
+            "description": "Timeout seconds",
+            "type": "integer"
+          },
+          "url": {
+            "description": "Target URL",
+            "type": "string"
+          },
+          "verify_ssl": {
+            "description": "Verify SSL",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "task_type"
+        ],
+        "type": "object"
+      },
+      "name": "execute"
+    },
+    {
+      "description": "Run many tasks in parallel and return ordered results.",
+      "inputSchema": {
+        "properties": {
+          "output_mode": {
+            "default": "compact",
+            "description": "full or compact",
+            "enum": [
+              "full",
+              "compact"
+            ],
+            "type": "string"
+          },
+          "tasks": {
+            "description": "Task definitions",
+            "items": {
+              "properties": {
+                "body": {
+                  "description": "Request body",
+                  "type": "string"
+                },
+                "code": {
+                  "description": "Python code",
+                  "type": "string"
+                },
+                "command": {
+                  "description": "Command",
+                  "type": "string"
+                },
+                "content": {
+                  "description": "File content",
+                  "type": "string"
+                },
+                "depends_on": {
+                  "description": "Task names that must complete before this task runs",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "extract_headings": {
+                  "description": "Include headings",
+                  "type": "boolean"
+                },
+                "extract_links": {
+                  "description": "Include links",
+                  "type": "boolean"
+                },
+                "fetch_max_chars": {
+                  "description": "Chars per fetched page",
+                  "type": "integer"
+                },
+                "fetch_top_results": {
+                  "description": "Fetch top result pages",
+                  "type": "integer"
+                },
+                "headers": {
+                  "description": "Headers",
+                  "type": "object"
+                },
+                "include_html": {
+                  "description": "Include raw HTML",
+                  "type": "boolean"
+                },
+                "link_include_pattern": {
+                  "description": "Regex for kept links",
+                  "type": "string"
+                },
+                "max_body_bytes": {
+                  "description": "Max response bytes",
+                  "type": "integer"
+                },
+                "max_links": {
+                  "description": "Max links",
+                  "type": "integer"
+                },
+                "max_results": {
+                  "description": "Max results",
+                  "type": "integer"
+                },
+                "max_text_chars": {
+                  "description": "Max extracted chars",
+                  "type": "integer"
+                },
+                "method": {
+                  "description": "HTTP method",
+                  "enum": [
+                    "DELETE",
+                    "GET",
+                    "HEAD",
+                    "OPTIONS",
+                    "PATCH",
+                    "POST",
+                    "PUT"
+                  ],
+                  "type": "string"
+                },
+                "mode": {
+                  "description": "w or a",
+                  "enum": [
+                    "w",
+                    "a"
+                  ],
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Task name",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "File path",
+                  "type": "string"
+                },
+                "providers": {
+                  "description": "Discovery providers",
+                  "items": {
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "query": {
+                  "description": "Search query",
+                  "type": "string"
+                },
+                "retries": {
+                  "description": "Retry count",
+                  "type": "integer"
+                },
+                "retry_backoff_seconds": {
+                  "description": "Retry backoff seconds",
+                  "type": "integer"
+                },
+                "task_type": {
+                  "description": "Task type",
+                  "enum": [
+                    "python_code",
+                    "http_request",
+                    "discovery_search",
+                    "web_scrape",
+                    "shell_command",
+                    "file_read",
+                    "file_write"
+                  ],
+                  "type": "string"
+                },
+                "timeout": {
+                  "description": "Timeout seconds",
+                  "type": "integer"
+                },
+                "url": {
+                  "description": "Target URL",
+                  "type": "string"
+                },
+                "verify_ssl": {
+                  "description": "Verify SSL",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "task_type"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "tasks"
+        ],
+        "type": "object"
+      },
+      "name": "execute_batch"
+    }
+  ],
+  "version": "1.0.1"
+}

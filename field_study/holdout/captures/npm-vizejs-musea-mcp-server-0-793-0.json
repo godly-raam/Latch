@@ -1,0 +1,458 @@
+{
+  "description": "MCP server for building Vue.js design systems - component analysis, documentation, variant generation, and design tokens",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@vizejs/musea-mcp-server@0.793.0"
+  ],
+  "manifest_sha256": "fdbe834477b06f1c698a449d80eeefe4dc06895c1fa73b5e340f73f394751237",
+  "package": "@vizejs/musea-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/ubugeeei-prod/vize",
+  "slug": "npm-vizejs-musea-mcp-server-0-793-0",
+  "stderr_summary": "npm WARN EBADENGINE   required: { node: '>=22' },\nnpm WARN EBADENGINE   current: { node: 'v20.19.2', npm: '9.2.0' }\nnpm WARN EBADENGINE }\nnpm WARN EBADENGINE Unsupported engine {\nnpm WARN EBADENGINE   package: '@vizejs/native@0.793.0',\nnpm WARN EBADENGINE   required: { node: '>=22' },\nnpm WARN EBADENGINE   current: { node: 'v20.19.2', npm: '9.2.0' }\nnpm WARN EBADENGINE }\n[musea-mcp] Starting server for project: /work\n[musea-mcp] Server started",
+  "tool_count": 13,
+  "tools": [
+    {
+      "description": "Statically analyze a Vue SFC to extract its props and emits. Accepts a Vue component path directly, or an art-file reference that resolves to the linked component source.",
+      "inputSchema": {
+        "properties": {
+          "component": {
+            "description": "Resolve an art file by its component reference or component basename, then analyze it",
+            "type": "string"
+          },
+          "path": {
+            "description": "Path to the .vue component file or .art.vue file (relative to project root)",
+            "type": "string"
+          },
+          "query": {
+            "description": "Fuzzy-search an art file, then analyze the linked component source",
+            "type": "string"
+          },
+          "ref": {
+            "description": "Generic art-file reference: path, title, component name, or search text",
+            "type": "string"
+          },
+          "title": {
+            "description": "Resolve an art file by its display title, then analyze its component source",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "analyze_component"
+    },
+    {
+      "description": "Derive an interactive props palette (control types, defaults, ranges, options) for a component described by an Art file. Falls back to SFC analysis when native palette inference is sparse.",
+      "inputSchema": {
+        "properties": {
+          "component": {
+            "description": "Resolve an art file by component reference or component basename",
+            "type": "string"
+          },
+          "path": {
+            "description": "Path to the .art.vue file (relative to project root)",
+            "type": "string"
+          },
+          "query": {
+            "description": "Fuzzy-search an art file before generating the palette",
+            "type": "string"
+          },
+          "ref": {
+            "description": "Generic art-file reference: path, title, component name, or search text",
+            "type": "string"
+          },
+          "title": {
+            "description": "Resolve an art file by title instead of path",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_palette"
+    },
+    {
+      "description": "List components registered in the design system. Returns titles, categories, tags, status, variant names, and related resource URIs.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Filter by category",
+            "type": "string"
+          },
+          "component": {
+            "description": "Filter by component reference or component basename",
+            "type": "string"
+          },
+          "includeVariants": {
+            "description": "Include per-variant metadata in the result (default: false)",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Maximum number of components to return (default: all)",
+            "type": "number"
+          },
+          "sortBy": {
+            "description": "Sort order for the result list (default: title)",
+            "enum": [
+              "title",
+              "category",
+              "status",
+              "variants"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Filter by status badge",
+            "enum": [
+              "draft",
+              "ready",
+              "deprecated"
+            ],
+            "type": "string"
+          },
+          "tag": {
+            "description": "Filter by tag",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_components"
+    },
+    {
+      "description": "Get full details of a design-system component: metadata, variants, source-component analysis, palette data, documentation, and related resource URIs.",
+      "inputSchema": {
+        "properties": {
+          "component": {
+            "description": "Resolve an art file by component reference or component basename",
+            "type": "string"
+          },
+          "includeAnalysis": {
+            "description": "Include resolved component props/emits analysis (default: true)",
+            "type": "boolean"
+          },
+          "includeDocumentation": {
+            "description": "Include generated Markdown docs inline (default: false)",
+            "type": "boolean"
+          },
+          "includePalette": {
+            "description": "Include inferred palette data (default: true)",
+            "type": "boolean"
+          },
+          "path": {
+            "description": "Path to the .art.vue file (relative to project root)",
+            "type": "string"
+          },
+          "query": {
+            "description": "Fuzzy-search an art file before loading details",
+            "type": "string"
+          },
+          "ref": {
+            "description": "Generic art-file reference: path, title, component name, or search text",
+            "type": "string"
+          },
+          "title": {
+            "description": "Resolve an art file by display title instead of path",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_component"
+    },
+    {
+      "description": "Retrieve a single variant (template and metadata) from a component, resolving the component by path, title, component name, or fuzzy query.",
+      "inputSchema": {
+        "properties": {
+          "component": {
+            "description": "Resolve an art file by component reference or component basename",
+            "type": "string"
+          },
+          "includeAnalysis": {
+            "description": "Include resolved component props/emits analysis (default: false)",
+            "type": "boolean"
+          },
+          "path": {
+            "description": "Path to the .art.vue file",
+            "type": "string"
+          },
+          "query": {
+            "description": "Fuzzy-search an art file before looking up the variant",
+            "type": "string"
+          },
+          "ref": {
+            "description": "Generic art-file reference: path, title, component name, or search text",
+            "type": "string"
+          },
+          "title": {
+            "description": "Resolve an art file by title",
+            "type": "string"
+          },
+          "variant": {
+            "description": "Variant name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "variant"
+        ],
+        "type": "object"
+      },
+      "name": "get_variant"
+    },
+    {
+      "description": "Ranked full-text search over component titles, descriptions, categories, tags, component names, and variant names.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Restrict matches to one category",
+            "type": "string"
+          },
+          "component": {
+            "description": "Restrict matches to a component reference/basename before searching",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of results to return (default: 10)",
+            "type": "number"
+          },
+          "query": {
+            "description": "Search query",
+            "type": "string"
+          },
+          "status": {
+            "description": "Restrict matches to one status",
+            "enum": [
+              "draft",
+              "ready",
+              "deprecated"
+            ],
+            "type": "string"
+          },
+          "tag": {
+            "description": "Restrict matches to one tag",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_components"
+    },
+    {
+      "description": "Intent-oriented component recommendation. Useful when the user describes a task or UX goal rather than knowing exact component names.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Optional category filter",
+            "type": "string"
+          },
+          "component": {
+            "description": "Optional component reference/basename filter",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of recommendations to return (default: 5)",
+            "type": "number"
+          },
+          "status": {
+            "description": "Optional status filter",
+            "enum": [
+              "draft",
+              "ready",
+              "deprecated"
+            ],
+            "type": "string"
+          },
+          "tag": {
+            "description": "Optional tag filter",
+            "type": "string"
+          },
+          "task": {
+            "description": "Intent or UI task to solve",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "type": "object"
+      },
+      "name": "recommend_components"
+    },
+    {
+      "description": "Analyze a Vue component's props and auto-generate an .art.vue file containing appropriate variant combinations (default, boolean toggles, enum values, etc.).",
+      "inputSchema": {
+        "properties": {
+          "componentPath": {
+            "description": "Path to the .vue component file (relative to project root)",
+            "type": "string"
+          },
+          "includeBooleanToggles": {
+            "description": "Generate variants that toggle each boolean prop (default: true)",
+            "type": "boolean"
+          },
+          "includeDefault": {
+            "description": "Include a default variant (default: true)",
+            "type": "boolean"
+          },
+          "includeEnumVariants": {
+            "description": "Generate one variant per enum/union value (default: true)",
+            "type": "boolean"
+          },
+          "maxVariants": {
+            "description": "Maximum number of variants to generate (default: 20)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "componentPath"
+        ],
+        "type": "object"
+      },
+      "name": "generate_variants"
+    },
+    {
+      "description": "Convert an .art.vue file into Storybook CSF 3.0 code for integration with existing Storybook setups.",
+      "inputSchema": {
+        "properties": {
+          "component": {
+            "description": "Resolve an art file by component reference or component basename",
+            "type": "string"
+          },
+          "path": {
+            "description": "Path to the .art.vue file",
+            "type": "string"
+          },
+          "query": {
+            "description": "Fuzzy-search an art file before converting to CSF",
+            "type": "string"
+          },
+          "ref": {
+            "description": "Generic art-file reference: path, title, component name, or search text",
+            "type": "string"
+          },
+          "title": {
+            "description": "Resolve an art file by title",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "generate_csf"
+    },
+    {
+      "description": "Generate Markdown documentation for a design-system component from its .art.vue definition.",
+      "inputSchema": {
+        "properties": {
+          "component": {
+            "description": "Resolve an art file by component reference or component basename",
+            "type": "string"
+          },
+          "includeSource": {
+            "description": "Embed source code in the output (default: false)",
+            "type": "boolean"
+          },
+          "includeTemplates": {
+            "description": "Embed variant templates in the output (default: false)",
+            "type": "boolean"
+          },
+          "path": {
+            "description": "Path to the .art.vue file (relative to project root)",
+            "type": "string"
+          },
+          "query": {
+            "description": "Fuzzy-search an art file before generating docs",
+            "type": "string"
+          },
+          "ref": {
+            "description": "Generic art-file reference: path, title, component name, or search text",
+            "type": "string"
+          },
+          "title": {
+            "description": "Resolve an art file by title",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "generate_docs"
+    },
+    {
+      "description": "Produce a single Markdown catalog covering every component in the design system, grouped by category.",
+      "inputSchema": {
+        "properties": {
+          "includeSource": {
+            "description": "Embed source code in the catalog (default: false)",
+            "type": "boolean"
+          },
+          "includeTemplates": {
+            "description": "Embed variant templates in the catalog (default: false)",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "generate_catalog"
+    },
+    {
+      "description": "Read design tokens (colors, spacing, typography, etc.) from a Style Dictionary-compatible JSON file or directory. Auto-detects common paths if not specified.",
+      "inputSchema": {
+        "properties": {
+          "format": {
+            "description": "Output format (default: json)",
+            "enum": [
+              "json",
+              "markdown"
+            ],
+            "type": "string"
+          },
+          "tokensPath": {
+            "description": "Path to tokens JSON file or directory (relative to project root). Auto-detects tokens/, design-tokens/, or style-dictionary/ if omitted.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_tokens"
+    },
+    {
+      "description": "Search flattened design tokens by token name, category path, value, or description. Much more practical than loading the full token tree for large systems.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Maximum number of matches to return (default: 20)",
+            "type": "number"
+          },
+          "query": {
+            "description": "Search query",
+            "type": "string"
+          },
+          "tokensPath": {
+            "description": "Path to tokens JSON file or directory (relative to project root). Auto-detects common locations if omitted.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Optional token type filter, e.g. color, dimension, typography",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_tokens"
+    }
+  ],
+  "version": "0.793.0"
+}

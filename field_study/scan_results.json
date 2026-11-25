@@ -1,6 +1,79 @@
 {
   "analyzed_target_count": 31,
   "captures_dir": "captures",
+  "compositions": {
+    "anchor_slugs": [
+      "npm-server-filesystem",
+      "npm-server-github-2025-4-8",
+      "npm-server-memory",
+      "npm-server-slack-2025-4-25",
+      "pypi-mcp-server-fetch",
+      "pypi-mcp-server-git"
+    ],
+    "auth_audit_note": "Every capture is a stdio manifest, so auth-audit has no HTTP/OAuth transport to audit. Its zero is an untested engine, not a pass.",
+    "count": 525,
+    "cross_server_path_count": 2937,
+    "engine_counts": {
+      "auth-audit": 0,
+      "graph": 5113,
+      "shadow": 186
+    },
+    "examples": [
+      {
+        "auth_findings": 0,
+        "composition_id": "npm-doitintl-doit-mcp-server-5-1-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+        "cross_server_paths": 288,
+        "graph_paths": 288,
+        "servers": [
+          "npm-doitintl-doit-mcp-server-5-1-0",
+          "pypi-mcp-server-fetch",
+          "npm-server-github-2025-4-8"
+        ],
+        "shadow_findings": 1
+      },
+      {
+        "auth_findings": 0,
+        "composition_id": "npm-doitintl-doit-mcp-server-5-1-0+npm-meshy-ai-meshy-mcp-server-0-6-12",
+        "cross_server_paths": 156,
+        "graph_paths": 156,
+        "servers": [
+          "npm-doitintl-doit-mcp-server-5-1-0",
+          "npm-meshy-ai-meshy-mcp-server-0-6-12"
+        ],
+        "shadow_findings": 0
+      },
+      {
+        "auth_findings": 0,
+        "composition_id": "npm-meshy-ai-meshy-mcp-server-0-6-12+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+        "cross_server_paths": 130,
+        "graph_paths": 130,
+        "servers": [
+          "npm-meshy-ai-meshy-mcp-server-0-6-12",
+          "pypi-mcp-server-fetch",
+          "npm-server-github-2025-4-8"
+        ],
+        "shadow_findings": 0
+      },
+      {
+        "auth_findings": 0,
+        "composition_id": "npm-bitwarden-mcp-server-2026-7-0+npm-coinbase-cds-mcp-server-9-30-1",
+        "cross_server_paths": 0,
+        "graph_paths": 0,
+        "servers": [
+          "npm-bitwarden-mcp-server-2026-7-0",
+          "npm-coinbase-cds-mcp-server-9-30-1"
+        ],
+        "shadow_findings": 0
+      }
+    ],
+    "flagged_composition_count": 136,
+    "harvested_server_count": 30,
+    "rule_counts": {
+      "CROSS_TOOL_HIJACK": 53,
+      "EXACT_TOOL_SHADOW": 4,
+      "LETHAL_TRIFECTA": 91
+    }
+  },
   "detector_fingerprint_sha256": "d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4",
   "engine_counts": {
     "audit": 1,
@@ -516,6 +589,14 @@
     "startup_error": 35,
     "timeout": 21
   },
+  "known_out_of_scope_misses": [
+    {
+      "package": "malicious-mcp-server",
+      "reason": "The package describes itself as \"A deliberately malicious MCP server for E2E testing purposes\". Its surface is hostile by intent (`tokenInputReceiver` collects API keys, database passwords and JWT secrets; `customerDataProvider` is PII-shaped; `promptGuardTriggerer` wraps untrusted content), but none of that is expressed in annotations or capability names, and the malicious behaviour is in runtime responses and handlers, which `tools/list` does not carry. The pinned detectors therefore return zero findings.",
+      "slug": "npm-malicious-mcp-server-1-5-0",
+      "version": "1.5.0"
+    }
+  ],
   "rule_counts": {
     "LETHAL_TRIFECTA": 70,
     "manifest_error": 1

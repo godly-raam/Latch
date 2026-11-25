@@ -1,0 +1,18 @@
+{
+  "description": "MCP server for security vulnerability scanning and detection",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "adversary-mcp-server==1.11.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "adversary-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/brettbergin/adversary-mcp-server",
+  "slug": "pypi-adversary-mcp-server-1-11-1",
+  "stderr_summary": "Downloading openai (2.3MiB)\nDownloading aiohttp (1.8MiB)\nDownloading semgrep (71.3MiB)\nDownloading sqlalchemy (4.5MiB)\nDownloading anthropic (2.5MiB)\n Downloaded aiohttp",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.11.1"
+}

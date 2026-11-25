@@ -1,0 +1,18 @@
+{
+  "description": "MCP Server for AI agent identity and authorization — create, verify, and manage agent identities",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-identity-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-identity-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agent-identity-mcp-server",
+  "slug": "pypi-agent-identity-mcp-server-0-1-0",
+  "stderr_summary": "Installed 33 packages in 39ms\nAn executable named `agent-identity-mcp-server` is not provided by package `agent-identity-mcp-server`.\nThe following executables are available:\n- agent-identity\n\nUse `uvx --from agent-identity-mcp-server agent-identity` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

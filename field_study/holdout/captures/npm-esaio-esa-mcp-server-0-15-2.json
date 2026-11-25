@@ -1,0 +1,19 @@
+{
+  "description": "Official MCP server for esa.io - STDIO transport version",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@esaio/esa-mcp-server@0.15.2"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@esaio/esa-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/esaio/esa-mcp-server",
+  "slug": "npm-esaio-esa-mcp-server-0-15-2",
+  "stderr_summary": "npm WARN EBADENGINE   package: '@esaio/esa-mcp-server@0.15.2',\nnpm WARN EBADENGINE   required: { npm: '>=11.7.0', node: '>=24.14.0' },\nnpm WARN EBADENGINE   current: { node: 'v20.19.2', npm: '9.2.0' }\nnpm WARN EBADENGINE }\nConfiguration error: Error: ESA_ACCESS_TOKEN environment variable is required\n    at l (file://<scratch>/npm-cache/_npx/75a93644a2c6d8a0/node_modules/@esaio/esa-mcp-server/bin/index.js:2:625)\n    at file://<scratch>/npm-cache/_npx/75a93644a2c6d8a0/node_modules/@esaio/esa-mcp-server/bin/index.js:2:749\n    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.15.2"
+}

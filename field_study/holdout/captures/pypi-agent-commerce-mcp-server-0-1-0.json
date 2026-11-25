@@ -1,0 +1,18 @@
+{
+  "description": "MCP Server for agent commerce — how AI agents create, compare, and track purchases",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-commerce-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-commerce-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agent-commerce-mcp-server",
+  "slug": "pypi-agent-commerce-mcp-server-0-1-0",
+  "stderr_summary": "Installed 33 packages in 35ms\nAn executable named `agent-commerce-mcp-server` is not provided by package `agent-commerce-mcp-server`.\nThe following executables are available:\n- agent-commerce\n\nUse `uvx --from agent-commerce-mcp-server agent-commerce` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

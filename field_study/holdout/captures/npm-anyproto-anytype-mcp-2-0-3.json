@@ -1,0 +1,19 @@
+{
+  "description": "Official MCP server for Anytype API",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@anyproto/anytype-mcp@2.0.3"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@anyproto/anytype-mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/anyproto/anytype-mcp",
+  "slug": "npm-anyproto-anytype-mcp-2-0-3",
+  "stderr_summary": "npm WARN deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nInitializing Anytype MCP Server...\nCan't connect to API. Please ensure Anytype is running and reachable.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.0.3"
+}

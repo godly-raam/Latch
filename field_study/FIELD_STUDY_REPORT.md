@@ -95,6 +95,53 @@ exfiltration — so the target is labelled
 `true_positive_informational`: a real capability of the product rather
 than a detector bug.
 
+## Cross-server compositions
+
+A per-server scan cannot answer two of the four engines' questions:
+`shadow` needs a second server before any tool name can collide with
+anything, and the trifecta is a property of the tool set an agent mounts,
+not of one server. The same pinned detectors were therefore re-run over
+**525** compositions drawn from the
+30 harvested surfaces with an
+analyzable manifest — every pair of them, plus each one mounted beside
+three kits taken from the pinned `package_eval` captures
+(`filesystem+fetch`, `filesystem+git`, `fetch+github`). The duplicate-name
+surface behind `CASE-01` is excluded — no capability analysis can run on
+it.
+
+Anchors: `npm-server-filesystem`, `npm-server-github-2025-4-8`, `npm-server-memory`, `npm-server-slack-2025-4-25`, `pypi-mcp-server-fetch`, `pypi-mcp-server-git`.
+
+| Metric | Value |
+| ------ | ----- |
+| Compositions scanned | 525 |
+| Compositions with at least one finding | 136 |
+| `LETHAL_TRIFECTA` paths | 5,113 (2,937 cross-server) |
+| `shadow` findings | 186 |
+| `auth-audit` findings | 0 |
+
+| Rule | Compositions |
+| ---- | ------------ |
+| `CROSS_TOOL_HIJACK` | 53 |
+| `EXACT_TOOL_SHADOW` | 4 |
+| `LETHAL_TRIFECTA` | 91 |
+
+Largest and quietest compositions in the sweep:
+
+| Composition | Servers | Graph paths | Cross-server | Shadow |
+| ----------- | ------- | ----------- | ------------ | ------ |
+| `npm-doitintl-doit-mcp-server-5-1-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8` | 3 | 288 | 288 | 1 |
+| `npm-doitintl-doit-mcp-server-5-1-0+npm-meshy-ai-meshy-mcp-server-0-6-12` | 2 | 156 | 156 | 0 |
+| `npm-meshy-ai-meshy-mcp-server-0-6-12+pypi-mcp-server-fetch+npm-server-github-2025-4-8` | 3 | 130 | 130 | 0 |
+| `npm-bitwarden-mcp-server-2026-7-0+npm-coinbase-cds-mcp-server-9-30-1` | 2 | 0 | 0 | 0 |
+
+This sweep is the measurement the per-server table cannot give: it
+shows that the same frozen rules do produce cross-server paths and
+`shadow` collisions once the corpus has more than one server in it.
+It is not a prevalence estimate — the compositions are enumerated
+from a fixed harvest, not sampled from real deployments.
+
+`auth-audit` stays at zero here: Every capture is a stdio manifest, so auth-audit has no HTTP/OAuth transport to audit. Its zero is an untested engine, not a pass.
+
 ## Targets
 
 | Target | Ecosystem | Version | Status | Tools | Findings |
@@ -296,11 +343,30 @@ Triage protocol:
 - Detectors were frozen for the duration of the harvest. Week-2 triage
   then changed them; the pre-fix and post-fix fingerprints in the
   hardening section pin both rule sets.
+- These post-fix numbers are in-sample: the rules were narrowed by
+  hand triage of these same captures, so they are a regression suite,
+  not validation. `field_study/HOLDOUT.md` repeats the run with the
+  rules frozen on a disjoint 100-package sample and is the
+  out-of-sample result.
+- A `no_finding` verdict is a statement about `tools/list` only
+  (names, schemas, annotations, descriptions). Responses, handler code
+  and prompt behaviour are outside the scan, so a hostile server whose
+  manifest looks benign is invisible here.
+- `auth-audit` is not exercised by this corpus: every capture is a
+  stdio manifest with no HTTP/OAuth transport to audit, so its zero
+  is an untested engine rather than a clean result.
+- **Known out-of-scope miss: `malicious-mcp-server@1.5.0`.** The package describes itself as "A deliberately malicious MCP server for E2E testing purposes". Its surface is hostile by intent (`tokenInputReceiver` collects API keys, database passwords and JWT secrets; `customerDataProvider` is PII-shaped; `promptGuardTriggerer` wraps untrusted content), but none of that is expressed in annotations or capability names, and the malicious behaviour is in runtime responses and handlers, which `tools/list` does not carry. The pinned detectors therefore return zero findings. It is recorded as `known_out_of_scope_miss` in `DISCLOSURE_LOG.md`, never as `no_finding`: a static `tools/list` scan reporting this server clean would be a false negative, not a true one.
 
 ## Reproduction
 
 ```bash
-python -m field_study.discover_targets --npm-limit 70 --pypi-limit 30
+# Round 1; each run writes <output stem>.split.json beside its list.
+python -m field_study.discover_targets --npm-limit 70 --pypi-limit 30 \
+    --output field_study/round1/targets.json
+# Holdout, disjoint from round 1 by explicit exclusion.
+python -m field_study.discover_targets --npm-limit 70 --pypi-limit 30 \
+    --output field_study/holdout/targets.json \
+    --exclude-targets field_study/round1/targets.json
 # harvest inside the disposable container from run_field_study.SAFETY_BLOCK
 python -m field_study.run_field_study --analyze
 pytest -q tests/test_field_study.py

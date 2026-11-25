@@ -1,0 +1,18 @@
+{
+  "description": "Apache AGE MCP Server",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "age_mcp_server==0.3.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "age_mcp_server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/rioriost/age_mcp_server",
+  "slug": "pypi-age-mcp-server-0-3-0",
+  "stderr_summary": "Downloading psycopg-binary (3.7MiB)\nDownloading numpy (15.0MiB)\nDownloading agefreighter (1.8MiB)\n Downloaded agefreighter\n Downloaded psycopg-binary",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.3.0"
+}

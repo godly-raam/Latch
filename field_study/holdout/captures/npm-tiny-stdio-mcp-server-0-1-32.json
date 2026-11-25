@@ -1,0 +1,19 @@
+{
+  "description": "Minimal MCP server over stdio with typed tools and rich content helpers",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "tiny-stdio-mcp-server@0.1.32"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "tiny-stdio-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/poe-platform/poe-code",
+  "slug": "npm-tiny-stdio-mcp-server-0-1-32",
+  "stderr_summary": "npm ERR! could not determine executable to run\n\nnpm ERR! A complete log of this run can be found in:\nnpm ERR!     <scratch>/npm-cache/_logs/2026-11-24T18_15_44_670Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.32"
+}

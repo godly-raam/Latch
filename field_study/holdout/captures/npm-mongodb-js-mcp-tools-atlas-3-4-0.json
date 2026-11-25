@@ -1,0 +1,19 @@
+{
+  "description": "Atlas tools for MongoDB MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@mongodb-js/mcp-tools-atlas@3.4.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@mongodb-js/mcp-tools-atlas",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/mongodb-js/mongodb-mcp-server",
+  "slug": "npm-mongodb-js-mcp-tools-atlas-3-4-0",
+  "stderr_summary": "npm ERR! could not determine executable to run\n\nnpm ERR! A complete log of this run can be found in:\nnpm ERR!     <scratch>/npm-cache/_logs/2026-11-24T18_09_08_468Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "3.4.0"
+}

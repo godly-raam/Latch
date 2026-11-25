@@ -1,0 +1,19 @@
+{
+  "description": "CLI and MCP server for DataForSEO API — browse documentation and make authenticated API requests",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "dataforseo-mcp-server@3.1.3"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "dataforseo-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/dataforseo/mcp-server-typescript",
+  "slug": "npm-dataforseo-mcp-server-3-1-3",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "3.1.3"
+}

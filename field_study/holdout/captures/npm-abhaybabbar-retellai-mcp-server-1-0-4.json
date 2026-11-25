@@ -1,0 +1,19 @@
+{
+  "description": "RetellAi MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@abhaybabbar/retellai-mcp-server@1.0.4"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@abhaybabbar/retellai-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/abhaybabbar/retellai-mcp-server",
+  "slug": "npm-abhaybabbar-retellai-mcp-server-1-0-4",
+  "stderr_summary": "npm WARN deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nError starting MCP server: Error: RETELL_API_KEY environment variable is required\n    at createMcpServer (file://<scratch>/npm-cache/_npx/cd53373a974a9b30/node_modules/@abhaybabbar/retellai-mcp-server/build/index.js:11:15)\n    at main (file://<scratch>/npm-cache/_npx/cd53373a974a9b30/node_modules/@abhaybabbar/retellai-mcp-server/build/index.js:23:27)\n    at file://<scratch>/npm-cache/_npx/cd53373a974a9b30/node_modules/@abhaybabbar/retellai-mcp-server/build/index.js:45:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.0.4"
+}

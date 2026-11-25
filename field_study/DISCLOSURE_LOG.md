@@ -1,7 +1,11 @@
 # Responsible-disclosure log
 
-**No disclosure has been sent.** This log is generated for Week 2/3 and
-records only artifacts already on disk. Latch never contacts a maintainer.
+**Status: one case closed without a ticket, none open.** No advisory and
+no security ticket has been filed. Every entry below is generated from
+artifacts already on disk, and Latch never contacts a maintainer on its
+own. `CASE-01` is closed because upstream is archived and unmaintained
+(`closed_upstream_archived`), not because a fix shipped: it is a
+recorded result, not a disclosure.
 
 ## Coordinated Disclosure & Upstream Bug Log
 
@@ -41,7 +45,7 @@ records only artifacts already on disk. Latch never contacts a maintainer.
 | `@ivotoby/openapi-mcp-server` | 1.18.0 | https://github.com/ivo-toby/mcp-openapi-server | `not_applicable` | No tool surface captured. |
 | `jira-mcp-server` | 0.0.1 | — | `not_applicable` | No tool surface captured. |
 | `kubernetes-mcp-server` | 0.1.3 | https://github.com/containers/kubernetes-mcp-server | `not_applicable` | No tool surface captured. |
-| `malicious-mcp-server` | 1.5.0 | https://github.com/anysource-AI/malicious-mcp-server | `no_finding` | Clean under the pinned detectors. |
+| `malicious-mcp-server` | 1.5.0 | https://github.com/anysource-AI/malicious-mcp-server | `known_out_of_scope_miss` | Malice is in runtime responses, not in `tools/list`: the pinned detectors return nothing. Recorded as a boundary, not clean. |
 | `@mantine/mcp-server` | 9.8.2 | https://github.com/mantinedev/mantine | `no_finding` | Clean under the pinned detectors. |
 | `@mapbox/mcp-server` | 0.18.1 | https://github.com/mapbox/mcp-server | `not_applicable` | No tool surface captured. |
 | `mcp-hello-world` | 1.1.2 | https://github.com/lobehub/mcp-hello-world | `no_finding` | Clean under the pinned detectors. |

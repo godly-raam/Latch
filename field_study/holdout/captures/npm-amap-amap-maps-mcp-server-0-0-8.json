@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for using the AMap Maps API",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@amap/amap-maps-mcp-server@0.0.8"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@amap/amap-maps-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-amap-amap-maps-mcp-server-0-0-8",
+  "stderr_summary": "npm WARN deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nAMAP_MAPS_API_KEY environment variable is not set",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.0.8"
+}

@@ -1,0 +1,185 @@
+{
+  "description": "MCP server for searching and fetching 6,500+ brand SVGs from thesvg.org",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@thesvg/mcp-server@0.9.2"
+  ],
+  "manifest_sha256": "f3dd5244d30ace7829ef28534c2622cad14659a5fb0cddd07723042718bcb80c",
+  "package": "@thesvg/mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/glincker/thesvg",
+  "slug": "npm-thesvg-mcp-server-0-9-2",
+  "stderr_summary": "",
+  "tool_count": 5,
+  "tools": [
+    {
+      "description": "Search for brand SVG icons from thesvg.org by name or slug. Returns matching icons with slug, name, variants, and categories. Use get_icon or get_icon_url to retrieve the actual SVG.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "kind": {
+            "default": "brand",
+            "description": "Icon kind: 'brand' (default) or 'ui' for UI icons.",
+            "enum": [
+              "brand",
+              "ui"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Maximum number of results (1-100, default 20)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Brand name or partial slug to search for",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_icons"
+    },
+    {
+      "description": "Fetch the raw SVG content for a specific brand icon from the jsDelivr CDN. Returns SVG markup, metadata, and the CDN URL.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "kind": {
+            "default": "brand",
+            "description": "Icon kind: 'brand' (default) or 'ui' for UI icons.",
+            "enum": [
+              "brand",
+              "ui"
+            ],
+            "type": "string"
+          },
+          "look": {
+            "default": "outline",
+            "description": "UI icon look (kind 'ui' only): outline, glass, duotone, offset, fill, glass-outline, depth. Defaults to 'outline'.",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Icon slug identifier (e.g. 'github', 'stripe', 'openai'). Use search_icons to find slugs.",
+            "type": "string"
+          },
+          "variant": {
+            "default": "default",
+            "description": "Icon variant to fetch: 'default', 'mono', 'light', 'dark', 'wordmark', 'color'. Defaults to 'default'. Use list_variants to see what a specific icon supports.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_icon"
+    },
+    {
+      "description": "List all available variants for a specific brand icon. Variants may include: default, mono, light, dark, wordmark, wordmarkLight, wordmarkDark, color.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "kind": {
+            "default": "brand",
+            "description": "Icon kind: 'brand' (default) or 'ui' for UI icons.",
+            "enum": [
+              "brand",
+              "ui"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "description": "Icon slug identifier (e.g. 'github', 'openai'). Use search_icons to find slugs.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "list_variants"
+    },
+    {
+      "description": "Get a jsDelivr CDN URL for a brand icon without fetching the SVG content. Use this to embed icons in HTML, Markdown, Notion, Webflow, or any img tag. Cheaper than get_icon when you only need the URL.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "kind": {
+            "default": "brand",
+            "description": "Icon kind: 'brand' (default) or 'ui' for UI icons.",
+            "enum": [
+              "brand",
+              "ui"
+            ],
+            "type": "string"
+          },
+          "look": {
+            "default": "outline",
+            "description": "UI icon look (kind 'ui' only): outline, glass, duotone, offset, fill, glass-outline, depth. Defaults to 'outline'.",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Icon slug identifier (e.g. 'github', 'stripe', 'openai'). Use search_icons to find slugs.",
+            "type": "string"
+          },
+          "variant": {
+            "default": "default",
+            "description": "Icon variant: 'default', 'mono', 'light', 'dark', 'wordmark', 'color'. Defaults to 'default'.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_icon_url"
+    },
+    {
+      "description": "List all icon categories available in thesvg.org library with icon counts. Use this to discover what categories exist in the library and to inform follow-up search_icons queries.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "kind": {
+            "default": "brand",
+            "description": "Icon kind: 'brand' (default) or 'ui' for UI icons.",
+            "enum": [
+              "brand",
+              "ui"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_categories"
+    }
+  ],
+  "version": "0.9.2"
+}

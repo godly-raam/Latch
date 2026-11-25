@@ -1,0 +1,19 @@
+{
+  "description": "MCP server that gives AI assistants access to aVenture research data on companies, people, funding, and news.",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@aventurevc/mcp-server@0.8.498"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@aventurevc/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/aventurevc/aventure-mcp",
+  "slug": "npm-aventurevc-mcp-server-0-8-498",
+  "stderr_summary": "npm WARN EBADENGINE Unsupported engine {\nnpm WARN EBADENGINE   package: '@aventurevc/mcp-server@0.8.498',\nnpm WARN EBADENGINE   required: { node: '>=24.22.1 <25' },\nnpm WARN EBADENGINE   current: { node: 'v20.19.2', npm: '9.2.0' }\nnpm WARN EBADENGINE }\nfile://<scratch>/npm-cache/_npx/969dd6d070abd7ce/node_modules/@aventurevc/mcp-server/dist/chunks/openapi-call-BpSfP2Qh.js:12\n`,`latin1`),t!==null&&r!==t){if(n[re])throw new s;this.onLengthMismatch()}e[S].timeout&&e[S].timeoutType===be&&e[S].timeout.refresh&&e[S].timeout.refresh(),n[H]()}}destroy(e){let{socket:t,client:n,abort:i}=this;t[D]=!1,e&&(r(n[w]<=1,`pipeline should only contain this request`),i(e))}};n.exports=Te})),Rt=t(((t,n)=>{var r=e(`node:assert`),{pipeline:i}=e(`node:stream`),a=$(),{RequestContentLengthMismatchError:o,ResponseContentLengthMismatchError:s,RequestAbortedError:c,SocketError:l,InformationalError:u,InvalidArgumentError:d,HeadersTimeoutError:f,BodyTimeoutError:p,ResponseExceededMaxSizeError:m}=Q(),{kUrl:h,kReset:g,kClient:_,kRunning:v,kPending:y,kQueue:b,kPendingIdx:x,kRunningIdx:S,kError:C,kSocket:w,kStrictContentLength:T,kOnError:E,kMaxConcurrentStreams:D,kHTTP2Session:O,kHostAuthority:k,kResume:A,kSize:j,kH",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.8.498"
+}

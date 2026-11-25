@@ -1,0 +1,555 @@
+{
+  "description": "MCP server for Hugeicons search and usage documentation",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@hugeicons/mcp-server@0.4.1"
+  ],
+  "manifest_sha256": "981b0ecdc78697909ce06457a796ec23ad460d4fff801833b7fec94b9a7be5a1",
+  "package": "@hugeicons/mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/hugeicons/hugeicons",
+  "slug": "npm-hugeicons-mcp-server-0-4-1",
+  "stderr_summary": "hugeicons MCP server running on stdio",
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search icons"
+      },
+      "description": "Search icons by name or tags. Exact name and tag matches rank first. Each result includes its JavaScript export name. Search for every icon you need in ONE call by separating the terms with commas (e.g. 'home, notification, settings') — far cheaper than one call per icon.",
+      "inputSchema": {
+        "properties": {
+          "include_tags": {
+            "description": "Include each icon's tags. Off by default — tags roughly triple the response and ranking already accounts for them. Only turn this on to compare icons that look equally plausible",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Maximum results per search. Defaults to 8; lower it to 1-3 when you know what you want",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "What to search for. Separate multiple searches with commas, up to 10 per call",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_icons",
+      "outputSchema": {
+        "properties": {
+          "searches": {
+            "items": {
+              "properties": {
+                "error": {
+                  "description": "Present when this term's search failed. Its results are empty because the lookup broke, not because the icon is missing — search the term again on its own",
+                  "type": "string"
+                },
+                "fuzzy": {
+                  "description": "True when nothing matched closely and these are best guesses",
+                  "type": "boolean"
+                },
+                "query": {
+                  "type": "string"
+                },
+                "results": {
+                  "items": {
+                    "properties": {
+                      "category": {
+                        "type": "string"
+                      },
+                      "component": {
+                        "description": "Export name in the JavaScript packages",
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "tags": {
+                        "description": "Only present when include_tags is true",
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "component",
+                      "category"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "total": {
+                  "description": "Relevant matches before the limit",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "query",
+                "total",
+                "fuzzy",
+                "results"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "searches"
+        ],
+        "type": "object"
+      },
+      "title": "Search icons"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get icon code"
+      },
+      "description": "Get the exact install command, import and usage snippet for one icon on a platform, with the correct export or constant name for the style.",
+      "inputSchema": {
+        "properties": {
+          "icon_name": {
+            "description": "The icon name (e.g. 'home-01'). Export and constant names such as 'Home01Icon' or 'strokeRoundedHome01' are accepted",
+            "type": "string"
+          },
+          "platform": {
+            "description": "Where the icon will be used",
+            "enum": [
+              "react",
+              "vue",
+              "angular",
+              "svelte",
+              "solid-js",
+              "react-native",
+              "flutter",
+              "html"
+            ],
+            "type": "string"
+          },
+          "style": {
+            "description": "The icon style. Defaults to stroke-rounded, the free style",
+            "enum": [
+              "bulk-rounded",
+              "duotone-rounded",
+              "duotone-standard",
+              "solid-rounded",
+              "solid-sharp",
+              "solid-standard",
+              "stroke-rounded",
+              "stroke-sharp",
+              "stroke-standard",
+              "twotone-rounded"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon_name",
+          "platform"
+        ],
+        "type": "object"
+      },
+      "name": "get_icon_code",
+      "outputSchema": {
+        "properties": {
+          "free": {
+            "type": "boolean"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "install": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "reference": {
+            "description": "The export, constant or classes to use in code",
+            "type": "string"
+          },
+          "style": {
+            "type": "string"
+          },
+          "usage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon",
+          "platform",
+          "style",
+          "free",
+          "reference",
+          "install",
+          "usage"
+        ],
+        "type": "object"
+      },
+      "title": "Get icon code"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List icons"
+      },
+      "description": "List Hugeicons icon names, a page at a time. Optionally filter by category. The first page without a category also returns every category with its icon count. Prefer search_icons to find an icon for a purpose.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Only list icons in this category (e.g. 'arrows', 'e-commerce')",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Icons per page. Defaults to 200",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Number of icons to skip. Use next_offset from the previous page. Defaults to 0",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_icons",
+      "outputSchema": {
+        "properties": {
+          "categories": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "category": {
+            "type": "string"
+          },
+          "icons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "next_offset": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "offset",
+          "limit",
+          "next_offset",
+          "icons"
+        ],
+        "type": "object"
+      },
+      "title": "List icons"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get platform usage"
+      },
+      "description": "Get setup instructions and component props for using Hugeicons on a platform",
+      "inputSchema": {
+        "properties": {
+          "platform": {
+            "description": "Platform name",
+            "enum": [
+              "react",
+              "vue",
+              "angular",
+              "svelte",
+              "solid-js",
+              "react-native",
+              "flutter",
+              "html"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform"
+        ],
+        "type": "object"
+      },
+      "name": "get_platform_usage",
+      "outputSchema": {
+        "properties": {
+          "basicUsage": {
+            "type": "string"
+          },
+          "installation": {
+            "properties": {
+              "core": {
+                "type": "string"
+              },
+              "packages": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "core",
+              "packages"
+            ],
+            "type": "object"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "props": {
+            "items": {
+              "properties": {
+                "default": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "type",
+                "description"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "platform",
+          "installation",
+          "basicUsage"
+        ],
+        "type": "object"
+      },
+      "title": "Get platform usage"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get icon glyphs"
+      },
+      "description": "Get the web font glyphs (unicode characters) for an icon in every available style",
+      "inputSchema": {
+        "properties": {
+          "icon_name": {
+            "description": "The icon name (e.g. 'home-01'). Export and constant names such as 'Home01Icon' or 'strokeRoundedHome01' are accepted",
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon_name"
+        ],
+        "type": "object"
+      },
+      "name": "get_icon_glyphs",
+      "outputSchema": {
+        "properties": {
+          "glyphs": {
+            "items": {
+              "properties": {
+                "icon_name": {
+                  "type": "string"
+                },
+                "style": {
+                  "type": "string"
+                },
+                "unicode": {
+                  "type": "string"
+                },
+                "unicode_decimal": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "icon_name",
+                "style",
+                "unicode",
+                "unicode_decimal"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon",
+          "glyphs"
+        ],
+        "type": "object"
+      },
+      "title": "Get icon glyphs"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get icon glyph by style"
+      },
+      "description": "Get the web font glyph (unicode character) for an icon in one style. Duotone and twotone icons also have a secondary glyph",
+      "inputSchema": {
+        "properties": {
+          "icon_name": {
+            "description": "The icon name (e.g. 'home-01'). Export and constant names such as 'Home01Icon' or 'strokeRoundedHome01' are accepted",
+            "type": "string"
+          },
+          "style": {
+            "description": "The icon style",
+            "enum": [
+              "bulk-rounded",
+              "duotone-rounded",
+              "duotone-standard",
+              "solid-rounded",
+              "solid-sharp",
+              "solid-standard",
+              "stroke-rounded",
+              "stroke-sharp",
+              "stroke-standard",
+              "twotone-rounded"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon_name",
+          "style"
+        ],
+        "type": "object"
+      },
+      "name": "get_icon_glyph_by_style",
+      "outputSchema": {
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "primary": {
+            "properties": {
+              "icon_name": {
+                "type": "string"
+              },
+              "style": {
+                "type": "string"
+              },
+              "unicode": {
+                "type": "string"
+              },
+              "unicode_decimal": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "icon_name",
+              "style",
+              "unicode",
+              "unicode_decimal"
+            ],
+            "type": "object"
+          },
+          "secondary": {
+            "anyOf": [
+              {
+                "properties": {
+                  "icon_name": {
+                    "type": "string"
+                  },
+                  "style": {
+                    "type": "string"
+                  },
+                  "unicode": {
+                    "type": "string"
+                  },
+                  "unicode_decimal": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "icon_name",
+                  "style",
+                  "unicode",
+                  "unicode_decimal"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "style": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "icon",
+          "style",
+          "primary",
+          "secondary"
+        ],
+        "type": "object"
+      },
+      "title": "Get icon glyph by style"
+    }
+  ],
+  "version": "0.4.1"
+}

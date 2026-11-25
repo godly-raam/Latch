@@ -1,0 +1,4617 @@
+{
+  "description": "MCP server for building and managing Clipform video forms",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@clipform/mcp-server@5.17.0"
+  ],
+  "manifest_sha256": "5e0bd25f9cc68686801037d37a28b4efc4f901c786ecb860ae1511ab07f987d0",
+  "package": "@clipform/mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/clipform/mcp-server",
+  "slug": "npm-clipform-mcp-server-5-17-0",
+  "stderr_summary": "Clipform MCP Server v5.17.0 running on stdio\nTelemetry enabled (server errors only). Set DO_NOT_TRACK=1 to disable.",
+  "tool_count": 32,
+  "tools": [
+    {
+      "_meta": {
+        "anthropic/alwaysLoad": true,
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Create Clipform"
+      },
+      "description": "Create a new Clipform (interactive video-style form). Returns a viewer URL and form ID. When connected via an authenticated MCP client (e.g. claude.ai), the form lands directly in the user's workspace. Anonymous sessions build into a temporary account of their own: guests connected through a chat app (ChatGPT, Claude) get a form that goes live, takes up to 3 responses and goes offline after 7 days unless the user signs up, with steps that need an account (such as payments and uploads) switched off until sign-up; other anonymous channels stay private previews. Some results also include a one-time claim URL that signs the user into that account; relay it when present.\n\nIf the user hasn't said what to build yet, offer to build their first form and suggest starting points: quiz, survey, interview, testimonial, application, booking, client intake, lead capture, or something else.\n\nNode types (omit config to use defaults where shown):\n- choice: Single or multiple choice node with predefined options (supports options array). Config: choice ({enable_branching, show_answer_feedback, record_scores}), selection_mode (\"single\"|\"multiple\", default: \"single\"), allow_text_response (boolean, default: false), randomise_options (boolean, default: false), show_option_count (boolean, default: false), option_display (\"list\"|\"letters\", default: \"list\"). Defaults: {\"selection_mode\":\"single\",\"choice\":{\"enable_branching\":false},\"randomise_options\":false,\"show_option_count\":false,\"option_display\":\"list\"}\n- open: Free-form text responses from users. Config: formats (array of {format, order}), max_recording_seconds (number, default: 120). Defaults: {\"formats\":[{\"order\":0,\"format\":\"text\"},{\"order\":1,\"format\":\"audio\"},{\"order\":2,\"format\":\"video\"}]}\n- booking: Let respondents book a meeting on a connected Calendly account without leaving the form. Config: provider (\"calendly\"), workspace_integration_id (string), title (string), description (string), calendly ({event_type_uri, event_name, scheduling_url, duration})\n- details: Collect several fields on one screen - name, email, phone, address, date, and more. Config: title (string), fields (array of {id, type, label, order, required, is_custom}), description (string), consent_items (array of {id, name, label, order, type, document, require_scroll_to_accept}), Available field IDs: first_name, last_name, email, phone. Standard fields keep their names (no label needed); for other wording or a non-English form, add a custom field ({ id, is_custom: true, label, type }). consent_items[].type is \"consent\" (required agreement) or \"opt_in\" (optional). Defaults: {\"fields\":[{\"id\":\"first_name\",\"required\":true},{\"id\":\"email\",\"required\":true}],\"consent_items\":[]}\n- draw: Drawing canvas; respondents draw and it is saved as a PNG image. Config: title (string), description (string), paper_color (string, default: \"#FAF9F6\"), diagram ({opacity, scale, preset}). Defaults: {\"paper_color\":\"#FAF9F6\",\"stroke_colors\":[\"#1F2937\",\"#EF4444\",\"#3B82F6\",\"#22C55E\",\"#FACC15\"],\"stroke_widths\":[3,6,12],\"diagram\":{\"opacity\":1,\"scale\":1}}\n- camera: Capture a photo or video from the device camera. Config: title (string), description (string), camera_facing (\"user\"|\"environment\", default: \"user\"), allowed_capture (array of \"photo\"|\"video\"), camera_capture (array of \"photo\"|\"video\"), allow_library_upload (boolean, default: true), capture_order (array of \"photo\"|\"video\"|\"library\"), max_files (number, default: 1), min_files (number, default: 1)\n- payment: Collect a payment from respondents inline, charged to a connected Stripe account. Config: amount (number), currency (\"usd\"|\"eur\"|\"gbp\"|\"cad\"|\"aud\", default: \"usd\"), provider (\"stripe\"|\"paddle\", default: \"stripe\"), workspace_integration_id (string), title (string), description (string). Defaults: {\"amount\":null,\"currency\":\"usd\",\"provider\":\"stripe\"}\n- button: Simple button for acknowledgment or navigation (supports options array). Config: button_text (string, default: \"Continue\"), button_style (\"primary\"|\"secondary\"|\"outline\", default: \"primary\")\n- redirect: Redirect users to an external URL. Config: url (string), auto_redirect (boolean, default: true). Defaults: {\"url\":\"\",\"auto_redirect\":true}\n- file_download: Provide a file for respondents to download. Config: files (array of {file_name, display_name, file_path, file_size, mime_type}), button_text (string, default: \"Continue\"), description (string)\n- end_screen: Final screen shown when form is completed. Config: title (string, default: \"Thank you!\"), message (string, default: \"Your response has been submitted.\"), icon (\"tick\"|\"trophy\"|\"star\"|\"crown\"|\"party\"|\"none\", default: \"tick\"), show_share_button (boolean, default: false), cta_type (\"none\"|\"restart\"|\"external_link\", default: \"none\"), cta_text (string, default: \"Continue\"), cta_url (string). Defaults: {\"title\":\"Thank you!\",\"message\":\"Your response has been submitted.\"}\n\nAll type definitions and config schemas are derived from @vid-master/config (node-types). Refer to the config descriptions above for the correct keys and shapes. AI-PROTECTED parameters have restrictions noted in their descriptions.\n\nExample: A form that asks a question, collects contact info, then finishes:\n{\n  title: \"Quick Survey\",\n  nodes: [\n    { type: \"open\", prompt: \"What's your biggest challenge?\" },\n    { type: \"details\", prompt: \"Leave your details\", config: { fields: [{ id: \"first_name\", required: true }, { id: \"email\", required: true }] } },\n    { type: \"end_screen\", prompt: \"Thanks for your response!\" }\n  ]\n}",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "background_color": {
+            "description": "Background color as 6-digit hex (e.g. '#1A1A2E').",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "type": "string"
+          },
+          "disable_back_navigation": {
+            "description": "Prevent going back. Set true for quizzes.",
+            "type": "boolean"
+          },
+          "font_family": {
+            "description": "AI-PROTECTED: Only set when the user explicitly requests a specific font.",
+            "type": "string"
+          },
+          "nodes": {
+            "description": "Ordered list of nodes/steps for the form",
+            "items": {
+              "properties": {
+                "config": {
+                  "additionalProperties": {},
+                  "description": "Type-specific configuration keyed by node type. Omit to use defaults. Per-type keys, shapes, and defaults are listed in the clipform_create_form description; craft guidance via clipform_get_guide.",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "label": {
+                  "description": "Short label for the node (used in logic builder). Defaults to the prompt text.",
+                  "type": "string"
+                },
+                "options": {
+                  "description": "Answer options. choice: required, min 1, max 12, max 6 when option_display is \"letters\", content max 80 chars button: required, min 1, max 1, content max 28 chars",
+                  "items": {
+                    "properties": {
+                      "content": {
+                        "description": "Option text",
+                        "type": "string"
+                      },
+                      "is_correct": {
+                        "description": "Mark this option as a correct answer for a quiz. Stored as the answer key; when score is not given it also sets score 1 (or 0 on the others).",
+                        "type": "boolean"
+                      },
+                      "score": {
+                        "description": "Score value for this option (for scored quizzes). Use 1 for correct, 0 for wrong. Scored options automatically enable correct-answer marking (record_scores) and correct/incorrect answer feedback on the node; set config.choice.show_answer_feedback: false to hide the feedback.",
+                        "maximum": 999,
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "content"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "prompt": {
+                  "description": "The text shown to the respondent",
+                  "type": "string"
+                },
+                "required": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "type": {
+                  "enum": [
+                    "choice",
+                    "open",
+                    "booking",
+                    "details",
+                    "draw",
+                    "camera",
+                    "payment",
+                    "button",
+                    "redirect",
+                    "file_download",
+                    "end_screen"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "prompt"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "primary_color": {
+            "description": "Primary/brand color as 6-digit hex (e.g. '#FF5500'). Used for buttons and accents.",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "type": "string"
+          },
+          "show_step_counter": {
+            "description": "Show step counter (e.g. '1/5'). Set true for quizzes.",
+            "type": "boolean"
+          },
+          "tags": {
+            "description": "Tags for indexing (e.g. ['quiz', 'trivia', 'arsenal']). Include format, genre, and topics.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Form title",
+            "type": "string"
+          },
+          "workspace_id": {
+            "description": "Workspace to act in (id from clipform_whoami workspaces). Omit to use the connection's default workspace.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "nodes"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_create_form",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "claim_url": {
+            "description": "Anonymous builds only. One-time link to sign up, keep this form and switch on its locked steps.",
+            "type": "string"
+          },
+          "dashboard_url": {
+            "description": "Builder URL (sign in to edit). For an anonymous build this is a one-time sign-up link, not an editor.",
+            "type": "string"
+          },
+          "form_id": {
+            "description": "Form UUID - pass to follow-up tools",
+            "type": "string"
+          },
+          "is_preview": {
+            "description": "True when viewer_url is a private preview (answers are not saved), false when it is the live URL.",
+            "type": "boolean"
+          },
+          "nodes": {
+            "description": "Created nodes in order - IDs for attach_node_media / update_node",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "prompt": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "type",
+                "prompt"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "plan": {
+            "additionalProperties": false,
+            "description": "Plan and auth context for this session",
+            "properties": {
+              "auth_mode": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "auth_mode"
+            ],
+            "type": "object"
+          },
+          "preview_url": {
+            "description": "Anonymous builds only. Private preview of the form. Answers are not saved, so do not share it with respondents.",
+            "type": "string"
+          },
+          "viewer_url": {
+            "description": "Form URL for respondents - the live public URL. For a guest build held back from going live this is a private preview link instead: answers are not saved, do not share it with respondents.",
+            "type": "string"
+          },
+          "workspace_name": {
+            "description": "Name of the workspace the form was created in",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id",
+          "viewer_url",
+          "nodes"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Create Clipform"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Import Form"
+      },
+      "description": "Copies the questions from a public Google Form, Typeform, or Tally form into a new Clipform. The source form and its responses stay where they are. Supported URLs: Google Forms (docs.google.com or forms.gle - must be shared as \"Anyone with the link\"), Typeform (form.typeform.com/to/...), and Tally (tally.so - must be public). The source form must be publicly accessible; a private form's questions cannot be read. The new Clipform goes live straight away unless you pass is_live: false (then it stays a draft with a preview link, and clipform_update_form with is_live: true publishes it later). An anonymous guest's import is checked first and stays a draft with a preview link if that check refuses it. Some question types don't map cleanly to a Clipform node and are skipped rather than guessed at; the result always reports exactly what was imported vs skipped, and why.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "is_live": {
+            "description": "Publish the imported form right away. Default true. Pass false to keep it a draft (use preview_url to review it).",
+            "type": "boolean"
+          },
+          "url": {
+            "description": "Public URL of the Google Form, Typeform, or Tally form to import",
+            "format": "uri",
+            "type": "string"
+          },
+          "workspace_id": {
+            "description": "Workspace to act in (id from clipform_whoami workspaces). Omit to use the connection's default workspace.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_import_form",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "builder_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Link to edit the form in the Clipform builder. Null for an anonymous session or when nothing was created."
+          },
+          "form_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New form's UUID - pass to follow-up tools. Null when no importable questions were found (nothing was created)."
+          },
+          "import_summary": {
+            "additionalProperties": false,
+            "properties": {
+              "imported": {
+                "description": "Questions successfully converted into Clipform nodes",
+                "type": "number"
+              },
+              "skipped": {
+                "description": "Questions that could not be converted",
+                "type": "number"
+              },
+              "skipped_details": {
+                "description": "Per-skipped-question title, reason, and source question type",
+                "items": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "title": {
+                "description": "Title of the source form",
+                "type": "string"
+              },
+              "total_questions": {
+                "description": "Total questions found in the source form",
+                "type": "number"
+              },
+              "warnings": {
+                "description": "Non-fatal issues surfaced during the import",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "title",
+              "total_questions",
+              "imported",
+              "skipped",
+              "skipped_details",
+              "warnings"
+            ],
+            "type": "object"
+          },
+          "is_live": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "True when the imported form is live at viewer_url. False for a draft, and also false when nothing was created. Null only when the API did not say (treat as a draft)."
+          },
+          "live_refused_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why an anonymous guest's import was kept as a draft instead of going live. Null otherwise."
+          },
+          "preview_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A time-limited link to view the unpublished draft right now - open this one to review a draft. Null when the form is live or nothing was created."
+          },
+          "viewer_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The form's public address. It is live now when is_live is true; otherwise it is where the form WILL be live once published (clipform_update_form with is_live: true), and opening it now shows a maintenance screen. Null when no importable questions were found."
+          },
+          "workspace_name": {
+            "description": "Name of the workspace the form was created in",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id",
+          "viewer_url",
+          "is_live",
+          "preview_url",
+          "builder_url",
+          "live_refused_reason",
+          "import_summary"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Import Form"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Clipforms"
+      },
+      "description": "List forms in your workspace with optional filtering. Returns paginated results (cursor-based). next_cursor is included when more results exist. To find or open a form by name, pass search with part of its title instead of paging through results. Needs a signed-in Clipform account (an anonymous session is asked to sign in).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "cursor": {
+            "description": "Pagination cursor from previous response's next_cursor",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of forms to return (default 25, max 100)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "order": {
+            "description": "Sort order (default: desc, newest first)",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "type": "string"
+          },
+          "published": {
+            "description": "Filter by publish status",
+            "enum": [
+              "true",
+              "false"
+            ],
+            "type": "string"
+          },
+          "search": {
+            "description": "Filter to forms whose title contains this text (case-insensitive substring). Use this to resolve a form by name in one call instead of paginating.",
+            "type": "string"
+          },
+          "sort": {
+            "description": "Sort field (default: created_at)",
+            "enum": [
+              "created_at",
+              "updated_at"
+            ],
+            "type": "string"
+          },
+          "tag": {
+            "description": "Filter by tag name(s), comma-separated. AND logic: only forms with ALL tags are returned.",
+            "type": "string"
+          },
+          "workspace_id": {
+            "description": "Workspace to act in (id from clipform_whoami workspaces). Omit to use the connection's default workspace.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "clipform_list_forms",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "forms": {
+            "description": "Matching forms (empty if none)",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "builder_url": {
+                  "description": "Dashboard Build tab for this form. Not present for an anonymous caller.",
+                  "type": "string"
+                },
+                "has_unpublished_changes": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "is_live": {
+                  "type": "boolean"
+                },
+                "share_id": {
+                  "type": "string"
+                },
+                "tags": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "color": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "color"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "viewer_url": {
+                  "description": "Live respondent link. Only present for a published (is_live) form, and not for an anonymous caller.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "share_id",
+                "is_live",
+                "has_unpublished_changes",
+                "tags"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pass as cursor to fetch the next page, or null when no more"
+          }
+        },
+        "required": [
+          "forms",
+          "next_cursor"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List Clipforms"
+    },
+    {
+      "_meta": {
+        "anthropic/alwaysLoad": true,
+        "securitySchemes": [
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Who Am I"
+      },
+      "description": "Show the current identity: auth mode (api key, oauth, session, or anonymous), active workspace, and plan limits. Needs a signed-in Clipform account (an anonymous session is asked to sign in).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "clipform_whoami",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "auth_mode": {
+            "description": "How this session is authenticated",
+            "enum": [
+              "api_key",
+              "oauth",
+              "session",
+              "anonymous"
+            ],
+            "type": "string"
+          },
+          "default_workspace_id": {
+            "description": "OAuth connector only: the workspace used when a tool call omits workspace_id",
+            "type": "string"
+          },
+          "is_authenticated": {
+            "description": "True for api_key, oauth, or session auth; false for anonymous",
+            "type": "boolean"
+          },
+          "links": {
+            "additionalProperties": false,
+            "description": "Workspace-level dashboard links - only present for a non-anonymous caller.",
+            "properties": {
+              "dashboard": {
+                "description": "Dashboard home for the active workspace.",
+                "type": "string"
+              },
+              "forms": {
+                "description": "Forms list for the active workspace.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "dashboard",
+              "forms"
+            ],
+            "type": "object"
+          },
+          "notice": {
+            "description": "Anonymous sessions only: the account is a temporary preview until claimed.",
+            "type": "string"
+          },
+          "plan": {
+            "additionalProperties": false,
+            "description": "Plan limits for the active workspace",
+            "properties": {
+              "form_limit": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Max forms in the workspace, or null if unlimited"
+              },
+              "name": {
+                "type": "string"
+              },
+              "node_limit": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Max nodes per form, or null if unlimited"
+              },
+              "tier": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "tier",
+              "node_limit",
+              "form_limit"
+            ],
+            "type": "object"
+          },
+          "workspace": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Active workspace, or null when anonymous"
+          },
+          "workspaces": {
+            "description": "Workspaces the caller can target with workspace_id - present for session (dashboard) auth and the OAuth connector",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "auth_mode",
+          "is_authenticated",
+          "workspace",
+          "plan"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Who Am I"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Clipform"
+      },
+      "description": "Retrieve a form's details including all nodes in sequential order and their routing. Returns title, settings, and every node with its options, config, media status, next node, and - for a node that routes by answer - each answer's route (all set with clipform_set_logic).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_get_form",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "form_id": {
+            "description": "Form UUID",
+            "type": "string"
+          },
+          "has_unpublished_changes": {
+            "description": "Live form has edits not yet republished",
+            "type": "boolean"
+          },
+          "is_live": {
+            "description": "Whether the form is published",
+            "type": "boolean"
+          },
+          "nodes": {
+            "description": "Nodes in sequential order - IDs for update_node / attach_node_media",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "config": {
+                  "additionalProperties": {},
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "next": {
+                  "additionalProperties": false,
+                  "description": "This node's outgoing edge, set via clipform_set_logic. Omitted for a chain tail or terminal node.",
+                  "properties": {
+                    "target_id": {
+                      "description": "The node/screen ID this node routes to",
+                      "type": "string"
+                    },
+                    "target_type": {
+                      "description": "What kind of target target_id is",
+                      "enum": [
+                        "node",
+                        "end_screen",
+                        "redirect",
+                        "link_list"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "target_id",
+                    "target_type"
+                  ],
+                  "type": "object"
+                },
+                "options": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "content": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "content"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "prompt": {
+                  "type": "string"
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "routes": {
+                  "description": "Each answer's own route, for a node that routes by answer",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "option_content": {
+                        "description": "The answer's text",
+                        "type": "string"
+                      },
+                      "option_id": {
+                        "type": "string"
+                      },
+                      "target_id": {
+                        "description": "The node/screen ID this answer routes to",
+                        "type": "string"
+                      },
+                      "target_type": {
+                        "enum": [
+                          "node",
+                          "end_screen",
+                          "redirect",
+                          "link_list"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "option_id",
+                      "option_content",
+                      "target_id",
+                      "target_type"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "type",
+                "prompt",
+                "required"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Form title",
+            "type": "string"
+          },
+          "urls": {
+            "additionalProperties": false,
+            "description": "Dashboard/viewer deeplinks for this form. An anonymous caller gets only 'viewer'.",
+            "properties": {
+              "analytics": {
+                "description": "Analytics tab - views, starts, completion rate, drop-off per node. Not present for an anonymous caller.",
+                "type": "string"
+              },
+              "builder": {
+                "description": "Build tab - the node/canvas editor. Not present for an anonymous caller.",
+                "type": "string"
+              },
+              "dynamic_link": {
+                "description": "Dynamic/personalized link setup. Not present for an anonymous caller.",
+                "type": "string"
+              },
+              "embed": {
+                "description": "Embed setup for websites. Not present for an anonymous caller.",
+                "type": "string"
+              },
+              "responses": {
+                "description": "Responses tab - individual submissions. Not present for an anonymous caller.",
+                "type": "string"
+              },
+              "share": {
+                "description": "Share tab - link, QR, social. Not present for an anonymous caller.",
+                "type": "string"
+              },
+              "summary": {
+                "description": "Summary tab - form overview and key stats. Not present for an anonymous caller.",
+                "type": "string"
+              },
+              "viewer": {
+                "description": "Live respondent link, or - for an anonymous caller's draft - a private preview link where answers are not saved (do not share it with respondents). Omitted for a non-anonymous caller's unpublished draft.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "form_id",
+          "title",
+          "is_live",
+          "has_unpublished_changes",
+          "nodes"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Clipform"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Update Clipform"
+      },
+      "description": "Update a form's title, publish status, settings, or tags. Only sends fields that are provided - omitted fields remain unchanged. AI-PROTECTED parameters have restrictions noted in their descriptions.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "alias": {
+            "description": "Readable link name for a template, so it is shared as app.clipform.io/try/NAME instead of an id. ONLY for forms in a Clipform Public workspace (others are refused). Lowercase letters, digits and single dashes, 3-50 characters (e.g. 'testimonial-howto'); reserved words and 9-character hex strings are refused. Adds a name: old names keep working, and a name is never reused by another form.",
+            "type": "string"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "AI-PROTECTED: Only set when the user explicitly provides an author name. Set null to clear."
+          },
+          "background_color": {
+            "description": "Background color as 6-digit hex (e.g. '#1A1A2E').",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "type": "string"
+          },
+          "brand_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "AI-PROTECTED: Custom brand name shown in footer. Only set when user explicitly provides."
+          },
+          "cover_media_asset_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cover image: the picture shown in emails, link previews and on the embed button, cropped to the form's 9:16 frame. A media_asset_id of a ready still image in this form's workspace. Set null to clear and fall back to the first step's media. Goes live on the next publish (is_live: true), which can be in the same call."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SEO description (meta description, og:description). Set null to clear."
+          },
+          "disable_back_navigation": {
+            "description": "Prevent respondents from going back. Recommended for quizzes.",
+            "type": "boolean"
+          },
+          "font_family": {
+            "description": "AI-PROTECTED: Only set when the user explicitly requests a specific font.",
+            "type": "string"
+          },
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "is_live": {
+            "description": "Setting true publishes/republishes the snapshot respondents see. Forms are live from creation, but edits and media attached AFTER creation are not visible until you re-send true - republishing is the expected final step of a build, never skip it after attaching media. Setting false takes the form offline (keeps the last published snapshot) - AI-PROTECTED: only take a form offline when the user explicitly asks.",
+            "type": "boolean"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "AI-PROTECTED: Only set when the user explicitly provides a logo URL. Set null to clear."
+          },
+          "primary_color": {
+            "description": "Primary/brand color as 6-digit hex (e.g. '#FF5500'). Used for buttons and accents.",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "type": "string"
+          },
+          "show_branding": {
+            "description": "Show Clipform branding. Set false to remove (Pro plan).",
+            "type": "boolean"
+          },
+          "show_step_counter": {
+            "description": "Show step counter (e.g. '1/5'). Recommended for quizzes.",
+            "type": "boolean"
+          },
+          "tags": {
+            "description": "Replace all tags on this form. Pass the full desired set (e.g. ['quiz', 'trivia', 'slug:elephants']). Omit to leave tags unchanged.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "New form title",
+            "type": "string"
+          },
+          "total_steps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Override the total step count shown in the step counter. Set null to auto-calculate."
+          }
+        },
+        "required": [
+          "form_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_update_form",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "form_id": {
+            "description": "Form UUID",
+            "type": "string"
+          },
+          "updated_fields": {
+            "description": "Names of the fields that were changed by this call",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "form_id",
+          "updated_fields"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Update Clipform"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Delete Clipform"
+      },
+      "description": "Move a form and all its nodes to the trash. It stops accepting responses immediately and can be restored later. Requires user confirmation before it runs. Needs a signed-in Clipform account (an anonymous session is asked to sign in).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "confirm": {
+            "description": "Set to true ONLY after the user has explicitly confirmed this destructive action. Leave unset otherwise - hosts that support confirmation dialogs will prompt the user automatically.",
+            "type": "boolean"
+          },
+          "form_id": {
+            "description": "The form UUID to delete (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_delete_form",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Delete Clipform"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Clipform Results"
+      },
+      "description": "View response counts, choice/action answer breakdowns, and recent open-text answers for a form. Answers to booking, contact details, file upload, drawing, camera, and payment nodes are counts only - use the dashboard for per-response detail. Needs a signed-in Clipform account (an anonymous session is asked to sign in).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_get_results",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "nodes": {
+            "description": "Nodes in form order. The booking, contact details, file upload, drawing, camera, and payment nodes carry only total_responses/total_views - no per-response detail.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "node_id": {
+                  "type": "string"
+                },
+                "node_type": {
+                  "type": "string"
+                },
+                "options": {
+                  "description": "Answer breakdown - choice and action-category (file_download/shopping) nodes only",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "count": {
+                        "type": "number"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "percentage": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "count",
+                      "percentage"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "prompt": {
+                  "type": "string"
+                },
+                "recent_answers": {
+                  "description": "Most recent open-text answers, capped at 20 - open questions only",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "submitted_at": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text",
+                      "submitted_at"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "selection_mode": {
+                  "description": "Choice questions only. `multiple` = people could pick several options, so option counts add up past total_responses and the option percentages can sum past 100.",
+                  "enum": [
+                    "single",
+                    "multiple"
+                  ],
+                  "type": "string"
+                },
+                "total_responses": {
+                  "type": "number"
+                },
+                "total_views": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "node_id",
+                "node_type",
+                "prompt",
+                "total_responses",
+                "total_views"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "results_url": {
+            "description": "Dashboard Responses tab for this form. Not present for an anonymous caller.",
+            "type": "string"
+          },
+          "total_responses": {
+            "description": "Total unique respondents to the form",
+            "type": "number"
+          }
+        },
+        "required": [
+          "total_responses",
+          "nodes"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Clipform Results"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List form responses"
+      },
+      "description": "List a Clipform form's individual responses (submissions) with time filtering - complements clipform_get_results (aggregates). Answers questions like 'what came in during the last 24 hours', 'what's the longest answer', 'what did people say'. Text answers plus a non-PII payment summary (amount and status); booking, contact details, file upload, drawing, and camera answers and audio/video recordings are redacted to placeholders and the customer's payment details stay in the dashboard (the responses URL from clipform_get_form). Responses are sorted newest first unless sort: 'oldest'. Needs a signed-in Clipform account (an anonymous session is asked to sign in).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "Form UUID (from clipform_list_forms / clipform_create_form)",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max responses to return (default 20, max 50)",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Only responses whose text answers contain this string (case-insensitive)",
+            "type": "string"
+          },
+          "since": {
+            "description": "Only responses submitted at or after this ISO 8601 time (e.g. '2026-08-29T00:00:00Z')",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          },
+          "sort": {
+            "description": "Order by submission time. Default: newest",
+            "enum": [
+              "newest",
+              "oldest"
+            ],
+            "type": "string"
+          },
+          "until": {
+            "description": "Only responses submitted at or before this ISO 8601 time",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_get_responses",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "locked_over_plan_limit": {
+            "description": "Matching responses hidden by the plan's response limit",
+            "type": "number"
+          },
+          "responses": {
+            "description": "Matching responses, filtered/sorted/capped per the inputs",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "answers": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "answer": {
+                        "description": "Text answer, or a redaction placeholder",
+                        "type": "string"
+                      },
+                      "question": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "question",
+                      "type",
+                      "answer"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "submitted_at": {
+                  "description": "ISO 8601 submission time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "submitted_at",
+                "status",
+                "answers"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "returned": {
+            "description": "Responses in this result",
+            "type": "number"
+          },
+          "total_matching": {
+            "description": "Responses matching the filters (before the limit cap)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "total_matching",
+          "returned",
+          "locked_over_plan_limit",
+          "responses"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List form responses"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Add Node"
+      },
+      "description": "Add a new node to an existing form. Inserted before the end screen by default; after_node_id controls insertion position. Inserting into a linear flow automatically re-links the chain (the node before the insertion point points to the new node, which points to what followed) - you do not need clipform_set_logic for a simple insert. For a second ending that only some answers reach (an end screen or redirect), pass unlinked: true and then route to it with clipform_set_logic. Node types and config schemas match clipform_create_form.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "after_node_id": {
+            "description": "Insert after this node ID. Omit to append before the end screen. Not used with unlinked.",
+            "type": "string"
+          },
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "node": {
+            "description": "The node to add",
+            "properties": {
+              "config": {
+                "additionalProperties": {},
+                "description": "Type-specific configuration keyed by node type. Omit to use defaults. Per-type keys, shapes, and defaults are listed in the clipform_create_form description; craft guidance via clipform_get_guide.",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "label": {
+                "description": "Short label for the node (used in logic builder). Defaults to the prompt text.",
+                "type": "string"
+              },
+              "options": {
+                "description": "Answer options. choice: required, min 1, max 12, max 6 when option_display is \"letters\", content max 80 chars button: required, min 1, max 1, content max 28 chars",
+                "items": {
+                  "properties": {
+                    "content": {
+                      "description": "Option text",
+                      "type": "string"
+                    },
+                    "is_correct": {
+                      "description": "Mark this option as a correct answer for a quiz. Stored as the answer key; when score is not given it also sets score 1 (or 0 on the others).",
+                      "type": "boolean"
+                    },
+                    "score": {
+                      "description": "Score value for this option (for scored quizzes). Use 1 for correct, 0 for wrong. Scored options automatically enable correct-answer marking (record_scores) and correct/incorrect answer feedback on the node; set config.choice.show_answer_feedback: false to hide the feedback.",
+                      "maximum": 999,
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "content"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "prompt": {
+                "description": "The text shown to the respondent",
+                "type": "string"
+              },
+              "required": {
+                "default": true,
+                "type": "boolean"
+              },
+              "type": {
+                "enum": [
+                  "choice",
+                  "open",
+                  "booking",
+                  "details",
+                  "draw",
+                  "camera",
+                  "payment",
+                  "button",
+                  "redirect",
+                  "file_download",
+                  "end_screen"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "prompt"
+            ],
+            "type": "object"
+          },
+          "unlinked": {
+            "description": "Create an ending (end_screen or redirect) outside the flow, so nothing routes to it until you point an answer at it with clipform_set_logic. Only for ending types: a question added this way would sit outside the flow.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "form_id",
+          "node"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_add_node",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "node_id": {
+            "description": "ID of the created node - pass to update_node / attach_node_media",
+            "type": "string"
+          },
+          "type": {
+            "description": "Node type that was added",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_id",
+          "type"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Add Node"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update Node"
+      },
+      "description": "Update one or more existing nodes' text, type, config, or options. Pass multiple updates in one call instead of separate tool calls. Requires node IDs (returned by clipform_create_form, clipform_add_node, or clipform_get_form). Does not change node positions in the flow. All type definitions and config schemas are derived from @vid-master/config (node-types).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "updates": {
+            "description": "One or more node updates to apply",
+            "items": {
+              "properties": {
+                "config": {
+                  "additionalProperties": {},
+                  "description": "Type-specific configuration keyed by node type. Omit to use defaults. Per-type keys, shapes, and defaults are listed in the clipform_create_form description; craft guidance via clipform_get_guide. Merged shallowly into the stored config - only the keys you pass are changed. Set a key to null to delete it; nested objects are replaced wholesale. When type is changed in the same call, config replaces the stored configuration instead of merging.",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "label": {
+                  "description": "Short label for the node (used in logic builder)",
+                  "type": "string"
+                },
+                "node_id": {
+                  "description": "The node ID to update",
+                  "type": "string"
+                },
+                "options": {
+                  "description": "The full option list (for choice nodes). Include each option's id from clipform_get_form to keep that option and its routes, answer key and results. Options without an id are added as new, except that if no option has an id, options are matched to the existing ones by text, then by position, so their routes are kept. Options left out are removed together with their routes. Omit to keep existing options.",
+                  "items": {
+                    "properties": {
+                      "content": {
+                        "description": "Option text",
+                        "type": "string"
+                      },
+                      "id": {
+                        "description": "The option's id from clipform_get_form. Include it to keep this option with its routes, answer key and results; omit it to add a new option (if no option in the list has an id, options are matched to the existing ones instead).",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "is_correct": {
+                        "description": "Mark this option as a correct answer for a quiz. Stored as the answer key; when score is not given it also sets score 1 (or 0 on the others).",
+                        "type": "boolean"
+                      },
+                      "score": {
+                        "description": "Score value for this option (for scored quizzes). Use 1 for correct, 0 for wrong. Scored options automatically enable correct-answer marking (record_scores) and correct/incorrect answer feedback on the node; set config.choice.show_answer_feedback: false to hide the feedback.",
+                        "maximum": 999,
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "content"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "prompt": {
+                  "description": "New node prompt text",
+                  "type": "string"
+                },
+                "required": {
+                  "description": "Whether an answer is required",
+                  "type": "boolean"
+                },
+                "type": {
+                  "description": "Change the node type",
+                  "enum": [
+                    "choice",
+                    "open",
+                    "booking",
+                    "details",
+                    "draw",
+                    "camera",
+                    "payment",
+                    "button",
+                    "redirect",
+                    "file_download",
+                    "end_screen"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "node_id"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "form_id",
+          "updates"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_update_node",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "description": "One result per requested update, in order",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "node_id": {
+                  "type": "string"
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "warnings": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "node_id",
+                "ok"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Update Node"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Delete Node"
+      },
+      "description": "Delete a node from a form. The logic chain is automatically re-linked (the previous node will point to the next one). Cannot delete the start node or the last end screen. On a live form the node stays on the live form until the form is published. Requires user confirmation before it runs.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "confirm": {
+            "description": "Set to true ONLY after the user has explicitly confirmed this destructive action. Leave unset otherwise - hosts that support confirmation dialogs will prompt the user automatically.",
+            "type": "boolean"
+          },
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "node_id": {
+            "description": "The node ID to delete",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id",
+          "node_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_delete_node",
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Delete Node"
+    },
+    {
+      "_meta": {
+        "openai/fileParams": [
+          "files"
+        ],
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Upload Media Asset"
+      },
+      "description": "Put one or more media files into your workspace media library (max 10, uploaded sequentially). This is step one of attaching media to a node - follow up with clipform_attach_node_media to place the returned media_asset_id on a node.\n\nWhen a public URL is provided, the media is fetched and stored automatically. The API picks where each asset is stored based on its size and type. Word-level captions from clipform_generate_tts enable per-word highlighting in the viewer once attached - pass the caption_ref it returned instead of hand-copying the captions array.\n\nPDFs (media_type document) are for consent agreements: they return a document descriptor, not a media_asset_id.\n\nProvide media via `items` (explicit type + URL), `files` (files attached by the host client), or both. At least one is required.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "files": {
+            "description": "Files attached by the host client. Each becomes a video or still library asset (or a consent-agreement document for application/pdf) based on its declared mime_type.",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "additionalProperties": {},
+                  "properties": {
+                    "download_url": {
+                      "description": "Short-lived URL the server downloads the file's bytes from",
+                      "type": "string"
+                    },
+                    "file_id": {
+                      "description": "Host-assigned identifier for the attached file",
+                      "type": "string"
+                    },
+                    "file_name": {
+                      "type": "string"
+                    },
+                    "mime_type": {
+                      "description": "Declared MIME type - determines whether the file becomes a video or still asset",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "download_url"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          },
+          "form_id": {
+            "description": "The form this is for (from clipform_create_form) - a routing hint only, to pick the right workspace. The result still lands in the workspace library, not on a node. Required on an anonymous session, or this lands in a different workspace and clipform_attach_node_media will not find it.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "items": {
+            "description": "One or more media items to create as workspace library assets",
+            "items": {
+              "properties": {
+                "ai_generated": {
+                  "description": "Whether this media was AI-generated. Drives the viewer's disclosure chip - set true for AI-rendered/synthesized media.",
+                  "type": "boolean"
+                },
+                "caption_ref": {
+                  "description": "caption_ref from clipform_generate_tts - an opaque handle that attaches that TTS run's word-level captions to this asset, resolved server-side. Preferred over captions.",
+                  "type": "string"
+                },
+                "captions": {
+                  "description": "Word-level captions from clipform_generate_tts. `words` is a required field on each caption (schema-enforced) - pass the full objects returned by clipform_generate_tts unmodified.",
+                  "items": {
+                    "properties": {
+                      "end": {
+                        "description": "Segment end time in seconds",
+                        "type": "number"
+                      },
+                      "start": {
+                        "description": "Segment start time in seconds",
+                        "type": "number"
+                      },
+                      "text": {
+                        "description": "Full segment text",
+                        "type": "string"
+                      },
+                      "words": {
+                        "description": "Per-word timestamps within the segment. Required - copy the full array from clipform_generate_tts verbatim.",
+                        "items": {
+                          "properties": {
+                            "end": {
+                              "type": "number"
+                            },
+                            "start": {
+                              "type": "number"
+                            },
+                            "word": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "word",
+                            "start",
+                            "end"
+                          ],
+                          "type": "object"
+                        },
+                        "minItems": 1,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "start",
+                      "end",
+                      "text",
+                      "words"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "filename": {
+                  "description": "Display filename for a document (media_type document). Defaults to the URL's file name.",
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "media_source": {
+                  "default": "uploaded",
+                  "description": "How the media was created",
+                  "enum": [
+                    "uploaded",
+                    "recorded"
+                  ],
+                  "type": "string"
+                },
+                "media_type": {
+                  "description": "Type of media. Use document for a consent-agreement PDF (url required, PDF only).",
+                  "enum": [
+                    "video",
+                    "still",
+                    "document"
+                  ],
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Public URL that links directly to the media file itself. When provided, the server fetches and stores it directly.",
+                  "format": "uri",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "media_type"
+              ],
+              "type": "object"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          },
+          "workspace_id": {
+            "description": "Workspace to act in (id from clipform_whoami workspaces). Omit to use the connection's default workspace.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "clipform_upload_media_asset",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "description": "One result per item, in order",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "document": {
+                  "additionalProperties": false,
+                  "description": "Consent-agreement descriptor (documents only) - set as consent_items[i].document via clipform_update_node",
+                  "properties": {
+                    "filename": {
+                      "type": "string"
+                    },
+                    "storage_path": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "storage_path",
+                    "filename",
+                    "url",
+                    "version"
+                  ],
+                  "type": "object"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "media_asset_id": {
+                  "description": "Absent for documents",
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "stored": {
+                  "description": "Bytes already stored (URL-based); false when an upload_url is pending",
+                  "type": "boolean"
+                },
+                "upload_method": {
+                  "type": "string"
+                },
+                "upload_url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "media_type",
+                "stored",
+                "ok"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "workspace_name": {
+            "description": "Name of the workspace the media library entries were created in",
+            "type": "string"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Upload Media Asset"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Complete Media Upload"
+      },
+      "description": "Confirm a signed-PUT upload finished, after PUTting the bytes to the upload_url returned by clipform_upload_media_asset with upload_method put. The API verifies the object actually landed in storage before it moves the asset on from processing - call this right after the PUT succeeds, or the asset stays invisible in the library. Not needed when the upload method was TUS.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "The form this is for (from clipform_create_form) - a routing hint only, to pick the right workspace. The result still lands in the workspace library, not on a node. Required on an anonymous session, or this lands in a different workspace and clipform_attach_node_media will not find it.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "media_asset_id": {
+            "description": "The media_asset_id returned by clipform_upload_media_asset for the PUT upload",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "media_asset_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_complete_media_upload",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "media_asset_id": {
+            "type": "string"
+          },
+          "status": {
+            "description": "The asset's status after this call - ready on success (processing while a video is still being prepared), or its already-settled status when called again (noop)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "media_asset_id",
+          "status"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Complete Media Upload"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Attach Node Media"
+      },
+      "description": "Attach an existing workspace media asset (from clipform_upload_media_asset) to one or more nodes (max 10). Pass one item or many; multiple items attach sequentially. Only works on node types that support media (choice, open, scale, draw, binary, button). A media asset is reusable - attach the same media_asset_id to several nodes.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "items": {
+            "description": "One or more attachments to make",
+            "items": {
+              "properties": {
+                "fit_media": {
+                  "description": "Show the whole frame (contain) instead of cover-cropping. ALWAYS set true when attaching renders from clipform_render_composition or clipform_render_video_template - they are composed 9:16 frames that must never be cropped. Leave unset for user-supplied media (arbitrary aspect ratios want the cover default).",
+                  "type": "boolean"
+                },
+                "media_asset_id": {
+                  "description": "A media asset ID returned by clipform_upload_media_asset",
+                  "type": "string"
+                },
+                "node_id": {
+                  "description": "The node ID",
+                  "type": "string"
+                },
+                "show_captions": {
+                  "description": "Display captions/subtitles on the node. Defaults to on; pass false to hide them.",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "node_id",
+                "media_asset_id"
+              ],
+              "type": "object"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "form_id",
+          "items"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_attach_node_media",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "description": "One result per item, in order",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "media_asset_id": {
+                  "type": "string"
+                },
+                "node_id": {
+                  "type": "string"
+                },
+                "ok": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "node_id",
+                "ok"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Attach Node Media"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Node Media"
+      },
+      "description": "Get the media attached to a node, including processing status. Useful for checking if a video upload has finished processing.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "node_id": {
+            "description": "The node ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id",
+          "node_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_get_node_media",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "media": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "duration": {
+                    "type": "number"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "transcription_status": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "media_type",
+                  "status"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Attached media (null if the node has none)"
+          }
+        },
+        "required": [
+          "media"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Node Media"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Delete Node Media"
+      },
+      "description": "Remove media from a node by unlinking it; the media asset and its files stay in the workspace library and keep working on any other node or live form that uses them. Requires user confirmation before it runs.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "confirm": {
+            "description": "Set to true ONLY after the user has explicitly confirmed this destructive action. Leave unset otherwise - hosts that support confirmation dialogs will prompt the user automatically.",
+            "type": "boolean"
+          },
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "node_id": {
+            "description": "The node ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id",
+          "node_id"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_delete_node_media",
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Delete Node Media"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Set Node Logic"
+      },
+      "description": "Set where one or more nodes go next. Pass multiple nodes in one call instead of separate tool calls.\n\n- Linear: one rule with only target_node_id (A to B to C).\n- By answer: on a single-select choice node with branching on, give one rule per answer with option_content set to the option's text, plus an optional default rule without option_content. Every answer needs a route: one with no rule of its own and no default has nowhere to go, and publishing fails. Different answers can go to different nodes or end screens. A multi-select choice has one route out, so answer rules are refused there.\n\nTurning branching on: set config.choice.enable_branching: true in clipform_create_form, or with clipform_update_node. update_node replaces the whole choice object, so send the node's full current choice config from clipform_get_form with enable_branching added - a choice object with only enable_branching drops quiz settings such as record_scores.\n\nA second ending that only some answers reach is added with clipform_add_node and unlinked: true.\n\nA call replaces that node's routing entirely - it does not merge with any prior target. A default rule covers the answers that exist now; an answer added later needs its own rule. clipform_get_form shows each answer's route afterwards, and flags any answer with no route.\n\nExample:\n  nodes: [\n    { node_id: \"q1-id\", rules: [{ target_node_id: \"q2-id\" }] },\n    { node_id: \"country-id\", rules: [\n      { option_content: \"United Kingdom\", target_node_id: \"video-id\" },\n      { option_content: \"Somewhere else\", target_node_id: \"sorry-end-id\" }\n    ] }\n  ]",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "The form UUID (returned by clipform_create_form, not the short share_id from the URL)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "nodes": {
+            "description": "One or more nodes to set logic on",
+            "items": {
+              "properties": {
+                "node_id": {
+                  "description": "The node ID to set routing on",
+                  "type": "string"
+                },
+                "rules": {
+                  "description": "One rule without option_content for a single next node, or one rule per answer (option_content) plus an optional default rule",
+                  "items": {
+                    "properties": {
+                      "option_content": {
+                        "description": "Route only this answer: the option's text exactly as clipform_get_form lists it, without the (id: ...) suffix. Omit for the node's default route, which covers every current answer without a rule of its own.",
+                        "type": "string"
+                      },
+                      "target_node_id": {
+                        "description": "The node ID this route goes to: any other node, including an end screen",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "target_node_id"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 13,
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "node_id",
+                "rules"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "form_id",
+          "nodes"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_set_logic",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "description": "One result per node, in order",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "node_id": {
+                  "type": "string"
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "rules_count": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "node_id",
+                "ok"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Set Node Logic"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Log Form Generation Audit"
+      },
+      "description": "Internal audit step run by a form-generation workflow. Records a completed generation's content provenance (sources, image attributions) for the flow that just built the form. Not a user action - only call it as the final step of a generation workflow you are running, never in response to a plain create or edit request.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "details": {
+            "description": "Content sources and attributions",
+            "properties": {
+              "images": {
+                "description": "Images used with attribution",
+                "items": {
+                  "properties": {
+                    "attribution": {
+                      "type": "string"
+                    },
+                    "license": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "sources": {
+                "description": "Knowledge sources used",
+                "items": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "form_id": {
+            "description": "The form ID (UUID format, not the share ID)",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "summary": {
+            "description": "Short description of what was generated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "form_id",
+          "summary",
+          "details"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_log_generation",
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Log Form Generation Audit"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Search Recent News"
+      },
+      "description": "Search recent news articles from NewsAPI and The Guardian and return them as structured results.\n\nCoverage: recent events, people, and topics (post-May-2025). Does NOT cover timeless topics (history, geography, science).\n\nReturns: article title, source, author, date, URL, description, and image URL per result.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "count": {
+            "description": "Max results per provider (default 5)",
+            "maximum": 15,
+            "minimum": 1,
+            "type": "number"
+          },
+          "query": {
+            "description": "News search query (e.g. 'Iran war 2026', 'Australian Open final', 'UK election')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_search_news",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "articles": {
+            "description": "Matching articles (empty if none)",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "author": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "image_url": {
+                  "type": "string"
+                },
+                "published_at": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query",
+          "articles"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Search Recent News"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Generate Text-to-Speech"
+      },
+      "description": "Generate narration audio from text with word-level captions. Use this for quiz question narration, survey introductions, form instructions, or any node that benefits from a human voice. Proactively suggest narration for quizzes and content-rich forms - it significantly improves engagement.\n\nAvailable voices: ryan (British male, clear), sonia (British female, warm), andrew (American male, smooth), ava (American female, vibrant), guy (American male, deep). Pick ONE voice that fits the topic - e.g. a London quiz gets ryan or sonia, a US sports quiz gets andrew or guy - and reuse that SAME voice for every item and every call across the whole form. Never mix voices within one form unless the user explicitly asks for multiple voices.\n\nUse the tone parameter to direct HOW the voice speaks. Always set a tone that matches the form's mood - e.g. quizzes: \"Energetic and playful, like a quiz show host teasing the audience\", surveys: \"Professional but warm, encouraging honest answers\", personality quizzes: \"Curious and reflective\". This dramatically improves the narration quality.\n\nPass one item or many (max 10) - multiple items run in parallel. Returns audio_url and caption_ref per item - pass caption_ref downstream to clipform_render_composition / clipform_render_video_template / clipform_upload_media_asset to attach this run's word-level captions instead of hand-copying the captions array.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "form_id": {
+            "description": "The form this is for (from clipform_create_form) - a routing hint only, to pick the right workspace. The result still lands in the workspace library, not on a node. Required on an anonymous session, or this lands in a different workspace and clipform_attach_node_media will not find it.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "items": {
+            "description": "One or more TTS items to generate",
+            "items": {
+              "properties": {
+                "text": {
+                  "description": "Narration text",
+                  "maxLength": 5000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "tone": {
+                  "description": "Style instructions for how the voice should sound. E.g. 'Speak like an energetic quiz show host, playful and teasing' or 'Warm and conversational, like chatting with a friend'. Infer from context if not specified by the user.",
+                  "maxLength": 500,
+                  "type": "string"
+                },
+                "voice": {
+                  "default": "ryan",
+                  "description": "Voice: ryan (British male, clear/articulate), sonia (British female, warm/bright), andrew (American male, smooth/neutral), ava (American female, vibrant/friendly), guy (American male, deep/authoritative). Pick ONE voice for the whole form based on its topic and audience, then reuse that same voice on every item and every call - never mix voices within a form unless the user explicitly asks for more than one.",
+                  "enum": [
+                    "ryan",
+                    "sonia",
+                    "andrew",
+                    "ava",
+                    "guy"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "type": "object"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          },
+          "workspace_id": {
+            "description": "Workspace to act in (id from clipform_whoami workspaces). Omit to use the connection's default workspace.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_generate_tts",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "description": "One result per item, in order",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "audio_url": {
+                  "type": "string"
+                },
+                "caption_ref": {
+                  "description": "Pass this as the caption_ref param on clipform_render_composition / clipform_render_video_template / clipform_upload_media_asset to attach this run's word-level captions - never hand-copy the captions array.",
+                  "type": "string"
+                },
+                "captions": {
+                  "description": "Word-level captions, for reference only - prefer passing caption_ref downstream instead of copying this array.",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "end": {
+                        "type": "number"
+                      },
+                      "start": {
+                        "type": "number"
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "words": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "end": {
+                              "type": "number"
+                            },
+                            "start": {
+                              "type": "number"
+                            },
+                            "word": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "word",
+                            "start",
+                            "end"
+                          ],
+                          "type": "object"
+                        },
+                        "minItems": 1,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "start",
+                      "end",
+                      "text",
+                      "words"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "ok": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "ok"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Generate Text-to-Speech"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Search Media"
+      },
+      "description": "Search images or stock video clips. Pass one query or many (max 10) - multiple queries run in one call instead of separate tool calls. Use results to feed into clipform_render_video_template (slideshow) for narrated slideshow videos, or upload directly as still images via clipform_upload_media_asset then clipform_attach_node_media. All results are pre-cleared for commercial use. Results include a description (alt text where the provider has it) - use it to pick visually distinct images.\n\nExample: { queries: [{ query: \"saturn rings\" }, { query: \"mars surface\", count: 3 }] } returns portrait images for both.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "queries": {
+            "description": "One or more search queries to run",
+            "items": {
+              "properties": {
+                "count": {
+                  "description": "Max results per provider (default 6 for image, 3 for video)",
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "number"
+                },
+                "kind": {
+                  "description": "image = stock photos (default), video = stock clips",
+                  "enum": [
+                    "image",
+                    "video"
+                  ],
+                  "type": "string"
+                },
+                "orientation": {
+                  "description": "portrait (default) fills the 9:16 frame; landscape gets auto blur-pad framing in Ken Burns videos",
+                  "enum": [
+                    "portrait",
+                    "landscape",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                "query": {
+                  "description": "What to search for (e.g. 'african lion', 'saturn rings')",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ],
+              "type": "object"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "queries"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_search_media",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "searches": {
+            "description": "Results grouped by query (items empty if a query found nothing or failed)",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "items": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "attribution": {
+                        "type": "string"
+                      },
+                      "duration": {
+                        "type": "number"
+                      },
+                      "height": {
+                        "type": "number"
+                      },
+                      "source": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "width": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "url"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "kind": {
+                  "enum": [
+                    "image",
+                    "video"
+                  ],
+                  "type": "string"
+                },
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query",
+                "kind",
+                "items"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "searches"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Search Media"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Render Composition"
+      },
+      "description": "Render a specialised video composition to MP4 or PNG - custom animated visuals that a video template can't provide, such as geography animations or designed motion graphics. Available composition names and their required input props schemas come from clipform_list_compositions.\n\nOutput formats: mp4 (H.264) or png (single frame). Returns a public URL when complete.\n\nFor multi-render builds (e.g. one clip per quiz question), pass everything in ONE call via items (max 10): all renders fire in parallel and you get one job ID each - then collect the results in a single clipform_check_render call with job_ids. Single render: pass compositionId/inputProps at the top level (wait: true blocks until the render is ready; wait: false returns a job ID).\n\nChoosing a render tool: for a recognisable form/quiz beat (guess-the-city, this-or-that, mystery reveal, multiple choice, photo montage...) reach for a video template first (clipform_list_video_templates + clipform_render_video_template) - it is a one-call recipe. For a photo/clip montage, narrated or silent, use the slideshow template (pass audio_url to sync it to a voice track). Use clipform_render_composition only when neither fits and you need a custom layer stack.\nA render for a form node is not done until it is attached to that node. Pass node_id (and form_id) so the completed render attaches itself automatically - do not poll clipform_check_render to completion or manually chain clipform_upload_media_asset + clipform_attach_node_media; fire the render and move on. In batch mode, set node_id per item (see items) and form_id once at the top level.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "caption_ref": {
+            "description": "Single render only: caption_ref from clipform_generate_tts - an opaque handle that attaches that TTS run's word-level captions to the media asset, resolved server-side. Preferred over captions. Only used when node_id is set. For batch mode, set caption_ref per item instead.",
+            "type": "string"
+          },
+          "captions": {
+            "description": "Single render only: word-level captions from clipform_generate_tts, carried onto the attached media asset. Only used when node_id is set. For batch mode, set captions per item instead.",
+            "items": {
+              "properties": {
+                "end": {
+                  "description": "Segment end time in seconds",
+                  "type": "number"
+                },
+                "start": {
+                  "description": "Segment start time in seconds",
+                  "type": "number"
+                },
+                "text": {
+                  "description": "Full segment text",
+                  "type": "string"
+                },
+                "words": {
+                  "description": "Per-word timestamps within the segment. Required - copy the full array from clipform_generate_tts verbatim.",
+                  "items": {
+                    "properties": {
+                      "end": {
+                        "type": "number"
+                      },
+                      "start": {
+                        "type": "number"
+                      },
+                      "word": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "word",
+                      "start",
+                      "end"
+                    ],
+                    "type": "object"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "start",
+                "end",
+                "text",
+                "words"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "compositionId": {
+            "description": "Single render: the composition ID. Call clipform_list_compositions to see available options (e.g. 'Slideshow', 'Map', 'Grid', 'Timeline', 'Silhouette', 'Text', 'Rebus', 'Scene', 'ShortFormQuiz', 'ScorecardQuiz', 'ScorecardGK', 'CountrySilhouetteQuiz'). Use items instead for multiple renders.",
+            "type": "string"
+          },
+          "form_id": {
+            "description": "The form UUID - required when node_id is set (single render) or any item sets node_id (batch).",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "inputProps": {
+            "additionalProperties": {},
+            "description": "Single render: props object matching the composition's schema from clipform_list_compositions. Validated STRICTLY - unknown or missing props fail with the schema in the error, nothing renders silently with defaults. For map compositions (Map), wide shots (camera.zoom < 9) may round lat/lng to 1 decimal place to improve cache hit rates; close shots and pin drops should keep full precision — the pin lands exactly on `target`.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "items": {
+            "description": "Batch mode: multiple renders in one call. All fire in parallel; returns one job ID per item - collect with clipform_check_render (job_ids). Use this whenever rendering more than one clip.",
+            "items": {
+              "properties": {
+                "caption_ref": {
+                  "description": "caption_ref from clipform_generate_tts - an opaque handle that attaches that TTS run's word-level captions to the media asset, resolved server-side. Preferred over captions. Only used when node_id is set.",
+                  "type": "string"
+                },
+                "captions": {
+                  "description": "Word-level captions from clipform_generate_tts - carried onto the attached media asset. Only used when node_id is set.",
+                  "items": {
+                    "properties": {
+                      "end": {
+                        "description": "Segment end time in seconds",
+                        "type": "number"
+                      },
+                      "start": {
+                        "description": "Segment start time in seconds",
+                        "type": "number"
+                      },
+                      "text": {
+                        "description": "Full segment text",
+                        "type": "string"
+                      },
+                      "words": {
+                        "description": "Per-word timestamps within the segment. Required - copy the full array from clipform_generate_tts verbatim.",
+                        "items": {
+                          "properties": {
+                            "end": {
+                              "type": "number"
+                            },
+                            "start": {
+                              "type": "number"
+                            },
+                            "word": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "word",
+                            "start",
+                            "end"
+                          ],
+                          "type": "object"
+                        },
+                        "minItems": 1,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "start",
+                      "end",
+                      "text",
+                      "words"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "compositionId": {
+                  "description": "The composition ID (see clipform_list_compositions)",
+                  "type": "string"
+                },
+                "inputProps": {
+                  "additionalProperties": {},
+                  "description": "Props matching the composition's schema - validated strictly",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "node_id": {
+                  "description": "Form node to attach this item's render to automatically once it completes. Requires the batch's top-level form_id.",
+                  "type": "string"
+                },
+                "outputFormat": {
+                  "default": "mp4",
+                  "description": "Output format (default: mp4)",
+                  "enum": [
+                    "mp4",
+                    "png"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "compositionId"
+              ],
+              "type": "object"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          },
+          "node_id": {
+            "description": "Single render only: form node to attach this render to automatically once it completes. Requires form_id. For batch mode, set node_id per item instead.",
+            "type": "string"
+          },
+          "outputFormat": {
+            "default": "mp4",
+            "description": "Single render: output format (default: mp4)",
+            "enum": [
+              "mp4",
+              "png"
+            ],
+            "type": "string"
+          },
+          "wait": {
+            "default": true,
+            "description": "Single render only: true (default) blocks until the render is ready and returns its URL; false returns a job ID for clipform_check_render. Batch items always run fire-and-poll.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "clipform_render_composition",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "jobs": {
+            "description": "One entry per render (single or batch)",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "attach_error": {
+                  "description": "Present when node_id was provided but auto-attach failed - the render itself still succeeded.",
+                  "type": "string"
+                },
+                "attached": {
+                  "description": "True when node_id was provided and the render was attached to the node automatically (present once the attach outcome is known).",
+                  "type": "boolean"
+                },
+                "composition_id": {
+                  "type": "string"
+                },
+                "job_id": {
+                  "description": "Present when status is 'rendering' - pass to check_render",
+                  "type": "string"
+                },
+                "media_asset_id": {
+                  "description": "The workspace media asset created from this render, when attached.",
+                  "type": "string"
+                },
+                "output_format": {
+                  "type": "string"
+                },
+                "public_url": {
+                  "description": "Present when status is 'complete' - attach via upload_media_asset then attach_node_media (fit_media: true), unless node_id was set (auto-attached)",
+                  "type": "string"
+                },
+                "republished": {
+                  "description": "True when the form was live and was republished to include this media.",
+                  "type": "boolean"
+                },
+                "status": {
+                  "enum": [
+                    "rendering",
+                    "complete"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "jobs"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Render Composition"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Search Music"
+      },
+      "description": "Search for royalty-free music tracks and ambient sounds. Quiz forms especially benefit from background music - it keeps energy up between questions. Also consider it for multi-step surveys and longer forms. Pass the returned URL as the audio for the slideshow video template via clipform_render_video_template. Returns download URLs, duration, artist, and license info.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "count": {
+            "description": "Max results (default: 5)",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "instrumentalOnly": {
+            "default": true,
+            "description": "Only instrumental tracks (default: true)",
+            "type": "boolean"
+          },
+          "maxDuration": {
+            "description": "Maximum duration in seconds",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "minDuration": {
+            "description": "Minimum duration in seconds",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "query": {
+            "description": "What to search for (e.g. 'upbeat quiz background', 'calm ambient', 'playful pizzicato')",
+            "minLength": 1,
+            "type": "string"
+          },
+          "tags": {
+            "description": "Genre/mood tags to filter by. Multiple tags are ANDed together (e.g. ['ambient', 'chill'] matches tracks tagged both).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_search_music",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "tracks": {
+            "description": "Matching tracks (empty if none); pass a url as the audio for the slideshow template",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "artist": {
+                  "type": "string"
+                },
+                "duration": {
+                  "type": "number"
+                },
+                "license": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "query",
+          "tracks"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Search Music"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Compositions"
+      },
+      "description": "Browse available video compositions and their expected props schemas. Call this before using clipform_render_composition to discover visual styles and their input props. For an image or photo montage, reach for a video template (clipform_list_video_templates + clipform_render_video_template) instead of a composition.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "clipform_list_compositions",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "compositions": {
+            "description": "Available compositions - pass an id to render_composition",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "durationInFrames": {
+                  "type": "number"
+                },
+                "fps": {
+                  "type": "number"
+                },
+                "height": {
+                  "type": "number"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "props": {
+                  "description": "Compact props summary (name*: type)",
+                  "type": "string"
+                },
+                "propsSchema": {
+                  "additionalProperties": {},
+                  "description": "Full JSON Schema for inputProps",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "width": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "width",
+                "height",
+                "fps",
+                "durationInFrames",
+                "props"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "compositions"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List Compositions"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Video Templates"
+      },
+      "description": "Browse available video templates - curated Scene arrangements (bed + overlay + sane defaults) that render through the Scene composition from a small controls object. Call this before clipform_render_video_template to see template names and their exposed controls. For a fully custom layer stack, assemble Scene layers directly via clipform_render_composition instead.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "clipform_list_video_templates",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "templates": {
+            "description": "Available video templates - pass a name + controls to clipform_render_video_template",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "controls": {
+                  "description": "Control names, '?'-suffixed when optional",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "exampleControls": {
+                  "additionalProperties": {},
+                  "description": "A worked, ready-to-render controls object for this template - copy and adapt it",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "keywords": {
+                  "description": "Natural-language phrases a user's intent might match against this template",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "tier": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "tier",
+                "description",
+                "keywords",
+                "controls"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "templates"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List Video Templates"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Render Video Template"
+      },
+      "description": "Render a curated video template (a pre-arranged Scene: bed + overlay + sane defaults) to MP4 or PNG from a small controls object, instead of hand-assembling Scene layers. Call clipform_list_video_templates first for available template names and their controls. Renders through the Scene composition under the hood.\n\nChoosing a render tool: for a recognisable form/quiz beat (guess-the-city, this-or-that, mystery reveal, multiple choice, photo montage...) reach for a video template first (clipform_list_video_templates + clipform_render_video_template) - it is a one-call recipe. For a photo/clip montage, narrated or silent, use the slideshow template (pass audio_url to sync it to a voice track). Use clipform_render_composition only when neither fits and you need a custom layer stack.\nA render for a form node is not done until it is attached to that node. Pass node_id (and form_id) so the completed render attaches itself automatically - do not poll clipform_check_render to completion or manually chain clipform_upload_media_asset + clipform_attach_node_media; fire the render and move on.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "caption_ref": {
+            "description": "caption_ref from clipform_generate_tts - an opaque handle that attaches that TTS run's word-level captions to the media asset, resolved server-side. Preferred over captions. Only used when node_id is set. Defaults to controls.audio_url when that is a clipform_generate_tts track (slideshow narration), so narrated montages keep their captions.",
+            "type": "string"
+          },
+          "captions": {
+            "description": "Word-level captions from clipform_generate_tts - carried onto the attached media asset. Only used when node_id is set.",
+            "items": {
+              "properties": {
+                "end": {
+                  "description": "Segment end time in seconds",
+                  "type": "number"
+                },
+                "start": {
+                  "description": "Segment start time in seconds",
+                  "type": "number"
+                },
+                "text": {
+                  "description": "Full segment text",
+                  "type": "string"
+                },
+                "words": {
+                  "description": "Per-word timestamps within the segment. Required - copy the full array from clipform_generate_tts verbatim.",
+                  "items": {
+                    "properties": {
+                      "end": {
+                        "type": "number"
+                      },
+                      "start": {
+                        "type": "number"
+                      },
+                      "word": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "word",
+                      "start",
+                      "end"
+                    ],
+                    "type": "object"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "start",
+                "end",
+                "text",
+                "words"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "controls": {
+            "additionalProperties": {},
+            "description": "Template-specific controls (see clipform_list_video_templates for the exposed control surface).",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "form_id": {
+            "description": "The form UUID (required when node_id is set).",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "node_id": {
+            "description": "Form node to attach this render to automatically once it completes - skips the manual clipform_upload_media_asset + clipform_attach_node_media steps and republishes the form if it's currently live. Requires form_id.",
+            "type": "string"
+          },
+          "outputFormat": {
+            "default": "mp4",
+            "description": "Output format (default: mp4)",
+            "enum": [
+              "mp4",
+              "png"
+            ],
+            "type": "string"
+          },
+          "template": {
+            "description": "Video template name (see clipform_list_video_templates).",
+            "type": "string"
+          },
+          "wait": {
+            "default": true,
+            "description": "true (default) blocks until the render is ready and returns its URL; false returns a job ID for clipform_check_render.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "template",
+          "controls"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_render_video_template",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "attach_error": {
+            "description": "Present when node_id was provided but auto-attach failed - the render itself still succeeded.",
+            "type": "string"
+          },
+          "attached": {
+            "description": "True when node_id was provided and the render was attached to the node automatically (present once the attach outcome is known).",
+            "type": "boolean"
+          },
+          "duration_seconds": {
+            "description": "Final video length in seconds - the narration's real length when audio_url drove it.",
+            "type": "number"
+          },
+          "job_id": {
+            "description": "Present when status is 'rendering' - pass to clipform_check_render",
+            "type": "string"
+          },
+          "media_asset_id": {
+            "description": "The workspace media asset created from this render, when attached.",
+            "type": "string"
+          },
+          "output_format": {
+            "type": "string"
+          },
+          "public_url": {
+            "description": "Present when status is 'complete' - attach via upload_media_asset then attach_node_media (fit_media: true), unless node_id was set (auto-attached)",
+            "type": "string"
+          },
+          "republished": {
+            "description": "True when the form was live and was republished to include this media.",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "rendering",
+              "complete"
+            ],
+            "type": "string"
+          },
+          "template": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Render Video Template"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Assets"
+      },
+      "description": "List available creative assets (sound effects, animations, fonts) for video compositions.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "type": {
+            "description": "Asset type to list (default: all)",
+            "enum": [
+              "sfx",
+              "animation",
+              "font",
+              "all"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "clipform_list_assets",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "animations": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "description": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "fonts": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "weights": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sfx": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "description": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "sfx",
+          "animations",
+          "fonts"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List Assets"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check Render Status"
+      },
+      "description": "Check the status of render jobs started by clipform_render_video_template or clipform_render_composition.\n\nPass job_ids to check a whole batch in ONE call - one line of status per job. Pass job_id for a single job. Returns the output URL for each completed render. Typical render time: 10-60 seconds. Attach is automatic when node_id was provided to the render tool - no need to poll to completion, and the attach outcome is reported here once known.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "job_id": {
+            "description": "A single job ID returned by the render tool",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "job_ids": {
+            "description": "Multiple job IDs - check the whole batch in one call instead of one call per job",
+            "items": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "name": "clipform_check_render",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "jobs": {
+            "description": "One entry per queried job; attach completed public_urls via upload_media_asset then attach_node_media unless already auto-attached",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "attach_error": {
+                  "description": "Present when node_id was set but auto-attach failed - the render itself still succeeded.",
+                  "type": "string"
+                },
+                "attached": {
+                  "description": "True when the render's node_id was set and it attached to the node automatically.",
+                  "type": "boolean"
+                },
+                "duration_seconds": {
+                  "type": "number"
+                },
+                "elapsed_seconds": {
+                  "type": "number"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "job_id": {
+                  "type": "string"
+                },
+                "media_asset_id": {
+                  "description": "The workspace media asset created from this render, when attached.",
+                  "type": "string"
+                },
+                "public_url": {
+                  "type": "string"
+                },
+                "republished": {
+                  "description": "True when the form was live and was republished to include this media.",
+                  "type": "boolean"
+                },
+                "status": {
+                  "enum": [
+                    "rendering",
+                    "complete",
+                    "failed",
+                    "not_found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "job_id",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "jobs"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Check Render Status"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Fetch Geographic Boundary"
+      },
+      "description": "Fetch a GeoJSON boundary polygon for a country, city, or region. Returns simplified GeoJSON ready to use as the 'boundary' prop in the Map composition.\n\nmainlandOnly excludes small islands and overseas territories (e.g. Corsica for France, Hawaii for USA).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "mainlandOnly": {
+            "default": true,
+            "description": "Keep only the largest landmass, excluding small islands and overseas territories",
+            "type": "boolean"
+          },
+          "maxPoints": {
+            "default": 500,
+            "description": "Maximum points per polygon ring for simplification (default 500, lower = smaller payload)",
+            "type": "number"
+          },
+          "query": {
+            "description": "Place name (e.g. 'France', 'Paris', 'Tokyo', 'Brazil')",
+            "type": "string"
+          },
+          "type": {
+            "default": "country",
+            "description": "Type of place to search for",
+            "enum": [
+              "country",
+              "city",
+              "state",
+              "region"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_fetch_boundary",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "geojson": {
+            "description": "The Feature GeoJSON as a JSON string - use as the boundary prop in the Map composition",
+            "type": "string"
+          },
+          "geometry_type": {
+            "enum": [
+              "Polygon",
+              "MultiPolygon"
+            ],
+            "type": "string"
+          },
+          "mainland_only": {
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Resolved place name",
+            "type": "string"
+          },
+          "size_kb": {
+            "description": "Approximate size of the returned GeoJSON in KB",
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "geometry_type",
+          "size_kb",
+          "mainland_only",
+          "geojson"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Fetch Geographic Boundary"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Craft Guide"
+      },
+      "description": "Retrieve craft knowledge for building a specific form type. Returns question psychology, difficulty curves, narration style, scoring setup, and writing principles as markdown. Does NOT return a step-by-step build workflow - use clipform_get_workflow for that.\n\nAvailable types: quiz, survey, interview, funnel, testimonial, application, booking, intake, lead-capture.\nAliases also accepted: trivia → quiz, test → quiz, exam → quiz, feedback → survey, poll → survey, nps → survey, questionnaire → survey, case-study → interview, callout → interview, lead-gen → funnel, qualification → funnel, lead-magnet → funnel, story → testimonial, review → testimonial, job-application → application, admission → application, enrollment → application, grant → application, registration → booking, signup → booking, event → booking, rsvp → booking, workshop → booking, client-intake → intake, onboarding → intake, enquiry → intake, inquiry → intake, new-client → intake, lead → lead-capture, lead-form → lead-capture, enquiry-form → lead-capture, waitlist → lead-capture, get-a-quote → lead-capture.\nQuiz variants (optional): personality, comprehension, composition - appends variant-specific addendum to the base quiz guide.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "type": {
+            "description": "Form type to get the craft guide for (accepts aliases like 'feedback' → survey)",
+            "type": "string"
+          },
+          "variant": {
+            "description": "Quiz sub-variant. Only used when type is 'quiz'. Omit for a standard scored quiz.",
+            "enum": [
+              "personality",
+              "comprehension",
+              "composition"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_get_guide",
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Craft Guide"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "mcp"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Build Workflow"
+      },
+      "description": "Retrieve a step-by-step build workflow for creating a specific form type. Returns the exact tool sequence, form settings, node configuration, scoring setup, and end screen config as a build recipe.\n\nDoes NOT return craft knowledge (question psychology, difficulty curves, narration style) - use clipform_get_guide for that.\n\nAvailable types: quiz, survey, interview, testimonial, application, booking, intake, lead-capture.\nAliases also accepted: trivia → quiz, test → quiz, exam → quiz, feedback → survey, poll → survey, nps → survey, questionnaire → survey, case-study → interview, callout → interview, lead-gen → funnel, qualification → funnel, lead-magnet → funnel, story → testimonial, review → testimonial, job-application → application, admission → application, enrollment → application, grant → application, registration → booking, signup → booking, event → booking, rsvp → booking, workshop → booking, client-intake → intake, onboarding → intake, enquiry → intake, inquiry → intake, new-client → intake, lead → lead-capture, lead-form → lead-capture, enquiry-form → lead-capture, waitlist → lead-capture, get-a-quote → lead-capture.\nQuiz variants (optional): personality, comprehension, composition - returns the variant-specific workflow instead of the base quiz workflow.\n\nOptional args by type:\n- quiz: topic, question_count (8)\n- quiz (variant: personality): topic, categories, question_count (8)\n- quiz (variant: comprehension): question_count (8), audience\n- interview: purpose, response_format (all), needs_consent (true)\n- survey: topic, anonymous (true)\n- funnel: outcomes, criteria, needs_contact (true)\n- testimonial: use_case\n- application: role\n- booking: event_name, event_type\n- intake: use_case, response_format (all)\n- lead-capture: use_case",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "anonymous": {
+            "description": "Anonymous survey (survey)",
+            "type": "boolean"
+          },
+          "audience": {
+            "description": "Target audience (quiz variant: comprehension)",
+            "type": "string"
+          },
+          "categories": {
+            "description": "Comma-separated outcome categories (quiz variant: personality)",
+            "type": "string"
+          },
+          "criteria": {
+            "description": "Routing criteria (funnel)",
+            "type": "string"
+          },
+          "event_name": {
+            "description": "Event or offering name (booking)",
+            "type": "string"
+          },
+          "event_type": {
+            "description": "Type of event (booking)",
+            "type": "string"
+          },
+          "needs_consent": {
+            "description": "Include consent statement (interview)",
+            "type": "boolean"
+          },
+          "needs_contact": {
+            "description": "Include contact capture (funnel)",
+            "type": "boolean"
+          },
+          "outcomes": {
+            "description": "Segments or recommendations (funnel)",
+            "type": "string"
+          },
+          "purpose": {
+            "description": "What you're collecting (interview)",
+            "type": "string"
+          },
+          "question_count": {
+            "description": "Number of questions, default 8 (quiz types)",
+            "type": "number"
+          },
+          "response_format": {
+            "description": "How respondents reply (interview)",
+            "enum": [
+              "video",
+              "audio",
+              "text",
+              "all"
+            ],
+            "type": "string"
+          },
+          "role": {
+            "description": "What the application is for (application)",
+            "type": "string"
+          },
+          "topic": {
+            "description": "Topic or theme (quiz, survey)",
+            "type": "string"
+          },
+          "type": {
+            "description": "Form type to get the build workflow for (accepts aliases like 'feedback' → survey)",
+            "type": "string"
+          },
+          "use_case": {
+            "description": "What stories to collect (testimonial)",
+            "type": "string"
+          },
+          "variant": {
+            "description": "Quiz sub-variant. Only used when type is 'quiz'. Omit for a standard scored quiz.",
+            "enum": [
+              "personality",
+              "comprehension",
+              "composition"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "clipform_get_workflow",
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "mcp"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Build Workflow"
+    }
+  ],
+  "version": "5.17.0"
+}

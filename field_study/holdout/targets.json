@@ -1,0 +1,1040 @@
+{
+  "counts": {
+    "npm": 70,
+    "pypi": 30,
+    "total": 100
+  },
+  "excluded_package_eval": {
+    "capture_slugs": [
+      "npm-mcp-remote-0-14-3",
+      "npm-mcp-remote-0-14-3-static-header",
+      "npm-server-everything",
+      "npm-server-filesystem",
+      "npm-server-filesystem-0-6-2",
+      "npm-server-github-2025-4-8",
+      "npm-server-memory",
+      "npm-server-puppeteer-2025-5-12",
+      "npm-server-slack-2025-4-25",
+      "npm-supergateway-3-1-0",
+      "pypi-mcp-proxy-0-8-2",
+      "pypi-mcp-server-fetch",
+      "pypi-mcp-server-git",
+      "pypi-mcp-server-git-2025-9-25"
+    ],
+    "package_names": [
+      "3dcitydb-mcp-server",
+      "@aikidosec/mcp",
+      "@angelogiacco/elevenlabs-mcp-server",
+      "@apify/actors-mcp-server",
+      "@azure-devops/mcp",
+      "@azure/mcp",
+      "@benborla29/mcp-server-mysql",
+      "@bitwarden/mcp-server",
+      "@brave/brave-search-mcp-server",
+      "@browserstack/mcp-server",
+      "@cap-js/mcp-server",
+      "@coinbase/cds-mcp-server",
+      "@contentful/mcp-server",
+      "@currents/mcp",
+      "@doitintl/doit-mcp-server",
+      "@ehrocks/fe-mcp-server",
+      "@ericthered926/duckduckgo-mcp-server",
+      "@eslint/mcp",
+      "@heroku/mcp-server",
+      "@hostinger/mcp",
+      "@hubspot/mcp-server",
+      "@iobroker/mcp-server",
+      "@ivotoby/openapi-mcp-server",
+      "@mantine/mcp-server",
+      "@mapbox/mcp-server",
+      "@meshy-ai/meshy-mcp-server",
+      "@microsoft/clarity-mcp-server",
+      "@modelcontextprotocol/server-everything",
+      "@modelcontextprotocol/server-filesystem",
+      "@modelcontextprotocol/server-github",
+      "@modelcontextprotocol/server-memory",
+      "@modelcontextprotocol/server-puppeteer",
+      "@modelcontextprotocol/server-sequential-thinking",
+      "@modelcontextprotocol/server-slack",
+      "@mui/mcp",
+      "@notionhq/notion-mcp-server",
+      "@pandacss/mcp",
+      "@phantom/mcp-server",
+      "@processon/mcp-server-processon-node",
+      "@qase/mcp-server",
+      "@roychri/mcp-server-asana",
+      "@runpod/mcp-server",
+      "@sap-ux/fiori-mcp-server",
+      "@sentry/mcp-server",
+      "@sigmacomputing/slack-mcp-server",
+      "@softeria/ms-365-mcp-server",
+      "@supabase/mcp-server-supabase",
+      "@superblocksteam/mcp-server",
+      "@theia/ai-mcp-server",
+      "@tocharianou/mcp-server-kibana",
+      "@transloadit/mcp-server",
+      "@tsmztech/mcp-server-salesforce",
+      "@ui5/mcp-server",
+      "@unthread-io/mcp-server",
+      "@upstash/context7-mcp",
+      "@upstash/mcp-server",
+      "@winor30/mcp-server-datadog",
+      "@wonderwhy-er/desktop-commander",
+      "@xeroapi/xero-mcp-server",
+      "@z_ai/mcp-server",
+      "@zencoderai/slack-mcp-server",
+      "Ai_Indeed_mcp_server",
+      "BigGo-MCP-Server",
+      "ELF-mcp-server",
+      "Things3-MCP-server",
+      "a-stock-mcp-server",
+      "a2a-mcp-server",
+      "a2a-protocol-mcp-server",
+      "a3m-mcp-server",
+      "aa-mcp-server",
+      "aapt-mcp-server",
+      "aas-mcp-server",
+      "abacum-mcp-server",
+      "ableton-live-mcp-server",
+      "ableton-mcp-server",
+      "abraflexi-mcp-server",
+      "ac-mcp-server",
+      "accessibility-mcp-server",
+      "accounting-subject-analysis-mcp-server",
+      "aceflow-mcp-server",
+      "acex-mcp-server",
+      "acli-mcp-server",
+      "acp-mcp-server",
+      "action1-mcp-server",
+      "actvalue.lambda-mcp-server",
+      "adb-mcp-server",
+      "adb-mysql-mcp-server",
+      "adbpg-mcp-server",
+      "add-mcp-server",
+      "add-stdio-mcp-server",
+      "axe-mcp-server",
+      "bailian-mcp-server",
+      "chelaile-mcp-server",
+      "chrome-devtools-mcp",
+      "hostinger-api-mcp",
+      "jira-mcp-server",
+      "kubernetes-mcp-server",
+      "malicious-mcp-server",
+      "mcp-hello-world",
+      "mcp-proxy",
+      "mcp-remote",
+      "mcp-server",
+      "mcp-server-fetch",
+      "mcp-server-git",
+      "mcp-server-kubernetes",
+      "mcp-server-whisper",
+      "next-devtools-mcp",
+      "scryfall-mcp-server",
+      "supergateway",
+      "tiny-http-mcp-server",
+      "touchdesigner-mcp-server"
+    ]
+  },
+  "targets": [
+    {
+      "description": "RetellAi MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@abhaybabbar/retellai-mcp-server",
+      "repository_url": "https://github.com/abhaybabbar/retellai-mcp-server",
+      "slug": "npm-abhaybabbar-retellai-mcp-server-1-0-4",
+      "version": "1.0.4"
+    },
+    {
+      "description": "MCP server for using the AMap Maps API",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@amap/amap-maps-mcp-server",
+      "repository_url": null,
+      "slug": "npm-amap-amap-maps-mcp-server-0-0-8",
+      "version": "0.0.8"
+    },
+    {
+      "description": "Official MCP server for Anytype API",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@anyproto/anytype-mcp",
+      "repository_url": "https://github.com/anyproto/anytype-mcp",
+      "slug": "npm-anyproto-anytype-mcp-2-0-3",
+      "version": "2.0.3"
+    },
+    {
+      "description": "MCP server for fetching and searching documentation",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@arabold/docs-mcp-server",
+      "repository_url": "https://github.com/arabold/docs-mcp-server",
+      "slug": "npm-arabold-docs-mcp-server-3-5-0",
+      "version": "3.5.0"
+    },
+    {
+      "description": "Auth0 Model Context Protocol (MCP) Server (Beta) — A secure and extendable implementation of an MCP server that provides AI assistants with controlled access to the Auth0 Management API through natural language. This project is in beta and not intended fo",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@auth0/auth0-mcp-server",
+      "repository_url": "https://github.com/auth0/auth0-mcp-server",
+      "slug": "npm-auth0-auth0-mcp-server-0-1-0-beta-19",
+      "version": "0.1.0-beta.19"
+    },
+    {
+      "description": "MCP server that gives AI assistants access to aVenture research data on companies, people, funding, and news.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@aventurevc/mcp-server",
+      "repository_url": "https://github.com/aventurevc/aventure-mcp",
+      "slug": "npm-aventurevc-mcp-server-0-8-498",
+      "version": "0.8.498"
+    },
+    {
+      "description": "BattleGrid MCP server — play crypto prediction games from AI agents",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@battlegrid/mcp-server",
+      "repository_url": "https://github.com/playbattlegrid/battlegrid-mcp",
+      "slug": "npm-battlegrid-mcp-server-32-0-115",
+      "version": "32.0.115"
+    },
+    {
+      "description": "Bit2Me MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@bit2me/mcp-server",
+      "repository_url": "https://github.com/bit2me-devs/bit2me-mcp",
+      "slug": "npm-bit2me-mcp-server-4-5-2",
+      "version": "4.5.2"
+    },
+    {
+      "description": "MCP server for browser automation using Browser MCP",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@browsermcp/mcp",
+      "repository_url": "https://github.com/BrowserMCP/mcp",
+      "slug": "npm-browsermcp-mcp-2-5-0",
+      "version": "2.5.0"
+    },
+    {
+      "description": "MCP server for building and managing Clipform video forms",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@clipform/mcp-server",
+      "repository_url": "https://github.com/clipform/mcp-server",
+      "slug": "npm-clipform-mcp-server-5-17-0",
+      "version": "5.17.0"
+    },
+    {
+      "description": "MCP server for interacting with Cloudflare API",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@cloudflare/mcp-server-cloudflare",
+      "repository_url": null,
+      "slug": "npm-cloudflare-mcp-server-cloudflare-0-2-0",
+      "version": "0.2.0"
+    },
+    {
+      "description": "CNB MCP Server. A comprehensive MCP server that provides seamless integration to the CNB's API(https://cnb.cool), offering a wide range of tools for repository management, pipelines operations and collaboration features",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@cnbcool/mcp-server",
+      "repository_url": "https://cnb.cool/cnb/tools/cnb-mcp-server",
+      "slug": "npm-cnbcool-mcp-server-0-6-7",
+      "version": "0.6.7"
+    },
+    {
+      "description": "Verified npm launcher for the open-source ContextStream Rust MCP server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@contextstream/mcp-server",
+      "repository_url": "https://github.com/contextstream/mcp-server",
+      "slug": "npm-contextstream-mcp-server-1-0-99",
+      "version": "1.0.99"
+    },
+    {
+      "description": "MCP server for DBX — query databases from Claude Code, Cursor, and other AI agents",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@dbx-app/mcp-server",
+      "repository_url": "https://github.com/t8y2/dbx",
+      "slug": "npm-dbx-app-mcp-server-0-4-145",
+      "version": "0.4.145"
+    },
+    {
+      "description": "Decodo MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@decodo/mcp-server",
+      "repository_url": "https://github.com/Decodo/mcp-server",
+      "slug": "npm-decodo-mcp-server-1-9-0",
+      "version": "1.9.0"
+    },
+    {
+      "description": "MCP server for Doppler API with auto-generated tools from OpenAPI specification",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@dopplerhq/mcp-server",
+      "repository_url": "https://github.com/DopplerHQ/mcp-server",
+      "slug": "npm-dopplerhq-mcp-server-1-0-5",
+      "version": "1.0.5"
+    },
+    {
+      "description": "Official MCP server for esa.io - STDIO transport version",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@esaio/esa-mcp-server",
+      "repository_url": "https://github.com/esaio/esa-mcp-server",
+      "slug": "npm-esaio-esa-mcp-server-0-15-2",
+      "version": "0.15.2"
+    },
+    {
+      "description": "Gmail MCP server with auto authentication support",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@gongrzhe/server-gmail-autoauth-mcp",
+      "repository_url": "https://github.com/gongrzhe/server-gmail-autoauth-mcp",
+      "slug": "npm-gongrzhe-server-gmail-autoauth-mcp-1-1-11",
+      "version": "1.1.11"
+    },
+    {
+      "description": "MCP server for Hugeicons search and usage documentation",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@hugeicons/mcp-server",
+      "repository_url": "https://github.com/hugeicons/hugeicons",
+      "slug": "npm-hugeicons-mcp-server-0-4-1",
+      "version": "0.4.1"
+    },
+    {
+      "description": "The official MCP Server for kintone",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@kintone/mcp-server",
+      "repository_url": "https://github.com/kintone/mcp-server",
+      "slug": "npm-kintone-mcp-server-1-11-4",
+      "version": "1.11.4"
+    },
+    {
+      "description": "Knip MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@knip/mcp",
+      "repository_url": "https://github.com/webpro-nl/knip",
+      "slug": "npm-knip-mcp-0-0-39",
+      "version": "0.0.39"
+    },
+    {
+      "description": "MCP server for accessing Mastra.ai documentation, changelogs, and news.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@mastra/mcp-docs-server",
+      "repository_url": "https://github.com/mastra-ai/mastra",
+      "slug": "npm-mastra-mcp-docs-server-1-3-15",
+      "version": "1.3.15"
+    },
+    {
+      "description": "MCP server for loading and extracting text from PDF files with chunked pagination and interactive viewer",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@modelcontextprotocol/server-pdf",
+      "repository_url": "https://github.com/modelcontextprotocol/ext-apps",
+      "slug": "npm-modelcontextprotocol-server-pdf-2-0-4",
+      "version": "2.0.4"
+    },
+    {
+      "description": "Atlas tools for MongoDB MCP server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@mongodb-js/mcp-tools-atlas",
+      "repository_url": "https://github.com/mongodb-js/mongodb-mcp-server",
+      "slug": "npm-mongodb-js-mcp-tools-atlas-3-4-0",
+      "version": "3.4.0"
+    },
+    {
+      "description": "NearAI MCP server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@near-mcp/aitp-mcp-server",
+      "repository_url": null,
+      "slug": "npm-near-mcp-aitp-mcp-server-0-1-34",
+      "version": "0.1.34"
+    },
+    {
+      "description": "MCP server for Bitbucket API integration - supports both Cloud and Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@nexus2520/bitbucket-mcp-server",
+      "repository_url": "https://github.com/pdogra1299/bitbucket-mcp-server",
+      "slug": "npm-nexus2520-bitbucket-mcp-server-4-0-0",
+      "version": "4.0.0"
+    },
+    {
+      "description": "MCP server for Redmine",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@onozaty/redmine-mcp-server",
+      "repository_url": "https://github.com/onozaty/redmine-mcp-server",
+      "slug": "npm-onozaty-redmine-mcp-server-1-4-0",
+      "version": "1.4.0"
+    },
+    {
+      "description": "MCP server for Airbnb search and listing details",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@openbnb/mcp-server-airbnb",
+      "repository_url": null,
+      "slug": "npm-openbnb-mcp-server-airbnb-0-3-0",
+      "version": "0.3.0"
+    },
+    {
+      "description": "Model Context Protocol (MCP) server for AI-assisted development of MDK applications.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@sap/mdk-mcp-server",
+      "repository_url": "https://github.com/SAP/mdk-mcp-server",
+      "slug": "npm-sap-mdk-mcp-server-0-4-4",
+      "version": "0.4.4"
+    },
+    {
+      "description": "Shortcut MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@shortcut/mcp",
+      "repository_url": "https://github.com/useshortcut/mcp-server-shortcut",
+      "slug": "npm-shortcut-mcp-0-25-0",
+      "version": "0.25.0"
+    },
+    {
+      "description": "MCP server for interacting SmartBear Products",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@smartbear/mcp",
+      "repository_url": "https://github.com/SmartBear/smartbear-mcp",
+      "slug": "npm-smartbear-mcp-0-45-0",
+      "version": "0.45.0"
+    },
+    {
+      "description": "MCP server that serves knowledge about your components based on your Storybook stories and documentation",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@storybook/mcp",
+      "repository_url": "https://github.com/storybookjs/storybook",
+      "slug": "npm-storybook-mcp-10-6-8",
+      "version": "10.6.8"
+    },
+    {
+      "description": "Advanced GitLab MCP server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@structured-world/gitlab-mcp",
+      "repository_url": "https://github.com/structured-world/gitlab-mcp",
+      "slug": "npm-structured-world-gitlab-mcp-13-5-0",
+      "version": "13.5.0"
+    },
+    {
+      "description": "stdio MCP server wrapping Tacit /api/v1 REST/SSE API",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@tacitai/mcp-server",
+      "repository_url": "https://github.com/scottkmcmillan/tacit",
+      "slug": "npm-tacitai-mcp-server-0-15-1",
+      "version": "0.15.1"
+    },
+    {
+      "description": "MCP server for searching and fetching 6,500+ brand SVGs from thesvg.org",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@thesvg/mcp-server",
+      "repository_url": "https://github.com/glincker/thesvg",
+      "slug": "npm-thesvg-mcp-server-0-9-2",
+      "version": "0.9.2"
+    },
+    {
+      "description": "MCP server for figma",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@thirdstrandstudio/mcp-figma",
+      "repository_url": null,
+      "slug": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "version": "0.7.0"
+    },
+    {
+      "description": "Transcend MCP Server — Admin tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-admin",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-admin-2-1-0",
+      "version": "2.1.0"
+    },
+    {
+      "description": "Transcend MCP Server — Assessments tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-assessment",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-assessment-2-1-18",
+      "version": "2.1.18"
+    },
+    {
+      "description": "Shared infrastructure for Transcend MCP Server packages.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-base",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-base-3-2-0",
+      "version": "3.2.0"
+    },
+    {
+      "description": "Transcend MCP Server — Consent Management tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-consent",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-consent-1-6-0",
+      "version": "1.6.0"
+    },
+    {
+      "description": "Transcend MCP Server — Custom Functions tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-custom-functions",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-custom-functions-0-3-5",
+      "version": "0.3.5"
+    },
+    {
+      "description": "Transcend MCP Server — Data Discovery tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-discovery",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-discovery-1-1-0",
+      "version": "1.1.0"
+    },
+    {
+      "description": "Transcend MCP Server — Documentation lookup tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-docs",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-docs-0-6-1",
+      "version": "0.6.1"
+    },
+    {
+      "description": "Transcend MCP Server — DSR Automation tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-dsr",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-dsr-2-2-0",
+      "version": "2.2.0"
+    },
+    {
+      "description": "Transcend MCP Server — Data Inventory tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-inventory",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-inventory-1-2-0",
+      "version": "1.2.0"
+    },
+    {
+      "description": "Transcend MCP Server — Policy Engine tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-policy",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-policy-0-2-10",
+      "version": "0.2.10"
+    },
+    {
+      "description": "Transcend MCP Server — Preference Management tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-preferences",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-preferences-0-9-0",
+      "version": "0.9.0"
+    },
+    {
+      "description": "Transcend MCP Server — Workflows tools.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-workflows",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "slug": "npm-transcend-io-mcp-server-workflows-1-2-0",
+      "version": "1.2.0"
+    },
+    {
+      "description": "MCP server for building Vue.js design systems - component analysis, documentation, variant generation, and design tokens",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@vizejs/musea-mcp-server",
+      "repository_url": "https://github.com/ubugeeei-prod/vize",
+      "slug": "npm-vizejs-musea-mcp-server-0-793-0",
+      "version": "0.793.0"
+    },
+    {
+      "description": "VoltAgent MCP server implementation for exposing agents, tools, and workflows via the Model Context Protocol.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@voltagent/mcp-server",
+      "repository_url": "https://github.com/VoltAgent/voltagent",
+      "slug": "npm-voltagent-mcp-server-2-2-0",
+      "version": "2.2.0"
+    },
+    {
+      "description": "Generic MCP server building blocks: structural tool types, JSON Schema utilities, merged tools, bounded results, untrusted-output wrapping, and a stateless HTTP handler.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@vouchington/mcp-server",
+      "repository_url": "https://github.com/vouchington/vouchington-platform",
+      "slug": "npm-vouchington-mcp-server-0-2-0",
+      "version": "0.2.0"
+    },
+    {
+      "description": "GitLab MCP server for projects, merge requests, issues, pipelines, wiki, releases, and more",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "@zereight/mcp-gitlab",
+      "repository_url": "https://github.com/zereight/gitlab-mcp",
+      "slug": "npm-zereight-mcp-gitlab-3-0-0",
+      "version": "3.0.0"
+    },
+    {
+      "description": "MCP server for Agentation - visual feedback for AI coding agents",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "agentation-mcp",
+      "repository_url": null,
+      "slug": "npm-agentation-mcp-1-3-2",
+      "version": "1.3.2"
+    },
+    {
+      "description": "Argo CD MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "argocd-mcp",
+      "repository_url": "https://github.com/argoproj-labs/mcp-for-argocd",
+      "slug": "npm-argocd-mcp-0-9-0",
+      "version": "0.9.0"
+    },
+    {
+      "description": "MCP Server for S3",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "aws-s3-mcp",
+      "repository_url": "https://github.com/samuraikun/aws-s3-mcp",
+      "slug": "npm-aws-s3-mcp-0-4-0",
+      "version": "0.4.0"
+    },
+    {
+      "description": "MCP Server for Datadog API",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "datadog-mcp-server",
+      "repository_url": "https://github.com/GeLi2001/datadog-mcp-server",
+      "slug": "npm-datadog-mcp-server-1-0-9",
+      "version": "1.0.9"
+    },
+    {
+      "description": "CLI and MCP server for DataForSEO API — browse documentation and make authenticated API requests",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "dataforseo-mcp-server",
+      "repository_url": "https://github.com/dataforseo/mcp-server-typescript",
+      "slug": "npm-dataforseo-mcp-server-3-1-3",
+      "version": "3.1.3"
+    },
+    {
+      "description": "Graphlit MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "graphlit-mcp-server",
+      "repository_url": "https://github.com/graphlit/graphlit-mcp-server",
+      "slug": "npm-graphlit-mcp-server-1-0-20260112001",
+      "version": "1.0.20260112001"
+    },
+    {
+      "description": "MCP server for Japanese law information using e-Gov API",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "hourei-mcp-server",
+      "repository_url": "https://github.com/groundcobra009/hourei-mcp-server",
+      "slug": "npm-hourei-mcp-server-1-0-6",
+      "version": "1.0.6"
+    },
+    {
+      "description": "Model Context Protocol (MCP) server for Kubernetes and OpenShift",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "kubernetes-mcp-server-linux-amd64",
+      "repository_url": "https://github.com/containers/kubernetes-mcp-server",
+      "slug": "npm-kubernetes-mcp-server-linux-amd64-0-1-3",
+      "version": "0.1.3"
+    },
+    {
+      "description": "LangSmith MCP Server - TypeScript implementation",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "langsmith-mcp-server",
+      "repository_url": null,
+      "slug": "npm-langsmith-mcp-server-0-1-7",
+      "version": "0.1.7"
+    },
+    {
+      "description": "MCP server for SearXNG integration",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "mcp-searxng",
+      "repository_url": "https://github.com/ihor-sokoliuk/mcp-searxng",
+      "slug": "npm-mcp-searxng-2-12-0",
+      "version": "2.12.0"
+    },
+    {
+      "description": "Code Runner MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "mcp-server-code-runner",
+      "repository_url": "https://github.com/formulahendry/mcp-server-code-runner",
+      "slug": "npm-mcp-server-code-runner-0-1-8",
+      "version": "0.1.8"
+    },
+    {
+      "description": "Official MongoDB MCP server: let AI agents search and manage databases and the Atlas data platform",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "mongodb-mcp-server",
+      "repository_url": "https://github.com/mongodb-js/mongodb-mcp-server",
+      "slug": "npm-mongodb-mcp-server-3-4-0",
+      "version": "3.4.0"
+    },
+    {
+      "description": "Official MCP server for Replicate's HTTP API",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "replicate-mcp",
+      "repository_url": "https://github.com/replicate/replicate-typescript-stainless",
+      "slug": "npm-replicate-mcp-0-9-0",
+      "version": "0.9.0"
+    },
+    {
+      "description": "'Slite MCP server'",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "slite-mcp-server",
+      "repository_url": null,
+      "slug": "npm-slite-mcp-server-1-3-0",
+      "version": "1.3.0"
+    },
+    {
+      "description": "MCP Server for Square API",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "square-mcp-server",
+      "repository_url": null,
+      "slug": "npm-square-mcp-server-0-1-2",
+      "version": "0.1.2"
+    },
+    {
+      "description": "MCP server for TailwindCSS utility classes, documentation, and project assistance",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "tailwindcss-mcp-server",
+      "repository_url": "https://github.com/CarbonoDev/tailwindcss-mcp-server",
+      "slug": "npm-tailwindcss-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "Minimal MCP server over stdio with typed tools and rich content helpers",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "tiny-stdio-mcp-server",
+      "repository_url": "https://github.com/poe-platform/poe-code",
+      "slug": "npm-tiny-stdio-mcp-server-0-1-32",
+      "version": "0.1.32"
+    },
+    {
+      "description": "MCP server for Wikipedia",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "npm",
+      "package": "wikipedia-mcp",
+      "repository_url": null,
+      "slug": "npm-wikipedia-mcp-1-0-3",
+      "version": "1.0.3"
+    },
+    {
+      "description": "Azure Data Lake Storage Gen2 Model Context Protocol (MCP) service",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "adls2-mcp-server",
+      "repository_url": "https://github.com/erikhoward/adls-mcp-server",
+      "slug": "pypi-adls2-mcp-server-0-1-4",
+      "version": "0.1.4"
+    },
+    {
+      "description": "Python MCP server for on-premises Azure DevOps Server and TFS.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "ado-mcp-server",
+      "repository_url": "https://github.com/viseshrp/ado-mcp",
+      "slug": "pypi-ado-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "MCP server for security vulnerability scanning and detection",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "adversary-mcp-server",
+      "repository_url": "https://github.com/brettbergin/adversary-mcp-server",
+      "slug": "pypi-adversary-mcp-server-1-11-1",
+      "version": "1.11.1"
+    },
+    {
+      "description": "MCP server for Azure Data Explorer integration",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "adx-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-adx-mcp-server-1-1-0",
+      "version": "1.1.0"
+    },
+    {
+      "description": "Apache AGE MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "age_mcp_server",
+      "repository_url": "https://github.com/rioriost/age_mcp_server",
+      "slug": "pypi-age-mcp-server-0-3-0",
+      "version": "0.3.0"
+    },
+    {
+      "description": "Usage analytics and monitoring for AI agent tool calls — track, analyze and optimize agent behavior",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-analytics-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-analytics-mcp-server",
+      "slug": "pypi-agent-analytics-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "MCP Server for agent commerce — how AI agents create, compare, and track purchases",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-commerce-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-commerce-mcp-server",
+      "slug": "pypi-agent-commerce-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "Slack for AI agents — rooms, messaging and context sharing for multi-agent coordination",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-coordination-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-coordination-mcp-server",
+      "slug": "pypi-agent-coordination-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "MCP server to estimate, budget, and compare the cost of LLM work per task",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-cost-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-agent-cost-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "Agent-to-Agent service directory — discover, register and rate AI agent services",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-directory-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-directory-mcp-server",
+      "slug": "pypi-agent-directory-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "Quality signals for MCP tools — agents report results, building a community-driven quality database",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-feedback-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-feedback-mcp-server",
+      "slug": "pypi-agent-feedback-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "MCP Server for AI agent identity and authorization — create, verify, and manage agent identities",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-identity-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-identity-mcp-server",
+      "slug": "pypi-agent-identity-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "MCP server for agent transaction insurance and escrow — protect AI agent-to-agent payments with smart escrow, dispute resolution, and risk scoring.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-insurance-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-insurance-mcp-server",
+      "slug": "pypi-agent-insurance-mcp-server-0-2-0",
+      "version": "0.2.0"
+    },
+    {
+      "description": "MCP工具构建基础库",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-mcp-server",
+      "repository_url": "https://codeup.aliyun.com/64650c96168f0a5963451dec/lib/agent-mcp-server",
+      "slug": "pypi-agent-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "Persistent memory for AI agents — store, retrieve and search knowledge across sessions",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-memory-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-memory-mcp-server",
+      "slug": "pypi-agent-memory-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "Trust and reputation system for AI agents — rate, verify and build trust between agents",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-reputation-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-reputation-mcp-server",
+      "slug": "pypi-agent-reputation-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "MCP server for agent reputation staking — trust through skin-in-the-game. Agents stake reputation as collateral; bad behavior gets slashed.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-staking-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-staking-mcp-server",
+      "slug": "pypi-agent-staking-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "Minimal stdio MCP server for parallel task execution by AI agents",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-tasker-mcp-server",
+      "repository_url": "https://github.com/S3bRR/agent-tasker-mcp",
+      "slug": "pypi-agent-tasker-mcp-server-1-0-1",
+      "version": "1.0.1"
+    },
+    {
+      "description": "MCP server providing persistent notes, todos, timers, and a cross-project registry — capabilities that augment Claude Code's built-in harness.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-toolkit-mcp-server",
+      "repository_url": "https://github.com/PaperBackPear3/awesome-agent-toolkits",
+      "slug": "pypi-agent-toolkit-mcp-server-0-4-0",
+      "version": "0.4.0"
+    },
+    {
+      "description": "Lighthouse for AI agents — test if APIs and services are properly accessible to AI agents",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-validator-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-validator-mcp-server",
+      "slug": "pypi-agent-validator-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "Reusable workflow templates for AI agents — share, discover and execute multi-step agent workflows",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agent-workflow-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agent-workflow-mcp-server",
+      "slug": "pypi-agent-workflow-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "MCP server exposing AgentAuth identity and authentication tools for AI agents",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentauth-mcp-server",
+      "repository_url": "https://github.com/radi-totev/agent-auth",
+      "slug": "pypi-agentauth-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "MCP Server for connecting to the AgentBridge Nexus",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentbridge-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-agentbridge-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "Agent Factory MCP Server",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentfactory-mcp-server",
+      "repository_url": null,
+      "slug": "pypi-agentfactory-mcp-server-0-1-0",
+      "version": "0.1.0"
+    },
+    {
+      "description": "A Model Context Protol(MCP) built for context exchange between LLM agents and external services.",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentic_mcp_server",
+      "repository_url": null,
+      "slug": "pypi-agentic-mcp-server-0-1-1",
+      "version": "0.1.1"
+    },
+    {
+      "description": "MCP Server for Claude Desktop - Agent OS kernel primitives including code safety verification, CMVK multi-model review, and IATP trust",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentmesh-mcp-server",
+      "repository_url": "https://github.com/microsoft/agent-governance-toolkit",
+      "slug": "pypi-agentmesh-mcp-server-3-7-0",
+      "version": "3.7.0"
+    },
+    {
+      "description": "AgentOath MCP Server -- expose trust protocol tools to any MCP-compatible AI agent (Claude, ChatGPT, etc.).",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentoath-mcp-server",
+      "repository_url": "https://github.com/AgentOath/agentoath",
+      "slug": "pypi-agentoath-mcp-server-0-2-0",
+      "version": "0.2.0"
+    },
+    {
+      "description": "Simple MCP server for AgentOps with Zed",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentops-mcp-server",
+      "repository_url": "https://github.com/rioriost/agentops_mcp_server",
+      "slug": "pypi-agentops-mcp-server-0-5-4",
+      "version": "0.5.4"
+    },
+    {
+      "description": "Serve the official MCP Skills extension with lossless resources (https://agentskills.io)",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentskills-mcp-server",
+      "repository_url": "https://github.com/pratikxpanda/agentskills-sdk",
+      "slug": "pypi-agentskills-mcp-server-0-7-0",
+      "version": "0.7.0"
+    },
+    {
+      "description": "mcp server for agentsphere sandbox",
+      "discovered_at_utc": "2026-11-24T17:59:22Z",
+      "ecosystem": "pypi",
+      "package": "agentsphere-mcp-server",
+      "repository_url": "https://www.agentsphere.run/home",
+      "slug": "pypi-agentsphere-mcp-server-1-9-1",
+      "version": "1.9.1"
+    }
+  ]
+}

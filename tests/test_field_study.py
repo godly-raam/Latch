@@ -8,19 +8,25 @@ import os
 import sys
 from pathlib import Path
 
+import field_study.discover_targets as discovery
 from field_study.discover_targets import (
     PYPI_JSON_URL,
     PYPI_SIMPLE_URL,
     discover_targets,
+    file_sha256,
     package_eval_exclusions,
 )
 import pytest
 
 from field_study.run_field_study import (
     analyze,
+    analyze_compositions,
+    build_compositions,
     classify_harvest,
     harvest_target,
     main,
+    render_disclosure_log,
+    render_report,
     sanitize_text,
     scratch_environment,
     write_results,
@@ -198,6 +204,156 @@ def test_discovery_excludes_package_eval_and_pins_versions() -> None:
     assert by_package["unseen-mcp-server"]["slug"] == (
         "npm-unseen-mcp-server-1-4-2"
     )
+
+
+NPM_ONLY = ["alpha-mcp-server", "beta-mcp-server", "gamma-mcp-server"]
+
+
+def _single_ecosystem_fetch(packages: list[str]):
+    def fetch(url: str) -> dict:
+        if url.startswith("https://registry.npmjs.org/"):
+            return {"objects": [_npm_entry(name, "1.0.0") for name in packages]}
+        raise AssertionError(f"unexpected registry URL: {url}")
+
+    return fetch
+
+
+def _write_exclusions(path: Path, *packages: str) -> Path:
+    path.write_text(
+        json.dumps({"targets": [{"package": name} for name in packages]}),
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_discovery_does_not_exclude_its_own_output(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """A split is defined by its named sources, never by files on disk."""
+
+    output = tmp_path / "targets.json"
+    monkeypatch.setattr(discovery, "TARGETS_JSON", output)
+    argv = ["--npm-limit", "10", "--pypi-limit", "0", "--output", str(output)]
+    fetch = _single_ecosystem_fetch(NPM_ONLY)
+
+    assert discovery.main(argv, fetch=fetch) == 0
+    first = json.loads(output.read_text(encoding="utf-8"))
+    assert [target["package"] for target in first["targets"]] == NPM_ONLY
+
+    # A pinned round is not replaced without --force...
+    before = output.read_bytes()
+    assert discovery.main(argv, fetch=fetch) == 1
+    assert output.read_bytes() == before
+
+    # ...and once forced, the packages already in the output are still unseen
+    # targets: only --exclude-targets and the package_eval pins exclude.
+    assert discovery.main([*argv, "--force"], fetch=fetch) == 0
+    again = json.loads(output.read_text(encoding="utf-8"))
+    assert [target["package"] for target in again["targets"]] == NPM_ONLY
+
+    split = json.loads(discovery.split_path(output).read_text(encoding="utf-8"))
+    assert [source["kind"] for source in split["exclusion_sources"]] == [
+        "package_eval_pins"
+    ]
+    assert split["output"] == str(output)  # a temp dir is outside the repo
+    assert split["discovered_count"] == len(NPM_ONLY)
+    assert split["overlap_with_exclusions"] == []
+    assert split["excluded_name_count"] == len(
+        package_eval_exclusions()["package_names"]
+    )
+
+
+def test_split_audit_differs_with_the_exclusion_source(tmp_path: Path) -> None:
+    """Two draws that exclude different rounds cannot share a split record."""
+
+    output = tmp_path / "round" / "targets.json"
+    output.parent.mkdir()
+    fetch = _single_ecosystem_fetch(NPM_ONLY)
+    exclude_a = _write_exclusions(tmp_path / "a.json", "alpha-mcp-server")
+    exclude_b = _write_exclusions(tmp_path / "b.json", "beta-mcp-server")
+
+    def run(exclude: Path, *, force: bool) -> int:
+        argv = [
+            "--npm-limit",
+            "10",
+            "--pypi-limit",
+            "0",
+            "--output",
+            str(output),
+            "--exclude-targets",
+            str(exclude),
+        ]
+        return discovery.main([*argv, "--force"] if force else argv, fetch=fetch)
+
+    assert run(exclude_a, force=False) == 0
+    first_split = discovery.split_path(output).read_text(encoding="utf-8")
+    first_packages = [
+        target["package"]
+        for target in json.loads(output.read_text(encoding="utf-8"))["targets"]
+    ]
+
+    assert run(exclude_b, force=True) == 0
+    second_split = discovery.split_path(output).read_text(encoding="utf-8")
+    second_packages = [
+        target["package"]
+        for target in json.loads(output.read_text(encoding="utf-8"))["targets"]
+    ]
+
+    assert first_split != second_split
+    assert first_packages == ["beta-mcp-server", "gamma-mcp-server"]
+    assert second_packages == ["alpha-mcp-server", "gamma-mcp-server"]
+
+    first = json.loads(first_split)
+    second = json.loads(second_split)
+    assert [source["path"] for source in first["exclusion_sources"]] == [
+        "package_eval/captured_manifests",
+        str(exclude_a),
+    ]
+    assert first["exclusion_sources"][1]["sha256"] == file_sha256(exclude_a)
+    assert second["exclusion_sources"][1]["sha256"] == file_sha256(exclude_b)
+    assert first["overlap_with_exclusions"] == []
+    assert second["overlap_with_exclusions"] == []
+    assert first["excluded_name_count"] == second["excluded_name_count"]
+
+
+def test_overlapping_target_fails_the_run_and_is_recorded(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """A leak past the filter is a failed split, not a quietly written list."""
+
+    output = tmp_path / "targets.json"
+    exclude = _write_exclusions(tmp_path / "exclude.json", "gamma-mcp-server")
+    leaked = {
+        "slug": "npm-gamma-mcp-server-1-0-0",
+        "ecosystem": "npm",
+        "package": "gamma-mcp-server",
+        "version": "1.0.0",
+        "repository_url": None,
+        "description": "",
+        "discovered_at_utc": DISCOVERED_AT,
+    }
+    # Simulate a filtering regression: an excluded package reaches discovery.
+    monkeypatch.setattr(discovery, "discover_targets", lambda *args, **kwargs: [leaked])
+
+    status = discovery.main(
+        [
+            "--npm-limit",
+            "10",
+            "--pypi-limit",
+            "0",
+            "--output",
+            str(output),
+            "--exclude-targets",
+            str(exclude),
+        ],
+        fetch=_single_ecosystem_fetch(NPM_ONLY),
+    )
+
+    assert status == 1
+    assert not output.exists()
+    split = json.loads(discovery.split_path(output).read_text(encoding="utf-8"))
+    assert split["overlap_with_exclusions"] == ["gamma-mcp-server"]
+    assert split["discovered_count"] == 1
 
 
 ALLOWED_ENV_KEYS = {
@@ -514,7 +670,9 @@ def test_analyze_is_deterministic_offline_and_leaves_other_suites_untouched(
     assert "Missing" not in report.split("## Findings by engine")[0]
 
     disclosure = first_paths[2].read_text(encoding="utf-8")
-    assert "No disclosure has been sent." in disclosure
+    # The header may not claim nothing was sent while listing a closed case.
+    assert "one case closed without a ticket, none open" in disclosure
+    assert "No disclosure has been sent." not in disclosure
     assert "`not_contacted`" in disclosure
 
     assert (
@@ -541,6 +699,113 @@ def _capture_graph(slug: str):
         if isinstance(tool, dict)
     ]
     return analyze_capability_graph({slug: tools})
+
+
+def test_compositions_are_the_only_place_shadow_and_cross_server_paths_exist(
+    tmp_path: Path,
+) -> None:
+    """A pair must yield a shadow collision and a cross-server trifecta."""
+
+    captures = tmp_path / "captures"
+    captures.mkdir()
+    server_a = [
+        {
+            "name": "get_issue",
+            "description": "Fetch a GitHub issue for triage.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {"issue_id": {"type": "string"}},
+            },
+        },
+        {
+            "name": "read_file",
+            "description": "Read a local file from disk.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {"path": {"type": "string"}},
+            },
+        },
+        {
+            "name": "echo",
+            "description": "Echo text back.",
+            "inputSchema": {"type": "object"},
+        },
+    ]
+    server_b = [
+        {
+            "name": "post_webhook",
+            "description": "Post a payload to a webhook.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string"},
+                    "payload": {"type": "string"},
+                },
+            },
+        },
+        {
+            "name": "echo",
+            "description": "Echo text back.",
+            "inputSchema": {"type": "object"},
+        },
+    ]
+    for capture in (
+        _capture("npm-alpha-1-0-0", server_a),
+        _capture("npm-beta-1-0-0", server_b),
+    ):
+        (captures / f"{capture['slug']}.json").write_text(
+            json.dumps(capture, sort_keys=True), encoding="utf-8"
+        )
+
+    # The kit enumeration is fixed even when an anchor is absent from the tree.
+    assert build_compositions(["npm-alpha-1-0-0", "npm-beta-1-0-0"]) == [
+        ("npm-alpha-1-0-0", "npm-beta-1-0-0"),
+        ("npm-alpha-1-0-0", "npm-server-filesystem", "pypi-mcp-server-fetch"),
+        ("npm-alpha-1-0-0", "npm-server-filesystem", "pypi-mcp-server-git"),
+        ("npm-alpha-1-0-0", "pypi-mcp-server-fetch", "npm-server-github-2025-4-8"),
+        ("npm-beta-1-0-0", "npm-server-filesystem", "pypi-mcp-server-fetch"),
+        ("npm-beta-1-0-0", "npm-server-filesystem", "pypi-mcp-server-git"),
+        ("npm-beta-1-0-0", "pypi-mcp-server-fetch", "npm-server-github-2025-4-8"),
+    ]
+
+    result = analyze_compositions(captures, manifest_dir=tmp_path / "no-anchors")
+
+    assert result["count"] == 1
+    assert result["harvested_server_count"] == 2
+    assert result["cross_server_path_count"] > 0
+    assert result["engine_counts"]["shadow"] > 0
+    assert "EXACT_TOOL_SHADOW" in result["rule_counts"]
+    # No HTTP/OAuth transport in the corpus: the engine stays untested, and the
+    # result says so instead of implying a pass.
+    assert result["engine_counts"]["auth-audit"] == 0
+    assert "untested engine" in result["auth_audit_note"]
+    assert result["flagged_composition_count"] == 1
+
+
+@pytest.mark.skipif(
+    not CAPTURES.is_dir(), reason="field-study captures are not in this checkout"
+)
+def test_known_out_of_scope_miss_is_labelled_not_clean() -> None:
+    """`malicious-mcp-server` is a documented blind spot, never `no_finding`."""
+
+    results = analyze(CAPTURES)
+    misses = {miss["slug"]: miss for miss in results["known_out_of_scope_misses"]}
+    miss = misses["npm-malicious-mcp-server-1-5-0"]
+    assert miss["package"] == "malicious-mcp-server"
+    assert "runtime responses" in miss["reason"]
+
+    disclosure = render_disclosure_log(results)
+    row = next(
+        line
+        for line in disclosure.splitlines()
+        if "`malicious-mcp-server`" in line
+    )
+    assert "`known_out_of_scope_miss`" in row
+    assert "no_finding" not in row
+
+    report = render_report(results)
+    assert "Known out-of-scope miss" in report
+    assert "malicious-mcp-server@1.5.0" in report
 
 
 @pytest.mark.skipif(

@@ -1,0 +1,18 @@
+{
+  "description": "Simple MCP server for AgentOps with Zed",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "agentops-mcp-server==0.5.4"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agentops-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/rioriost/agentops_mcp_server",
+  "slug": "pypi-agentops-mcp-server-0-5-4",
+  "stderr_summary": "Downloading cpython-3.14.10-linux-x86_64-gnu (download) (35.2MiB)",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.5.4"
+}

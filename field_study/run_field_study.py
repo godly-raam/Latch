@@ -36,6 +36,7 @@ import re
 import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
+from itertools import combinations
 from pathlib import Path
 from typing import Any
 
@@ -52,7 +53,9 @@ from package_eval.run_package_eval import detector_fingerprint
 from .discover_targets import TARGETS_JSON, load_targets
 
 FIELD_DIR = Path(__file__).resolve().parent
+REPO_ROOT = FIELD_DIR.parent
 CAPTURE_DIR = FIELD_DIR / "captures"
+PACKAGE_EVAL_MANIFESTS = REPO_ROOT / "package_eval" / "captured_manifests"
 RESULTS_JSON = FIELD_DIR / "scan_results.json"
 REPORT_MD = FIELD_DIR / "FIELD_STUDY_REPORT.md"
 DISCLOSURE_MD = FIELD_DIR / "DISCLOSURE_LOG.md"
@@ -121,6 +124,45 @@ TRIAGE_LABELS: dict[str, str] = {
     "npm-chrome-devtools-mcp-1-13-0": "true_positive_informational",
     "npm-doitintl-doit-mcp-server-5-1-0": "true_positive_informational",
 }
+
+#: Targets whose malice lives entirely outside ``tools/list``. A manifest-only
+#: engine returns nothing on them, and that nothing is a false negative, not a
+#: clean verdict, so they are recorded under their own name instead of
+#: ``no_finding``.
+KNOWN_OUT_OF_SCOPE_MISSES: dict[str, str] = {
+    "npm-malicious-mcp-server-1-5-0": (
+        "The package describes itself as \"A deliberately malicious MCP server "
+        "for E2E testing purposes\". Its surface is hostile by intent "
+        "(`tokenInputReceiver` collects API keys, database passwords and JWT "
+        "secrets; `customerDataProvider` is PII-shaped; `promptGuardTriggerer` "
+        "wraps untrusted content), but none of that is expressed in "
+        "annotations or capability names, and the malicious behaviour is in "
+        "runtime responses and handlers, which `tools/list` does not carry. "
+        "The pinned detectors therefore return zero findings."
+    ),
+}
+
+#: Real agent kits taken from the pinned `package_eval` corpus. The field study
+#: harvests third-party servers; these are the first-party servers a real client
+#: mounts them beside, so a composition is "one harvested server plus a kit an
+#: agent actually ships with".
+COMPOSITION_ANCHOR_SLUGS: tuple[str, ...] = (
+    "npm-server-filesystem",
+    "npm-server-github-2025-4-8",
+    "npm-server-memory",
+    "npm-server-slack-2025-4-25",
+    "pypi-mcp-server-fetch",
+    "pypi-mcp-server-git",
+)
+
+#: Two-server kits each harvested surface is additionally mounted into. Three
+#: servers is the smallest realistic agent, and it is the smallest set in which
+#: `shadow` and the cross-server trifecta are meaningful at all.
+COMPOSITION_ANCHOR_KITS: tuple[tuple[str, ...], ...] = (
+    ("npm-server-filesystem", "pypi-mcp-server-fetch"),
+    ("npm-server-filesystem", "pypi-mcp-server-git"),
+    ("pypi-mcp-server-fetch", "npm-server-github-2025-4-8"),
+)
 
 SAFETY_BLOCK = """\
 Refusing to harvest on a non-container host.
@@ -440,9 +482,153 @@ def _findings_for(capture: dict[str, Any]) -> list[dict[str, Any]]:
     return findings
 
 
+def load_anchor_manifests(
+    manifest_dir: Path | None = None,
+) -> dict[str, list[ToolDefinition]]:
+    """Load the first-party anchor surfaces used by the composition sweep."""
+
+    directory = manifest_dir or PACKAGE_EVAL_MANIFESTS
+    anchors: dict[str, list[ToolDefinition]] = {}
+    for slug in COMPOSITION_ANCHOR_SLUGS:
+        path = directory / f"{slug}.json"
+        if not path.is_file():
+            continue
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        tools = [
+            ToolDefinition.model_validate(tool)
+            for tool in payload.get("tools") or []
+            if isinstance(tool, dict)
+        ]
+        if tools:
+            anchors[slug] = tools
+    return anchors
+
+
+def build_compositions(
+    harvested_slugs: list[str] | tuple[str, ...],
+) -> list[tuple[str, ...]]:
+    """Every pair of harvested servers, plus every harvested server in a kit."""
+
+    slugs = sorted(harvested_slugs)
+    compositions: list[tuple[str, ...]] = list(combinations(slugs, 2))
+    for slug in slugs:
+        for kit in COMPOSITION_ANCHOR_KITS:
+            compositions.append((slug, *kit))
+    return compositions
+
+
+def analyze_compositions(
+    capture_dir: Path | None = None,
+    *,
+    excluded: set[str] | None = None,
+    manifest_dir: Path | None = None,
+) -> dict[str, Any]:
+    """Run the cross-server engines over 2-3 server compositions.
+
+    A single-server scan cannot answer either question these engines ask:
+    ``shadow`` needs a second server before any name can collide, and the
+    trifecta is a property of the tool set an agent mounts. This sweep is still
+    fully offline; it only regroups the recorded surfaces.
+    """
+
+    skip = set(excluded or set())
+    harvested: dict[str, list[ToolDefinition]] = {}
+    for capture in load_captures(capture_dir):
+        slug = capture.get("slug") or ""
+        if slug in skip or capture.get("harvest_status") != "harvested":
+            continue
+        tools = [
+            ToolDefinition.model_validate(tool)
+            for tool in capture.get("tools") or []
+            if isinstance(tool, dict)
+        ]
+        if tools:
+            harvested[slug] = tools
+
+    anchors = load_anchor_manifests(manifest_dir)
+    servers = {**anchors, **harvested}
+    rows: list[dict[str, Any]] = []
+    rule_counts: dict[str, int] = {}
+    engine_counts = {"graph": 0, "shadow": 0, "auth-audit": 0}
+    cross_server_paths = 0
+
+    for composition in build_compositions(harvested):
+        if any(server_id not in servers for server_id in composition):
+            # An anchor surface is missing from this checkout; skip the kit
+            # rather than invent that server's tools.
+            continue
+        manifests = {server_id: servers[server_id] for server_id in composition}
+        graph = analyze_capability_graph(manifests)
+        shadow = analyze_shadowing(manifests)
+        auth = run_auth_audit(
+            [ServerSpec(server_id=server_id, transport="static") for server_id in composition],
+            manifests,
+        )
+        cross = sum(1 for path in graph.trifecta_paths if path.cross_server)
+        rules = sorted(
+            {"LETHAL_TRIFECTA" for _ in graph.trifecta_paths}
+            | {finding.rule_id for finding in shadow.findings}
+            | {finding.rule_id for finding in auth.findings}
+        )
+        for rule in rules:
+            rule_counts[rule] = rule_counts.get(rule, 0) + 1
+        engine_counts["graph"] += len(graph.trifecta_paths)
+        engine_counts["shadow"] += len(shadow.findings)
+        engine_counts["auth-audit"] += len(auth.findings)
+        cross_server_paths += cross
+        rows.append(
+            {
+                "composition_id": "+".join(composition),
+                "servers": list(composition),
+                "graph_paths": len(graph.trifecta_paths),
+                "cross_server_paths": cross,
+                "shadow_findings": len(shadow.findings),
+                "auth_findings": len(auth.findings),
+            }
+        )
+
+    flagged = [row for row in rows if row["graph_paths"] or row["shadow_findings"] or row["auth_findings"]]
+    ranked = sorted(
+        rows,
+        key=lambda row: (
+            -row["cross_server_paths"],
+            -row["shadow_findings"],
+            row["composition_id"],
+        ),
+    )
+    examples = ranked[:3]
+    quiet = next(
+        (
+            row
+            for row in ranked
+            if not row["graph_paths"] and not row["shadow_findings"]
+        ),
+        None,
+    )
+    if quiet is not None:
+        examples.append(quiet)
+
+    return {
+        "anchor_slugs": sorted(anchors),
+        "auth_audit_note": (
+            "Every capture is a stdio manifest, so auth-audit has no HTTP/OAuth "
+            "transport to audit. Its zero is an untested engine, not a pass."
+        ),
+        "count": len(rows),
+        "cross_server_path_count": cross_server_paths,
+        "engine_counts": engine_counts,
+        "examples": examples,
+        "flagged_composition_count": len(flagged),
+        "harvested_server_count": len(harvested),
+        "rule_counts": dict(sorted(rule_counts.items())),
+    }
+
+
 def analyze(
     capture_dir: Path | None = None,
     targets_path: Path | None = None,
+    *,
+    manifest_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Run every static engine over the captures; fully offline and deterministic."""
 
@@ -454,6 +640,7 @@ def analyze(
 
     rows: list[dict[str, Any]] = []
     findings: list[dict[str, Any]] = []
+    unanalyzable: set[str] = set()
     for capture in captures:
         slug = capture.get("slug") or ""
         tools = capture.get("tools") or []
@@ -461,6 +648,8 @@ def analyze(
         target_findings = _findings_for(capture) if can_analyze else []
         findings.extend(target_findings)
         rule_ids = sorted({finding["rule_id"] for finding in target_findings})
+        if rule_ids == [MANIFEST_RULE]:
+            unanalyzable.add(slug)
         target = targets.get(slug, {})
         rows.append(
             {
@@ -529,11 +718,26 @@ def analyze(
         "true_positive_informational_targets": informational,
     }
 
+    known_misses = [
+        {
+            "package": row["package"],
+            "reason": KNOWN_OUT_OF_SCOPE_MISSES[row["slug"]],
+            "slug": row["slug"],
+            "version": row["version"],
+        }
+        for row in rows
+        if row["slug"] in KNOWN_OUT_OF_SCOPE_MISSES
+    ]
+
     return {
         "analyzed_target_count": sum(
             1 for row in rows if row["analysis_status"] == "analyzed"
         ),
         "captures_dir": (capture_dir or CAPTURE_DIR).name,
+        "compositions": analyze_compositions(
+            capture_dir, excluded=unanalyzable, manifest_dir=manifest_dir
+        ),
+        "known_out_of_scope_misses": known_misses,
         "detector_fingerprint_sha256": detector_fingerprint(),
         "engine_counts": engine_counts,
         "findings": findings,
@@ -657,6 +861,97 @@ def _render_hardening(results: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _render_compositions(compositions: dict[str, Any]) -> list[str]:
+    """Report the cross-server sweep: the part a per-server scan cannot see."""
+
+    if not compositions or not compositions.get("count"):
+        return []
+    counts = compositions.get("engine_counts", {})
+    anchors = compositions.get("anchor_slugs") or []
+    lines = [
+        "## Cross-server compositions",
+        "",
+        "A per-server scan cannot answer two of the four engines' questions:",
+        "`shadow` needs a second server before any tool name can collide with",
+        "anything, and the trifecta is a property of the tool set an agent mounts,",
+        "not of one server. The same pinned detectors were therefore re-run over",
+        f"**{compositions['count']}** compositions drawn from the",
+        f"{compositions['harvested_server_count']} harvested surfaces with an",
+        "analyzable manifest — every pair of them, plus each one mounted beside",
+        "three kits taken from the pinned `package_eval` captures",
+        "(`filesystem+fetch`, `filesystem+git`, `fetch+github`). The duplicate-name",
+        "surface behind `CASE-01` is excluded — no capability analysis can run on",
+        "it.",
+        "",
+        "Anchors: "
+        + (", ".join(f"`{slug}`" for slug in anchors) if anchors else "none")
+        + ".",
+        "",
+        "| Metric | Value |",
+        "| ------ | ----- |",
+        f"| Compositions scanned | {compositions['count']} |",
+        f"| Compositions with at least one finding |"
+        f" {compositions['flagged_composition_count']} |",
+        f"| `LETHAL_TRIFECTA` paths | {counts.get('graph', 0):,}"
+        f" ({compositions['cross_server_path_count']:,} cross-server) |",
+        f"| `shadow` findings | {counts.get('shadow', 0):,} |",
+        f"| `auth-audit` findings | {counts.get('auth-audit', 0):,} |",
+        "",
+    ]
+    if compositions.get("rule_counts"):
+        lines.extend(["| Rule | Compositions |", "| ---- | ------------ |"])
+        for rule_id, count in compositions["rule_counts"].items():
+            lines.append(f"| `{rule_id}` | {count} |")
+        lines.append("")
+
+    examples = compositions.get("examples") or []
+    if examples:
+        lines.extend(
+            [
+                "Largest and quietest compositions in the sweep:",
+                "",
+                "| Composition | Servers | Graph paths | Cross-server | Shadow |",
+                "| ----------- | ------- | ----------- | ------------ | ------ |",
+            ]
+        )
+        for row in examples:
+            lines.append(
+                f"| `{row['composition_id']}` | {len(row['servers'])} |"
+                f" {row['graph_paths']} | {row['cross_server_paths']} |"
+                f" {row['shadow_findings']} |"
+            )
+        lines.append("")
+
+    lines.extend(
+        [
+            "This sweep is the measurement the per-server table cannot give: it",
+            "shows that the same frozen rules do produce cross-server paths and",
+            "`shadow` collisions once the corpus has more than one server in it.",
+            "It is not a prevalence estimate — the compositions are enumerated",
+            "from a fixed harvest, not sampled from real deployments.",
+            "",
+            f"`auth-audit` stays at zero here: {compositions.get('auth_audit_note', '')}",
+            "",
+        ]
+    )
+    return lines
+
+
+def _render_known_misses(misses: list[dict[str, Any]]) -> list[str]:
+    """State every target the pinned detectors are known to be blind to."""
+
+    lines: list[str] = []
+    for miss in misses:
+        lines.append(
+            f"- **Known out-of-scope miss: `{miss['package']}@{miss['version']}`."
+            f"** {miss['reason']} It is recorded as `known_out_of_scope_miss` in"
+            " `DISCLOSURE_LOG.md`, never as `no_finding`: a static"
+            " `tools/list` scan reporting this server clean would be a false"
+            " negative, not a true one."
+        )
+    return lines
+
+
 def render_report(results: dict[str, Any]) -> str:
     """Render ``FIELD_STUDY_REPORT.md`` deterministically."""
 
@@ -694,6 +989,7 @@ def render_report(results: dict[str, Any]) -> str:
         "credentials. The study never supplies them.",
         "",
         *_render_hardening(results),
+        *_render_compositions(results.get("compositions") or {}),
         "## Targets",
         "",
         "| Target | Ecosystem | Version | Status | Tools | Findings |",
@@ -803,11 +1099,30 @@ def render_report(results: dict[str, Any]) -> str:
             "- Detectors were frozen for the duration of the harvest. Week-2 triage",
             "  then changed them; the pre-fix and post-fix fingerprints in the",
             "  hardening section pin both rule sets.",
+            "- These post-fix numbers are in-sample: the rules were narrowed by",
+            "  hand triage of these same captures, so they are a regression suite,",
+            "  not validation. `field_study/HOLDOUT.md` repeats the run with the",
+            "  rules frozen on a disjoint 100-package sample and is the",
+            "  out-of-sample result.",
+            "- A `no_finding` verdict is a statement about `tools/list` only",
+            "  (names, schemas, annotations, descriptions). Responses, handler code",
+            "  and prompt behaviour are outside the scan, so a hostile server whose",
+            "  manifest looks benign is invisible here.",
+            "- `auth-audit` is not exercised by this corpus: every capture is a",
+            "  stdio manifest with no HTTP/OAuth transport to audit, so its zero",
+            "  is an untested engine rather than a clean result.",
+            *_render_known_misses(results.get("known_out_of_scope_misses") or []),
             "",
             "## Reproduction",
             "",
             "```bash",
-            "python -m field_study.discover_targets --npm-limit 70 --pypi-limit 30",
+            "# Round 1; each run writes <output stem>.split.json beside its list.",
+            "python -m field_study.discover_targets --npm-limit 70 --pypi-limit 30 \\",
+            "    --output field_study/round1/targets.json",
+            "# Holdout, disjoint from round 1 by explicit exclusion.",
+            "python -m field_study.discover_targets --npm-limit 70 --pypi-limit 30 \\",
+            "    --output field_study/holdout/targets.json \\",
+            "    --exclude-targets field_study/round1/targets.json",
             "# harvest inside the disposable container from run_field_study.SAFETY_BLOCK",
             "python -m field_study.run_field_study --analyze",
             "pytest -q tests/test_field_study.py",
@@ -854,8 +1169,12 @@ def render_disclosure_log(results: dict[str, Any]) -> str:
     lines = [
         "# Responsible-disclosure log",
         "",
-        "**No disclosure has been sent.** This log is generated for Week 2/3 and",
-        "records only artifacts already on disk. Latch never contacts a maintainer.",
+        "**Status: one case closed without a ticket, none open.** No advisory and",
+        "no security ticket has been filed. Every entry below is generated from",
+        "artifacts already on disk, and Latch never contacts a maintainer on its",
+        "own. `CASE-01` is closed because upstream is archived and unmaintained",
+        "(`closed_upstream_archived`), not because a fix shipped: it is a",
+        "recorded result, not a disclosure.",
         "",
         "## Coordinated Disclosure & Upstream Bug Log",
         "",
@@ -884,6 +1203,12 @@ def render_disclosure_log(results: dict[str, Any]) -> str:
         if row["harvest_status"] != "harvested":
             status = "not_applicable"
             note = "No tool surface captured."
+        elif row["slug"] in KNOWN_OUT_OF_SCOPE_MISSES:
+            status = "known_out_of_scope_miss"
+            note = (
+                "Malice is in runtime responses, not in `tools/list`: the pinned"
+                " detectors return nothing. Recorded as a boundary, not clean."
+            )
         elif not row["finding_count"]:
             status = "no_finding"
             note = "Clean under the pinned detectors."

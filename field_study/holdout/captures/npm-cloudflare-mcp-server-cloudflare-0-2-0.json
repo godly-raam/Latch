@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for interacting with Cloudflare API",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@cloudflare/mcp-server-cloudflare@0.2.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@cloudflare/mcp-server-cloudflare",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-cloudflare-mcp-server-cloudflare-0-2-0",
+  "stderr_summary": "[DEBUG 2026-11-24T18:06:38.771Z] Uncaught exception: Error: Unknown command: undefined. Expected 'init' or 'run'.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.2.0"
+}

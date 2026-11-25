@@ -1,0 +1,18 @@
+{
+  "description": "Agent Factory MCP Server",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "agentfactory-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agentfactory-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-agentfactory-mcp-server-0-1-0",
+  "stderr_summary": "Downloading pip (1.9MiB)\nDownloading sqlalchemy (4.5MiB)\nDownloading uvloop (4.3MiB)\nDownloading google-genai (1.2MiB)\nDownloading tiktoken (1.1MiB)\nDownloading pydantic-ai-slim (3.0MiB)\nDownloading logfire-cli (3.7MiB)",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

@@ -1,0 +1,19 @@
+{
+  "description": "Transcend MCP Server — Preference Management tools.",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@transcend-io/mcp-server-preferences@0.9.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@transcend-io/mcp-server-preferences",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/transcend-io/tools",
+  "slug": "npm-transcend-io-mcp-server-preferences-0-9-0",
+  "stderr_summary": "file://<scratch>/npm-cache/_npx/35878c3491f68291/node_modules/@transcend-io/mcp-server-base/dist/index.mjs:2207\n\tthrow new Error(`No authentication provided. Set TRANSCEND_API_KEY, send an Authorization header, or include a session cookie with ${TRANSCEND_ACTIVE_ORG_ID_HEADER}.`);\n\t      ^\n\nError: No authentication provided. Set TRANSCEND_API_KEY, send an Authorization header, or include a session cookie with x-transcend-active-organization-id.\n    at resolveAuth (file://<scratch>/npm-cache/_npx/35878c3491f68291/node_modules/@transcend-io/mcp-server-base/dist/index.mjs:2207:8)\n    at resolveStdioStartupAuth (file://<scratch>/npm-cache/_npx/35878c3491f68291/node_modules/@transcend-io/mcp-server-base/dist/index.mjs:2451:9)\n    at createMCPServer (file://<scratch>/npm-cache/_npx/35878c3491f68291/node_modules/@transcend-io/mcp-server-base/dist/index.mjs:4069:30)\n\nNode.js v20.19.2",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.9.0"
+}

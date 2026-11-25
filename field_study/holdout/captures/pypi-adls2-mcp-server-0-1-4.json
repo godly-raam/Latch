@@ -1,0 +1,18 @@
+{
+  "description": "Azure Data Lake Storage Gen2 Model Context Protocol (MCP) service",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "adls2-mcp-server==0.1.4"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "adls2-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/erikhoward/adls-mcp-server",
+  "slug": "pypi-adls2-mcp-server-0-1-4",
+  "stderr_summary": "Downloading pydantic-core (2.2MiB)\nDownloading cryptography (4.5MiB)\n Downloaded pydantic-core",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.4"
+}

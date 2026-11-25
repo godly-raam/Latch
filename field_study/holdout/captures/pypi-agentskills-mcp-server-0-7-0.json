@@ -1,0 +1,18 @@
+{
+  "description": "Serve the official MCP Skills extension with lossless resources (https://agentskills.io)",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agentskills-mcp-server==0.7.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agentskills-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/pratikxpanda/agentskills-sdk",
+  "slug": "pypi-agentskills-mcp-server-0-7-0",
+  "stderr_summary": "Installed 31 packages in 14ms\nusage: agentskills_mcp_server [-h] --config CONFIG\n                              [--transport {stdio,streamable-http}] [--check]\nagentskills_mcp_server: error: the following arguments are required: --config",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.7.0"
+}

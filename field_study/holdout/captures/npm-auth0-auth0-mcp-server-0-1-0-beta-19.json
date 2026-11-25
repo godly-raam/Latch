@@ -1,0 +1,19 @@
+{
+  "description": "Auth0 Model Context Protocol (MCP) Server (Beta) — A secure and extendable implementation of an MCP server that provides AI assistants with controlled access to the Auth0 Management API through natural language. This project is in beta and not intended fo",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@auth0/auth0-mcp-server@0.1.0-beta.19"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@auth0/auth0-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/auth0/auth0-mcp-server",
+  "slug": "npm-auth0-auth0-mcp-server-0-1-0-beta-19",
+  "stderr_summary": "at Module._compile (node:internal/modules/cjs/loader:1529:14)\n    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)\n    at Module.load (node:internal/modules/cjs/loader:1275:32)\n    at Module._load (node:internal/modules/cjs/loader:1096:12)\n    at cjsLoader (node:internal/modules/esm/translators:298:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:240:7)\n    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)\n\nNode.js v20.19.2",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0-beta.19"
+}

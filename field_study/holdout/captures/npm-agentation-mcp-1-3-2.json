@@ -1,0 +1,19 @@
+{
+  "description": "MCP server for Agentation - visual feedback for AI coding agents",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "agentation-mcp@1.3.2"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agentation-mcp",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-agentation-mcp-1-3-2",
+  "stderr_summary": "npm WARN deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.3.2"
+}

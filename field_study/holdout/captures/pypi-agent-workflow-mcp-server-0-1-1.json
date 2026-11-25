@@ -1,0 +1,18 @@
+{
+  "description": "Reusable workflow templates for AI agents — share, discover and execute multi-step agent workflows",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-workflow-mcp-server==0.1.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-workflow-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agent-workflow-mcp-server",
+  "slug": "pypi-agent-workflow-mcp-server-0-1-1",
+  "stderr_summary": "Installed 29 packages in 29ms\nAn executable named `agent-workflow-mcp-server` is not provided by package `agent-workflow-mcp-server`.\nThe following executables are available:\n- agent-workflow-server\n\nUse `uvx --from agent-workflow-mcp-server agent-workflow-server` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.1"
+}

@@ -1,0 +1,19 @@
+{
+  "description": "The official MCP Server for kintone",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@kintone/mcp-server@1.11.4"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@kintone/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/kintone/mcp-server",
+  "slug": "npm-kintone-mcp-server-1-11-4",
+  "stderr_summary": "Error: Environment variables are missing or invalid:\nKINTONE_BASE_URL: Required\n    at parseKintoneMcpServerConfig (file://<scratch>/npm-cache/_npx/049ea056bd706728/node_modules/@kintone/mcp-server/dist/config/parser.js:19:11)\n    at file://<scratch>/npm-cache/_npx/049ea056bd706728/node_modules/@kintone/mcp-server/dist/config/index.js:4:16\n    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\n\nNode.js v20.19.2",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.11.4"
+}

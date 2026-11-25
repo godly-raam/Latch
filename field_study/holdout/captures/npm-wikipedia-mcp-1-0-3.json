@@ -1,0 +1,55 @@
+{
+  "description": "MCP server for Wikipedia",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "wikipedia-mcp@1.0.3"
+  ],
+  "manifest_sha256": "16aa64bf6a99e036d020c98550dace0af9308b600e69852aee83a2b3687cf5a7",
+  "package": "wikipedia-mcp",
+  "protocol_version": "2024-11-05",
+  "repository_url": null,
+  "slug": "npm-wikipedia-mcp-1-0-3",
+  "stderr_summary": "",
+  "tool_count": 2,
+  "tools": [
+    {
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "description": "The search term for Wikipedia",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search"
+    },
+    {
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "pageId": {
+            "description": "The page ID of the Wikipedia article to read",
+            "type": "number"
+          },
+          "title": {
+            "description": "The title of the Wikipedia article to read",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "readArticle"
+    }
+  ],
+  "version": "1.0.3"
+}

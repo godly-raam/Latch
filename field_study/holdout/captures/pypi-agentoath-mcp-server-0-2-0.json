@@ -1,0 +1,18 @@
+{
+  "description": "AgentOath MCP Server -- expose trust protocol tools to any MCP-compatible AI agent (Claude, ChatGPT, etc.).",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agentoath-mcp-server==0.2.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agentoath-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AgentOath/agentoath",
+  "slug": "pypi-agentoath-mcp-server-0-2-0",
+  "stderr_summary": "Installed 13 packages in 14ms\nAn executable named `agentoath-mcp-server` is not provided by package `agentoath-mcp-server`.\nThe following executables are available:\n- agentoath-mcp\n\nUse `uvx --from agentoath-mcp-server agentoath-mcp` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.2.0"
+}

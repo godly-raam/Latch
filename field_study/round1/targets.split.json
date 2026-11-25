@@ -1,0 +1,14 @@
+{
+  "discovered_count": 100,
+  "excluded_name_count": 11,
+  "exclusion_sources": [
+    {
+      "kind": "package_eval_pins",
+      "package_count": 11,
+      "path": "package_eval/captured_manifests",
+      "sha256": "80ad9b9bac0022a2b95dbe417b6a5fef7bbe62a4aae910ea964c7f18353f1e45"
+    }
+  ],
+  "output": "field_study/round1/targets.json",
+  "overlap_with_exclusions": []
+}

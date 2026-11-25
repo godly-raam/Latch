@@ -1,0 +1,19 @@
+{
+  "description": "CNB MCP Server. A comprehensive MCP server that provides seamless integration to the CNB's API(https://cnb.cool), offering a wide range of tools for repository management, pipelines operations and collaboration features",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@cnbcool/mcp-server@0.6.7"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@cnbcool/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://cnb.cool/cnb/tools/cnb-mcp-server",
+  "slug": "npm-cnbcool-mcp-server-0-6-7",
+  "stderr_summary": "npm ERR! could not determine executable to run\n\nnpm ERR! A complete log of this run can be found in:\nnpm ERR!     <scratch>/npm-cache/_logs/2026-11-24T18_06_39_445Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.6.7"
+}

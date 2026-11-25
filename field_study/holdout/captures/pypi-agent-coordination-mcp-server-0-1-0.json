@@ -1,0 +1,18 @@
+{
+  "description": "Slack for AI agents — rooms, messaging and context sharing for multi-agent coordination",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-coordination-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-coordination-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agent-coordination-mcp-server",
+  "slug": "pypi-agent-coordination-mcp-server-0-1-0",
+  "stderr_summary": "Installed 29 packages in 36ms\nAn executable named `agent-coordination-mcp-server` is not provided by package `agent-coordination-mcp-server`.\nThe following executables are available:\n- agent-coord\n\nUse `uvx --from agent-coordination-mcp-server agent-coord` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

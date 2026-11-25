@@ -1,0 +1,19 @@
+{
+  "description": "BattleGrid MCP server — play crypto prediction games from AI agents",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@battlegrid/mcp-server@32.0.115"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@battlegrid/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/playbattlegrid/battlegrid-mcp",
+  "slug": "npm-battlegrid-mcp-server-32-0-115",
+  "stderr_summary": "Error: BATTLEGRID_API_KEY or BATTLEGRID_API_KEYS environment variable is required.\nGet your API key at: https://battlegrid.trade → Profile → MCP tab",
+  "tool_count": 0,
+  "tools": [],
+  "version": "32.0.115"
+}

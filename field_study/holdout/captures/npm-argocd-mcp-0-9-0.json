@@ -1,0 +1,19 @@
+{
+  "description": "Argo CD MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "argocd-mcp@0.9.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "argocd-mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/argoproj-labs/mcp-for-argocd",
+  "slug": "npm-argocd-mcp-0-9-0",
+  "stderr_summary": "Commands:\n  argocd-mcp stdio  Start ArgoCD MCP server using stdio.\n  argocd-mcp sse    Start ArgoCD MCP server using SSE.\n  argocd-mcp http   Start ArgoCD MCP server using Http Stream.\n\nOptions:\n  --help     Show help                                                 [boolean]\n  --version  Show version number                                       [boolean]\n\nNot enough non-option arguments: got 0, need at least 1",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.9.0"
+}

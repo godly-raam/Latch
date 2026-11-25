@@ -1,0 +1,19 @@
+{
+  "description": "Decodo MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@decodo/mcp-server@1.9.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@decodo/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/Decodo/mcp-server",
+  "slug": "npm-decodo-mcp-server-1-9-0",
+  "stderr_summary": "env SCRAPER_API_TOKEN missing: set your API key or basic auth token",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.9.0"
+}

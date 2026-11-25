@@ -1,0 +1,134 @@
+{
+  "description": "MCP server for Airbnb search and listing details",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@openbnb/mcp-server-airbnb@0.3.0"
+  ],
+  "manifest_sha256": "7bf34f2d3e8a027f59610a761819a9e41f91dc23ed81d05f198692603cc0f627",
+  "package": "@openbnb/mcp-server-airbnb",
+  "protocol_version": "2025-11-25",
+  "repository_url": null,
+  "slug": "npm-openbnb-mcp-server-airbnb-0-3-0",
+  "stderr_summary": "\"disableGeocoding\": false,\n  \"nodeVersion\": \"v20.19.2\",\n  \"platform\": \"linux\"\n}\n[2026-11-24T18:09:47.079Z] [INFO] Fetching robots.txt from Airbnb\n[2026-11-24T18:09:47.347Z] [INFO] Successfully fetched robots.txt\n[2026-11-24T18:09:47.347Z] [INFO] Airbnb MCP Server running on stdio: {\n  \"version\": \"0.3.0\",\n  \"robotsRespected\": true\n}",
+  "tool_count": 2,
+  "tools": [
+    {
+      "description": "Search for Airbnb listings with various filters and pagination. Provide direct links to the user",
+      "inputSchema": {
+        "properties": {
+          "adults": {
+            "description": "Number of adults",
+            "type": "number"
+          },
+          "checkin": {
+            "description": "Check-in date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "checkout": {
+            "description": "Check-out date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "children": {
+            "description": "Number of children",
+            "type": "number"
+          },
+          "cursor": {
+            "description": "Base64-encoded string used for Pagination",
+            "type": "string"
+          },
+          "ignoreRobotsText": {
+            "description": "Ignore robots.txt rules for this request",
+            "type": "boolean"
+          },
+          "infants": {
+            "description": "Number of infants",
+            "type": "number"
+          },
+          "location": {
+            "description": "Location to search for (city, state, etc.)",
+            "type": "string"
+          },
+          "maxPrice": {
+            "description": "Maximum price for the stay",
+            "type": "number"
+          },
+          "minPrice": {
+            "description": "Minimum price for the stay",
+            "type": "number"
+          },
+          "pets": {
+            "description": "Number of pets",
+            "type": "number"
+          },
+          "placeId": {
+            "description": "Google Maps Place ID (overrides the location parameter)",
+            "type": "string"
+          },
+          "propertyType": {
+            "description": "Filter by property type: 'entire_home' (entire homes/apartments), 'private_room' (private rooms in shared homes), 'shared_room' (shared/dorm-style rooms), 'hotel_room' (hotel rooms)",
+            "enum": [
+              "entire_home",
+              "private_room",
+              "shared_room",
+              "hotel_room"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "type": "object"
+      },
+      "name": "airbnb_search"
+    },
+    {
+      "description": "Get detailed information about a specific Airbnb listing. Provide direct links to the user",
+      "inputSchema": {
+        "properties": {
+          "adults": {
+            "description": "Number of adults",
+            "type": "number"
+          },
+          "checkin": {
+            "description": "Check-in date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "checkout": {
+            "description": "Check-out date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "children": {
+            "description": "Number of children",
+            "type": "number"
+          },
+          "id": {
+            "description": "The Airbnb listing ID",
+            "type": "string"
+          },
+          "ignoreRobotsText": {
+            "description": "Ignore robots.txt rules for this request",
+            "type": "boolean"
+          },
+          "infants": {
+            "description": "Number of infants",
+            "type": "number"
+          },
+          "pets": {
+            "description": "Number of pets",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "airbnb_listing_details"
+    }
+  ],
+  "version": "0.3.0"
+}

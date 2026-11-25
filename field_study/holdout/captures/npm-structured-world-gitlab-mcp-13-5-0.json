@@ -1,0 +1,19 @@
+{
+  "description": "Advanced GitLab MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@structured-world/gitlab-mcp@13.5.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@structured-world/gitlab-mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/structured-world/gitlab-mcp",
+  "slug": "npm-structured-world-gitlab-mcp-13-5-0",
+  "stderr_summary": "npm WARN EBADENGINE Unsupported engine {\nnpm WARN EBADENGINE   package: 'undici@8.13.1',\nnpm WARN EBADENGINE   required: { node: '>=22.19.0' },\nnpm WARN EBADENGINE   current: { node: 'v20.19.2', npm: '9.2.0' }\nnpm WARN EBADENGINE }\nnpm WARN EBADENGINE Unsupported engine {\nnpm WARN EBADENGINE   package: 'strip-json-comments@5.1.0',\nnpm WARN EBADENGINE   required: { node: '>=22' },\nnpm WARN EBADENGINE   current: { node: 'v20.19.2', npm: '9.2.0' }\nnpm WARN EBADENGINE }",
+  "tool_count": 0,
+  "tools": [],
+  "version": "13.5.0"
+}

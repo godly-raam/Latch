@@ -1,0 +1,19 @@
+{
+  "description": "Gmail MCP server with auto authentication support",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@gongrzhe/server-gmail-autoauth-mcp@1.1.11"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@gongrzhe/server-gmail-autoauth-mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/gongrzhe/server-gmail-autoauth-mcp",
+  "slug": "npm-gongrzhe-server-gmail-autoauth-mcp-1-1-11",
+  "stderr_summary": "npm WARN deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm WARN deprecated uuid@9.0.1: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.1.11"
+}

@@ -1,0 +1,19 @@
+{
+  "description": "NearAI MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@near-mcp/aitp-mcp-server@0.1.34"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@near-mcp/aitp-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-near-mcp-aitp-mcp-server-0-1-34",
+  "stderr_summary": "npm WARN deprecated base-x@2.0.6: use 3.0.0 instead, safe-buffer has been merged and release for compatability",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.34"
+}
