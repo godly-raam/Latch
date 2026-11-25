@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Model Context Protocol server for the Agent Identity Registry (AIR)",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "air-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "air-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AgentIdentityRegistry/air-site",
+  "slug": "pypi-air-mcp-server-0-1-0",
+  "stderr_summary": "For further information visit https://errors.pydantic.dev/2.14/v/missing\nListTasksRequest.method\n  Input should be 'tasks/list' [type=literal_error, input_value='server/discover', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nCancelTaskRequest.method\n  Input should be 'tasks/cancel' [type=literal_error, input_value='server/discover', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nCancelTaskRequest.params.taskId\n  Field required [type=missing, input_value={'_meta': {'io.modelconte...lientCapabilities': {}}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

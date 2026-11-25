@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP Server for GCP environment for interacting with various Observability APIs.",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@google-cloud/observability-mcp@0.2.3"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@google-cloud/observability-mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/googleapis/gcloud-mcp",
+  "slug": "npm-google-cloud-observability-mcp-0-2-3",
+  "stderr_summary": "npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.2.3"
+}

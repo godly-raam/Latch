@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "AI for Humanities MCP Server - Coming soon. Part of the AIH-Infra ecosystem.",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "ai4h-mcp-server==0.0.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "ai4h-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AIH-Infra",
+  "slug": "pypi-ai4h-mcp-server-0-0-1",
+  "stderr_summary": "Installed 1 package in 0.65ms\nPackage `ai4h-mcp-server` does not provide any executables.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.0.1"
+}

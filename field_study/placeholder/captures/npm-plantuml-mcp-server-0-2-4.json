@@ -1,0 +1,82 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for generating PlantUML diagrams",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "plantuml-mcp-server@0.2.4"
+  ],
+  "manifest_sha256": "45f6468779ab522f423efa27c6e70cef656f9e50ef225a9effe1ff4a85342584",
+  "package": "plantuml-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/infobip/plantuml-mcp-server",
+  "slug": "npm-plantuml-mcp-server-0-2-4",
+  "stderr_summary": "PlantUML MCP server running on stdio",
+  "tool_count": 3,
+  "tools": [
+    {
+      "description": "Generate a PlantUML diagram with automatic syntax validation and error reporting for auto-fix workflows. Returns embeddable image URLs for valid diagrams or structured error details for invalid syntax that can be automatically corrected. Optionally saves the diagram to a local file.",
+      "inputSchema": {
+        "properties": {
+          "format": {
+            "default": "svg",
+            "description": "Output image format (SVG or PNG)",
+            "enum": [
+              "svg",
+              "png"
+            ],
+            "type": "string"
+          },
+          "output_path": {
+            "description": "Optional. Path to save diagram locally. Automatically creates all necessary parent directories. Restricted to current working directory by default. Set PLANTUML_ALLOWED_DIRS env var (colon-separated paths, or \"*\" for unrestricted) to allow additional directories. Only .svg and .png extensions permitted.",
+            "type": "string"
+          },
+          "plantuml_code": {
+            "description": "PlantUML diagram code. Will be automatically validated for syntax errors before generating the diagram URL.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plantuml_code"
+        ],
+        "type": "object"
+      },
+      "name": "generate_plantuml_diagram"
+    },
+    {
+      "description": "Encode PlantUML code for URL usage",
+      "inputSchema": {
+        "properties": {
+          "plantuml_code": {
+            "description": "PlantUML diagram code to encode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plantuml_code"
+        ],
+        "type": "object"
+      },
+      "name": "encode_plantuml"
+    },
+    {
+      "description": "Decode encoded PlantUML string back to PlantUML code",
+      "inputSchema": {
+        "properties": {
+          "encoded_string": {
+            "description": "Encoded PlantUML string to decode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "encoded_string"
+        ],
+        "type": "object"
+      },
+      "name": "decode_plantuml"
+    }
+  ],
+  "version": "0.2.4"
+}

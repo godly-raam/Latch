@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Socket MCP server for scanning dependencies",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@socketsecurity/mcp@0.5.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@socketsecurity/mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/SocketDev/socket-mcp",
+  "slug": "npm-socketsecurity-mcp-0-5-0",
+  "stderr_summary": "npm warn EBADENGINE Unsupported engine {\nnpm warn EBADENGINE   package: '@socketsecurity/mcp@0.5.0',\nnpm warn EBADENGINE   required: { npm: '>=12.2.0', node: '>=24', pnpm: '>=12.12.0' },\nnpm warn EBADENGINE   current: { node: 'v22.23.5', npm: '10.9.9' }\nnpm warn EBADENGINE }\nNo local sign-in is available. Run `socket-mcp login` to sign in with your browser, or set SOCKET_API_TOKEN as a discouraged fallback.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.5.0"
+}

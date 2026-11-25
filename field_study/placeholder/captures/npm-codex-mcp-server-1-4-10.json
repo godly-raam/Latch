@@ -1,0 +1,232 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server wrapper for OpenAI Codex CLI",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "codex-mcp-server@1.4.10"
+  ],
+  "manifest_sha256": "6a332e3b926ca81357bfb8fa23409c2df04089446db06d05ce820ad3a934dbba",
+  "package": "codex-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/tuannvm/codex-mcp-server",
+  "slug": "npm-codex-mcp-server-1-4-10",
+  "stderr_summary": "codex-mcp-server started successfully",
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Execute Codex CLI"
+      },
+      "description": "Execute Codex CLI in non-interactive mode for AI assistance",
+      "inputSchema": {
+        "properties": {
+          "callbackUri": {
+            "description": "Static MCP callback URI to pass to Codex via environment (if provided)",
+            "type": "string"
+          },
+          "fullAuto": {
+            "description": "Enable full-auto mode: sandboxed automatic execution without approval prompts (equivalent to -a on-request --sandbox workspace-write)",
+            "type": "boolean"
+          },
+          "model": {
+            "description": "Specify which model to use (defaults to gpt-5.3-codex). Options: gpt-5.3-codex, gpt-5.2-codex, gpt-5.1-codex, gpt-5.1-codex-max, gpt-5-codex, gpt-4o, gpt-4, o3, o4-mini",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "The coding task, question, or analysis request",
+            "type": "string"
+          },
+          "reasoningEffort": {
+            "description": "Control reasoning depth (none < minimal < low < medium < high < xhigh)",
+            "enum": [
+              "none",
+              "minimal",
+              "low",
+              "medium",
+              "high",
+              "xhigh"
+            ],
+            "type": "string"
+          },
+          "resetSession": {
+            "description": "Reset the session history before processing this request",
+            "type": "boolean"
+          },
+          "sandbox": {
+            "description": "Sandbox policy for shell command execution. read-only: no writes allowed, workspace-write: writes only in workspace, danger-full-access: full system access (dangerous)",
+            "enum": [
+              "read-only",
+              "workspace-write",
+              "danger-full-access"
+            ],
+            "type": "string"
+          },
+          "sessionId": {
+            "description": "Optional session ID for conversational context. Note: when resuming a session, sandbox/fullAuto/workingDirectory parameters are not applied (CLI limitation)",
+            "type": "string"
+          },
+          "workingDirectory": {
+            "description": "Working directory for the agent to use as its root (passed via -C flag)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "codex",
+      "outputSchema": {
+        "properties": {
+          "threadId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Code Review"
+      },
+      "description": "Run a code review against the current repository using Codex CLI",
+      "inputSchema": {
+        "properties": {
+          "base": {
+            "description": "Review changes against a specific base branch (e.g., \"main\", \"develop\")",
+            "type": "string"
+          },
+          "commit": {
+            "description": "Review the changes introduced by a specific commit SHA",
+            "type": "string"
+          },
+          "model": {
+            "description": "Specify which model to use for the review (defaults to gpt-5.3-codex)",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Custom review instructions or focus areas (cannot be used with uncommitted=true; use base/commit review instead)",
+            "type": "string"
+          },
+          "title": {
+            "description": "Optional title to display in the review summary",
+            "type": "string"
+          },
+          "uncommitted": {
+            "description": "Review staged, unstaged, and untracked changes (working tree) - cannot be combined with custom prompt",
+            "type": "boolean"
+          },
+          "workingDirectory": {
+            "description": "Working directory to run the review in (passed via -C as a global Codex option)",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "review"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Ping Server"
+      },
+      "description": "Test MCP server connection",
+      "inputSchema": {
+        "properties": {
+          "message": {
+            "description": "Message to echo back",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "ping"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Help"
+      },
+      "description": "Get Codex CLI help information",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "help"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Sessions"
+      },
+      "description": "List all active conversation sessions with metadata",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "listSessions"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Web Search"
+      },
+      "description": "Perform web search using Codex CLI with web search enabled",
+      "inputSchema": {
+        "properties": {
+          "numResults": {
+            "description": "Number of search results to return (1-50, default: 10)",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "The search query to execute",
+            "type": "string"
+          },
+          "searchDepth": {
+            "description": "Search depth: basic (faster) or full (deeper analysis, default: basic)",
+            "enum": [
+              "basic",
+              "full"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "websearch"
+    }
+  ],
+  "version": "1.4.10"
+}

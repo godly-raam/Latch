@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "A MCP server for Alibaba Cloud",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "alibaba-cloud-ops-mcp-server==0.9.27"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "alibaba-cloud-ops-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-alibaba-cloud-ops-mcp-server-0-9-27",
+  "stderr_summary": "Installed 71 packages in 70ms\n<scratch>/uv-cache/archive-v0/Hn43-o2M2r2ZPVL7/lib/python3.13/site-packages/fastmcp/server/auth/providers/bearer.py:6: AuthlibDeprecationWarning: authlib.jose module is deprecated, please use joserfc instead.\nIt will be compatible before version 2.0.0.\n  from authlib.jose import JsonWebKey, JsonWebToken",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.9.27"
+}

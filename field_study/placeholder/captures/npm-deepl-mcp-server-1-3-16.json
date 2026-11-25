@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for DeepL translation API",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "deepl-mcp-server@1.3.16"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "deepl-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/DeepL/deepl-mcp-server",
+  "slug": "npm-deepl-mcp-server-1-3-16",
+  "stderr_summary": "DEEPL_API_KEY is not set. Create an API key at https://www.deepl.com/pro-api and provide it to this server as the DEEPL_API_KEY environment variable.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.3.16"
+}

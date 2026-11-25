@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for AKShare financial data",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "akshare-mcp-server==0.1.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "akshare-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-akshare-mcp-server-0-1-1",
+  "stderr_summary": "Downloading lxml (5.0MiB)\nDownloading numpy (15.0MiB)\nDownloading curl-cffi (13.4MiB)\nDownloading mini-racer (21.2MiB)\nDownloading pydantic-core (2.2MiB)\nDownloading pandas (11.4MiB)\nDownloading isort (1.6MiB)\nDownloading akshare (1.1MiB)\nDownloading mypy (14.8MiB)\nDownloading black (2.0MiB)",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.1"
+}

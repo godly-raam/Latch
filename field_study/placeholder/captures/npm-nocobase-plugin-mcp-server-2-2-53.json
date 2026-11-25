@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "An MCP server for building NocoBase systems and supporting business workflows.",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@nocobase/plugin-mcp-server@2.2.53"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@nocobase/plugin-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-nocobase-plugin-mcp-server-2-2-53",
+  "stderr_summary": "npm error could not determine executable to run\nnpm error A complete log of this run can be found in: <scratch>/npm-cache/_logs/2026-11-25T20_48_29_800Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.2.53"
+}

@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP (Model Context Protocol) server support for aiohttp",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "aiohttp-mcp-server==0.3.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "aiohttp-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/aio-libs/aiohttp-mcp-server",
+  "slug": "pypi-aiohttp-mcp-server-0-3-0",
+  "stderr_summary": "Installed 16 packages in 11ms\nPackage `aiohttp-mcp-server` does not provide any executables.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.3.0"
+}

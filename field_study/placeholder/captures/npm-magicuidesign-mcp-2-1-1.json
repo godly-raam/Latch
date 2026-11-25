@@ -1,0 +1,142 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Official MCP server for Magic UI.",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@magicuidesign/mcp@2.1.1"
+  ],
+  "manifest_sha256": "3f9e04fb67600ceebd7ecbfc3f7b6c71e6f28efa3bad00e5fc24645ced00e372",
+  "package": "@magicuidesign/mcp",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/magicuidesign/mcp",
+  "slug": "npm-magicuidesign-mcp-2-1-1",
+  "stderr_summary": "",
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Lists Magic UI registry items with optional filtering by kind, query, and limit.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "description": "Optional kind filter such as component, example, style, or a raw registry type like registry:ui.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of items to return. Defaults to 25.",
+            "maximum": 150,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Pagination offset for exhaustive registry browsing. Defaults to 0.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Optional text filter applied to names, titles, descriptions, and registry types.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "listRegistryItems"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Gets detailed information for a single Magic UI registry item.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "includeExamples": {
+            "description": "Include related example code when the item is a component.",
+            "type": "boolean"
+          },
+          "includeRelated": {
+            "description": "Include related registry items such as examples or dependencies.",
+            "type": "boolean"
+          },
+          "includeSource": {
+            "description": "Include the item's source code content.",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Registry item name, for example marquee. The @magicui/marquee form and the item registryUrl are also accepted.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "getRegistryItem"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Searches Magic UI registry items by keyword or use case.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "description": "Optional kind filter such as component, example, or style.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of results to return. Defaults to 25.",
+            "maximum": 150,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Pagination offset for stepping through ranked search results. Defaults to 0.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Search query matched against names, titles, descriptions, and registry types.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "searchRegistryItems"
+    }
+  ],
+  "version": "2.1.1"
+}

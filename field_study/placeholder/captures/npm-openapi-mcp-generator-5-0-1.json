@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Generates MCP server code from OpenAPI specifications",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "openapi-mcp-generator@5.0.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "openapi-mcp-generator",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/harsha-iiiv/openapi-mcp-generator",
+  "slug": "npm-openapi-mcp-generator-5-0-1",
+  "stderr_summary": "error: required option '-i, --input <file_or_url>' not specified",
+  "tool_count": 0,
+  "tools": [],
+  "version": "5.0.1"
+}

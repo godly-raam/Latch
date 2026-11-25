@@ -1,0 +1,431 @@
+{
+  "credential_mode": "placeholder",
+  "description": "AI Memory MCP Server — persistent memory for AI assistants via Model Context Protocol. Cross-platform search across ChatGPT, Claude, DeepSeek, Gemini & Kimi.",
+  "ecosystem": "pypi",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "uvx",
+    "aimemory-mcp-server==1.7.0"
+  ],
+  "manifest_sha256": "297bd7da9024785a9f7bb39a3dac908d59f00f5c0e122365f7e5a9dc14b6e6ac",
+  "package": "aimemory-mcp-server",
+  "protocol_version": "2026-07-28",
+  "repository_url": "https://github.com/jingchang0623-crypto/aimemory",
+  "slug": "pypi-aimemory-mcp-server-1-7-0",
+  "stderr_summary": "│                            https://gofastmcp.com                             │\n│                                                                              │\n│                  🖥  Server:      AI Memory, 4.2.6                            │\n│                  🚀 Deploy free: https://horizon.prefect.io                  │\n│                                                                              │\n╰──────────────────────────────────────────────────────────────────────────────╯\n\n\n[11/25/26 20:57:13] INFO     Starting MCP server 'AI Memory'    transport.py:241\n                             with transport 'stdio'",
+  "tool_count": 13,
+  "tools": [
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Save a new memory to your knowledge base.\n\nUse this to store important facts, preferences, code snippets, meeting notes,\nor any conversation takeaways that you want to remember for future sessions.\nThe memory will be searchable via full-text search (FTS5) and can be\nretrieved by any MCP-connected AI assistant.\n\nExamples of what to save:\n- \"User prefers Python over JavaScript for backend work\" (preference)\n- \"Team uses PostgreSQL for all new projects\" (fact)\n- \"```python\\ndef hello(): print('hi')```\" (code snippet)",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "description": "The memory content to store (required). Can be any text: facts, notes, preferences, code, etc.",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional source identifier, e.g. \"chatgpt-conv-123\", \"claude-session-456\", or platform name."
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional list of tags for categorization, e.g. [\"work\", \"meeting\", \"python\", \"preference\"]."
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "save_memory",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Save Memory"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Search your memory store using full-text search (FTS5).\n\nSearches across content, tags, and source fields. Results are ranked by\nrelevance score. This is the primary way your AI assistant retrieves\npast information — use it to find relevant context from conversations\nacross ChatGPT, Claude, DeepSeek, Gemini, Kimi, and more.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 10,
+            "description": "Maximum number of results to return (default: 10, max: 100).",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Search query string. Supports FTS5 syntax:\n- Simple: \"python tutorial\" (words appearing anywhere)\n- AND: \"python AND machine learning\" (both terms required)\n- OR: \"react OR vue\" (either term matches)\n- Phrase: \"exact phrase match\" (exact phrase in quotes)\n- NEAR: \"NEAR/3(word1 word2)\" (words within 3 tokens)\n- Prefix: \"prog*\" (matches \"program\", \"programming\", etc.)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_memories",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Search Memories"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "List memories, optionally filtered by tag. Returns newest first.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 20,
+            "description": "Maximum number of memories to return (default: 20, max: 200).",
+            "type": "integer"
+          },
+          "tag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional tag to filter by. Only memories containing this exact tag will be returned."
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_memories",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "List Memories"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Update an existing memory's content and/or tags.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "New content for the memory. If omitted, keeps existing content."
+          },
+          "memory_id": {
+            "description": "The ID of the memory to update (required).",
+            "type": "integer"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "New tags list for the memory. If omitted, keeps existing tags."
+          }
+        },
+        "required": [
+          "memory_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_memory",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Update Memory"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Delete a memory by its ID.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "memory_id": {
+            "description": "The ID of the memory to permanently delete (required).",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "memory_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_memory",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Delete Memory"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Retrieve a single memory by its ID.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "memory_id": {
+            "description": "The ID of the memory to retrieve (required).",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "memory_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_memory",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Get Memory"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Get statistics about your memory store.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "memory_stats",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Memory Stats"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Export all memories as JSON for backup or migration.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "export_memories",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Export Memories"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Import memories from a JSON list. Useful for restoring backup or bulk import.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "memories": {
+            "description": "List of memory dicts. Each should have \"content\" (required), \n      optional \"tags\" (list), and optional \"source\" (string).",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "skip_duplicates": {
+            "default": true,
+            "description": "If True (default), skip memories with content that already exists.\n            If False, import all memories (may create duplicates).",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "memories"
+        ],
+        "type": "object"
+      },
+      "name": "import_memories",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Import Memories"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Save multiple new memories at once. Optimized for bulk operations and AI conversation analysis.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "memories": {
+            "description": "List of memory dicts. Each should have:\n- content (required): The memory text to store\n- tags (optional): List of tag strings, e.g. [\"meeting\", \"project-x\"]\n- source (optional): Source identifier, e.g. \"chatgpt-conv-123\"",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "memories"
+        ],
+        "type": "object"
+      },
+      "name": "batch_save_memories",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Batch Save Memories"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Get all unique tags from your memory store with usage counts.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_all_tags",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Get All Tags"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Search relevant memories and return them formatted for AI context injection (CORE FEATURE).\n\nThis is the core \"memory injection\" feature — it finds memories relevant to the\ncurrent conversation and formats them so they can be injected into the AI's context.\nUse this at the start of conversations or when you need relevant background.\n\nWHY THIS MATTERS: Most MCP memory servers just store/search. AI Memory formats\nthe results READY for injection — saving you prompt engineering work.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "context",
+            "description": "Output format:\n- \"context\" (default): Formatted as \"=== Relevant Memories ===\\n[1] content...\\n===\" ready to inject\n- \"list\": Simple list of memory objects for programmatic use",
+            "type": "string"
+          },
+          "max_memories": {
+            "default": 5,
+            "description": "Maximum number of memories to return (default: 5, max: 20).",
+            "type": "integer"
+          },
+          "query": {
+            "description": "The search query describing what context you need.\n   Examples: \"user preferences for Python\", \"previous meeting notes\",\n   \"coding standards discussed before\", \"user's past debugging approaches\".",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "inject_memory",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Inject Memory"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Delete ALL memories from the database. This action cannot be undone!\n\n⚠️ WARNING: This permanently removes every memory. Export your data first\nusing export_memories if you want to keep a backup.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "clear_all_memories",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Clear All Memories"
+    }
+  ],
+  "version": "1.7.0"
+}

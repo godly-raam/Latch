@@ -1,0 +1,307 @@
+{
+  "credential_mode": "placeholder",
+  "description": "AI Development Life Cycle MCP Server with FastMCP framework",
+  "ecosystem": "pypi",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "uvx",
+    "aidlc-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "cf29a28f1a0826f10becd8fa335f694fa692b9f85d142a88bd0b923a8e7108e8",
+  "package": "aidlc-mcp-server",
+  "protocol_version": "2026-07-28",
+  "repository_url": "https://github.com/awslabs/aidlc-workflows",
+  "slug": "pypi-aidlc-mcp-server-0-1-0",
+  "stderr_summary": "│                                                                              │\n│                 🖥  Server:      AIDLC Workflow Server, 0.1.0                 │\n│                 🚀 Deploy free: https://horizon.prefect.io                   │\n│                                                                              │\n╰──────────────────────────────────────────────────────────────────────────────╯\n\n\n[11/25/26 20:57:02] INFO     Starting MCP server 'AIDLC         transport.py:241\n                             Workflow Server' with transport                    \n                             'stdio'",
+  "tool_count": 6,
+  "tools": [
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Create a new AIDLC project.\n\nIMPORTANT: Before calling, ask the user which operational mode they want:\n'suggest' (recommended), 'human_in_loop', or 'autonomous'.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Project name (alphanumeric, hyphens, underscores)",
+            "type": "string"
+          },
+          "operational_mode": {
+            "description": "'suggest', 'human_in_loop', or 'autonomous'",
+            "type": "string"
+          },
+          "user_request": {
+            "description": "What the user wants to build",
+            "type": "string"
+          },
+          "workspace_path": {
+            "description": "Absolute path to the workspace directory",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "user_request",
+          "workspace_path",
+          "operational_mode"
+        ],
+        "type": "object"
+      },
+      "name": "aidlc_start_project",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Aidlc Start Project"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Load workflow guidance dynamically from aidlc-rules/.\n\nThis is the primary tool. Workflow files can be edited at any time\nand changes take effect immediately (no restart needed).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "detail_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "For 'detail' type, format: 'category/name'"
+          },
+          "guidance_type": {
+            "description": "What to load. One of:\n'core_workflow' - Main workflow instructions\n'startup' - Common files needed at workflow start\n'stage' - Stage-specific guidance (requires phase + stage)\n'detail' - A specific detail file (requires detail_name)\n'project_status' - Current project state",
+            "type": "string"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Phase name for stage guidance"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Project name (for project_status and stage tracking)"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Stage name (e.g. 'requirements-analysis')"
+          },
+          "workspace_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Workspace path (for project_status)"
+          }
+        },
+        "required": [
+          "guidance_type"
+        ],
+        "type": "object"
+      },
+      "name": "aidlc_get_guidance",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Aidlc Get Guidance"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Complete a workflow stage, save its deliverable, and advance.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "default": "",
+            "description": "The deliverable content (markdown)",
+            "type": "string"
+          },
+          "project_id": {
+            "description": "Project name",
+            "type": "string"
+          },
+          "skip": {
+            "default": false,
+            "description": "If True, skip this stage instead of completing it",
+            "type": "boolean"
+          },
+          "skip_reason": {
+            "default": "",
+            "description": "Reason for skipping (required if skip=True)",
+            "type": "string"
+          },
+          "stage": {
+            "description": "Stage being completed (e.g. 'requirements-analysis')",
+            "type": "string"
+          },
+          "workspace_path": {
+            "description": "Absolute path to workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_path",
+          "project_id",
+          "stage"
+        ],
+        "type": "object"
+      },
+      "name": "aidlc_complete_stage",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Aidlc Complete Stage"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "List all AIDLC projects in the workspace.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_path": {
+            "description": "Absolute path to workspace directory",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_path"
+        ],
+        "type": "object"
+      },
+      "name": "aidlc_list_projects",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Aidlc List Projects"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Append an entry to the project's audit log.\n\nPer AIDLC rules, ALL user inputs and actions must be logged with\ncomplete raw input — never summarize.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "description": "Action type (e.g. 'user_input', 'approval', 'decision')",
+            "type": "string"
+          },
+          "details": {
+            "description": "Complete details to log",
+            "type": "string"
+          },
+          "project_id": {
+            "description": "Project name",
+            "type": "string"
+          },
+          "workspace_path": {
+            "description": "Absolute path to workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_path",
+          "project_id",
+          "action",
+          "details"
+        ],
+        "type": "object"
+      },
+      "name": "aidlc_log",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Aidlc Log"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "Manage workflow extensions.\n\nExtensions in aidlc-rules/aidlc-rules/aws-aidlc-rule-details/extensions/ provide domain-specific\nguidance (e.g. 'react-frontend', 'aws-infrastructure').",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "default": "list",
+            "description": "'list' to see available extensions, 'read' to load one",
+            "type": "string"
+          },
+          "extension_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Name of extension to read (without .md)"
+          }
+        },
+        "type": "object"
+      },
+      "name": "aidlc_manage_extensions",
+      "outputSchema": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Aidlc Manage Extensions"
+    }
+  ],
+  "version": "0.1.0"
+}

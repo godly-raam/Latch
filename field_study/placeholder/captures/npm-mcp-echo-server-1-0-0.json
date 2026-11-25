@@ -1,0 +1,42 @@
+{
+  "credential_mode": "placeholder",
+  "description": "A minimal MCP server template that echoes messages",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "mcp-echo-server@1.0.0"
+  ],
+  "manifest_sha256": "f265e20dd9d5c8a896736becd2ec350ce7cbf46c7d0ba1374f259cc57548901f",
+  "package": "mcp-echo-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": null,
+  "slug": "npm-mcp-echo-server-1-0-0",
+  "stderr_summary": "MCP Echo Server running on stdio",
+  "tool_count": 1,
+  "tools": [
+    {
+      "description": "Echoes back the provided message",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "description": "The message to echo back",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "name": "echo"
+    }
+  ],
+  "version": "1.0.0"
+}

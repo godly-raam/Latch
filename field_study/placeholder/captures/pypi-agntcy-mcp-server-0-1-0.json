@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP bridge for the AGNTCY multi-agent network — agent registry, ACP messaging, SLIM protocol, capability discovery",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agntcy-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agntcy-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agntcy-mcp-server",
+  "slug": "pypi-agntcy-mcp-server-0-1-0",
+  "stderr_summary": "Downloading pygments (1.2MiB)\n Downloaded pygments\nInstalled 37 packages in 15ms\nAn executable named `agntcy-mcp-server` is not provided by package `agntcy-mcp-server`.\nThe following executables are available:\n- agntcy-server\n\nUse `uvx --from agntcy-mcp-server agntcy-server` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

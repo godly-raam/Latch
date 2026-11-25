@@ -1,0 +1,165 @@
+{
+  "credential_mode": "placeholder",
+  "description": "TLA+ model checking MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "tlaplus-mcp@1.0.3"
+  ],
+  "manifest_sha256": "395424b9d14b4a97e6c8a231b95ac89aa301b503abff9625cdff288f5f5bb2b9",
+  "package": "tlaplus-mcp",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/sonoisa/tlaplus-mcp",
+  "slug": "npm-tlaplus-mcp-1-0-3",
+  "stderr_summary": "tlaplus-mcp 1.0.3 is running on stdio",
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Parse and syntax-check a TLA+ specification using SANY (Syntactic Analyzer)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "spec": {
+            "description": "TLA+ specification source code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "spec"
+        ],
+        "type": "object"
+      },
+      "name": "sany_parse"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Translate a PlusCal algorithm embedded in a TLA+ specification into TLA+",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "spec": {
+            "description": "TLA+ specification containing PlusCal algorithm",
+            "type": "string"
+          }
+        },
+        "required": [
+          "spec"
+        ],
+        "type": "object"
+      },
+      "name": "pluscal_translate"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Run the TLC model checker on a TLA+ specification to verify invariants and temporal properties. Specifications can read and overwrite host files through modules such as Json; repeated calls can have additional side effects.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "config": {
+            "description": "TLC model checking configuration",
+            "properties": {
+              "checkDeadlock": {
+                "default": true,
+                "description": "Whether to check for deadlock (default: true)",
+                "type": "boolean"
+              },
+              "constants": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "CONSTANT assignments (e.g. {\"N\": \"3\"})",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "init": {
+                "description": "Init predicate name (e.g. \"Init\")",
+                "type": "string"
+              },
+              "invariants": {
+                "description": "Invariant names to check",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "next": {
+                "description": "Next predicate name (e.g. \"Next\")",
+                "type": "string"
+              },
+              "properties": {
+                "description": "Temporal property names to check",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "specification": {
+                "description": "SPECIFICATION name (e.g. \"Spec\"). Alternative to init/next.",
+                "type": "string"
+              },
+              "stateConstraint": {
+                "description": "STATE CONSTRAINT expression",
+                "type": "string"
+              },
+              "symmetry": {
+                "description": "SYMMETRY set name",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "dumpTrace": {
+            "default": false,
+            "description": "Dump counterexample trace as JSON",
+            "type": "boolean"
+          },
+          "spec": {
+            "description": "TLA+ specification source code",
+            "type": "string"
+          },
+          "workers": {
+            "default": 1,
+            "description": "Number of worker threads",
+            "type": "number"
+          }
+        },
+        "required": [
+          "spec",
+          "config"
+        ],
+        "type": "object"
+      },
+      "name": "tlc_check"
+    }
+  ],
+  "version": "1.0.3"
+}

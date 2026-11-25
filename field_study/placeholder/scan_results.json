@@ -1,0 +1,3043 @@
+{
+  "analyzed_target_count": 24,
+  "captures_dir": "captures",
+  "compositions": {
+    "anchor_slugs": [
+      "npm-server-filesystem",
+      "npm-server-github-2025-4-8",
+      "npm-server-memory",
+      "npm-server-slack-2025-4-25",
+      "pypi-mcp-server-fetch",
+      "pypi-mcp-server-git"
+    ],
+    "auth_audit_note": "Every capture is a stdio manifest, so auth-audit has no HTTP/OAuth transport to audit. Its zero is an untested engine, not a pass.",
+    "count": 348,
+    "cross_server_path_count": 4927,
+    "engine_counts": {
+      "auth-audit": 0,
+      "graph": 7820,
+      "shadow": 41
+    },
+    "examples": [
+      {
+        "auth_findings": 0,
+        "composition_id": "npm-loopctl-mcp-server-3-47-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+        "cross_server_paths": 517,
+        "graph_paths": 517,
+        "servers": [
+          "npm-loopctl-mcp-server-3-47-0",
+          "pypi-mcp-server-fetch",
+          "npm-server-github-2025-4-8"
+        ],
+        "shadow_findings": 4
+      },
+      {
+        "auth_findings": 0,
+        "composition_id": "npm-alchemy-mcp-server-0-3-0+npm-loopctl-mcp-server-3-47-0",
+        "cross_server_paths": 368,
+        "graph_paths": 368,
+        "servers": [
+          "npm-alchemy-mcp-server-0-3-0",
+          "npm-loopctl-mcp-server-3-47-0"
+        ],
+        "shadow_findings": 0
+      },
+      {
+        "auth_findings": 0,
+        "composition_id": "npm-dialpad-dialtone-mcp-server-1-15-0+npm-loopctl-mcp-server-3-47-0",
+        "cross_server_paths": 242,
+        "graph_paths": 242,
+        "servers": [
+          "npm-dialpad-dialtone-mcp-server-1-15-0",
+          "npm-loopctl-mcp-server-3-47-0"
+        ],
+        "shadow_findings": 0
+      },
+      {
+        "auth_findings": 0,
+        "composition_id": "npm-alchemy-mcp-server-0-3-0+npm-bugsnag-mcp-server-1-1-0",
+        "cross_server_paths": 0,
+        "graph_paths": 0,
+        "servers": [
+          "npm-alchemy-mcp-server-0-3-0",
+          "npm-bugsnag-mcp-server-1-1-0"
+        ],
+        "shadow_findings": 0
+      }
+    ],
+    "flagged_composition_count": 53,
+    "harvested_server_count": 24,
+    "rule_counts": {
+      "CROSS_TOOL_HIJACK": 6,
+      "EXACT_TOOL_SHADOW": 5,
+      "LETHAL_TRIFECTA": 49
+    },
+    "triage": {
+      "counts": {
+        "artifact": 0,
+        "plausible": 0,
+        "real": 0
+      },
+      "sample_size": 0,
+      "sampled": [],
+      "seed": 20261125,
+      "untriaged": 53
+    }
+  },
+  "credential_modes": {
+    "none": 0,
+    "placeholder": 100
+  },
+  "detector_fingerprint_sha256": "d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4",
+  "engine_counts": {
+    "audit": 2,
+    "auth-audit": 0,
+    "graph": 197,
+    "shadow": 0
+  },
+  "findings": [
+    {
+      "engine": "audit",
+      "rule_id": "UNICODE_VARIATION_SELECTOR",
+      "severity": "HIGH",
+      "target": "npm-godot-mcp-server-0-6-1",
+      "tool": "call_method"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:webhook_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:webhook_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:webhook_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:artifact_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:corpus_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_cost_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_ingestion_anomalies"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:get_story_token_usage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_analytics_top"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_hybrid_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:knowledge_search_coverage"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_agents"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_blocked_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epic_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_epics"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_ready_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:list_stories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:rulebook_draft_create"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:skill_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:token_budget_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:verification_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:webhook_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:webhook_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:webhook_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:webhook_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:webhook_list"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-loopctl-mcp-server-3-47-0",
+      "tool": "npm-loopctl-mcp-server-3-47-0:work_item_pull"
+    },
+    {
+      "engine": "audit",
+      "rule_id": "UNICODE_VARIATION_SELECTOR",
+      "severity": "HIGH",
+      "target": "pypi-aimemory-mcp-server-1-7-0",
+      "tool": "clear_all_memories"
+    }
+  ],
+  "flagged_target_count": 3,
+  "harvest_status_counts": {
+    "harvested": 24,
+    "missing_required_env": 8,
+    "startup_error": 37,
+    "timeout": 31
+  },
+  "known_out_of_scope_misses": [],
+  "rule_counts": {
+    "LETHAL_TRIFECTA": 197,
+    "UNICODE_VARIATION_SELECTOR": 2
+  },
+  "schema_version": "1.0",
+  "severity_counts": {
+    "CRITICAL": 66,
+    "HIGH": 133
+  },
+  "target_count": 100,
+  "targets": [
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for the Monaco SDK",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@0xmonaco/mcp-server",
+      "repository_url": "https://github.com/Monaco-Research/monaco-sdk",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-0xmonaco-mcp-server-1-1-20",
+      "tool_count": 0,
+      "version": "1.1.20"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for interacting with CKAN open data portals",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@aborruso/ckan-mcp-server",
+      "repository_url": "https://github.com/ondata/ckan-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-aborruso-ckan-mcp-server-0-4-146",
+      "tool_count": 0,
+      "version": "0.4.146"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for filesystem access",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@agent-infra/mcp-server-filesystem",
+      "repository_url": "https://github.com/bytedance/UI-TARS-desktop",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-agent-infra-mcp-server-filesystem-1-2-29",
+      "tool_count": 0,
+      "version": "1.2.29"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server for using Alchemy APIs",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "3c5ee962fbb19804a6e22d8c522b9a389642dcaa34e006a3be321a363a1a3483",
+      "package": "@alchemy/mcp-server",
+      "repository_url": "https://github.com/alchemyplatform/alchemy-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-alchemy-mcp-server-0-3-0",
+      "tool_count": 97,
+      "version": "0.3.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Azure MCP Server - Model Context Protocol implementation for Azure, for linux on x64",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@azure/mcp-linux-x64",
+      "repository_url": "https://github.com/microsoft/mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-azure-mcp-linux-x64-4-0-0-beta-10",
+      "tool_count": 0,
+      "version": "4.0.0-beta.10"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Azure MCP Server - Model Context Protocol implementation for Azure, for win32 on x64",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@azure/mcp-win32-x64",
+      "repository_url": "https://github.com/microsoft/mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-azure-mcp-win32-x64-4-0-0-beta-10",
+      "tool_count": 0,
+      "version": "4.0.0-beta.10"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "A Bugsnag MCP server for interacting with Bugsnag API",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "3118661276f8e05c6956ce3b26377c1755d75c005b26a8437cfaff5007a1eef6",
+      "package": "bugsnag-mcp-server",
+      "repository_url": "https://github.com/yourusername/bugsnag-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-bugsnag-mcp-server-1-1-0",
+      "tool_count": 11,
+      "version": "1.1.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for accessing LSP functionality",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "cclsp",
+      "repository_url": "https://github.com/ktnyt/cclsp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-cclsp-0-7-0",
+      "tool_count": 0,
+      "version": "0.7.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for Clipwright: generate UGC videos from your coding agent",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "missing_required_env",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@clipwright/mcp-server",
+      "repository_url": "https://github.com/seocombat/clipwright-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-clipwright-mcp-server-0-80-0",
+      "tool_count": 0,
+      "version": "0.80.0"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "[![npm version](https://img.shields.io/npm/v/cls-mcp-server)](https://www.npmjs.com/package/cls-mcp-server) [![license](https://img.shields.io/npm/l/cls-mcp-server)](https://github.com/Tencent/cls-mcp-server/blob/v1.3.0/LICENSE)",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "d90d8a0610048c791c6dd9e84a50af22e84db2d79b1fa6cc692bbb7827553531",
+      "package": "cls-mcp-server",
+      "repository_url": "https://github.com/Tencent/cls-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-cls-mcp-server-1-3-0",
+      "tool_count": 20,
+      "version": "1.3.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Codacy MCP server",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@codacy/codacy-mcp",
+      "repository_url": "https://github.com/codacy/codacy-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-codacy-codacy-mcp-0-7-5",
+      "tool_count": 0,
+      "version": "0.7.5"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP Server with Code Review",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "code-review-mcp-server",
+      "repository_url": "https://github.com/Orcus2021/code-review-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-code-review-mcp-server-1-5-3",
+      "tool_count": 0,
+      "version": "1.5.3"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server wrapper for OpenAI Codex CLI",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "6a332e3b926ca81357bfb8fa23409c2df04089446db06d05ce820ad3a934dbba",
+      "package": "codex-mcp-server",
+      "repository_url": "https://github.com/tuannvm/codex-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-codex-mcp-server-1-4-10",
+      "tool_count": 6,
+      "version": "1.4.10"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for DeepL translation API",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "missing_required_env",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "deepl-mcp-server",
+      "repository_url": "https://github.com/DeepL/deepl-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-deepl-mcp-server-1-3-16",
+      "tool_count": 0,
+      "version": "1.3.16"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "An MCP server for Trello boards, powered by Bun for maximum performance.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "missing_required_env",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@delorenj/mcp-server-trello",
+      "repository_url": "https://github.com/delorenj/mcp-server-trello",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-delorenj-mcp-server-trello-1-8-1",
+      "tool_count": 0,
+      "version": "1.8.1"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP Server for Dialtone Design System",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "2a21d090c1ad3ae2d1b3404c23943f8a287e4b3cef0558fbb6a506e424ce8f7e",
+      "package": "@dialpad/dialtone-mcp-server",
+      "repository_url": "https://github.com/dialpad/dialtone",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-dialpad-dialtone-mcp-server-1-15-0",
+      "tool_count": 7,
+      "version": "1.15.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "A Docusaurus plugin that exposes an MCP server endpoint for AI agents to search and retrieve documentation",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "docusaurus-plugin-mcp-server",
+      "repository_url": "https://github.com/scalvert/docusaurus-plugin-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-docusaurus-plugin-mcp-server-2-7-2",
+      "tool_count": 0,
+      "version": "2.7.2"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "Official draw.io MCP server for LLMs - Open diagrams in draw.io editor",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "cb01e657a8d4e4275d7a1939de4085d2845dfacc76f252685b604dbf23c881f7",
+      "package": "@drawio/mcp",
+      "repository_url": "https://github.com/jgraph/drawio-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-drawio-mcp-1-13-1",
+      "tool_count": 8,
+      "version": "1.13.1"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "A TypeScript-based MCP server that provides DuckDuckGo search functionality.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "8f5947ecf79762d3d34a0fb09f1eec041c05c7241b13a49e6a24c5afc65b0023",
+      "package": "duckduckgo-mcp-server",
+      "repository_url": "https://github.com/zhsama/duckduckgo-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-duckduckgo-mcp-server-0-1-2",
+      "tool_count": 1,
+      "version": "0.1.2"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for Electron application automation and management. See MCP_USAGE_GUIDE.md for proper argument structure examples.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "electron-mcp-server",
+      "repository_url": "https://github.com/halilural/electron-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-electron-mcp-server-1-5-1",
+      "tool_count": 0,
+      "version": "1.5.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "A Model Context Protocol (MCP) server that bridges AI assistants with Elgato apps.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@elgato/mcp-server",
+      "repository_url": "https://github.com/elgatosf/elgato-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-elgato-mcp-server-0-1-8",
+      "tool_count": 0,
+      "version": "0.1.8"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for EventCatalog",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "missing_required_env",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@eventcatalog/mcp-server",
+      "repository_url": "https://github.com/event-catalog/mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-eventcatalog-mcp-server-2-1-0",
+      "tool_count": 0,
+      "version": "2.1.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for using the Ghost API",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "missing_required_env",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@fanyangmeng/ghost-mcp",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-fanyangmeng-ghost-mcp-0-2-0",
+      "tool_count": 0,
+      "version": "0.2.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "[![npm](https://img.shields.io/npm/v/@flexprice/mcp-server?label=npm)](https://www.npmjs.com/package/@flexprice/mcp-server) [![Docs](https://img.shields.io/badge/docs-docs.flexprice.io-informational)](https://docs.flexprice.io/docs/connect/mcp-server)",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@flexprice/mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-flexprice-mcp-server-2-1-51",
+      "tool_count": 0,
+      "version": "2.1.51"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server for Godot game engine integration",
+      "ecosystem": "npm",
+      "finding_count": 1,
+      "harvest_status": "harvested",
+      "manifest_sha256": "261ee4e9aa0699ae417e0f37798c37235875eb1f82cb550e4f8f0d0f26a341f7",
+      "package": "godot-mcp-server",
+      "repository_url": "https://github.com/tomyud1/godot-mcp",
+      "rule_ids": [
+        "UNICODE_VARIATION_SELECTOR"
+      ],
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "slug": "npm-godot-mcp-server-0-6-1",
+      "tool_count": 71,
+      "version": "0.6.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Model Context Protocol (MCP) Server for interacting with GCP APIs",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@google-cloud/gcloud-mcp",
+      "repository_url": "https://github.com/googleapis/gcloud-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-google-cloud-gcloud-mcp-0-5-3",
+      "tool_count": 0,
+      "version": "0.5.3"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP Server for GCP environment for interacting with various Observability APIs.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@google-cloud/observability-mcp",
+      "repository_url": "https://github.com/googleapis/gcloud-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-google-cloud-observability-mcp-0-2-3",
+      "tool_count": 0,
+      "version": "0.2.3"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "A Model Context Protocol (MCP) server that provides comprehensive PostgreSQL database management capabilities for AI assistants",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "16ef0ff8f232e26a414dacc16ecd4cc07431190307c256cba9d497cfdd5bfc2f",
+      "package": "@henkey/postgres-mcp-server",
+      "repository_url": "https://github.com/HenkDz/postgresql-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-henkey-postgres-mcp-server-1-0-7",
+      "tool_count": 18,
+      "version": "1.0.7"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Unified MCP server for Ignite UI — documentation, GitHub API, and CLI scaffolding",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@igniteui/mcp-server",
+      "repository_url": "https://github.com/IgniteUI/igniteui-cli",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-igniteui-mcp-server-16-0-1",
+      "tool_count": 0,
+      "version": "16.0.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for interacting with your LINE Official Account",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@line/line-bot-mcp-server",
+      "repository_url": "ssh://git@github.com/line/line-bot-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-line-line-bot-mcp-server-0-5-0",
+      "tool_count": 0,
+      "version": "0.5.0"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server for loopctl — structural trust for AI development loops",
+      "ecosystem": "npm",
+      "finding_count": 197,
+      "harvest_status": "harvested",
+      "manifest_sha256": "78370febc61631b900bac2a7b599dcd2c09d593b6835637e6aa0be66c361c92a",
+      "package": "loopctl-mcp-server",
+      "repository_url": "https://github.com/mkreyman/loopctl",
+      "rule_ids": [
+        "LETHAL_TRIFECTA"
+      ],
+      "severity_counts": {
+        "CRITICAL": 66,
+        "HIGH": 131
+      },
+      "slug": "npm-loopctl-mcp-server-3-47-0",
+      "tool_count": 298,
+      "version": "3.47.0"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "Official MCP server for Magic UI.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "3f9e04fb67600ceebd7ecbfc3f7b6c71e6f28efa3bad00e5fc24645ced00e372",
+      "package": "@magicuidesign/mcp",
+      "repository_url": "https://github.com/magicuidesign/mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-magicuidesign-mcp-2-1-1",
+      "tool_count": 3,
+      "version": "2.1.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP Server for Matillion Data Productivity Cloud Public API integration",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@matillion/mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-matillion-mcp-server-1-20-6",
+      "tool_count": 0,
+      "version": "1.20.6"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "A minimal MCP server template that echoes messages",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "f265e20dd9d5c8a896736becd2ec350ce7cbf46c7d0ba1374f259cc57548901f",
+      "package": "mcp-echo-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-mcp-echo-server-1-0-0",
+      "tool_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "An MCP server to run arbitrary commands",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "1c2fd337bcbc99a39dc5dba6d6d22015064697aaecf511a3c1d18a15baa98dd6",
+      "package": "mcp-server-commands",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-mcp-server-commands-0-8-2",
+      "tool_count": 1,
+      "version": "0.8.2"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "[![smithery badge](https://smithery.ai/badge/mcp-server-sqlite-npx)](https://smithery.ai/server/mcp-server-sqlite-npx) [![MseeP.ai Security Assessment Badge](https://mseep.net/mseep-audited.png)](https://mseep.ai/app/johnnyoshika-mcp-server-sqlite-npx)",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "mcp-server-sqlite-npx",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-mcp-server-sqlite-npx-0-8-0",
+      "tool_count": 0,
+      "version": "0.8.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for Platforma Desktop",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@milaboratories/pl-mcp-server",
+      "repository_url": "https://github.com/milaboratory/platforma",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-milaboratories-pl-mcp-server-48-0-0",
+      "tool_count": 0,
+      "version": "48.0.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "An MCP server that reads and writes spreadsheet data to MS Excel file",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@negokaz/excel-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-negokaz-excel-mcp-server-0-12-0",
+      "tool_count": 0,
+      "version": "0.12.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "CLI for NitroStack - Create and manage MCP server projects.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@nitrostack/cli",
+      "repository_url": "https://github.com/nitrocloudofficial/nitrostack",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-nitrostack-cli-1-1-3",
+      "tool_count": 0,
+      "version": "1.1.3"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "An MCP server for building NocoBase systems and supporting business workflows.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@nocobase/plugin-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-nocobase-plugin-mcp-server-2-2-53",
+      "tool_count": 0,
+      "version": "2.2.53"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server that wraps Noves Intent service for natural language blockchain data",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "8c40a73d3f8faf4d6aa9c06a71055bc2eaf8099a94badece45d1f8d66dbee158",
+      "package": "@noves/noves-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-noves-noves-mcp-server-0-1-3",
+      "tool_count": 9,
+      "version": "0.1.3"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Generates MCP server code from OpenAPI specifications",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "openapi-mcp-generator",
+      "repository_url": "https://github.com/harsha-iiiv/openapi-mcp-generator",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-openapi-mcp-generator-5-0-1",
+      "tool_count": 0,
+      "version": "5.0.1"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server for interacting with openapisearch.com API",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "6122970b144e50b2c955b223971bd4933331df17658477fc7002512e10a7fd27",
+      "package": "openapi-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-openapi-mcp-server-2-1-0",
+      "tool_count": 2,
+      "version": "2.1.0"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server for generating PlantUML diagrams",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "45f6468779ab522f423efa27c6e70cef656f9e50ef225a9effe1ff4a85342584",
+      "package": "plantuml-mcp-server",
+      "repository_url": "https://github.com/infobip/plantuml-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-plantuml-mcp-server-0-2-4",
+      "tool_count": 3,
+      "version": "0.2.4"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for generating Playwright tests",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "playwright-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-playwright-mcp-server-1-0-0",
+      "tool_count": 0,
+      "version": "1.0.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Model Context Protocol (MCP) server for container runtimes (Podman and Docker)",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "podman-mcp-server",
+      "repository_url": "https://github.com/manusa/podman-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-podman-mcp-server-0-0-15",
+      "tool_count": 0,
+      "version": "0.0.15"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Model Context Protocol (MCP) server for MediaWiki",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@professional-wiki/mediawiki-mcp-server",
+      "repository_url": "https://github.com/ProfessionalWiki/MediaWiki-MCP-Server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-professional-wiki-mediawiki-mcp-server-0-21-0",
+      "tool_count": 0,
+      "version": "0.21.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Experimental MCP server for browser automation using Puppeteer (inspired by @modelcontextprotocol/server-puppeteer)",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "puppeteer-mcp-server",
+      "repository_url": "https://github.com/merajmehrabi/puppeteer-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-puppeteer-mcp-server-0-7-2",
+      "tool_count": 0,
+      "version": "0.7.2"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Reverse engineer anything from your terminal or agent with one CLI and MCP server.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "rea-agents",
+      "repository_url": "https://github.com/morluto/rea",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-rea-agents-6-10-1",
+      "tool_count": 0,
+      "version": "6.10.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Windows x64 runtime for @sbroenne/mcp-server-excel, the Microsoft Excel automation MCP server. Requires desktop Excel.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@sbroenne/mcp-server-excel-win32-x64",
+      "repository_url": "https://github.com/sbroenne/mcp-server-excel",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-sbroenne-mcp-server-excel-win32-x64-2-6-13",
+      "tool_count": 0,
+      "version": "2.6.13"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Serper MCP Server supporting search and webpage scraping",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "missing_required_env",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "serper-search-scrape-mcp-server",
+      "repository_url": "https://github.com/marcopesani/mcp-server-serper",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-serper-search-scrape-mcp-server-0-1-2",
+      "tool_count": 0,
+      "version": "0.1.2"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for image session management and processing",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "sharp-mcp",
+      "repository_url": "https://github.com/choesumin/sharp-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-sharp-mcp-0-2-6",
+      "tool_count": 0,
+      "version": "0.2.6"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "A command line tool for setting up Shopify Dev MCP server",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@shopify/dev-mcp",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-shopify-dev-mcp-1-19-0",
+      "tool_count": 0,
+      "version": "1.19.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Element MCP server",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@siemens/element-mcp",
+      "repository_url": "https://code.siemens.com/ux/sdl-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-siemens-element-mcp-51-8-0-v-2-1-0",
+      "tool_count": 0,
+      "version": "51.8.0-v.2.1.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Model Context Protocol (MCP) server for Slack Workspaces. This integration supports both Stdio and SSE transports, proxy settings and does not require any permissions or bots being created or approved by Workspace admins",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "slack-mcp-server",
+      "repository_url": "https://github.com/korotovsky/slack-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-slack-mcp-server-1-3-0",
+      "tool_count": 0,
+      "version": "1.3.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Socket MCP server for scanning dependencies",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "missing_required_env",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@socketsecurity/mcp",
+      "repository_url": "https://github.com/SocketDev/socket-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-socketsecurity-mcp-0-5-0",
+      "tool_count": 0,
+      "version": "0.5.0"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "Reusable Stately MCP server for XState machine tooling.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "7d3a40bca770710110832349486a99452dad28e764e590c3d4dae1e8bf3cc4a6",
+      "package": "@statelyai/mcp",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-statelyai-mcp-0-32-2",
+      "tool_count": 22,
+      "version": "0.32.2"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for Redash integration",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@suthio/redash-mcp",
+      "repository_url": "https://github.com/suthio/redash-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-suthio-redash-mcp-0-1-2",
+      "tool_count": 0,
+      "version": "0.1.2"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server for advanced web search using Tavily",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "1dad20bf2fabe70c13081395215446146112db66d506332f9f509c129b2210af",
+      "package": "tavily-mcp",
+      "repository_url": "https://github.com/tavily-ai/tavily-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-tavily-mcp-0-2-22",
+      "tool_count": 5,
+      "version": "0.2.22"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP server for Terraform Registry operations",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "391932f324d900ec7f5ba0412d3def1552b141b3f10194f2f560c57a2c01e66f",
+      "package": "terraform-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-terraform-mcp-server-0-13-0",
+      "tool_count": 10,
+      "version": "0.13.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "TinyCloud delegated operations MCP server",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@tinycloud/mcp",
+      "repository_url": "https://github.com/TinyCloudLabs/js-sdk",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-tinycloud-mcp-0-11-0",
+      "tool_count": 0,
+      "version": "0.11.0"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "TLA+ model checking MCP server",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "395424b9d14b4a97e6c8a231b95ac89aa301b503abff9625cdff288f5f5bb2b9",
+      "package": "tlaplus-mcp",
+      "repository_url": "https://github.com/sonoisa/tlaplus-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-tlaplus-mcp-1-0-3",
+      "tool_count": 3,
+      "version": "1.0.3"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Transcend MCP Server — transcend.yml pull and push tools.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@transcend-io/mcp-server-config",
+      "repository_url": "https://github.com/transcend-io/tools",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-transcend-io-mcp-server-config-0-2-2",
+      "tool_count": 0,
+      "version": "0.2.2"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Model Context Protocol (MCP) Server for the *@trycompai/mcp-server* API.",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@trycompai/mcp-server",
+      "repository_url": "https://github.com/trycompai/comp-v2",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-trycompai-mcp-server-0-7-16",
+      "tool_count": 0,
+      "version": "0.7.16"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "TwelveLabs MCP Server",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "twelvelabs-mcp",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-twelvelabs-mcp-1-0-0",
+      "tool_count": 0,
+      "version": "1.0.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Customer-run MCP server for the Grade SDK v1 API",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "missing_required_env",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@usegrade/mcp-server",
+      "repository_url": "https://github.com/creatorcheck/creatorcheck",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-usegrade-mcp-server-0-1-0",
+      "tool_count": 0,
+      "version": "0.1.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "An MCP server that connects to Vercel API",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "vercel-mcp",
+      "repository_url": "https://github.com/zueai/vercel-api-mcp",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-vercel-mcp-0-0-7",
+      "tool_count": 0,
+      "version": "0.0.7"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "MCP Server for withPICA — enables AI assistants to interact with your withPICA music catalog",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "38d8110c14dacb39cc2f2432c2dca33e076b8c2ddb7616c81cc7880ba9984005",
+      "package": "@withpica/mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-withpica-mcp-server-2-128-0",
+      "tool_count": 3,
+      "version": "2.128.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for Zapier SDK",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "@zapier/zapier-sdk-mcp",
+      "repository_url": "https://gitlab.com/zapier/zapier-sdk/zapier-sdk",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-zapier-zapier-sdk-mcp-0-29-1",
+      "tool_count": 0,
+      "version": "0.29.1"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "Zeplin’s official MCP server for AI-assisted UI development",
+      "ecosystem": "npm",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "aecf00df0ecb8508ed296c3216bc723c5efd8521e18f855f47c1710b0926dc34",
+      "package": "@zeplin/mcp-server",
+      "repository_url": "https://github.com/zeplin/mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "npm-zeplin-mcp-server-1-0-6",
+      "tool_count": 4,
+      "version": "1.0.6"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Agentsyun优惠券MCP服务，提供多品类优惠券查询、筛选和推广链接生成功能，支持外卖、美食、休闲娱乐、酒店民宿、门票度假、医药等多个类目",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "agentsyun-coupon-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-agentsyun-coupon-mcp-server-0-0-18",
+      "tool_count": 0,
+      "version": "0.0.18"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "An Agile Project Management MCP Server that transforms LLMs into powerful agile assistants",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "agile-mcp-server",
+      "repository_url": "https://github.com/agile-mcp/agile-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-agile-mcp-server-0-4-0",
+      "tool_count": 0,
+      "version": "0.4.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP bridge for the AGNTCY multi-agent network — agent registry, ACP messaging, SLIM protocol, capability discovery",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "agntcy-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agntcy-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-agntcy-mcp-server-0-1-0",
+      "tool_count": 0,
+      "version": "0.1.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP-Server for agriculture data — soil conditions, crop weather, global statistics, food products",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "agriculture-mcp-server",
+      "repository_url": "https://github.com/AiAgentKarl/agriculture-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-agriculture-mcp-server-0-1-2",
+      "tool_count": 0,
+      "version": "0.1.2"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Model Context Protocol (MCP) server for Anzo Graph Database with dual API support (5.4 + 6.0+), 50+ tools, discovery capabilities, and comprehensive skill-based workflows",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "ags-mcp-server",
+      "repository_url": "https://pypi.org/project/ags-mcp-server/",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-ags-mcp-server-1-2-0",
+      "tool_count": 0,
+      "version": "1.2.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP (Model Context Protocol) Server for AI Cogence RAG Backend",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "ai-cogence-mcp-server",
+      "repository_url": "https://github.com/ai-cogence/mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-ai-cogence-mcp-server-1-0-0",
+      "tool_count": 0,
+      "version": "1.0.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Ai-Core MCP Server - Model Context Protocol server for Ai-Core API",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "ai-core-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-ai-core-mcp-server-1-0-0",
+      "tool_count": 0,
+      "version": "1.0.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server exposing AI e-commerce operation tools for internal agents",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "ai-ecom-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-ai-ecom-mcp-server-0-1-5",
+      "tool_count": 0,
+      "version": "0.1.5"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "本地 MCP 橋樑：把多個 API key + endpoint 收編為統一的模型能力池，給 Agent 透過 MCP 調用",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "ai-mcp-server",
+      "repository_url": "https://github.com/brianMacao/ai-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-ai-mcp-server-0-1-1",
+      "tool_count": 0,
+      "version": "0.1.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "AI for Humanities MCP Server - Coming soon. Part of the AIH-Infra ecosystem.",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "ai4h-mcp-server",
+      "repository_url": "https://github.com/AIH-Infra",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-ai4h-mcp-server-0-0-1",
+      "tool_count": 0,
+      "version": "0.0.1"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "AI Development Life Cycle MCP Server with FastMCP framework",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "harvested",
+      "manifest_sha256": "cf29a28f1a0826f10becd8fa335f694fa692b9f85d142a88bd0b923a8e7108e8",
+      "package": "aidlc-mcp-server",
+      "repository_url": "https://github.com/awslabs/aidlc-workflows",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-aidlc-mcp-server-0-1-0",
+      "tool_count": 6,
+      "version": "0.1.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP Server for ai.market - Search, evaluate, and purchase datasets",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "aimarket-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-aimarket-mcp-server-0-1-0",
+      "tool_count": 0,
+      "version": "0.1.0"
+    },
+    {
+      "analysis_status": "analyzed",
+      "description": "AI Memory MCP Server — persistent memory for AI assistants via Model Context Protocol. Cross-platform search across ChatGPT, Claude, DeepSeek, Gemini & Kimi.",
+      "ecosystem": "pypi",
+      "finding_count": 1,
+      "harvest_status": "harvested",
+      "manifest_sha256": "297bd7da9024785a9f7bb39a3dac908d59f00f5c0e122365f7e5a9dc14b6e6ac",
+      "package": "aimemory-mcp-server",
+      "repository_url": "https://github.com/jingchang0623-crypto/aimemory",
+      "rule_ids": [
+        "UNICODE_VARIATION_SELECTOR"
+      ],
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "slug": "pypi-aimemory-mcp-server-1-7-0",
+      "tool_count": 13,
+      "version": "1.7.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP (Model Context Protocol) server support for aiohttp",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "aiohttp-mcp-server",
+      "repository_url": "https://github.com/aio-libs/aiohttp-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-aiohttp-mcp-server-0-3-0",
+      "tool_count": 0,
+      "version": "0.3.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for AI agent identity verification via AIP",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "aip-mcp-server",
+      "repository_url": "https://github.com/The-Nexus-Guard/aip",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-aip-mcp-server-0-1-1",
+      "tool_count": 0,
+      "version": "0.1.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Model Context Protocol server for the Agent Identity Registry (AIR)",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "air-mcp-server",
+      "repository_url": "https://github.com/AgentIdentityRegistry/air-site",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-air-mcp-server-0-1-0",
+      "tool_count": 0,
+      "version": "0.1.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "An MCP server for Airbook.",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "airbook-mcp-server",
+      "repository_url": "https://github.com/pypa/sampleproject",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-airbook-mcp-server-0-0-1",
+      "tool_count": 0,
+      "version": "0.0.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP Server for Airflow",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "airflow-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-airflow-mcp-server-0-9-1",
+      "tool_count": 0,
+      "version": "0.9.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for AITasker — lets AI agents create tasks, review bids, and manage deliveries",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "aitasker-mcp-server",
+      "repository_url": "https://github.com/bleshinsky/aitasker-app/tree/master/backend/mcp_server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-aitasker-mcp-server-0-1-1",
+      "tool_count": 0,
+      "version": "0.1.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP server for AKShare financial data",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "akshare-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-akshare-mcp-server-0-1-1",
+      "tool_count": 0,
+      "version": "0.1.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP Server for Prometheus Alertmanager integration",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "alertmanager-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-alertmanager-mcp-server-1-3-1",
+      "tool_count": 0,
+      "version": "1.3.1"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "AlgoChains MCP Server — 533 tools for live algo trading: Tradovate/Alpaca/OANDA, Databento/Polygon data, Onyx RAG, Graphiti KG, AlphaLoop, HMM regimes, autonomous marketplace pipeline, Kalshi, physical-world event intelligence, real data only.",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "algochains-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-algochains-mcp-server-22-7-3",
+      "tool_count": 0,
+      "version": "22.7.3"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Algogene MCP Server - A Python package for MCP server functionality",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "algogene-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-algogene-mcp-server-0-1-8",
+      "tool_count": 0,
+      "version": "0.1.8"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "The application management MCP server for Alibaba Cloud",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "alibaba-cloud-application-management-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-alibaba-cloud-application-management-mcp-server-1-0-4",
+      "tool_count": 0,
+      "version": "1.0.4"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "A MCP server for Alibaba Cloud",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "alibaba-cloud-ops-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-alibaba-cloud-ops-mcp-server-0-9-27",
+      "tool_count": 0,
+      "version": "0.9.27"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "AlibabaCloud Container Service MCP Server (ack-mcp-server)",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "timeout",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "alibabacloud-ack-mcp-server",
+      "repository_url": "https://github.com/aliyun/alibabacloud-ack-mcp-server",
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-alibabacloud-ack-mcp-server-1-0-2",
+      "tool_count": 0,
+      "version": "1.0.2"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "Alibaba Cloud AgentLoop Memory MCP Server - MCP Server for cloud-hosted memory management",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "alibabacloud-agentloop-memory-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-alibabacloud-agentloop-memory-mcp-server-0-2-0",
+      "tool_count": 0,
+      "version": "0.2.0"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP Server for AlibabaCloud DMS",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "alibabacloud-dms-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-alibabacloud-dms-mcp-server-0-1-23",
+      "tool_count": 0,
+      "version": "0.1.23"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "MCP Server for AlibabaCloud DTS",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "alibabacloud-dts-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-alibabacloud-dts-mcp-server-0-1-4",
+      "tool_count": 0,
+      "version": "0.1.4"
+    },
+    {
+      "analysis_status": "not_analyzed",
+      "description": "IMS Editing MCP Server",
+      "ecosystem": "pypi",
+      "finding_count": 0,
+      "harvest_status": "startup_error",
+      "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+      "package": "alibabacloud-ims-editing-mcp-server",
+      "repository_url": null,
+      "rule_ids": [],
+      "severity_counts": {},
+      "slug": "pypi-alibabacloud-ims-editing-mcp-server-0-0-3",
+      "tool_count": 0,
+      "version": "0.0.3"
+    }
+  ],
+  "triage": {
+    "false_positive_detector_bug": 0,
+    "false_positive_detector_bug_targets": [],
+    "manifest_error": 0,
+    "manifest_error_targets": [],
+    "pending": 3,
+    "pending_targets": [
+      "npm-godot-mcp-server-0-6-1",
+      "npm-loopctl-mcp-server-3-47-0",
+      "pypi-aimemory-mcp-server-1-7-0"
+    ],
+    "status": "pending_hand_review",
+    "true_positive_exploitable": 0,
+    "true_positive_exploitable_targets": [],
+    "true_positive_informational": 0,
+    "true_positive_informational_targets": []
+  }
+}

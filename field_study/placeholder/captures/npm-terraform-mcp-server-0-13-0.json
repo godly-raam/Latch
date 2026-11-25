@@ -1,0 +1,252 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for Terraform Registry operations",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "terraform-mcp-server@0.13.0"
+  ],
+  "manifest_sha256": "391932f324d900ec7f5ba0412d3def1552b141b3f10194f2f560c57a2c01e66f",
+  "package": "terraform-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": null,
+  "slug": "npm-terraform-mcp-server-0-13-0",
+  "stderr_summary": "npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn deprecated glob@11.1.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\n🚀 Starting terraform-registry-mcp MCP server v0.13.0...\n✅ Server connected and ready for requests via stdio",
+  "tool_count": 10,
+  "tools": [
+    {
+      "description": "Get detailed information about a Terraform provider by name and optionally version.",
+      "inputSchema": {
+        "properties": {
+          "namespace": {
+            "description": "Provider namespace (e.g. 'hashicorp')",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider name (e.g. 'aws')",
+            "type": "string"
+          },
+          "version": {
+            "description": "Provider version (defaults to latest)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "providerDetails"
+    },
+    {
+      "description": "Get an example usage of a Terraform resource and related resources.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "description": "Alternative resource name field (fallback if resource not specified)",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider name (e.g. 'aws')",
+            "type": "string"
+          },
+          "resource": {
+            "description": "Resource name (e.g. 'aws_instance')",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "resourceUsage"
+    },
+    {
+      "description": "Search for and recommend Terraform modules based on a query.",
+      "inputSchema": {
+        "properties": {
+          "keyword": {
+            "description": "Alternative search keyword (fallback if query not specified)",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Filter modules by provider (e.g. 'aws')",
+            "type": "string"
+          },
+          "query": {
+            "description": "Search query (e.g. 'vpc')",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "moduleSearch"
+    },
+    {
+      "description": "List all available data sources for a provider and their basic details.",
+      "inputSchema": {
+        "properties": {
+          "namespace": {
+            "description": "Provider namespace (e.g. 'hashicorp')",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider name (e.g. 'aws')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "namespace"
+        ],
+        "type": "object"
+      },
+      "name": "listDataSources"
+    },
+    {
+      "description": "Fetches comprehensive details about a specific resource type's arguments, including required and optional attributes, nested blocks, and their descriptions.",
+      "inputSchema": {
+        "properties": {
+          "namespace": {
+            "description": "Provider namespace (e.g. 'hashicorp')",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider name (e.g. 'aws')",
+            "type": "string"
+          },
+          "resource": {
+            "description": "Resource name (e.g. 'aws_instance')",
+            "type": "string"
+          },
+          "version": {
+            "description": "Provider version (defaults to latest)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "namespace",
+          "resource"
+        ],
+        "type": "object"
+      },
+      "name": "resourceArgumentDetails"
+    },
+    {
+      "description": "Retrieves detailed metadata for a Terraform module including versions, inputs, outputs, and dependencies.",
+      "inputSchema": {
+        "properties": {
+          "module": {
+            "description": "Module name (e.g. 'vpc')",
+            "type": "string"
+          },
+          "namespace": {
+            "description": "Module namespace (e.g. 'terraform-aws-modules')",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider name (e.g. 'aws')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "namespace",
+          "module",
+          "provider"
+        ],
+        "type": "object"
+      },
+      "name": "moduleDetails"
+    },
+    {
+      "description": "Get details about a Terraform provider function.",
+      "inputSchema": {
+        "properties": {
+          "function": {
+            "description": "Function name (e.g. 'arn_parse')",
+            "type": "string"
+          },
+          "namespace": {
+            "description": "Provider namespace (e.g. 'hashicorp')",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider name (e.g. 'aws')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "function"
+        ],
+        "type": "object"
+      },
+      "name": "functionDetails"
+    },
+    {
+      "description": "List and view provider-specific guides, including version upgrades and feature guides.",
+      "inputSchema": {
+        "properties": {
+          "guide": {
+            "description": "Specific guide to fetch (by slug or title)",
+            "type": "string"
+          },
+          "namespace": {
+            "description": "Provider namespace (e.g. 'hashicorp')",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider name (e.g. 'aws')",
+            "type": "string"
+          },
+          "search": {
+            "description": "Search term to filter guides",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider"
+        ],
+        "type": "object"
+      },
+      "name": "providerGuides"
+    },
+    {
+      "description": "Search for policy libraries in the Terraform Registry.",
+      "inputSchema": {
+        "properties": {
+          "provider": {
+            "description": "Filter policies by provider (e.g. 'aws')",
+            "type": "string"
+          },
+          "query": {
+            "description": "Search query for finding policy libraries",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "policySearch"
+    },
+    {
+      "description": "Get detailed information about a specific policy library including its latest version.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "description": "Policy library name (e.g. 'vault-aws-secret-type')",
+            "type": "string"
+          },
+          "namespace": {
+            "description": "Policy library namespace (e.g. 'Great-Stone')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "namespace",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "policyDetails"
+    }
+  ],
+  "version": "0.13.0"
+}

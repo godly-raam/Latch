@@ -1,0 +1,26 @@
+{
+  "discovered_count": 100,
+  "excluded_name_count": 211,
+  "exclusion_sources": [
+    {
+      "kind": "package_eval_pins",
+      "package_count": 11,
+      "path": "package_eval/captured_manifests",
+      "sha256": "80ad9b9bac0022a2b95dbe417b6a5fef7bbe62a4aae910ea964c7f18353f1e45"
+    },
+    {
+      "kind": "exclude_targets",
+      "package_count": 100,
+      "path": "field_study/round1/targets.json",
+      "sha256": "f58d630a02879547861914711418a8de14f1859418d43eda71fe8fea0e8fc739"
+    },
+    {
+      "kind": "exclude_targets",
+      "package_count": 100,
+      "path": "field_study/holdout/targets.json",
+      "sha256": "bc02ab7ec055a2a2cfa5446d400cd3865fe75dbf529685e771d109c175a59e84"
+    }
+  ],
+  "output": "field_study/placeholder/targets.json",
+  "overlap_with_exclusions": []
+}

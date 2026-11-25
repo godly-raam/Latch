@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP-Server for agriculture data — soil conditions, crop weather, global statistics, food products",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agriculture-mcp-server==0.1.2"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agriculture-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agriculture-mcp-server",
+  "slug": "pypi-agriculture-mcp-server-0-1-2",
+  "stderr_summary": "Installed 40 packages in 17ms\nAn executable named `agriculture-mcp-server` is not provided by package `agriculture-mcp-server`.\nThe following executables are available:\n- agriculture-server\n\nUse `uvx --from agriculture-mcp-server agriculture-server` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.2"
+}

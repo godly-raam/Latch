@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP Server for ai.market - Search, evaluate, and purchase datasets",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "aimarket-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "aimarket-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-aimarket-mcp-server-0-1-0",
+  "stderr_summary": "Installed 33 packages in 11ms\nAn executable named `aimarket-mcp-server` is not provided by package `aimarket-mcp-server`.\nThe following executables are available:\n- aimarket-mcp\n\nUse `uvx --from aimarket-mcp-server aimarket-mcp` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

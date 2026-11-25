@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Alibaba Cloud AgentLoop Memory MCP Server - MCP Server for cloud-hosted memory management",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "alibabacloud-agentloop-memory-mcp-server==0.2.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "alibabacloud-agentloop-memory-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-alibabacloud-agentloop-memory-mcp-server-0-2-0",
+  "stderr_summary": "~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<scratch>/uv-cache/archive-v0/dTL90_tqLxDte_o0/lib/python3.13/site-packages/click/core.py\", line 911, in invoke\n    return callback(*args, **kwargs)\n  File \"<scratch>/uv-cache/archive-v0/dTL90_tqLxDte_o0/lib/python3.13/site-packages/mcp_server_agentloop_memory/__init__.py\", line 85, in main\n    from mcp_server_agentloop_memory.server import run_server\n  File \"<scratch>/uv-cache/archive-v0/dTL90_tqLxDte_o0/lib/python3.13/site-packages/mcp_server_agentloop_memory/server.py\", line 20, in <module>\n    from mcp.server.fastmcp import FastMCP\n  File \"<scratch>/uv-cache/archive-v0/dTL90_tqLxDte_o0/lib/python3.13/site-packages/mcp/server/fastmcp.py\", line 16, in <module>\n    raise ModuleNotFoundError(_MESSAGE, name=__name__)\nModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp<2' to keep running v1 code.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.2.0"
+}

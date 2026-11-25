@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Windows x64 runtime for @sbroenne/mcp-server-excel, the Microsoft Excel automation MCP server. Requires desktop Excel.",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@sbroenne/mcp-server-excel-win32-x64@2.6.13"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@sbroenne/mcp-server-excel-win32-x64",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/sbroenne/mcp-server-excel",
+  "slug": "npm-sbroenne-mcp-server-excel-win32-x64-2-6-13",
+  "stderr_summary": "npm error could not determine executable to run\nnpm error A complete log of this run can be found in: <scratch>/npm-cache/_logs/2026-11-25T20_48_59_143Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.6.13"
+}

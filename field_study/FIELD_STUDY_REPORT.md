@@ -1,11 +1,11 @@
 # Field study: unseen npm & PyPI MCP servers
 
-**Status: harvest + offline static scan, hand-triaged in Week 2 and
-re-analyzed after the detector fix.** Every number below comes from
+**Status: harvest + offline static scan, hand-triaged in Week 2 and re-analyzed after the detector fix.**
+Every number below comes from
 `field_study/run_field_study.py --analyze` over recorded `tools/list`
 captures; no package was executed during analysis. There are no
-independent ground-truth labels: each verdict is a self-assigned hand
-triage whose criteria are stated in the worksheet below.
+independent ground-truth labels: any verdict below is a self-assigned
+hand triage whose criteria are stated in the worksheet.
 
 - Detector fingerprint: `d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4`
 - Captured targets: **100**
@@ -22,9 +22,9 @@ triage whose criteria are stated in the worksheet below.
 | `timeout` | 21 | Exceeded the per-package timeout. |
 | `startup_error` | 35 | Install or startup failed for another reason. |
 
-A high `missing_required_env` share is expected and is not a defect: most
-hosted-service MCP servers cannot list tools without `GITHUB_TOKEN`-class
-credentials. The study never supplies them.
+A high `missing_required_env` share is expected and is not a
+defect: most hosted-service MCP servers cannot list tools without
+`GITHUB_TOKEN`-class credentials. The study never supplies them.
 
 ## Detector hardening (Week 2 hand triage → fix)
 
@@ -109,6 +109,14 @@ three kits taken from the pinned `package_eval` captures
 surface behind `CASE-01` is excluded — no capability analysis can run on
 it.
 
+**Unvalidated stress test on arbitrary server pairs — not findings.**
+Nothing below was drawn from a real deployment: the grid is every pair of
+harvested surfaces plus three first-party kits, so the counts are upper
+bounds on what the frozen rules emit on that grid, not a prevalence
+estimate.
+A fixed-seed hand triage of a sample follows and finds that most
+flags do not survive contact with the pair.
+
 Anchors: `npm-server-filesystem`, `npm-server-github-2025-4-8`, `npm-server-memory`, `npm-server-slack-2025-4-25`, `pypi-mcp-server-fetch`, `pypi-mcp-server-git`.
 
 | Metric | Value |
@@ -124,6 +132,54 @@ Anchors: `npm-server-filesystem`, `npm-server-github-2025-4-8`, `npm-server-memo
 | `CROSS_TOOL_HIJACK` | 53 |
 | `EXACT_TOOL_SHADOW` | 4 |
 | `LETHAL_TRIFECTA` | 91 |
+
+### Hand triage of the sweep
+
+20 of the 136 flagged compositions were drawn with `random.Random(20261125)` over the sorted composition ids and read individually
+(`python -m field_study.triage_compositions`). Verdicts: **4 real, 2 plausible, 14 artifact**. The remaining 116 are untriaged.
+
+| Composition | Verdict | Evidence |
+| ----------- | ------- | -------- |
+| `npm-bitwarden-mcp-server-2026-7-0+npm-doitintl-doit-mcp-server-5-1-0` | `real` | `create_folder` is genuinely mounted by both servers; the 53 hijacks are prose matches on `delete`/`status` and the 78 paths treat a vault read as untrusted ingest. |
+| `npm-bitwarden-mcp-server-2026-7-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0` | `artifact` | `generate` is matched inside sequential-thinking prose; no tool routes to another server. |
+| `npm-bitwarden-mcp-server-2026-7-0+npm-sap-ux-fiori-mcp-server-1-17-0` | `artifact` | `generate` is matched inside SAP build instructions; prose, not routing. |
+| `npm-bitwarden-mcp-server-2026-7-0+npm-tsmztech-mcp-server-salesforce-0-0-8` | `artifact` | `status` is matched inside Salesforce prose; prose, not routing. |
+| `npm-chelaile-mcp-server-1-1-0+npm-chrome-devtools-mcp-1-13-0` | `artifact` | public transit search is not attacker-controlled input, and the other paths are chrome-devtools alone. |
+| `npm-chrome-devtools-mcp-1-13-0+npm-ericthered926-duckduckgo-mcp-server-0-6-0` | `real` | search snippets are attacker-influenced, chrome reads network traffic, and `navigate_page` accepts any URL. |
+| `npm-chrome-devtools-mcp-1-13-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0` | `artifact` | all four paths are inside chrome-devtools; the partner adds no leg. |
+| `npm-chrome-devtools-mcp-1-13-0+pypi-a2a-mcp-server-0-1-5` | `artifact` | all four paths are inside chrome-devtools; the partner adds no leg. |
+| `npm-chrome-devtools-mcp-1-13-0+pypi-acp-mcp-server-0-0-5` | `artifact` | all four paths are inside chrome-devtools; the partner adds no leg. |
+| `npm-doitintl-doit-mcp-server-5-1-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0` | `artifact` | all 66 paths are inside doit; the partner adds no leg. |
+| `npm-doitintl-doit-mcp-server-5-1-0+npm-mui-mcp-0-1-10` | `artifact` | all 66 paths are inside doit; the partner adds no leg. |
+| `npm-doitintl-doit-mcp-server-5-1-0+npm-server-filesystem+pypi-mcp-server-git` | `real` | third-party ticket and diagram text, local file reads, then alert email and Slack recipients. |
+| `npm-doitintl-doit-mcp-server-5-1-0+npm-touchdesigner-mcp-server-2-2-0` | `real` | ticket text, TouchDesigner node reads, then alert recipients. |
+| `npm-doitintl-doit-mcp-server-5-1-0+pypi-acp-mcp-server-0-0-5` | `artifact` | cross-server paths are 0; every path is inside doit. |
+| `npm-ericthered926-duckduckgo-mcp-server-0-6-0+npm-hostinger-api-mcp-4-20-0` | `artifact` | `search` is matched inside hostinger prose; no routing. |
+| `npm-ericthered926-duckduckgo-mcp-server-0-6-0+npm-hostinger-mcp-4-20-0` | `artifact` | `search` is matched inside hostinger prose; no routing. |
+| `npm-hostinger-mcp-4-20-0+npm-server-filesystem+pypi-mcp-server-fetch` | `artifact` | `search` is matched inside hostinger prose; filesystem and fetch add no hijack. |
+| `npm-meshy-ai-meshy-mcp-server-0-6-12+pypi-mcp-server-fetch+npm-server-github-2025-4-8` | `artifact` | the ingest leg is a caller-supplied Meshy model analysis, and the egress repository is fixed. |
+| `npm-next-devtools-mcp-0-4-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8` | `plausible` | fetch, then a private repository read, then an issue or PR is a real chain; the destination repository is fixed, not caller-chosen. |
+| `npm-upstash-context7-mcp-4-7-3+pypi-mcp-server-fetch+npm-server-github-2025-4-8` | `plausible` | fetch, then a private repository read, then an issue or PR is a real chain; the destination repository is fixed, not caller-chosen. |
+
+The artifacts come from three mechanisms, each visible in the
+notes above:
+
+1. **A leg the detector misclassified.** `create_pull_request` is
+   read as untrusted input, a local `read_file`/`search_files` as
+   ingest, and a fixed product API as an egress. A path built from
+   one of those is not a chain, whatever its shape.
+2. **A single-server chain the partner does not touch.** Several
+   sampled compositions flag only because one mounted server has an
+   inherent trifecta of its own; the second server adds no leg, so
+   the flag is a property of the harness, not of the pair.
+3. **Prose matched against a generic tool name.** `search`,
+   `status`, `delete`, `generate`, `browser` and `fetch` occur in
+   ordinary descriptions, and `CROSS_TOOL_HIJACK` then claims
+   routing that the text does not contain.
+
+No detector was changed for this triage: the sweep is labelled,
+not fixed, so the frozen fingerprint above still covers it and the
+remaining compositions stay untriaged.
 
 Largest and quietest compositions in the sweep:
 
@@ -337,8 +393,9 @@ Triage protocol:
   ecosystem; prevalence claims are out of scope.
 - Capture is `tools/list` only. Handler-level bugs (path traversal,
   injection) are invisible to a manifest auditor and are not scored.
-- Packages needing credentials never list tools here, so the analyzed
-  subset is biased toward servers that start without secrets.
+- Packages needing credentials never list tools here, so the
+  analyzed subset is biased toward servers that start without
+  secrets.
 - No independent second rater: every label in Week 2 is self-assigned.
 - Detectors were frozen for the duration of the harvest. Week-2 triage
   then changed them; the pre-fix and post-fix fingerprints in the

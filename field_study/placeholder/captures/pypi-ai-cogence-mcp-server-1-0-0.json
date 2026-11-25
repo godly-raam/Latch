@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP (Model Context Protocol) Server for AI Cogence RAG Backend",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "ai-cogence-mcp-server==1.0.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "ai-cogence-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/ai-cogence/mcp-server",
+  "slug": "pypi-ai-cogence-mcp-server-1-0-0",
+  "stderr_summary": "Downloading asyncpg (3.6MiB)\n Downloaded tiktoken\n Downloaded aiohttp\n Downloaded langchain-community\n Downloaded openai\n Downloaded asyncpg\n Downloaded psycopg-binary\n Downloaded uvloop\n Downloaded sqlalchemy\n Downloaded zstandard",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.0.0"
+}

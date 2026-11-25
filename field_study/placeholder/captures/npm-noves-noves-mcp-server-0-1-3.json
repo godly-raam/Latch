@@ -1,0 +1,245 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server that wraps Noves Intent service for natural language blockchain data",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@noves/noves-mcp-server@0.1.3"
+  ],
+  "manifest_sha256": "8c40a73d3f8faf4d6aa9c06a71055bc2eaf8099a94badece45d1f8d66dbee158",
+  "package": "@noves/noves-mcp-server",
+  "protocol_version": "2024-11-05",
+  "repository_url": null,
+  "slug": "npm-noves-noves-mcp-server-0-1-3",
+  "stderr_summary": "'getHistoricalTokenPrices',\n  'getChainNewTxs',\n  'getTokenPrice',\n  'getTokensBalances'\n]\n🔧 Has getTokenPrice method: function\n✅ getTokenPrice method exists on provider\n🚀 Initializing Noves MCP server...\n📡 Creating transport...\n✅ Noves MCP server running on stdio",
+  "tool_count": 9,
+  "tools": [
+    {
+      "description": "Get recent transactions for a wallet address with natural language descriptions",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network (e.g., ethereum, polygon, arbitrum, bsc)",
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Number of transactions to return (default: 10)",
+            "type": "number"
+          },
+          "walletAddress": {
+            "description": "Wallet address to analyze",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "walletAddress"
+        ],
+        "type": "object"
+      },
+      "name": "get_recent_transactions"
+    },
+    {
+      "description": "Get detailed analysis of a specific transaction with natural language description",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network",
+            "type": "string"
+          },
+          "transactionHash": {
+            "description": "Transaction hash to analyze",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "transactionHash"
+        ],
+        "type": "object"
+      },
+      "name": "get_transaction_details"
+    },
+    {
+      "description": "Get human-readable description of a specific transaction using Noves translation",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network",
+            "type": "string"
+          },
+          "transactionHash": {
+            "description": "Transaction hash to get human-readable description",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "transactionHash"
+        ],
+        "type": "object"
+      },
+      "name": "get_translated_transaction"
+    },
+    {
+      "description": "Get detailed transfer information from recent transactions (focus on token movements)",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network",
+            "type": "string"
+          },
+          "limit": {
+            "default": 5,
+            "description": "Number of transactions to return (default: 5)",
+            "type": "number"
+          },
+          "walletAddress": {
+            "description": "Wallet address to analyze",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "walletAddress"
+        ],
+        "type": "object"
+      },
+      "name": "get_transaction_transfers"
+    },
+    {
+      "description": "Get a comprehensive summary of wallet activity with key insights",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network",
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Number of recent transactions to include in summary (default: 10)",
+            "type": "number"
+          },
+          "walletAddress": {
+            "description": "Wallet address to analyze",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "walletAddress"
+        ],
+        "type": "object"
+      },
+      "name": "get_wallet_summary"
+    },
+    {
+      "description": "Analyze wallet activity and provide insights with natural language summaries",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network",
+            "type": "string"
+          },
+          "timeframe": {
+            "default": "30d",
+            "description": "Time period to analyze (e.g., \"7d\", \"30d\", \"1y\")",
+            "type": "string"
+          },
+          "walletAddress": {
+            "description": "Wallet address to analyze",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "walletAddress"
+        ],
+        "type": "object"
+      },
+      "name": "analyze_wallet"
+    },
+    {
+      "description": "Get current price of a token on a specific blockchain",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network (e.g., ethereum, polygon, arbitrum)",
+            "type": "string"
+          },
+          "tokenAddress": {
+            "description": "Token contract address",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "tokenAddress"
+        ],
+        "type": "object"
+      },
+      "name": "get_current_token_price"
+    },
+    {
+      "description": "Get historical price of a token at a specific timestamp",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network (e.g., ethereum, polygon, arbitrum)",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "Unix timestamp for historical price",
+            "type": "string"
+          },
+          "tokenAddress": {
+            "description": "Token contract address",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "tokenAddress",
+          "timestamp"
+        ],
+        "type": "object"
+      },
+      "name": "get_historical_token_price"
+    },
+    {
+      "description": "Compare token price between two timestamps to show price change",
+      "inputSchema": {
+        "properties": {
+          "chain": {
+            "description": "Blockchain network (e.g., ethereum, polygon, arbitrum)",
+            "type": "string"
+          },
+          "fromTimestamp": {
+            "description": "Start Unix timestamp for comparison",
+            "type": "string"
+          },
+          "toTimestamp": {
+            "default": "1795639722",
+            "description": "End Unix timestamp for comparison (default: current time)",
+            "type": "string"
+          },
+          "tokenAddress": {
+            "description": "Token contract address",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "tokenAddress",
+          "fromTimestamp"
+        ],
+        "type": "object"
+      },
+      "name": "get_token_price_comparison"
+    }
+  ],
+  "version": "0.1.3"
+}

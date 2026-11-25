@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "A command line tool for setting up Shopify Dev MCP server",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@shopify/dev-mcp@1.19.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@shopify/dev-mcp",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-shopify-dev-mcp-1-19-0",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.19.0"
+}

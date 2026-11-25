@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP Server for Airflow",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "airflow-mcp-server==0.9.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "airflow-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-airflow-mcp-server-0-9-1",
+  "stderr_summary": "Installed 37 packages in 14ms\nConfiguration error: Missing required configuration: base_url",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.9.1"
+}

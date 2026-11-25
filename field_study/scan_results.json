@@ -72,7 +72,123 @@
       "CROSS_TOOL_HIJACK": 53,
       "EXACT_TOOL_SHADOW": 4,
       "LETHAL_TRIFECTA": 91
+    },
+    "triage": {
+      "counts": {
+        "artifact": 14,
+        "plausible": 2,
+        "real": 4
+      },
+      "sample_size": 20,
+      "sampled": [
+        {
+          "composition_id": "npm-bitwarden-mcp-server-2026-7-0+npm-doitintl-doit-mcp-server-5-1-0",
+          "note": "`create_folder` is genuinely mounted by both servers; the 53 hijacks are prose matches on `delete`/`status` and the 78 paths treat a vault read as untrusted ingest.",
+          "verdict": "real"
+        },
+        {
+          "composition_id": "npm-bitwarden-mcp-server-2026-7-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0",
+          "note": "`generate` is matched inside sequential-thinking prose; no tool routes to another server.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-bitwarden-mcp-server-2026-7-0+npm-sap-ux-fiori-mcp-server-1-17-0",
+          "note": "`generate` is matched inside SAP build instructions; prose, not routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-bitwarden-mcp-server-2026-7-0+npm-tsmztech-mcp-server-salesforce-0-0-8",
+          "note": "`status` is matched inside Salesforce prose; prose, not routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-chelaile-mcp-server-1-1-0+npm-chrome-devtools-mcp-1-13-0",
+          "note": "public transit search is not attacker-controlled input, and the other paths are chrome-devtools alone.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-chrome-devtools-mcp-1-13-0+npm-ericthered926-duckduckgo-mcp-server-0-6-0",
+          "note": "search snippets are attacker-influenced, chrome reads network traffic, and `navigate_page` accepts any URL.",
+          "verdict": "real"
+        },
+        {
+          "composition_id": "npm-chrome-devtools-mcp-1-13-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0",
+          "note": "all four paths are inside chrome-devtools; the partner adds no leg.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-chrome-devtools-mcp-1-13-0+pypi-a2a-mcp-server-0-1-5",
+          "note": "all four paths are inside chrome-devtools; the partner adds no leg.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-chrome-devtools-mcp-1-13-0+pypi-acp-mcp-server-0-0-5",
+          "note": "all four paths are inside chrome-devtools; the partner adds no leg.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-doitintl-doit-mcp-server-5-1-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0",
+          "note": "all 66 paths are inside doit; the partner adds no leg.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-doitintl-doit-mcp-server-5-1-0+npm-mui-mcp-0-1-10",
+          "note": "all 66 paths are inside doit; the partner adds no leg.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-doitintl-doit-mcp-server-5-1-0+npm-server-filesystem+pypi-mcp-server-git",
+          "note": "third-party ticket and diagram text, local file reads, then alert email and Slack recipients.",
+          "verdict": "real"
+        },
+        {
+          "composition_id": "npm-doitintl-doit-mcp-server-5-1-0+npm-touchdesigner-mcp-server-2-2-0",
+          "note": "ticket text, TouchDesigner node reads, then alert recipients.",
+          "verdict": "real"
+        },
+        {
+          "composition_id": "npm-doitintl-doit-mcp-server-5-1-0+pypi-acp-mcp-server-0-0-5",
+          "note": "cross-server paths are 0; every path is inside doit.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-ericthered926-duckduckgo-mcp-server-0-6-0+npm-hostinger-api-mcp-4-20-0",
+          "note": "`search` is matched inside hostinger prose; no routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-ericthered926-duckduckgo-mcp-server-0-6-0+npm-hostinger-mcp-4-20-0",
+          "note": "`search` is matched inside hostinger prose; no routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-hostinger-mcp-4-20-0+npm-server-filesystem+pypi-mcp-server-fetch",
+          "note": "`search` is matched inside hostinger prose; filesystem and fetch add no hijack.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-meshy-ai-meshy-mcp-server-0-6-12+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "the ingest leg is a caller-supplied Meshy model analysis, and the egress repository is fixed.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-next-devtools-mcp-0-4-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "fetch, then a private repository read, then an issue or PR is a real chain; the destination repository is fixed, not caller-chosen.",
+          "verdict": "plausible"
+        },
+        {
+          "composition_id": "npm-upstash-context7-mcp-4-7-3+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "fetch, then a private repository read, then an issue or PR is a real chain; the destination repository is fixed, not caller-chosen.",
+          "verdict": "plausible"
+        }
+      ],
+      "seed": 20261125,
+      "untriaged": 116
     }
+  },
+  "credential_modes": {
+    "none": 100,
+    "placeholder": 0
   },
   "detector_fingerprint_sha256": "d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4",
   "engine_counts": {

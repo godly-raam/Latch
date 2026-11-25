@@ -1,0 +1,261 @@
+{
+  "credential_mode": "placeholder",
+  "description": "A Bugsnag MCP server for interacting with Bugsnag API",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "bugsnag-mcp-server@1.1.0"
+  ],
+  "manifest_sha256": "3118661276f8e05c6956ce3b26377c1755d75c005b26a8437cfaff5007a1eef6",
+  "package": "bugsnag-mcp-server",
+  "protocol_version": "2024-11-05",
+  "repository_url": "https://github.com/yourusername/bugsnag-mcp",
+  "slug": "npm-bugsnag-mcp-server-1-1-0",
+  "stderr_summary": "Bugsnag MCP server running",
+  "tool_count": 11,
+  "tools": [
+    {
+      "description": "List available Bugsnag organizations",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_organizations"
+    },
+    {
+      "description": "List projects in an organization",
+      "inputSchema": {
+        "properties": {
+          "organization_id": {
+            "description": "Bugsnag organization ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_projects"
+    },
+    {
+      "description": "List errors in a project with filtering options",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Maximum number of errors to return",
+            "type": "number"
+          },
+          "project_id": {
+            "description": "Bugsnag project ID",
+            "type": "string"
+          },
+          "sort": {
+            "description": "Sort order for errors",
+            "enum": [
+              "newest",
+              "oldest",
+              "priority"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Filter by error status",
+            "enum": [
+              "open",
+              "fixed",
+              "ignored"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_errors"
+    },
+    {
+      "description": "Get detailed information about a specific error",
+      "inputSchema": {
+        "properties": {
+          "error_id": {
+            "description": "Bugsnag error ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "error_id"
+        ],
+        "type": "object"
+      },
+      "name": "view_error"
+    },
+    {
+      "description": "List events (occurrences) for a specific error",
+      "inputSchema": {
+        "properties": {
+          "error_id": {
+            "description": "Bugsnag error ID",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of events to return",
+            "type": "number"
+          },
+          "project_id": {
+            "description": "Bugsnag project ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "error_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_error_events"
+    },
+    {
+      "description": "View the latest event for an error",
+      "inputSchema": {
+        "properties": {
+          "error_id": {
+            "description": "Bugsnag error ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "error_id"
+        ],
+        "type": "object"
+      },
+      "name": "view_latest_event"
+    },
+    {
+      "description": "View detailed information about a specific event",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Bugsnag event ID",
+            "type": "string"
+          },
+          "project_id": {
+            "description": "Bugsnag project ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "view_event"
+    },
+    {
+      "description": "Extract and format stacktrace information from an event",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Bugsnag event ID",
+            "type": "string"
+          },
+          "include_code": {
+            "description": "Include source code context if available",
+            "type": "boolean"
+          },
+          "project_id": {
+            "description": "Bugsnag project ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "view_stacktrace"
+    },
+    {
+      "description": "View the full chain of exceptions for an event",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Bugsnag event ID",
+            "type": "string"
+          },
+          "project_id": {
+            "description": "Bugsnag project ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "view_exception_chain"
+    },
+    {
+      "description": "Search for issues using various criteria",
+      "inputSchema": {
+        "properties": {
+          "app_version": {
+            "description": "Filter by app version",
+            "type": "string"
+          },
+          "error_class": {
+            "description": "Filter by error class",
+            "type": "string"
+          },
+          "project_id": {
+            "description": "Bugsnag project ID",
+            "type": "string"
+          },
+          "query": {
+            "description": "Search query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "type": "object"
+      },
+      "name": "search_issues"
+    },
+    {
+      "description": "View all event data tabs including app, device, user, request, breadcrumbs, metadata, and stacktrace",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Bugsnag event ID",
+            "type": "string"
+          },
+          "include_code": {
+            "description": "Include source code context in stacktrace if available",
+            "type": "boolean"
+          },
+          "project_id": {
+            "description": "Bugsnag project ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "view_tabs"
+    }
+  ],
+  "version": "1.1.0"
+}

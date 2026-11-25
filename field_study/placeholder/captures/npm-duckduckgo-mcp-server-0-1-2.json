@@ -1,0 +1,55 @@
+{
+  "credential_mode": "placeholder",
+  "description": "A TypeScript-based MCP server that provides DuckDuckGo search functionality.",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "duckduckgo-mcp-server@0.1.2"
+  ],
+  "manifest_sha256": "8f5947ecf79762d3d34a0fb09f1eec041c05c7241b13a49e6a24c5afc65b0023",
+  "package": "duckduckgo-mcp-server",
+  "protocol_version": "2024-11-05",
+  "repository_url": "https://github.com/zhsama/duckduckgo-mcp-server",
+  "slug": "npm-duckduckgo-mcp-server-0-1-2",
+  "stderr_summary": "npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\n[INFO] DuckDuckGo Search MCP Server running on stdio",
+  "tool_count": 1,
+  "tools": [
+    {
+      "description": "Performs a web search using the DuckDuckGo, ideal for general queries, news, articles, and online content. Use this for broad information gathering, recent events, or when you need diverse web sources. Supports content filtering and region-specific searches. Maximum 20 results per request.",
+      "inputSchema": {
+        "properties": {
+          "count": {
+            "default": 10,
+            "description": "Number of results (1-20, default 10)",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "number"
+          },
+          "query": {
+            "description": "Search query (max 400 chars)",
+            "maxLength": 400,
+            "type": "string"
+          },
+          "safeSearch": {
+            "default": "moderate",
+            "description": "SafeSearch level (strict, moderate, off)",
+            "enum": [
+              "strict",
+              "moderate",
+              "off"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "duckduckgo_web_search"
+    }
+  ],
+  "version": "0.1.2"
+}

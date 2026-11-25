@@ -1,0 +1,3481 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for using Alchemy APIs",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@alchemy/mcp-server@0.3.0"
+  ],
+  "manifest_sha256": "3c5ee962fbb19804a6e22d8c522b9a389642dcaa34e006a3be321a363a1a3483",
+  "package": "@alchemy/mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": "https://github.com/alchemyplatform/alchemy-mcp-server",
+  "slug": "npm-alchemy-mcp-server-0-3-0",
+  "stderr_summary": "Alchemy MCP Server is running on stdio",
+  "tool_count": 97,
+  "tools": [
+    {
+      "description": "List all blockchain networks supported by Alchemy, including EVM and Solana chains",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "listSupportedNetworks"
+    },
+    {
+      "description": "Get current USD prices for tokens by their ticker symbol (e.g. BTC, ETH)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "symbols": {
+            "description": "A list of blockchaintoken symbols to query. e.g. [\"BTC\", \"ETH\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "symbols"
+        ],
+        "type": "object"
+      },
+      "name": "fetchTokenPriceBySymbol"
+    },
+    {
+      "description": "Get current USD prices for tokens by their contract address and network",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "addresses": {
+            "description": "A list of token contract address and network pairs",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "The token contract address to query. e.g. \"0x1234567890123456789012345678901234567890\"",
+                  "type": "string"
+                },
+                "network": {
+                  "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "network"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "addresses"
+        ],
+        "type": "object"
+      },
+      "name": "fetchTokenPriceByAddress"
+    },
+    {
+      "description": "Get historical token price data over a date range with configurable interval",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "endTime": {
+            "description": "The end time date to query. e.g. \"2021-01-01\"",
+            "type": "string"
+          },
+          "interval": {
+            "description": "The interval to query. e.g. \"1d\" or \"1h\"",
+            "type": "string"
+          },
+          "startTime": {
+            "description": "The start time date to query. e.g. \"2021-01-01\"",
+            "type": "string"
+          },
+          "symbol": {
+            "description": "The token symbol to query. e.g. \"BTC\" or \"ETH\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "startTime",
+          "endTime",
+          "interval"
+        ],
+        "type": "object"
+      },
+      "name": "fetchTokenPriceHistoryBySymbol"
+    },
+    {
+      "description": "Get historical token prices using natural language time frames like \"last week\" or \"past 7 days\"",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "interval": {
+            "default": "1d",
+            "description": "The interval to query. e.g. \"1d\" or \"1h\"",
+            "type": "string"
+          },
+          "symbol": {
+            "description": "The token symbol to query. e.g. \"BTC\" or \"ETH\"",
+            "type": "string"
+          },
+          "timeFrame": {
+            "description": "Time frame like \"last-week\", \"past-7d\", \"ytd\", \"last-month\", etc. or use natural language like \"last week\"",
+            "type": "string"
+          },
+          "useNaturalLanguageProcessing": {
+            "default": false,
+            "description": "If true, will interpret timeFrame as natural language",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "symbol",
+          "timeFrame"
+        ],
+        "type": "object"
+      },
+      "name": "fetchTokenPriceHistoryByTimeFrame"
+    },
+    {
+      "description": "Get all ERC-20 tokens owned by wallet addresses across multiple chains",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "addresses": {
+            "description": "A list of wallet address and network pairs",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "The wallet address to query. e.g. \"0x1234567890123456789012345678901234567890\"",
+                  "type": "string"
+                },
+                "networks": {
+                  "description": "Network IDs. Call listSupportedNetworks for all options. e.g. [\"eth-mainnet\", \"base-mainnet\"]",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "address",
+                "networks"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "addresses"
+        ],
+        "type": "object"
+      },
+      "name": "fetchTokensOwnedByMultichainAddresses"
+    },
+    {
+      "description": "Get transaction history for wallet addresses across multiple chains, with human-readable dates and ETH values",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "addresses": {
+            "description": "A list of wallet address and network pairs",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "The wallet address to query. e.g. \"0x1234567890123456789012345678901234567890\"",
+                  "type": "string"
+                },
+                "networks": {
+                  "description": "Network IDs. Call listSupportedNetworks for all options. e.g. [\"eth-mainnet\", \"base-mainnet\"]",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "address",
+                "networks"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "after": {
+            "description": "The cursor that points to the next set of results. Use this to paginate through the results.",
+            "type": "string"
+          },
+          "before": {
+            "description": "The cursor that points to the previous set of results. Use this to paginate through the results.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "The number of results to return. Default is 25. Max is 100",
+            "type": "number"
+          }
+        },
+        "required": [
+          "addresses"
+        ],
+        "type": "object"
+      },
+      "name": "fetchAddressTransactionHistory"
+    },
+    {
+      "description": "Get token and ETH transfers filtered by address, block range, or contract",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "default": [
+              "external",
+              "erc20"
+            ],
+            "description": "The category of transfers to query. e.g. \"external\" or \"internal\"",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "contractAddresses": {
+            "default": [],
+            "description": "The contract addresses to query. e.g. [\"0x1234567890123456789012345678901234567890\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "excludeZeroValue": {
+            "default": true,
+            "description": "Whether to exclude zero value transfers.",
+            "type": "boolean"
+          },
+          "fromAddress": {
+            "description": "The wallet address to query the transfer was sent from.",
+            "type": "string"
+          },
+          "fromBlock": {
+            "default": "0x0",
+            "description": "The block number to start the search from. e.g. \"1234567890\". Inclusive from block (hex string, int, latest, or indexed).",
+            "type": "string"
+          },
+          "maxCount": {
+            "default": "0xA",
+            "description": "The maximum number of results to return. e.g. \"0x3E8\".",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "order": {
+            "default": "asc",
+            "description": "The order of the results. e.g. \"asc\" or \"desc\".",
+            "type": "string"
+          },
+          "pageKey": {
+            "description": "The cursor to start the search from. Use this to paginate through the results.",
+            "type": "string"
+          },
+          "toAddress": {
+            "description": "The wallet address to query the transfer was sent to.",
+            "type": "string"
+          },
+          "toBlock": {
+            "default": "latest",
+            "description": "The block number to end the search at. e.g. \"1234567890\". Inclusive to block (hex string, int, latest, or indexed).",
+            "type": "string"
+          },
+          "withMetadata": {
+            "default": false,
+            "description": "Whether to include metadata in the results.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "fetchTransfers"
+    },
+    {
+      "description": "Get NFTs owned by wallet addresses across multiple chains, with spam filtering",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "addresses": {
+            "description": "A list of wallet address and network pairs",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "The wallet address to query. e.g. \"0x1234567890123456789012345678901234567890\"",
+                  "type": "string"
+                },
+                "excludeFilters": {
+                  "default": [
+                    "SPAM",
+                    "AIRDROPS"
+                  ],
+                  "description": "The filters to exclude from the results. e.g. [\"SPAM\", \"AIRDROPS\"]",
+                  "items": {
+                    "enum": [
+                      "SPAM",
+                      "AIRDROPS"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "includeFilters": {
+                  "default": [],
+                  "description": "The filters to include in the results. e.g. [\"SPAM\", \"AIRDROPS\"]",
+                  "items": {
+                    "enum": [
+                      "SPAM",
+                      "AIRDROPS"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "networks": {
+                  "default": [
+                    "eth-mainnet"
+                  ],
+                  "description": "Network IDs. Call listSupportedNetworks for all options. e.g. [\"eth-mainnet\", \"base-mainnet\"]",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "spamConfidenceLevel": {
+                  "default": "VERY_HIGH",
+                  "description": "The spam confidence level to query. e.g. \"LOW\" or \"HIGH\"",
+                  "enum": [
+                    "LOW",
+                    "MEDIUM",
+                    "HIGH",
+                    "VERY_HIGH"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "pageKey": {
+            "description": "The cursor to start the search from. Use this to paginate through the results.",
+            "type": "string"
+          },
+          "pageSize": {
+            "default": 10,
+            "description": "The number of results to return. Default is 100. Max is 100",
+            "type": "number"
+          },
+          "withMetadata": {
+            "default": true,
+            "description": "Whether to include metadata in the results.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "addresses"
+        ],
+        "type": "object"
+      },
+      "name": "fetchNftsOwnedByMultichainAddresses"
+    },
+    {
+      "description": "Get NFT contract data for wallet addresses across multiple chains",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "addresses": {
+            "description": "A list of wallet address and network pairs",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "The wallet address to query. e.g. \"0x1234567890123456789012345678901234567890\"",
+                  "type": "string"
+                },
+                "networks": {
+                  "default": [
+                    "eth-mainnet"
+                  ],
+                  "description": "Network IDs. Call listSupportedNetworks for all options. e.g. [\"eth-mainnet\", \"base-mainnet\"]",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "address"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "withMetadata": {
+            "default": true,
+            "description": "Whether to include metadata in the results.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "addresses"
+        ],
+        "type": "object"
+      },
+      "name": "fetchNftContractDataByMultichainAddress"
+    },
+    {
+      "description": "Send a transaction from a smart contract account (SCA) via the Alchemy wallet API. Requires AGENT_WALLET_SERVER",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "callData": {
+            "description": "The data of the transaction.",
+            "type": "string"
+          },
+          "ownerScaAccountAddress": {
+            "description": "The owner SCA account address.",
+            "type": "string"
+          },
+          "signerAddress": {
+            "description": "The signer address to send the transaction from.",
+            "type": "string"
+          },
+          "toAddress": {
+            "description": "The address to send the transaction to.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value of the transaction in ETH.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ownerScaAccountAddress",
+          "signerAddress",
+          "toAddress"
+        ],
+        "type": "object"
+      },
+      "name": "sendTransaction"
+    },
+    {
+      "description": "Initiate a token swap from a smart contract account (SCA) via the Alchemy wallet API. Requires AGENT_WALLET_SERVER",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "ownerScaAccountAddress": {
+            "description": "The owner SCA account address.",
+            "type": "string"
+          },
+          "signerAddress": {
+            "description": "The signer address to send the transaction from.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ownerScaAccountAddress",
+          "signerAddress"
+        ],
+        "type": "object"
+      },
+      "name": "swap"
+    },
+    {
+      "description": "Get all NFTs owned by an address on a single network, with metadata and spam filtering options",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddresses": {
+            "description": "Array of contract addresses to filter the responses with. Max limit 45.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "excludeFilters": {
+            "description": "Filters to exclude. e.g. [\"SPAM\", \"AIRDROPS\"]",
+            "items": {
+              "enum": [
+                "SPAM",
+                "AIRDROPS"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "includeFilters": {
+            "description": "Filters to include. e.g. [\"SPAM\", \"AIRDROPS\"]",
+            "items": {
+              "enum": [
+                "SPAM",
+                "AIRDROPS"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "orderBy": {
+            "description": "Order for the results. Can be 'transferTime'.",
+            "type": "string"
+          },
+          "owner": {
+            "description": "Address for NFT owner (can be in ENS format for Eth Mainnet).",
+            "type": "string"
+          },
+          "pageKey": {
+            "description": "Pagination key from a previous response.",
+            "type": "string"
+          },
+          "pageSize": {
+            "description": "Number of NFTs to return per page. Max 100.",
+            "type": "number"
+          },
+          "spamConfidenceLevel": {
+            "description": "The spam confidence level to filter at.",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "VERY_HIGH"
+            ],
+            "type": "string"
+          },
+          "tokenUriTimeoutInMs": {
+            "description": "Timeout in ms for metadata URI resolution. Set to 0 for cache-only.",
+            "type": "number"
+          },
+          "withMetadata": {
+            "default": true,
+            "description": "If true, returns NFT metadata. Defaults to true.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "owner"
+        ],
+        "type": "object"
+      },
+      "name": "getNFTsForOwner"
+    },
+    {
+      "description": "Get all NFTs in a specific contract or collection with optional metadata",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address for the NFT collection.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of NFTs to return. Defaults to 100.",
+            "type": "number"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "startToken": {
+            "description": "Token ID offset for pagination.",
+            "type": "string"
+          },
+          "tokenUriTimeoutInMs": {
+            "description": "Timeout in ms for metadata URI resolution.",
+            "type": "number"
+          },
+          "withMetadata": {
+            "default": true,
+            "description": "If true, returns NFT metadata.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "contractAddress"
+        ],
+        "type": "object"
+      },
+      "name": "getNFTsForContract"
+    },
+    {
+      "description": "Get all NFTs in a collection by contract address or OpenSea slug",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "collectionSlug": {
+            "description": "OpenSea slug for the NFT collection.",
+            "type": "string"
+          },
+          "contractAddress": {
+            "description": "Contract address for the NFT collection.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of NFTs to return. Defaults to 100.",
+            "type": "number"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "startToken": {
+            "description": "Token ID offset for pagination.",
+            "type": "string"
+          },
+          "tokenUriTimeoutInMs": {
+            "description": "Timeout in ms for metadata URI resolution.",
+            "type": "number"
+          },
+          "withMetadata": {
+            "default": true,
+            "description": "If true, returns NFT metadata.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getNFTsForCollection"
+    },
+    {
+      "description": "Get metadata for a specific NFT by contract address and token ID",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address of the NFT.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "refreshCache": {
+            "description": "If true, refreshes the cached metadata.",
+            "type": "boolean"
+          },
+          "tokenId": {
+            "description": "The ID of the token. Can be in hex or decimal format.",
+            "type": "string"
+          },
+          "tokenType": {
+            "description": "'ERC721' or 'ERC1155'. Specifies type of token.",
+            "type": "string"
+          },
+          "tokenUriTimeoutInMs": {
+            "description": "Timeout in ms for metadata URI resolution.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "contractAddress",
+          "tokenId"
+        ],
+        "type": "object"
+      },
+      "name": "getNFTMetadata"
+    },
+    {
+      "description": "Get metadata for an NFT contract (name, symbol, total supply, etc.)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address for the NFT contract.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractAddress"
+        ],
+        "type": "object"
+      },
+      "name": "getContractMetadata"
+    },
+    {
+      "description": "Get metadata for an NFT collection by its OpenSea slug",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "collectionSlug": {
+            "description": "OpenSea slug for the NFT collection.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "collectionSlug"
+        ],
+        "type": "object"
+      },
+      "name": "getCollectionMetadata"
+    },
+    {
+      "description": "Invalidate cached metadata for an NFT contract to force a refresh on next query",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address to invalidate cached metadata for.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractAddress"
+        ],
+        "type": "object"
+      },
+      "name": "invalidateNFTContractCache"
+    },
+    {
+      "description": "Get all owner addresses for a specific NFT token",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address for the NFT.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "tokenId": {
+            "description": "The token ID to get owners for.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractAddress",
+          "tokenId"
+        ],
+        "type": "object"
+      },
+      "name": "getOwnersForNFT"
+    },
+    {
+      "description": "Get all owner addresses for an NFT contract, optionally with token balances",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address for the NFT contract.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "pageKey": {
+            "description": "Pagination key for contracts with >50,000 owners.",
+            "type": "string"
+          },
+          "withTokenBalances": {
+            "description": "If true, returns token balances for each owner.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "contractAddress"
+        ],
+        "type": "object"
+      },
+      "name": "getOwnersForContract"
+    },
+    {
+      "description": "Get a list of all known spam NFT contract addresses on a network",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getSpamContracts"
+    },
+    {
+      "description": "Check if a specific contract address is flagged as spam",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address to check for spam status.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractAddress"
+        ],
+        "type": "object"
+      },
+      "name": "isSpamContract"
+    },
+    {
+      "description": "Check if a specific NFT is flagged as an airdrop",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address of the NFT.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "tokenId": {
+            "description": "The token ID to check.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractAddress",
+          "tokenId"
+        ],
+        "type": "object"
+      },
+      "name": "isAirdropNFT"
+    },
+    {
+      "description": "Get a summary of trait/attribute distribution for an NFT collection",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address of the NFT collection.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractAddress"
+        ],
+        "type": "object"
+      },
+      "name": "summarizeNFTAttributes"
+    },
+    {
+      "description": "Get the marketplace floor price for an NFT collection",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "collectionSlug": {
+            "description": "OpenSea slug for the NFT collection.",
+            "type": "string"
+          },
+          "contractAddress": {
+            "description": "Contract address for the NFT collection.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getFloorPrice"
+    },
+    {
+      "description": "Search for NFT contracts by keyword in their metadata",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "query": {
+            "description": "Search keyword to match against NFT contract metadata.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "searchContractMetadata"
+    },
+    {
+      "description": "Check if a wallet address owns any NFTs from a specific contract",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address for the NFT contract.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "wallet": {
+            "description": "Wallet address to check for contract ownership.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "wallet",
+          "contractAddress"
+        ],
+        "type": "object"
+      },
+      "name": "isHolderOfContract"
+    },
+    {
+      "description": "Compute the rarity score for a specific NFT within its collection",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address of the NFT collection.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "tokenId": {
+            "description": "Token ID of the NFT to compute rarity for.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractAddress",
+          "tokenId"
+        ],
+        "type": "object"
+      },
+      "name": "computeRarity"
+    },
+    {
+      "description": "Get historical NFT sales data, filterable by marketplace, contract, buyer, or seller",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "buyerAddress": {
+            "description": "Address of the buyer to filter by.",
+            "type": "string"
+          },
+          "contractAddress": {
+            "description": "Contract address of an NFT collection to filter by.",
+            "type": "string"
+          },
+          "fromBlock": {
+            "description": "Starting block number. Hex, decimal, or \"latest\".",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max number of sales to return. Max and default 1000.",
+            "type": "number"
+          },
+          "marketplace": {
+            "description": "Marketplace to filter by. e.g. \"seaport\", \"looksrare\", \"x2y2\", \"blur\", \"cryptopunks\"",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "order": {
+            "description": "Sort order: \"asc\" or \"desc\".",
+            "type": "string"
+          },
+          "pageKey": {
+            "description": "Pagination key from a previous response.",
+            "type": "string"
+          },
+          "sellerAddress": {
+            "description": "Address of the seller to filter by.",
+            "type": "string"
+          },
+          "taker": {
+            "description": "\"BUYER\" or \"SELLER\" - the price taker in the trade.",
+            "type": "string"
+          },
+          "toBlock": {
+            "description": "Ending block number. Hex, decimal, or \"latest\".",
+            "type": "string"
+          },
+          "tokenId": {
+            "description": "Token ID within the contract to filter by.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getNFTSales"
+    },
+    {
+      "description": "Get all NFT contracts that an address owns tokens in",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "excludeFilters": {
+            "description": "Filters to exclude.",
+            "items": {
+              "enum": [
+                "SPAM",
+                "AIRDROPS"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "includeFilters": {
+            "description": "Filters to include.",
+            "items": {
+              "enum": [
+                "SPAM",
+                "AIRDROPS"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "orderBy": {
+            "description": "Order for the results.",
+            "type": "string"
+          },
+          "owner": {
+            "description": "Owner address to get NFT contracts for.",
+            "type": "string"
+          },
+          "pageKey": {
+            "description": "Pagination key from a previous response.",
+            "type": "string"
+          },
+          "pageSize": {
+            "description": "Number of contracts to return. Max 100.",
+            "type": "number"
+          },
+          "spamConfidenceLevel": {
+            "description": "Spam confidence level to filter at.",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "VERY_HIGH"
+            ],
+            "type": "string"
+          },
+          "withMetadata": {
+            "description": "If true, returns contract metadata.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "owner"
+        ],
+        "type": "object"
+      },
+      "name": "getContractsForOwner"
+    },
+    {
+      "description": "Get all NFT collections that an address owns tokens in",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "excludeFilters": {
+            "description": "Filters to exclude.",
+            "items": {
+              "enum": [
+                "SPAM",
+                "AIRDROPS"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "includeFilters": {
+            "description": "Filters to include.",
+            "items": {
+              "enum": [
+                "SPAM",
+                "AIRDROPS"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "owner": {
+            "description": "Owner address to get NFT collections for.",
+            "type": "string"
+          },
+          "pageKey": {
+            "description": "Pagination key from a previous response.",
+            "type": "string"
+          },
+          "pageSize": {
+            "description": "Number of collections to return. Max 100.",
+            "type": "number"
+          },
+          "withMetadata": {
+            "description": "If true, returns collection metadata.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "owner"
+        ],
+        "type": "object"
+      },
+      "name": "getCollectionsForOwner"
+    },
+    {
+      "description": "Report an NFT contract address as spam or not spam",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "The address to report as spam.",
+            "type": "string"
+          },
+          "isSpam": {
+            "description": "Whether the address is spam.",
+            "type": "boolean"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "isSpam"
+        ],
+        "type": "object"
+      },
+      "name": "reportSpam"
+    },
+    {
+      "description": "Get the ERC-20 token allowance a spender has been granted by an owner",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "description": "The token contract address.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "owner": {
+            "description": "The address of the token owner.",
+            "type": "string"
+          },
+          "spender": {
+            "description": "The address of the spender.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contract",
+          "owner",
+          "spender"
+        ],
+        "type": "object"
+      },
+      "name": "getTokenAllowance"
+    },
+    {
+      "description": "Get ERC-20 token balances for a wallet address on a single network",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "The wallet address to get token balances for.",
+            "type": "string"
+          },
+          "maxCount": {
+            "description": "Max number of token balances to return. Capped at 100.",
+            "type": "number"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "pageKey": {
+            "description": "Pagination key for fetching more results.",
+            "type": "string"
+          },
+          "tokenSpec": {
+            "anyOf": [
+              {
+                "enum": [
+                  "erc20",
+                  "DEFAULT_TOKENS",
+                  "NATIVE_TOKEN"
+                ],
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "description": "Token specification: \"erc20\", \"NATIVE_TOKEN\", or an array of contract addresses."
+          }
+        },
+        "required": [
+          "address"
+        ],
+        "type": "object"
+      },
+      "name": "getTokenBalances"
+    },
+    {
+      "description": "Get metadata (name, symbol, decimals, logo) for an ERC-20 token contract",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "contractAddress": {
+            "description": "The token contract address to get metadata for.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractAddress"
+        ],
+        "type": "object"
+      },
+      "name": "getTokenMetadata"
+    },
+    {
+      "description": "Get all transaction receipts for a given block by number or hash",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockHash": {
+            "description": "Block hash in hex. One of blockNumber or blockHash must be provided.",
+            "type": "string"
+          },
+          "blockNumber": {
+            "description": "Block number in hex. One of blockNumber or blockHash must be provided.",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getTransactionReceipts"
+    },
+    {
+      "description": "Get the raw RLP-encoded block data for a given block number or tag",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockNumberOrTag": {
+            "description": "Block number in hex or tag like 'latest'",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockNumberOrTag"
+        ],
+        "type": "object"
+      },
+      "name": "debugGetRawBlock"
+    },
+    {
+      "description": "Get the raw RLP-encoded block header for a given block number or tag",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockNumberOrTag": {
+            "description": "Block number in hex or tag like 'latest'",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockNumberOrTag"
+        ],
+        "type": "object"
+      },
+      "name": "debugGetRawHeader"
+    },
+    {
+      "description": "Get the raw receipt data for all transactions in a block",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockNumberOrTag": {
+            "description": "Block number in hex or tag like 'latest'",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockNumberOrTag"
+        ],
+        "type": "object"
+      },
+      "name": "debugGetRawReceipts"
+    },
+    {
+      "description": "Replay and trace all transactions in a block identified by its hash",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockHash": {
+            "description": "32-byte block hash",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "tracer": {
+            "additionalProperties": true,
+            "description": "Tracer options",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "blockHash"
+        ],
+        "type": "object"
+      },
+      "name": "debugTraceBlockByHash"
+    },
+    {
+      "description": "Replay and trace all transactions in a block identified by its number",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockNumberOrTag": {
+            "description": "Block number in hex or tag like 'latest'",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "tracer": {
+            "additionalProperties": true,
+            "description": "Tracer options",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "blockNumberOrTag"
+        ],
+        "type": "object"
+      },
+      "name": "debugTraceBlockByNumber"
+    },
+    {
+      "description": "Trace a call without executing it on-chain — useful for debugging contract interactions",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockIdentifier": {
+            "description": "Block hash, number, or tag",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "options": {
+            "additionalProperties": true,
+            "description": "Tracer and state override options",
+            "properties": {},
+            "type": "object"
+          },
+          "transaction": {
+            "additionalProperties": true,
+            "description": "Transaction call object with from, to, gas, value, data",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "transaction",
+          "blockIdentifier"
+        ],
+        "type": "object"
+      },
+      "name": "debugTraceCall"
+    },
+    {
+      "description": "Get a detailed execution trace of an already-mined transaction",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "options": {
+            "additionalProperties": true,
+            "description": "Options including tracer type and config",
+            "properties": {},
+            "type": "object"
+          },
+          "transactionHash": {
+            "description": "Transaction hash",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transactionHash"
+        ],
+        "type": "object"
+      },
+      "name": "debugTraceTransaction"
+    },
+    {
+      "description": "Get Parity-style execution traces for all transactions in a block",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockIdentifier": {
+            "default": "latest",
+            "description": "Block identifier (number, hash, or tag)",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "traceBlock"
+    },
+    {
+      "description": "Execute and trace a call without broadcasting it (Parity-style tracing)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockIdentifier": {
+            "description": "Block identifier (number, hash, or tag)",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "traceTypes": {
+            "description": "Array of trace types. e.g. [\"trace\", \"stateDiff\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "transaction": {
+            "additionalProperties": true,
+            "description": "Transaction call object",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "transaction",
+          "traceTypes"
+        ],
+        "type": "object"
+      },
+      "name": "traceCall"
+    },
+    {
+      "description": "Get a specific sub-trace within a transaction by index position",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "traceIndexes": {
+            "description": "Hex index positions",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "transactionHash": {
+            "description": "Transaction hash",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transactionHash",
+          "traceIndexes"
+        ],
+        "type": "object"
+      },
+      "name": "traceGet"
+    },
+    {
+      "description": "Trace a raw signed transaction without broadcasting it to the network",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "rawTransaction": {
+            "description": "Raw transaction data",
+            "type": "string"
+          },
+          "traceTypes": {
+            "description": "Array of trace types. e.g. [\"trace\", \"stateDiff\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "rawTransaction",
+          "traceTypes"
+        ],
+        "type": "object"
+      },
+      "name": "traceRawTransaction"
+    },
+    {
+      "description": "Replay all transactions in a block and return traces with optional state diffs",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockIdentifier": {
+            "description": "Block identifier (number, hash, or tag)",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "traceTypes": {
+            "description": "Array of trace types. e.g. [\"trace\", \"stateDiff\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "blockIdentifier",
+          "traceTypes"
+        ],
+        "type": "object"
+      },
+      "name": "traceReplayBlockTransactions"
+    },
+    {
+      "description": "Replay a specific transaction and return its trace with optional state diffs",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "traceTypes": {
+            "description": "Array of trace types. e.g. [\"trace\", \"stateDiff\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "transactionHash": {
+            "description": "Transaction hash",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transactionHash",
+          "traceTypes"
+        ],
+        "type": "object"
+      },
+      "name": "traceReplayTransaction"
+    },
+    {
+      "description": "Get the Parity-style execution trace of an already-mined transaction",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "transactionHash": {
+            "description": "Transaction hash",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transactionHash"
+        ],
+        "type": "object"
+      },
+      "name": "traceTransaction"
+    },
+    {
+      "description": "Search for traces matching criteria like sender, recipient, and block range",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "description": "Offset trace number",
+            "type": "string"
+          },
+          "count": {
+            "description": "Number of traces to return",
+            "type": "number"
+          },
+          "fromAddress": {
+            "description": "Filter by sender addresses",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "fromBlock": {
+            "description": "Starting block (hex, decimal, or tag)",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "toAddress": {
+            "description": "Filter by recipient addresses",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "toBlock": {
+            "description": "Ending block (hex, decimal, or tag)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "traceFilter"
+    },
+    {
+      "description": "Simulate a transaction and preview what asset changes (token transfers, ETH movements) would occur",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "transaction": {
+            "additionalProperties": false,
+            "description": "Transaction object to simulate",
+            "properties": {
+              "data": {
+                "description": "The transaction data",
+                "type": "string"
+              },
+              "from": {
+                "description": "The sender address",
+                "type": "string"
+              },
+              "gas": {
+                "description": "The gas limit",
+                "type": "string"
+              },
+              "to": {
+                "description": "The recipient address",
+                "type": "string"
+              },
+              "value": {
+                "description": "The value in wei",
+                "type": "string"
+              }
+            },
+            "required": [
+              "to"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "transaction"
+        ],
+        "type": "object"
+      },
+      "name": "simulateAssetChanges"
+    },
+    {
+      "description": "Simulate a bundle of 1-2 transactions and preview the combined asset changes",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "transactions": {
+            "description": "Array of transaction objects to simulate (1-2 items)",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "description": "The transaction data",
+                  "type": "string"
+                },
+                "from": {
+                  "description": "The sender address",
+                  "type": "string"
+                },
+                "gas": {
+                  "description": "The gas limit",
+                  "type": "string"
+                },
+                "to": {
+                  "description": "The recipient address",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "The value in wei",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to"
+              ],
+              "type": "object"
+            },
+            "maxItems": 2,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "transactions"
+        ],
+        "type": "object"
+      },
+      "name": "simulateAssetChangesBundle"
+    },
+    {
+      "description": "Simulate full transaction execution and get detailed call traces, logs, and return data",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "transaction": {
+            "additionalProperties": false,
+            "description": "Transaction object to simulate",
+            "properties": {
+              "data": {
+                "description": "The transaction data",
+                "type": "string"
+              },
+              "from": {
+                "description": "The sender address",
+                "type": "string"
+              },
+              "gas": {
+                "description": "The gas limit",
+                "type": "string"
+              },
+              "to": {
+                "description": "The recipient address",
+                "type": "string"
+              },
+              "value": {
+                "description": "The value in wei",
+                "type": "string"
+              }
+            },
+            "required": [
+              "to"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "transaction"
+        ],
+        "type": "object"
+      },
+      "name": "simulateExecution"
+    },
+    {
+      "description": "Simulate execution of a bundle of 1-2 transactions with full call traces",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "transactions": {
+            "description": "Array of transaction objects to simulate (1-2 items)",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "description": "The transaction data",
+                  "type": "string"
+                },
+                "from": {
+                  "description": "The sender address",
+                  "type": "string"
+                },
+                "gas": {
+                  "description": "The gas limit",
+                  "type": "string"
+                },
+                "to": {
+                  "description": "The recipient address",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "The value in wei",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to"
+              ],
+              "type": "object"
+            },
+            "maxItems": 2,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "transactions"
+        ],
+        "type": "object"
+      },
+      "name": "simulateExecutionBundle"
+    },
+    {
+      "description": "Get the recommended max priority fee per gas for EIP-1559 transactions",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getMaxPriorityFeePerGas"
+    },
+    {
+      "description": "Get the receipt for an ERC-4337 user operation by its hash",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "userOpHash": {
+            "description": "The user operation hash",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userOpHash"
+        ],
+        "type": "object"
+      },
+      "name": "getUserOperationReceipt"
+    },
+    {
+      "description": "Get the entry point contract addresses supported for ERC-4337 account abstraction",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getSupportedEntryPoints"
+    },
+    {
+      "description": "Get details of an ERC-4337 user operation by its hash",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "userOpHash": {
+            "description": "The user operation hash",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userOpHash"
+        ],
+        "type": "object"
+      },
+      "name": "getUserOperationByHash"
+    },
+    {
+      "description": "Estimate gas costs for an ERC-4337 user operation against an entry point",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "entryPoint": {
+            "description": "EntryPoint address",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateOverrideSet": {
+            "additionalProperties": true,
+            "description": "State override set for gas estimation",
+            "properties": {},
+            "type": "object"
+          },
+          "userOperation": {
+            "additionalProperties": true,
+            "description": "UserOperation object",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "userOperation",
+          "entryPoint"
+        ],
+        "type": "object"
+      },
+      "name": "estimateUserOperationGas"
+    },
+    {
+      "description": "Simulate an ERC-4337 user operation and preview the predicted asset changes",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockNumber": {
+            "description": "Block number for simulation context",
+            "type": "string"
+          },
+          "entryPoint": {
+            "description": "EntryPoint address",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "userOperation": {
+            "additionalProperties": true,
+            "description": "UserOperation object",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "userOperation",
+          "entryPoint"
+        ],
+        "type": "object"
+      },
+      "name": "simulateUserOperationAssetChanges"
+    },
+    {
+      "description": "Get Ethereum Beacon Chain genesis information (time, validator root, fork version)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getBeaconGenesis"
+    },
+    {
+      "description": "Get a Beacon Chain block by slot number, root, or keyword (head, finalized, genesis)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockId": {
+            "description": "Block ID: head, genesis, finalized, slot number, or 0x-prefixed block root",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconBlock"
+    },
+    {
+      "description": "Get attestations included in a specific Beacon Chain block",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockId": {
+            "description": "Block ID: head, genesis, finalized, slot number, or 0x-prefixed block root",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconBlockAttestations"
+    },
+    {
+      "description": "Get the root hash of a specific Beacon Chain block",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockId": {
+            "description": "Block ID: head, genesis, finalized, slot number, or 0x-prefixed block root",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconBlockRoot"
+    },
+    {
+      "description": "Get blob sidecars for a Beacon Chain block (EIP-4844 blob data)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockId": {
+            "description": "Block ID: head, genesis, finalized, slot number, or 0x-prefixed block root",
+            "type": "string"
+          },
+          "indices": {
+            "description": "Array of blob indices to filter by",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconBlobSidecars"
+    },
+    {
+      "description": "Get Beacon Chain block headers, optionally filtered by slot or parent root",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "parentRoot": {
+            "description": "Parent root to filter by",
+            "type": "string"
+          },
+          "slot": {
+            "description": "Slot number to filter by",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getBeaconHeaders"
+    },
+    {
+      "description": "Get a specific Beacon Chain block header by its block ID",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockId": {
+            "description": "Block ID: head, genesis, finalized, slot number, or 0x-prefixed block root",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconHeaderByBlockId"
+    },
+    {
+      "description": "Get voluntary validator exit messages currently in the Beacon Chain mempool",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getBeaconPoolVoluntaryExits"
+    },
+    {
+      "description": "Get attestations currently pending in the Beacon Chain mempool",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getBeaconPoolAttestations"
+    },
+    {
+      "description": "Get beacon committee assignments for a given state, optionally filtered by epoch/slot",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "epoch": {
+            "description": "Epoch number to filter by",
+            "type": "string"
+          },
+          "index": {
+            "description": "Committee index to filter by",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "slot": {
+            "description": "Slot number to filter by",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateCommittees"
+    },
+    {
+      "description": "Get finality checkpoints (justified and finalized epochs) for a given state",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateFinalityCheckpoints"
+    },
+    {
+      "description": "Get the fork version information for a given Beacon Chain state",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateFork"
+    },
+    {
+      "description": "Get pending validator consolidation requests for a given state",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStatePendingConsolidations"
+    },
+    {
+      "description": "Get the state root hash for a given Beacon Chain state",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateRoot"
+    },
+    {
+      "description": "Get sync committee assignments for a given state and optional epoch",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "epoch": {
+            "description": "Epoch number to filter by",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateSyncCommittees"
+    },
+    {
+      "description": "Get the RANDAO mix value for a given Beacon Chain state and optional epoch",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "epoch": {
+            "description": "Epoch number to get RANDAO for",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateRandao"
+    },
+    {
+      "description": "Get validator ETH balances for a given state, optionally filtered by validator ID",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Validator indices or pubkeys to filter by",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateValidatorBalances"
+    },
+    {
+      "description": "Get validator details for a given state, optionally filtered by ID or status",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Validator indices or pubkeys to filter by",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          },
+          "status": {
+            "description": "Validator statuses to filter by",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "stateId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateValidators"
+    },
+    {
+      "description": "Get full details for a specific Beacon Chain validator by index or public key",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          },
+          "stateId": {
+            "description": "State ID: head, genesis, finalized, slot, or state root",
+            "type": "string"
+          },
+          "validatorId": {
+            "description": "Validator index or pubkey",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stateId",
+          "validatorId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconStateValidatorById"
+    },
+    {
+      "description": "Get the block rewards breakdown (proposer, attestation, sync committee) for a Beacon block",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "blockId": {
+            "description": "Block ID: head, genesis, finalized, slot number, or 0x-prefixed block root",
+            "type": "string"
+          },
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "blockId"
+        ],
+        "type": "object"
+      },
+      "name": "getBeaconBlockRewards"
+    },
+    {
+      "description": "Get the full Beacon Chain configuration specification and protocol constants",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getBeaconConfigSpec"
+    },
+    {
+      "description": "Check whether a Beacon Chain node is currently syncing and its sync progress",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getBeaconNodeSyncing"
+    },
+    {
+      "description": "Get the software version string of the Beacon Chain node",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "default": "eth-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"eth-mainnet\", \"base-mainnet\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "getBeaconNodeVersion"
+    },
+    {
+      "description": "Get detailed information about a Solana asset (token, NFT, or compressed NFT) by its mint ID",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Asset ID base-58 encoded",
+            "type": "string"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAsset"
+    },
+    {
+      "description": "Get detailed information about multiple Solana assets by their mint IDs in a single request",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "ids": {
+            "description": "Array of asset IDs base-58 encoded",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAssets"
+    },
+    {
+      "description": "Get the Merkle proof for a compressed Solana asset, needed for on-chain verification",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Asset ID base-58 encoded",
+            "type": "string"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAssetProof"
+    },
+    {
+      "description": "Get Merkle proofs for multiple compressed Solana assets in a single request",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "ids": {
+            "description": "Array of asset IDs base-58 encoded",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAssetProofs"
+    },
+    {
+      "description": "Get all Solana assets managed by a specific authority address",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "description": "Cursor for pagination (after)",
+            "type": "string"
+          },
+          "authorityAddress": {
+            "description": "Authority address to query assets for",
+            "type": "string"
+          },
+          "before": {
+            "description": "Cursor for pagination (before)",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of results to return. Max 1000.",
+            "type": "number"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number for pagination",
+            "type": "number"
+          },
+          "sortBy": {
+            "additionalProperties": true,
+            "description": "Sort criteria object",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "authorityAddress"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAssetsByAuthority"
+    },
+    {
+      "description": "Get all Solana assets created by a specific address, with optional verification filter",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "description": "Cursor for pagination (after)",
+            "type": "string"
+          },
+          "before": {
+            "description": "Cursor for pagination (before)",
+            "type": "string"
+          },
+          "creatorAddress": {
+            "description": "Creator address to query assets for",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of results to return. Max 1000.",
+            "type": "number"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          },
+          "onlyVerified": {
+            "description": "If true, only returns verified assets",
+            "type": "boolean"
+          },
+          "page": {
+            "description": "Page number for pagination",
+            "type": "number"
+          },
+          "sortBy": {
+            "additionalProperties": true,
+            "description": "Sort criteria object",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "creatorAddress"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAssetsByCreator"
+    },
+    {
+      "description": "Get all Solana assets in a specific group (e.g. an NFT collection)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "description": "Cursor for pagination (after)",
+            "type": "string"
+          },
+          "before": {
+            "description": "Cursor for pagination (before)",
+            "type": "string"
+          },
+          "groupKey": {
+            "description": "Group key to query by",
+            "type": "string"
+          },
+          "groupValue": {
+            "description": "Group value to query by",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of results to return. Max 1000.",
+            "type": "number"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number for pagination",
+            "type": "number"
+          },
+          "sortBy": {
+            "additionalProperties": true,
+            "description": "Sort criteria object",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "groupKey",
+          "groupValue"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAssetsByGroup"
+    },
+    {
+      "description": "Get all Solana assets (tokens, NFTs) owned by a specific wallet address",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "description": "Cursor for pagination (after)",
+            "type": "string"
+          },
+          "before": {
+            "description": "Cursor for pagination (before)",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of results to return. Max 1000.",
+            "type": "number"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          },
+          "ownerAddress": {
+            "description": "Owner address to query assets for",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number for pagination",
+            "type": "number"
+          },
+          "sortBy": {
+            "additionalProperties": true,
+            "description": "Sort criteria object",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "ownerAddress"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAssetsByOwner"
+    },
+    {
+      "description": "Get transaction signatures associated with a specific Solana asset",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "description": "Cursor for pagination (after)",
+            "type": "string"
+          },
+          "before": {
+            "description": "Cursor for pagination (before)",
+            "type": "string"
+          },
+          "id": {
+            "description": "Asset ID to get signatures for",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of results to return",
+            "type": "number"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number for pagination",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetAssetSignatures"
+    },
+    {
+      "description": "Get edition information (master/print editions) for a Solana NFT",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "description": "Number of results to return",
+            "type": "number"
+          },
+          "mintAddress": {
+            "description": "Mint address of the NFT",
+            "type": "string"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number for pagination",
+            "type": "number"
+          }
+        },
+        "required": [
+          "mintAddress"
+        ],
+        "type": "object"
+      },
+      "name": "solanaGetNftEditions"
+    },
+    {
+      "description": "Get Solana SPL token accounts filtered by mint address or owner",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Cursor for pagination",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of results to return",
+            "type": "number"
+          },
+          "mintAddress": {
+            "description": "Mint address to filter by",
+            "type": "string"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          },
+          "ownerAddress": {
+            "description": "Owner address to filter by",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "solanaGetTokenAccounts"
+    },
+    {
+      "description": "Search for Solana assets with flexible filters (owner, creator, authority, burnt, frozen status)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "description": "Cursor for pagination (after)",
+            "type": "string"
+          },
+          "authorityAddress": {
+            "description": "Authority address to filter by",
+            "type": "string"
+          },
+          "before": {
+            "description": "Cursor for pagination (before)",
+            "type": "string"
+          },
+          "burnt": {
+            "description": "Filter by burnt status",
+            "type": "boolean"
+          },
+          "conditionType": {
+            "description": "Condition type for combining filters",
+            "type": "string"
+          },
+          "creatorAddress": {
+            "description": "Creator address to filter by",
+            "type": "string"
+          },
+          "frozen": {
+            "description": "Filter by frozen status",
+            "type": "boolean"
+          },
+          "grouping": {
+            "description": "Grouping criteria",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "limit": {
+            "description": "Number of results to return",
+            "type": "number"
+          },
+          "negate": {
+            "description": "Negate the search filters",
+            "type": "boolean"
+          },
+          "network": {
+            "default": "solana-mainnet",
+            "description": "Network ID. Call listSupportedNetworks for all options. e.g. \"solana-mainnet\"",
+            "type": "string"
+          },
+          "ownerAddress": {
+            "description": "Owner address to filter by",
+            "type": "string"
+          },
+          "page": {
+            "description": "Page number for pagination",
+            "type": "number"
+          },
+          "sortBy": {
+            "additionalProperties": true,
+            "description": "Sort criteria object",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "name": "solanaSearchAssets"
+    }
+  ],
+  "version": "0.3.0"
+}

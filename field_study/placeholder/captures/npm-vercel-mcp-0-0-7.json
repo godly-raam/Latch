@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "An MCP server that connects to Vercel API",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "vercel-mcp@0.0.7"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "vercel-mcp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/zueai/vercel-api-mcp",
+  "slug": "npm-vercel-mcp-0-0-7",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.0.7"
+}

@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for filesystem access",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@agent-infra/mcp-server-filesystem@1.2.29"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@agent-infra/mcp-server-filesystem",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/bytedance/UI-TARS-desktop",
+  "slug": "npm-agent-infra-mcp-server-filesystem-1-2-29",
+  "stderr_summary": "Usage: mcp-server-filesystem --allowed-directories <allowed-directories>",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.2.29"
+}

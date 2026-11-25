@@ -58,13 +58,31 @@ Every one of the 18 harvested surfaces is clean under the frozen rules, so the
 out-of-sample false-positive count is **zero**. No triage was required: there was
 nothing to triage.
 
-**Read it as a bound, not a proof.** Eighteen surfaces is a small denominator.
-With `0` failures in `18` trials, the rule of three puts the 95% upper bound on
-the per-server false-positive rate at about `17%` (`3/18`). The holdout rules out
-the pre-fix behaviour — where most SaaS surfaces in round 1 flagged — but it
-cannot certify a rate near zero.
+**Read it as a bound, not a proof, and only for this surface class.** Eighteen
+surfaces is a small denominator. With `0` failures in `18` trials, the rule of
+three puts the 95% upper bound on the per-server false-positive rate at about
+`17%` (`3/18`). What `0/18` rules out is the pre-fix behaviour on small, easy
+surfaces — servers that start with no credentials and expose a handful of
+tools. It says nothing more than that: it is not a per-server rate for
+credentialed products, and it is not evidence about larger SaaS surfaces.
+
+The servers that produced round 1's noise are still under-represented here.
+Thirteen of the 100 holdout packages exited asking for a token or URL, and the
+18 that were analyzed are small (median `3` tools, largest `32`), so the
+credentialed CRUD and analytics surfaces that drove the pre-fix explosion are
+barely in the sample. The `0/18` stays citable as a bound on the small,
+credential-free class; it is not a claim that the hardened rules are quiet on
+credentialed SaaS servers. `field_study/PLACEHOLDER_CREDENTIALS.md` is the
+third sample built to reach that class: the same frozen rules over a fresh
+100-package pull, harvested with fixed dummy credentials so presence-only
+checks pass. Its result does not change this `0/18`.
 
 ## Cross-server compositions on the holdout
+
+**Unvalidated stress test on arbitrary server pairs — not findings.** These are
+counts of what the frozen rules emit when every harvested holdout surface is
+mounted beside every other one and beside three first-party kits. Nothing here
+comes from a real deployment, and the grid is enumerated, not sampled.
 
 | Metric | Value |
 | ------ | ----- |
@@ -79,6 +97,15 @@ Three of the 37 flagged sets are `EXACT_TOOL_SHADOW` and 13 are
 single-server pass. `auth-audit` is again unexercised: the corpus is stdio
 manifests with no HTTP/OAuth transport, so its zero is an untested engine.
 
+A fixed-seed hand triage of 20 of the 37 (`random.Random(20261125)`, reproduced
+by `python -m field_study.triage_compositions --captures
+field_study/holdout/captures`) found **3 real, 3 plausible and 14 artifacts**;
+the other 17 are untriaged. The full per-composition verdicts are in the
+report's "Hand triage of the sweep" section. Most flags do not survive contact
+with the pair: the common artifacts are a write tool (`create_pull_request`)
+treated as untrusted ingest, a single-server chain the partner does not touch,
+and ordinary prose matched against a generic tool name such as `search`.
+
 ## Scope of what this shows
 
 - **Shown:** the hardened rules produce no findings on a fresh, disjoint sample
@@ -89,6 +116,10 @@ manifests with no HTTP/OAuth transport, so its zero is an untested engine.
   only. The yield is also lower than round 1 (`18%` vs `31%`), and the analyzed
   surfaces are small (median `3` tools, largest `32`), so the harder SaaS
   surfaces that drove round 1's findings are under-represented.
+- **Not shown:** any rate for credentialed servers. The 13 packages that exited
+  asking for a token never listed tools, and no real credential was supplied.
+  The placeholder-credential sample is the separate attempt to reach that
+  class; it is reported on its own and does not revise `0/18`.
 - **Still untested:** runtime behaviour (responses and handlers), `auth-audit`
   on remote HTTP/OAuth servers, and any target that needs credentials. See the
   Limitations section of `FIELD_STUDY_REPORT.md` for the boundary this study
@@ -107,3 +138,6 @@ manifests with no HTTP/OAuth transport, so its zero is an untested engine.
 - `field_study/holdout/scan_results.json` — full findings and aggregates.
 - `field_study/holdout/FIELD_STUDY_REPORT.md` — the same renderer applied to
   this sample.
+- `field_study/PLACEHOLDER_CREDENTIALS.md` — the third sample: a fresh
+  100-package pull harvested with fixed dummy credentials under the same frozen
+  rules. Reported separately so the `0/18` above stays a clean bound.

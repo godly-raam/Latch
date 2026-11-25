@@ -19,6 +19,9 @@ from field_study.discover_targets import (
 import pytest
 
 from field_study.run_field_study import (
+    COMPOSITION_TRIAGE,
+    COMPOSITION_TRIAGE_BUCKETS,
+    PLACEHOLDER_CREDENTIAL_ENV,
     analyze,
     analyze_compositions,
     build_compositions,
@@ -31,6 +34,7 @@ from field_study.run_field_study import (
     scratch_environment,
     write_results,
 )
+from field_study.triage_compositions import sample_details
 from mcpprobe.graph import analyze_capability_graph
 from mcpprobe.models import ToolDefinition
 from mcpprobe.transport import TransportTimeout
@@ -857,3 +861,139 @@ def test_week2_triage_regressions_on_the_real_captures() -> None:
         # The annotation may corroborate a sink, but must never stand alone.
         assert signals - {"annotation.openWorldEgress"}, path.egress_tool
         assert "schema.outbound_sink" in signals, path.egress_tool
+
+
+def test_placeholder_credentials_are_fixed_dummies_and_opt_in(monkeypatch) -> None:
+    """The third sample sets dummy env only on request; a host secret never passes."""
+
+    monkeypatch.setenv("GITHUB_TOKEN", "host-real-token-value")
+    with scratch_environment() as (env, _root):
+        assert "GITHUB_TOKEN" not in env
+    with scratch_environment(placeholder_credentials=True) as (env, _root):
+        assert env["GITHUB_TOKEN"] == "latch-placeholder-not-a-real-token"
+        assert env["GITHUB_TOKEN"] != "host-real-token-value"
+        assert env["SUPABASE_URL"] == "https://placeholder.invalid"
+
+    dummies = {
+        "latch-placeholder-not-a-real-token",
+        "latch-placeholder-not-a-real-secret",
+        "latch-placeholder",
+        "AKIALATCHPLACEHOLDER",
+        "postgres://placeholder:placeholder@127.0.0.1:5432/placeholder",
+        "mongodb://127.0.0.1:27017/placeholder",
+        "redis://127.0.0.1:6379/0",
+        "https://placeholder.invalid",
+        "placeholder@example.invalid",
+        "https://placeholder@placeholder.invalid/1",
+        "xoxb-latch-placeholder",
+        "xoxp-latch-placeholder",
+        "sk_test_latch_placeholder",
+        "000000000:latch-placeholder",
+        "00000000-0000-0000-0000-000000000000",
+        "AC00000000000000000000000000000000",
+        "T00000000",
+        "127.0.0.1",
+        "placeholder",
+        "us-east-1",
+    }
+    # Every value must be a literal dummy: adding a real-looking value fails here.
+    assert set(PLACEHOLDER_CREDENTIAL_ENV.values()) <= dummies
+    assert "host-real-token-value" not in PLACEHOLDER_CREDENTIAL_ENV.values()
+
+
+def test_placeholder_harvest_records_its_credential_mode(tmp_path: Path) -> None:
+    script = tmp_path / "mock_mcp.py"
+    script.write_text(MOCK_STDIO, encoding="utf-8")
+    target = {
+        "slug": "pypi-mock-field-9-9-9",
+        "ecosystem": "pypi",
+        "package": "mock-field",
+        "version": "9.9.9",
+        "repository_url": None,
+        "description": "offline fixture",
+        "launch_argv": [sys.executable, str(script), str(tmp_path / "env.json")],
+    }
+
+    capture = harvest_target(target, timeout=10.0, placeholder_credentials=True)
+    assert capture["credential_mode"] == "placeholder"
+    assert capture["harvest_status"] == "harvested"
+    child = json.loads((tmp_path / "env.json").read_text(encoding="utf-8"))
+    assert "GITHUB_TOKEN" in child["env_keys"]
+    assert "SUPABASE_URL" in child["env_keys"]
+
+    plain = harvest_target(target, timeout=10.0)
+    assert plain["credential_mode"] == "none"
+    resume = json.loads((tmp_path / "env.json").read_text(encoding="utf-8"))
+    assert "GITHUB_TOKEN" not in resume["env_keys"]
+    assert "SUPABASE_URL" not in resume["env_keys"]
+
+
+def test_composition_triage_record_and_seeded_draw_are_deterministic() -> None:
+    """20 verdicts per round, and the sampler reproduces the recorded draw."""
+
+    assert len(COMPOSITION_TRIAGE) == 40
+    assert {verdict for verdict, _note in COMPOSITION_TRIAGE.values()} == set(
+        COMPOSITION_TRIAGE_BUCKETS
+    )
+    assert all(note.strip() for _verdict, note in COMPOSITION_TRIAGE.values())
+
+    rows = [{"composition_id": f"comp-{index:03d}"} for index in range(60)]
+    first = [row["composition_id"] for row in sample_details(rows, seed=7, size=20)]
+    again = [row["composition_id"] for row in sample_details(rows, seed=7, size=20)]
+    other = [row["composition_id"] for row in sample_details(rows, seed=8, size=20)]
+    assert first == again
+    assert len(first) == 20
+    assert other != first
+
+
+@pytest.mark.skipif(
+    not CAPTURES.is_dir(), reason="field-study captures are not in this checkout"
+)
+def test_composition_sweep_is_labelled_unvalidated_and_shows_the_triage() -> None:
+    results = analyze(CAPTURES)
+    compositions = results["compositions"]
+    triage = compositions["triage"]
+    report = render_report(results)
+
+    assert "Unvalidated stress test on arbitrary server pairs — not findings." in report
+    assert triage["sample_size"] == 20
+    assert sum(triage["counts"].values()) == 20
+    assert triage["untriaged"] == compositions["flagged_composition_count"] - 20
+    assert (
+        f"**{triage['counts']['real']} real, {triage['counts']['plausible']} plausible,"
+        f" {triage['counts']['artifact']} artifact**"
+    ) in report
+    for row in triage["sampled"]:
+        assert f"| `{row['composition_id']}` | `{row['verdict']}` |" in report
+
+
+def test_placeholder_mode_is_stated_in_the_report(tmp_path: Path) -> None:
+    captures = tmp_path / "captures"
+    captures.mkdir()
+    capture = _capture(
+        "npm-mock-1-0-0",
+        [{"name": "echo", "description": "Echo text.", "inputSchema": {"type": "object"}}],
+    )
+    capture["credential_mode"] = "placeholder"
+    (captures / "npm-mock-1-0-0.json").write_text(
+        json.dumps(capture), encoding="utf-8"
+    )
+    results = analyze(captures, tmp_path / "targets.json")
+    report = render_report(results)
+
+    assert results["credential_modes"]["placeholder"] == 1
+    assert "Credential mode: **placeholder**" in report
+    assert "`tools/list` returned with placeholder credentials." in report
+    assert "--placeholder-credentials" in report
+    assert "no real secret was used" in report
+
+    plain_captures = tmp_path / "plain"
+    plain_captures.mkdir()
+    plain = _capture(
+        "npm-mock-1-0-0",
+        [{"name": "echo", "description": "Echo text.", "inputSchema": {"type": "object"}}],
+    )
+    (plain_captures / "npm-mock-1-0-0.json").write_text(json.dumps(plain), encoding="utf-8")
+    plain_report = render_report(analyze(plain_captures, tmp_path / "targets.json"))
+    assert "Credential mode:" not in plain_report
+    assert "--placeholder-credentials" not in plain_report

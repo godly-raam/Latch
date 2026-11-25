@@ -164,6 +164,300 @@ COMPOSITION_ANCHOR_KITS: tuple[tuple[str, ...], ...] = (
     ("pypi-mcp-server-fetch", "npm-server-github-2025-4-8"),
 )
 
+#: Fixed-seed hand triage of the cross-server sweep. The sweep mounts arbitrary
+#: server pairs, so its aggregates are a stress test on the harness, not
+#: findings. These are the sampled rows that were read one by one; reproduce the
+#: draw with ``python -m field_study.triage_compositions``.
+COMPOSITION_TRIAGE_SEED = 20261125
+COMPOSITION_TRIAGE_SAMPLE_SIZE = 20
+COMPOSITION_TRIAGE_BUCKETS = ("real", "plausible", "artifact")
+
+#: ``composition_id -> (verdict, evidence)``. ``real`` means the composition
+#: itself carries an attacker-influenced ingest, a private read and a
+#: caller-chosen sink (or a genuine same-name collision); ``plausible`` means the
+#: mechanism is genuine but needs a precondition the pair does not supply;
+#: ``artifact`` means the flag says nothing about the pair -- a single-server
+#: chain the partner does not affect, ordinary prose matched against a generic
+#: tool name, or a leg the detector misclassified (a local read as ingest, a
+#: write tool as ingest, a fixed product API as egress).
+COMPOSITION_TRIAGE: dict[str, tuple[str, str]] = {
+    # Round 1 (20 of 136).
+    "npm-bitwarden-mcp-server-2026-7-0+npm-doitintl-doit-mcp-server-5-1-0": (
+        "real",
+        "`create_folder` is genuinely mounted by both servers; the 53 hijacks are"
+        " prose matches on `delete`/`status` and the 78 paths treat a vault read"
+        " as untrusted ingest.",
+    ),
+    "npm-bitwarden-mcp-server-2026-7-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0": (
+        "artifact",
+        "`generate` is matched inside sequential-thinking prose; no tool routes"
+        " to another server.",
+    ),
+    "npm-bitwarden-mcp-server-2026-7-0+npm-sap-ux-fiori-mcp-server-1-17-0": (
+        "artifact",
+        "`generate` is matched inside SAP build instructions; prose, not routing.",
+    ),
+    "npm-bitwarden-mcp-server-2026-7-0+npm-tsmztech-mcp-server-salesforce-0-0-8": (
+        "artifact",
+        "`status` is matched inside Salesforce prose; prose, not routing.",
+    ),
+    "npm-chelaile-mcp-server-1-1-0+npm-chrome-devtools-mcp-1-13-0": (
+        "artifact",
+        "public transit search is not attacker-controlled input, and the other"
+        " paths are chrome-devtools alone.",
+    ),
+    "npm-chrome-devtools-mcp-1-13-0+npm-ericthered926-duckduckgo-mcp-server-0-6-0": (
+        "real",
+        "search snippets are attacker-influenced, chrome reads network traffic,"
+        " and `navigate_page` accepts any URL.",
+    ),
+    "npm-chrome-devtools-mcp-1-13-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0": (
+        "artifact",
+        "all four paths are inside chrome-devtools; the partner adds no leg.",
+    ),
+    "npm-chrome-devtools-mcp-1-13-0+pypi-a2a-mcp-server-0-1-5": (
+        "artifact",
+        "all four paths are inside chrome-devtools; the partner adds no leg.",
+    ),
+    "npm-chrome-devtools-mcp-1-13-0+pypi-acp-mcp-server-0-0-5": (
+        "artifact",
+        "all four paths are inside chrome-devtools; the partner adds no leg.",
+    ),
+    "npm-doitintl-doit-mcp-server-5-1-0+npm-modelcontextprotocol-server-sequential-thinking-2-2-0": (
+        "artifact",
+        "all 66 paths are inside doit; the partner adds no leg.",
+    ),
+    "npm-doitintl-doit-mcp-server-5-1-0+npm-mui-mcp-0-1-10": (
+        "artifact",
+        "all 66 paths are inside doit; the partner adds no leg.",
+    ),
+    "npm-doitintl-doit-mcp-server-5-1-0+npm-server-filesystem+pypi-mcp-server-git": (
+        "real",
+        "third-party ticket and diagram text, local file reads, then alert email"
+        " and Slack recipients.",
+    ),
+    "npm-doitintl-doit-mcp-server-5-1-0+npm-touchdesigner-mcp-server-2-2-0": (
+        "real",
+        "ticket text, TouchDesigner node reads, then alert recipients.",
+    ),
+    "npm-doitintl-doit-mcp-server-5-1-0+pypi-acp-mcp-server-0-0-5": (
+        "artifact",
+        "cross-server paths are 0; every path is inside doit.",
+    ),
+    "npm-ericthered926-duckduckgo-mcp-server-0-6-0+npm-hostinger-api-mcp-4-20-0": (
+        "artifact",
+        "`search` is matched inside hostinger prose; no routing.",
+    ),
+    "npm-ericthered926-duckduckgo-mcp-server-0-6-0+npm-hostinger-mcp-4-20-0": (
+        "artifact",
+        "`search` is matched inside hostinger prose; no routing.",
+    ),
+    "npm-hostinger-mcp-4-20-0+npm-server-filesystem+pypi-mcp-server-fetch": (
+        "artifact",
+        "`search` is matched inside hostinger prose; filesystem and fetch add no"
+        " hijack.",
+    ),
+    "npm-meshy-ai-meshy-mcp-server-0-6-12+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "artifact",
+        "the ingest leg is a caller-supplied Meshy model analysis, and the egress"
+        " repository is fixed.",
+    ),
+    "npm-next-devtools-mcp-0-4-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "plausible",
+        "fetch, then a private repository read, then an issue or PR is a real"
+        " chain; the destination repository is fixed, not caller-chosen.",
+    ),
+    "npm-upstash-context7-mcp-4-7-3+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "plausible",
+        "fetch, then a private repository read, then an issue or PR is a real"
+        " chain; the destination repository is fixed, not caller-chosen.",
+    ),
+    # Holdout (20 of 37).
+    "npm-browsermcp-mcp-2-5-0+npm-mcp-searxng-2-12-0": (
+        "artifact",
+        "`browser` is matched inside searxng prose; no routing.",
+    ),
+    "npm-browsermcp-mcp-2-5-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "plausible",
+        "fetch, then a private repository read, then an issue or PR; the"
+        " destination repository is fixed.",
+    ),
+    "npm-clipform-mcp-server-5-17-0+npm-wikipedia-mcp-1-0-3": (
+        "artifact",
+        "`search` is matched inside clipform prose; no routing.",
+    ),
+    "npm-clipform-mcp-server-5-17-0+pypi-agent-tasker-mcp-server-1-0-1": (
+        "real",
+        "news text, then private form responses, then `execute`, which takes a"
+        " caller-chosen URL and command.",
+    ),
+    "npm-hourei-mcp-server-1-0-6+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "artifact",
+        "`search_law` reads a fixed legal database, not attacker-controlled"
+        " content.",
+    ),
+    "npm-hugeicons-mcp-server-0-4-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "artifact",
+        "icon install snippets are not untrusted input.",
+    ),
+    "npm-mcp-searxng-2-12-0+npm-server-filesystem+pypi-mcp-server-fetch": (
+        "artifact",
+        "`fetch` is matched inside searxng prose; no routing.",
+    ),
+    "npm-mcp-searxng-2-12-0+npm-wikipedia-mcp-1-0-3": (
+        "artifact",
+        "`search` is matched inside searxng prose; no routing.",
+    ),
+    "npm-square-mcp-server-0-1-2+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "plausible",
+        "fetch, then a private repository read, then an issue or PR; the"
+        " destination repository is fixed.",
+    ),
+    "npm-tacitai-mcp-server-0-15-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "plausible",
+        "fetch, then a private repository read, then an issue or PR; the"
+        " destination repository is fixed.",
+    ),
+    "npm-tailwindcss-mcp-server-0-1-1+pypi-agent-tasker-mcp-server-1-0-1": (
+        "artifact",
+        "Tailwind docs are a fixed first-party source; the chain starts from"
+        " documentation prose.",
+    ),
+    "npm-tailwindcss-mcp-server-0-1-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "artifact",
+        "the ingest leg is `create_pull_request`, a write tool, not an ingest.",
+    ),
+    "npm-transcend-io-mcp-server-docs-0-6-1+npm-wikipedia-mcp-1-0-3": (
+        "artifact",
+        "`search` is matched inside Transcend docs prose; no routing.",
+    ),
+    "npm-transcend-io-mcp-server-docs-0-6-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "artifact",
+        "`docs_fetch` reads a fixed docs site, not attacker-controlled content.",
+    ),
+    "npm-vizejs-musea-mcp-server-0-793-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "artifact",
+        "the ingest leg is `create_pull_request`, a write tool, not an ingest.",
+    ),
+    "npm-wikipedia-mcp-1-0-3+npm-server-filesystem+pypi-mcp-server-fetch": (
+        "artifact",
+        "`search` is matched inside wikipedia prose; no routing.",
+    ),
+    "pypi-agent-tasker-mcp-server-1-0-1+npm-server-filesystem+pypi-mcp-server-fetch": (
+        "real",
+        "fetch, then local file reads, then `execute`, which takes a caller-chosen"
+        " URL and command.",
+    ),
+    "pypi-agent-tasker-mcp-server-1-0-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "artifact",
+        "the ingest leg is `create_pull_request`, a write tool, not an ingest.",
+    ),
+    "pypi-agentic-mcp-server-0-1-1+npm-server-filesystem+pypi-mcp-server-git": (
+        "real",
+        "`read_file` and `write_file` are mounted by two servers; dispatch is"
+        " genuinely ambiguous.",
+    ),
+    "pypi-agentic-mcp-server-0-1-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8": (
+        "artifact",
+        "the ingest leg is `create_pull_request`, a write tool, not an ingest.",
+    ),
+}
+
+#: Obviously fake credential values for the third sample. A server that only
+#: checks whether a variable is set can now start and list tools; nothing here
+#: authenticates against any service, and no real secret is used.
+PLACEHOLDER_CREDENTIAL_ENV: dict[str, str] = {
+    "ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "AIRTABLE_API_KEY": "latch-placeholder-not-a-real-token",
+    "ANTHROPIC_API_KEY": "latch-placeholder-not-a-real-token",
+    "API_KEY": "latch-placeholder-not-a-real-token",
+    "API_TOKEN": "latch-placeholder-not-a-real-token",
+    "ASANA_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "AUTH_TOKEN": "latch-placeholder-not-a-real-token",
+    "AWS_ACCESS_KEY_ID": "AKIALATCHPLACEHOLDER",
+    "AWS_REGION": "us-east-1",
+    "AWS_SECRET_ACCESS_KEY": "latch-placeholder-not-a-real-secret",
+    "AZURE_CLIENT_ID": "00000000-0000-0000-0000-000000000000",
+    "AZURE_CLIENT_SECRET": "latch-placeholder-not-a-real-secret",
+    "AZURE_DEVOPS_PAT": "latch-placeholder-not-a-real-token",
+    "AZURE_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+    "BRAVE_API_KEY": "latch-placeholder-not-a-real-token",
+    "CLOUDFLARE_API_TOKEN": "latch-placeholder-not-a-real-token",
+    "CONTENTFUL_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "DATABASE_URL": "postgres://placeholder:placeholder@127.0.0.1:5432/placeholder",
+    "DATABRICKS_HOST": "https://placeholder.invalid",
+    "DATABRICKS_TOKEN": "latch-placeholder-not-a-real-token",
+    "DATADOG_API_KEY": "latch-placeholder-not-a-real-token",
+    "DATADOG_APP_KEY": "latch-placeholder-not-a-real-token",
+    "DISCORD_BOT_TOKEN": "latch-placeholder-not-a-real-token",
+    "ELEVENLABS_API_KEY": "latch-placeholder-not-a-real-token",
+    "FIGMA_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "FIGMA_API_KEY": "latch-placeholder-not-a-real-token",
+    "GEMINI_API_KEY": "latch-placeholder-not-a-real-token",
+    "GITHUB_PERSONAL_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "GITHUB_TOKEN": "latch-placeholder-not-a-real-token",
+    "GITLAB_PERSONAL_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "GITLAB_TOKEN": "latch-placeholder-not-a-real-token",
+    "GOOGLE_API_KEY": "latch-placeholder-not-a-real-token",
+    "GRAFANA_API_KEY": "latch-placeholder-not-a-real-token",
+    "HF_TOKEN": "latch-placeholder-not-a-real-token",
+    "HUBSPOT_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "HUGGINGFACE_API_KEY": "latch-placeholder-not-a-real-token",
+    "JIRA_API_TOKEN": "latch-placeholder-not-a-real-token",
+    "JIRA_BASE_URL": "https://placeholder.invalid",
+    "JIRA_USER_EMAIL": "placeholder@example.invalid",
+    "KAGGLE_KEY": "latch-placeholder-not-a-real-token",
+    "KAGGLE_USERNAME": "placeholder",
+    "LINEAR_API_KEY": "latch-placeholder-not-a-real-token",
+    "MAPBOX_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "MONGODB_URI": "mongodb://127.0.0.1:27017/placeholder",
+    "MYSQL_DATABASE": "placeholder",
+    "MYSQL_HOST": "127.0.0.1",
+    "MYSQL_PASSWORD": "placeholder",
+    "MYSQL_USER": "placeholder",
+    "NETLIFY_AUTH_TOKEN": "latch-placeholder-not-a-real-token",
+    "NEW_RELIC_API_KEY": "latch-placeholder-not-a-real-token",
+    "NOTION_API_KEY": "latch-placeholder-not-a-real-token",
+    "NOTION_TOKEN": "latch-placeholder-not-a-real-token",
+    "OPENAI_API_KEY": "latch-placeholder-not-a-real-token",
+    "OPENWEATHER_API_KEY": "latch-placeholder-not-a-real-token",
+    "PAGERDUTY_API_KEY": "latch-placeholder-not-a-real-token",
+    "POSTGRES_URL": "postgres://placeholder:placeholder@127.0.0.1:5432/placeholder",
+    "REDIS_URL": "redis://127.0.0.1:6379/0",
+    "REPLICATE_API_TOKEN": "latch-placeholder-not-a-real-token",
+    "RESEND_API_KEY": "latch-placeholder-not-a-real-token",
+    "SECRET_KEY": "latch-placeholder-not-a-real-secret",
+    "SENDGRID_API_KEY": "latch-placeholder-not-a-real-token",
+    "SENTRY_AUTH_TOKEN": "latch-placeholder-not-a-real-token",
+    "SENTRY_DSN": "https://placeholder@placeholder.invalid/1",
+    "SHOPIFY_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "SLACK_BOT_TOKEN": "xoxb-latch-placeholder",
+    "SLACK_TEAM_ID": "T00000000",
+    "SLACK_USER_TOKEN": "xoxp-latch-placeholder",
+    "SMTP_HOST": "127.0.0.1",
+    "SMTP_PASSWORD": "placeholder",
+    "SMTP_USER": "placeholder",
+    "SNOWFLAKE_ACCOUNT": "placeholder",
+    "SNOWFLAKE_PASSWORD": "placeholder",
+    "SNOWFLAKE_USER": "placeholder",
+    "STRIPE_SECRET_KEY": "sk_test_latch_placeholder",
+    "SUPABASE_ACCESS_TOKEN": "latch-placeholder-not-a-real-token",
+    "SUPABASE_SERVICE_ROLE_KEY": "latch-placeholder-not-a-real-token",
+    "SUPABASE_URL": "https://placeholder.invalid",
+    "TELEGRAM_BOT_TOKEN": "000000000:latch-placeholder",
+    "TOKEN": "latch-placeholder-not-a-real-token",
+    "TRELLO_KEY": "latch-placeholder",
+    "TRELLO_TOKEN": "latch-placeholder-not-a-real-token",
+    "TWILIO_ACCOUNT_SID": "AC00000000000000000000000000000000",
+    "TWILIO_AUTH_TOKEN": "latch-placeholder-not-a-real-token",
+    "VERCEL_TOKEN": "latch-placeholder-not-a-real-token",
+    "X_API_KEY": "latch-placeholder-not-a-real-token",
+}
+
+#: One credential mode per harvest: ``none`` supplies nothing, ``placeholder``
+#: supplies :data:`PLACEHOLDER_CREDENTIAL_ENV` so presence-only checks pass.
+CREDENTIAL_MODES = ("none", "placeholder")
+
 SAFETY_BLOCK = """\
 Refusing to harvest on a non-container host.
 
@@ -195,13 +489,19 @@ _REQUIRED_HINT = re.compile(
 
 
 @contextmanager
-def scratch_environment() -> Iterator[tuple[dict[str, str], Path]]:
+def scratch_environment(
+    *, placeholder_credentials: bool = False
+) -> Iterator[tuple[dict[str, str], Path]]:
     """Yield a child environment plus its isolated, writable scratch root.
 
     ``npx`` and ``uvx`` need a writable ``HOME`` and package caches to install
     into. Every one of those is redirected into a fresh temporary tree, so a
     harvested package can never read or write the user's real home or caches.
     Only ``PATH`` is inherited from the host.
+
+    With ``placeholder_credentials`` the child additionally receives the fixed
+    dummy values in :data:`PLACEHOLDER_CREDENTIAL_ENV`; no host variable is ever
+    copied, so a real secret cannot leak into a harvest.
     """
 
     with tempfile.TemporaryDirectory(prefix="latch-harvest-") as raw_root:
@@ -221,6 +521,8 @@ def scratch_environment() -> Iterator[tuple[dict[str, str], Path]]:
             "UV_TOOL_DIR": str(root / "uv-tools"),
             "UV_NO_PROGRESS": "1",
         }
+        if placeholder_credentials:
+            env.update(PLACEHOLDER_CREDENTIAL_ENV)
         yield env, root
 
 
@@ -318,13 +620,20 @@ def harvest_target(
     timeout: float = DEFAULT_TIMEOUT_SECONDS,
     env: dict[str, str] | None = None,
     scratch_root: Path | None = None,
+    placeholder_credentials: bool = False,
 ) -> dict[str, Any]:
     """Harvest one target into a capture record. Never raises on launch failure."""
 
     if env is None or scratch_root is None:
-        with scratch_environment() as (scratch_env, root):
+        with scratch_environment(
+            placeholder_credentials=placeholder_credentials
+        ) as (scratch_env, root):
             return harvest_target(
-                target, timeout=timeout, env=scratch_env, scratch_root=root
+                target,
+                timeout=timeout,
+                env=scratch_env,
+                scratch_root=root,
+                placeholder_credentials=placeholder_credentials,
             )
 
     async def drive() -> tuple[Any, str, BaseException | None, list[Any], str | None]:
@@ -342,6 +651,7 @@ def harvest_target(
         tools = []
 
     return {
+        "credential_mode": "placeholder" if placeholder_credentials else "none",
         "description": target.get("description", ""),
         "ecosystem": target["ecosystem"],
         "harvest_status": status,
@@ -364,16 +674,23 @@ def harvest_all(
     capture_dir: Path | None = None,
     timeout: float = DEFAULT_TIMEOUT_SECONDS,
     limit: int | None = None,
+    placeholder_credentials: bool = False,
 ) -> list[dict[str, Any]]:
     directory = capture_dir or CAPTURE_DIR
     directory.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, Any]] = []
     # One scratch tree for the whole run: npm/uv caches stay warm across
     # packages, still fully isolated from the host and removed afterwards.
-    with scratch_environment() as (env, scratch_root):
+    with scratch_environment(
+        placeholder_credentials=placeholder_credentials
+    ) as (env, scratch_root):
         for target in targets[:limit] if limit else targets:
             capture = harvest_target(
-                target, timeout=timeout, env=env, scratch_root=scratch_root
+                target,
+                timeout=timeout,
+                env=env,
+                scratch_root=scratch_root,
+                placeholder_credentials=placeholder_credentials,
             )
             path = directory / f"{capture['slug']}.json"
             path.write_text(
@@ -608,6 +925,16 @@ def analyze_compositions(
     if quiet is not None:
         examples.append(quiet)
 
+    sampled = [
+        {
+            "composition_id": row["composition_id"],
+            "note": COMPOSITION_TRIAGE[row["composition_id"]][1],
+            "verdict": COMPOSITION_TRIAGE[row["composition_id"]][0],
+        }
+        for row in flagged
+        if row["composition_id"] in COMPOSITION_TRIAGE
+    ]
+
     return {
         "anchor_slugs": sorted(anchors),
         "auth_audit_note": (
@@ -621,6 +948,16 @@ def analyze_compositions(
         "flagged_composition_count": len(flagged),
         "harvested_server_count": len(harvested),
         "rule_counts": dict(sorted(rule_counts.items())),
+        "triage": {
+            "counts": {
+                bucket: sum(1 for row in sampled if row["verdict"] == bucket)
+                for bucket in COMPOSITION_TRIAGE_BUCKETS
+            },
+            "sample_size": len(sampled),
+            "sampled": sorted(sampled, key=lambda row: row["composition_id"]),
+            "seed": COMPOSITION_TRIAGE_SEED,
+            "untriaged": len(flagged) - len(sampled),
+        },
     }
 
 
@@ -729,11 +1066,19 @@ def analyze(
         if row["slug"] in KNOWN_OUT_OF_SCOPE_MISSES
     ]
 
+    credential_modes = {
+        mode: sum(
+            1 for capture in captures if capture.get("credential_mode", "none") == mode
+        )
+        for mode in CREDENTIAL_MODES
+    }
+
     return {
         "analyzed_target_count": sum(
             1 for row in rows if row["analysis_status"] == "analyzed"
         ),
         "captures_dir": (capture_dir or CAPTURE_DIR).name,
+        "credential_modes": credential_modes,
         "compositions": analyze_compositions(
             capture_dir, excluded=unanalyzable, manifest_dir=manifest_dir
         ),
@@ -866,6 +1211,8 @@ def _render_compositions(compositions: dict[str, Any]) -> list[str]:
 
     if not compositions or not compositions.get("count"):
         return []
+    triage = compositions.get("triage") or {}
+    sampled = triage.get("sampled") or []
     counts = compositions.get("engine_counts", {})
     anchors = compositions.get("anchor_slugs") or []
     lines = [
@@ -882,6 +1229,23 @@ def _render_compositions(compositions: dict[str, Any]) -> list[str]:
         "(`filesystem+fetch`, `filesystem+git`, `fetch+github`). The duplicate-name",
         "surface behind `CASE-01` is excluded — no capability analysis can run on",
         "it.",
+        "",
+        "**Unvalidated stress test on arbitrary server pairs — not findings.**",
+        "Nothing below was drawn from a real deployment: the grid is every pair of",
+        "harvested surfaces plus three first-party kits, so the counts are upper",
+        "bounds on what the frozen rules emit on that grid, not a prevalence",
+        "estimate.",
+        *(
+            [
+                "A fixed-seed hand triage of a sample follows and finds that most",
+                "flags do not survive contact with the pair.",
+            ]
+            if sampled
+            else [
+                "No sample of this sweep has been hand-triaged yet, so the counts",
+                "below are untriaged rule output.",
+            ]
+        ),
         "",
         "Anchors: "
         + (", ".join(f"`{slug}`" for slug in anchors) if anchors else "none")
@@ -903,6 +1267,56 @@ def _render_compositions(compositions: dict[str, Any]) -> list[str]:
         for rule_id, count in compositions["rule_counts"].items():
             lines.append(f"| `{rule_id}` | {count} |")
         lines.append("")
+
+    if sampled:
+        counts = triage.get("counts") or {}
+        lines.extend(
+            [
+                "### Hand triage of the sweep",
+                "",
+                f"{triage.get('sample_size', len(sampled))} of the"
+                f" {compositions['flagged_composition_count']} flagged compositions"
+                f" were drawn with `random.Random({triage.get('seed')})` over the"
+                " sorted composition ids and read individually",
+                "(`python -m field_study.triage_compositions`). Verdicts:"
+                f" **{counts.get('real', 0)} real, {counts.get('plausible', 0)}"
+                f" plausible, {counts.get('artifact', 0)} artifact**. The remaining"
+                f" {triage.get('untriaged', 0)} are untriaged.",
+                "",
+                "| Composition | Verdict | Evidence |",
+                "| ----------- | ------- | -------- |",
+            ]
+        )
+        for row in sampled:
+            lines.append(
+                f"| `{row['composition_id']}` | `{row['verdict']}` |"
+                f" {row['note']} |"
+            )
+        lines.extend(
+            [
+                "",
+                "The artifacts come from three mechanisms, each visible in the",
+                "notes above:",
+                "",
+                "1. **A leg the detector misclassified.** `create_pull_request` is",
+                "   read as untrusted input, a local `read_file`/`search_files` as",
+                "   ingest, and a fixed product API as an egress. A path built from",
+                "   one of those is not a chain, whatever its shape.",
+                "2. **A single-server chain the partner does not touch.** Several",
+                "   sampled compositions flag only because one mounted server has an",
+                "   inherent trifecta of its own; the second server adds no leg, so",
+                "   the flag is a property of the harness, not of the pair.",
+                "3. **Prose matched against a generic tool name.** `search`,",
+                "   `status`, `delete`, `generate`, `browser` and `fetch` occur in",
+                "   ordinary descriptions, and `CROSS_TOOL_HIJACK` then claims",
+                "   routing that the text does not contain.",
+                "",
+                "No detector was changed for this triage: the sweep is labelled,",
+                "not fixed, so the frozen fingerprint above still covers it and the",
+                "remaining compositions stay untriaged.",
+                "",
+            ]
+        )
 
     examples = compositions.get("examples") or []
     if examples:
@@ -958,18 +1372,48 @@ def render_report(results: dict[str, Any]) -> str:
     status_counts = results["harvest_status_counts"]
     triage = results["triage"]
     analyzed = results["analyzed_target_count"]
+    placeholder = bool((results.get("credential_modes") or {}).get("placeholder"))
+    harvested_meaning = (
+        "`tools/list` returned with placeholder credentials."
+        if placeholder
+        else "`tools/list` returned without credentials."
+    )
+
+    if results["flagged_target_count"] and not triage["pending"]:
+        status_sentence = (
+            "**Status: harvest + offline static scan, hand-triaged in Week 2 and"
+            " re-analyzed after the detector fix.**"
+        )
+    elif not results["flagged_target_count"]:
+        status_sentence = (
+            "**Status: harvest + offline static scan; no surface flagged.**"
+        )
+    else:
+        status_sentence = (
+            "**Status: harvest + offline static scan; flagged surfaces await"
+            " hand triage.**"
+        )
 
     lines = [
         "# Field study: unseen npm & PyPI MCP servers",
         "",
-        "**Status: harvest + offline static scan, hand-triaged in Week 2 and",
-        "re-analyzed after the detector fix.** Every number below comes from",
+        status_sentence,
+        "Every number below comes from",
         "`field_study/run_field_study.py --analyze` over recorded `tools/list`",
         "captures; no package was executed during analysis. There are no",
-        "independent ground-truth labels: each verdict is a self-assigned hand",
-        "triage whose criteria are stated in the worksheet below.",
+        "independent ground-truth labels: any verdict below is a self-assigned",
+        "hand triage whose criteria are stated in the worksheet.",
         "",
         f"- Detector fingerprint: `{results['detector_fingerprint_sha256']}`",
+        *(
+            [
+                "- Credential mode: **placeholder** — every credential a harvested"
+                " package received is a fixed dummy value (`latch-placeholder-…`);"
+                " no real secret was used."
+            ]
+            if placeholder
+            else []
+        ),
         f"- Captured targets: **{results['target_count']}**",
         f"- Analyzed surfaces: **{analyzed}**",
         f"- Flagged surfaces: **{results['flagged_target_count']}**",
@@ -979,14 +1423,24 @@ def render_report(results: dict[str, Any]) -> str:
         "",
         "| Status | Count | Meaning |",
         "| ------ | ----- | ------- |",
-        f"| `harvested` | {status_counts.get('harvested', 0)} | `tools/list` returned without credentials. |",
+        f"| `harvested` | {status_counts.get('harvested', 0)} | {harvested_meaning} |",
         f"| `missing_required_env` | {status_counts.get('missing_required_env', 0)} | Exited asking for a token/key/URL; recorded, not retried with secrets. |",
         f"| `timeout` | {status_counts.get('timeout', 0)} | Exceeded the per-package timeout. |",
         f"| `startup_error` | {status_counts.get('startup_error', 0)} | Install or startup failed for another reason. |",
         "",
-        "A high `missing_required_env` share is expected and is not a defect: most",
-        "hosted-service MCP servers cannot list tools without `GITHUB_TOKEN`-class",
-        "credentials. The study never supplies them.",
+        *(
+            [
+                "Presence-only checks pass under placeholder credentials, so this",
+                "share should fall. A package that still exits here validates the",
+                "credential against its service, which the study does not supply.",
+            ]
+            if placeholder
+            else [
+                "A high `missing_required_env` share is expected and is not a",
+                "defect: most hosted-service MCP servers cannot list tools without",
+                "`GITHUB_TOKEN`-class credentials. The study never supplies them.",
+            ]
+        ),
         "",
         *_render_hardening(results),
         *_render_compositions(results.get("compositions") or {}),
@@ -1093,8 +1547,20 @@ def render_report(results: dict[str, Any]) -> str:
             "  ecosystem; prevalence claims are out of scope.",
             "- Capture is `tools/list` only. Handler-level bugs (path traversal,",
             "  injection) are invisible to a manifest auditor and are not scored.",
-            "- Packages needing credentials never list tools here, so the analyzed",
-            "  subset is biased toward servers that start without secrets.",
+            *(
+                [
+                    "- Credentials are placeholders, not real ones, so a server that",
+                    "  validates its token before listing tools still never lists them.",
+                    "  The analyzed subset stays biased toward servers that start",
+                    "  without a working credential.",
+                ]
+                if placeholder
+                else [
+                    "- Packages needing credentials never list tools here, so the",
+                    "  analyzed subset is biased toward servers that start without",
+                    "  secrets.",
+                ]
+            ),
             "- No independent second rater: every label in Week 2 is self-assigned.",
             "- Detectors were frozen for the duration of the harvest. Week-2 triage",
             "  then changed them; the pre-fix and post-fix fingerprints in the",
@@ -1125,6 +1591,20 @@ def render_report(results: dict[str, Any]) -> str:
             "    --exclude-targets field_study/round1/targets.json",
             "# harvest inside the disposable container from run_field_study.SAFETY_BLOCK",
             "python -m field_study.run_field_study --analyze",
+            *(
+                [
+                    "# Third sample: presence-only checks pass, tokens stay fake.",
+                    "python -m field_study.run_field_study --harvest --placeholder-credentials \\",
+                    "    --targets field_study/placeholder/targets.json \\",
+                    "    --captures field_study/placeholder/captures",
+                    "python -m field_study.run_field_study --analyze \\",
+                    "    --captures field_study/placeholder/captures \\",
+                    "    --targets field_study/placeholder/targets.json \\",
+                    "    --output-dir field_study/placeholder",
+                ]
+                if placeholder
+                else []
+            ),
             "pytest -q tests/test_field_study.py",
             "```",
             "",
@@ -1281,6 +1761,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT_SECONDS)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--i-understand-this-executes-packages", action="store_true")
+    parser.add_argument(
+        "--placeholder-credentials",
+        action="store_true",
+        help=(
+            "harvest with fixed dummy credential values so presence-only checks "
+            "pass; never supplies a real secret"
+        ),
+    )
     args = parser.parse_args(argv)
 
     if args.harvest:
@@ -1296,6 +1784,7 @@ def main(argv: list[str] | None = None) -> int:
             capture_dir=args.captures,
             timeout=args.timeout,
             limit=args.limit,
+            placeholder_credentials=args.placeholder_credentials,
         )
 
     if args.analyze or not args.harvest:

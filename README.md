@@ -642,8 +642,12 @@ without supplying API credentials (`field_study/FIELD_STUDY_REPORT.md`):
   detectors over every pair of harvested servers plus each server beside
   `filesystem+fetch`, `filesystem+git` and `fetch+github` flags **`136`**
   compositions: `2,937` of `5,113` `LETHAL_TRIFECTA` paths are cross-server and
-  `shadow` contributes `186` findings. `auth-audit` stays at `0` because every
-  capture is a stdio manifest with no HTTP/OAuth transport to audit — an
+  `shadow` contributes `186` findings. **These are an unvalidated stress test on
+  arbitrary server pairs, not findings:** the grid is enumerated, not sampled
+  from deployments, and a fixed-seed triage of 20 of the 136 found `4` real,
+  `2` plausible and `14` artifacts (single-server chains, prose matched against
+  generic tool names, and misclassified legs). `auth-audit` stays at `0` because
+  every capture is a stdio manifest with no HTTP/OAuth transport to audit — an
   untested engine there, not a pass.
 - **Known miss:** `malicious-mcp-server@1.5.0` is labelled
   `known_out_of_scope_miss`, not clean. Its surface is hostile by intent
@@ -656,10 +660,15 @@ without supplying API credentials (`field_study/FIELD_STUDY_REPORT.md`):
   next slice of the same registry queries (no package in common with round 1):
   `18` returned a surface (`112` tools) and **`0` of `18` flagged** — no false
   positives out of sample. Eighteen surfaces bounds the per-server
-  false-positive rate at roughly `17%` (rule of three), not at zero.
-  Compositions on the same sample: `37` of `207` flag, with `675` of `1,401`
-  `LETHAL_TRIFECTA` paths cross-server and `21` `shadow` findings. Method,
-  funnel and artifacts: `field_study/HOLDOUT.md`.
+  false-positive rate at roughly `17%` (rule of three), not at zero, and the
+  result covers only small surfaces that start without credentials: the
+  credentialed SaaS servers behind round 1's noise are still under-represented
+  (`13` of the 100 asked for a token and never listed tools). Compositions on
+  the same sample: `37` of `207` flag (again a stress test, not findings), with
+  `675` of `1,401` `LETHAL_TRIFECTA` paths cross-server and `21` `shadow`
+  findings. Method, funnel and artifacts: `field_study/HOLDOUT.md`. A third
+  sample repeats the run with fixed dummy credentials so presence-only checks
+  pass, without using any real secret: `field_study/PLACEHOLDER_CREDENTIALS.md`.
 
 ## GitHub Actions
 

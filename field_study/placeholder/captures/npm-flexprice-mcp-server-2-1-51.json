@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "[![npm](https://img.shields.io/npm/v/@flexprice/mcp-server?label=npm)](https://www.npmjs.com/package/@flexprice/mcp-server) [![Docs](https://img.shields.io/badge/docs-docs.flexprice.io-informational)](https://docs.flexprice.io/docs/connect/mcp-server)",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@flexprice/mcp-server@2.1.51"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@flexprice/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-flexprice-mcp-server-2-1-51",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.1.51"
+}

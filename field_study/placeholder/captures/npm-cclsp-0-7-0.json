@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for accessing LSP functionality",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "cclsp@0.7.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "cclsp",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/ktnyt/cclsp",
+  "slug": "npm-cclsp-0-7-0",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.7.0"
+}

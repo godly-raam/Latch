@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "AlibabaCloud Container Service MCP Server (ack-mcp-server)",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "alibabacloud-ack-mcp-server==1.0.2"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "alibabacloud-ack-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/aliyun/alibabacloud-ack-mcp-server",
+  "slug": "pypi-alibabacloud-ack-mcp-server-1-0-2",
+  "stderr_summary": "Building alibabacloud-darabonba-array==0.1.0\n      Built alibabacloud-darabonba-signature-util==0.0.4\n      Built alibabacloud-darabonba-map==0.0.1\nDownloading kubernetes (7.2MiB)\nDownloading lz4 (1.3MiB)\n      Built alibabacloud-darabonba-string==0.0.4\n      Built alibabacloud-darabonba-array==0.1.0\n Downloaded lz4\n Downloaded kubernetes\nInstalled 108 packages in 81ms",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.0.2"
+}

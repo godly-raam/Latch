@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Serper MCP Server supporting search and webpage scraping",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "serper-search-scrape-mcp-server@0.1.2"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "serper-search-scrape-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/marcopesani/mcp-server-serper",
+  "slug": "npm-serper-search-scrape-mcp-server-0-1-2",
+  "stderr_summary": "throw new Error(\"SERPER_API_KEY environment variable is required\");\n          ^\n\nError: SERPER_API_KEY environment variable is required\n    at file://<scratch>/npm-cache/_npx/f2489248900223a7/node_modules/serper-search-scrape-mcp-server/build/index.js:14:11\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\n\nNode.js v22.23.5",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.2"
+}

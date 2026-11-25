@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for EventCatalog",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@eventcatalog/mcp-server@2.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@eventcatalog/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/event-catalog/mcp-server",
+  "slug": "npm-eventcatalog-mcp-server-2-1-0",
+  "stderr_summary": "Fatal error starting server: McpError: MCP error -32602: EVENTCATALOG_URL is not set\n    at parseConfig (file://<scratch>/npm-cache/_npx/555dbd8e688e534c/node_modules/@eventcatalog/mcp-server/dist/config.js:38:15)\n    at main (file://<scratch>/npm-cache/_npx/555dbd8e688e534c/node_modules/@eventcatalog/mcp-server/dist/index.js:31:20)\n    at file://<scratch>/npm-cache/_npx/555dbd8e688e534c/node_modules/@eventcatalog/mcp-server/dist/index.js:49:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  code: -32602,\n  data: undefined\n}",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.1.0"
+}

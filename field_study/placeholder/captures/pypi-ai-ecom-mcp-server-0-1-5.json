@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server exposing AI e-commerce operation tools for internal agents",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "ai-ecom-mcp-server==0.1.5"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "ai-ecom-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-ai-ecom-mcp-server-0-1-5",
+  "stderr_summary": "Installed 8 packages in 3ms",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.5"
+}

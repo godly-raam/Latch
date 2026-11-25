@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for Clipwright: generate UGC videos from your coding agent",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@clipwright/mcp-server@0.80.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@clipwright/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/seocombat/clipwright-mcp",
+  "slug": "npm-clipwright-mcp-server-0-80-0",
+  "stderr_summary": "CLIPWRIGHT_API_KEY env var is required",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.80.0"
+}

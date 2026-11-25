@@ -73,7 +73,123 @@
       "CROSS_TOOL_HIJACK": 13,
       "EXACT_TOOL_SHADOW": 3,
       "LETHAL_TRIFECTA": 24
+    },
+    "triage": {
+      "counts": {
+        "artifact": 14,
+        "plausible": 3,
+        "real": 3
+      },
+      "sample_size": 20,
+      "sampled": [
+        {
+          "composition_id": "npm-browsermcp-mcp-2-5-0+npm-mcp-searxng-2-12-0",
+          "note": "`browser` is matched inside searxng prose; no routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-browsermcp-mcp-2-5-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "fetch, then a private repository read, then an issue or PR; the destination repository is fixed.",
+          "verdict": "plausible"
+        },
+        {
+          "composition_id": "npm-clipform-mcp-server-5-17-0+npm-wikipedia-mcp-1-0-3",
+          "note": "`search` is matched inside clipform prose; no routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-clipform-mcp-server-5-17-0+pypi-agent-tasker-mcp-server-1-0-1",
+          "note": "news text, then private form responses, then `execute`, which takes a caller-chosen URL and command.",
+          "verdict": "real"
+        },
+        {
+          "composition_id": "npm-hourei-mcp-server-1-0-6+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "`search_law` reads a fixed legal database, not attacker-controlled content.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-hugeicons-mcp-server-0-4-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "icon install snippets are not untrusted input.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-mcp-searxng-2-12-0+npm-server-filesystem+pypi-mcp-server-fetch",
+          "note": "`fetch` is matched inside searxng prose; no routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-mcp-searxng-2-12-0+npm-wikipedia-mcp-1-0-3",
+          "note": "`search` is matched inside searxng prose; no routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-square-mcp-server-0-1-2+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "fetch, then a private repository read, then an issue or PR; the destination repository is fixed.",
+          "verdict": "plausible"
+        },
+        {
+          "composition_id": "npm-tacitai-mcp-server-0-15-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "fetch, then a private repository read, then an issue or PR; the destination repository is fixed.",
+          "verdict": "plausible"
+        },
+        {
+          "composition_id": "npm-tailwindcss-mcp-server-0-1-1+pypi-agent-tasker-mcp-server-1-0-1",
+          "note": "Tailwind docs are a fixed first-party source; the chain starts from documentation prose.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-tailwindcss-mcp-server-0-1-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "the ingest leg is `create_pull_request`, a write tool, not an ingest.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-transcend-io-mcp-server-docs-0-6-1+npm-wikipedia-mcp-1-0-3",
+          "note": "`search` is matched inside Transcend docs prose; no routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-transcend-io-mcp-server-docs-0-6-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "`docs_fetch` reads a fixed docs site, not attacker-controlled content.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-vizejs-musea-mcp-server-0-793-0+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "the ingest leg is `create_pull_request`, a write tool, not an ingest.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "npm-wikipedia-mcp-1-0-3+npm-server-filesystem+pypi-mcp-server-fetch",
+          "note": "`search` is matched inside wikipedia prose; no routing.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "pypi-agent-tasker-mcp-server-1-0-1+npm-server-filesystem+pypi-mcp-server-fetch",
+          "note": "fetch, then local file reads, then `execute`, which takes a caller-chosen URL and command.",
+          "verdict": "real"
+        },
+        {
+          "composition_id": "pypi-agent-tasker-mcp-server-1-0-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "the ingest leg is `create_pull_request`, a write tool, not an ingest.",
+          "verdict": "artifact"
+        },
+        {
+          "composition_id": "pypi-agentic-mcp-server-0-1-1+npm-server-filesystem+pypi-mcp-server-git",
+          "note": "`read_file` and `write_file` are mounted by two servers; dispatch is genuinely ambiguous.",
+          "verdict": "real"
+        },
+        {
+          "composition_id": "pypi-agentic-mcp-server-0-1-1+pypi-mcp-server-fetch+npm-server-github-2025-4-8",
+          "note": "the ingest leg is `create_pull_request`, a write tool, not an ingest.",
+          "verdict": "artifact"
+        }
+      ],
+      "seed": 20261125,
+      "untriaged": 17
     }
+  },
+  "credential_modes": {
+    "none": 100,
+    "placeholder": 0
   },
   "detector_fingerprint_sha256": "d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4",
   "engine_counts": {

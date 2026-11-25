@@ -1,0 +1,54 @@
+{
+  "credential_mode": "placeholder",
+  "description": "An MCP server to run arbitrary commands",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "mcp-server-commands@0.8.2"
+  ],
+  "manifest_sha256": "1c2fd337bcbc99a39dc5dba6d6d22015064697aaecf511a3c1d18a15baa98dd6",
+  "package": "mcp-server-commands",
+  "protocol_version": "2024-11-05",
+  "repository_url": null,
+  "slug": "npm-mcp-server-commands-0-8-2",
+  "stderr_summary": "",
+  "tool_count": 1,
+  "tools": [
+    {
+      "description": "Run a process on this linux machine",
+      "inputSchema": {
+        "properties": {
+          "argv": {
+            "description": "Executable mode: directly spawn a process. argv[0] is the executable, followed by arguments passed verbatim (no shell interpretation). Cannot be combined with 'command_line'.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "command_line": {
+            "description": "Shell mode: a shell command line executed via the system's default shell. Supports pipes, redirects, globbing. Cannot be combined with 'argv'.",
+            "type": "string"
+          },
+          "cwd": {
+            "description": "Optional to set working directory",
+            "type": "string"
+          },
+          "stdin_text": {
+            "description": "Optional text written to STDIN (written fully, then closed). Useful for heredoc-style input or file contents.",
+            "type": "string"
+          },
+          "timeout_ms": {
+            "description": "Optional timeout in milliseconds, defaults to 30,000ms",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "run_process"
+    }
+  ],
+  "version": "0.8.2"
+}

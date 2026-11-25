@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "AlgoChains MCP Server — 533 tools for live algo trading: Tradovate/Alpaca/OANDA, Databento/Polygon data, Onyx RAG, Graphiti KG, AlphaLoop, HMM regimes, autonomous marketplace pipeline, Kalshi, physical-world event intelligence, real data only.",
+  "ecosystem": "pypi",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "uvx",
+    "algochains-mcp-server==22.7.3"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "algochains-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-algochains-mcp-server-22-7-3",
+  "stderr_summary": "Building algochains-mcp-server==22.7.3\nDownloading pandas (11.4MiB)\nDownloading numpy (15.0MiB)\nDownloading lxml (5.0MiB)\nDownloading curl-cffi (13.4MiB)\n      Built algochains-mcp-server==22.7.3\n Downloaded lxml\n Downloaded pandas",
+  "tool_count": 0,
+  "tools": [],
+  "version": "22.7.3"
+}

@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Reverse engineer anything from your terminal or agent with one CLI and MCP server.",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "rea-agents@6.10.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "rea-agents",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/morluto/rea",
+  "slug": "npm-rea-agents-6-10-1",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "6.10.1"
+}

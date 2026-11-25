@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "IMS Editing MCP Server",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "alibabacloud-ims-editing-mcp-server==0.0.3"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "alibabacloud-ims-editing-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-alibabacloud-ims-editing-mcp-server-0-0-3",
+  "stderr_summary": "field_info = FieldInfo_.from_annotated_attribute(ann_type, assigned_value, _source=AnnotationSource.CLASS)\n  File \"<scratch>/uv-cache/archive-v0/2NGqiPZwP10gjLqd/lib/python3.13/site-packages/pydantic/fields.py\", line 644, in from_annotated_attribute\n    field_info = FieldInfo._construct(\n        prepend_metadata + metadata if prepend_metadata is not None else metadata, **attr_overrides\n    )\n  File \"<scratch>/uv-cache/archive-v0/2NGqiPZwP10gjLqd/lib/python3.13/site-packages/pydantic/fields.py\", line 743, in _construct\n    merged_field_info = cls(**merged_kwargs)\n  File \"<scratch>/uv-cache/archive-v0/2NGqiPZwP10gjLqd/lib/python3.13/site-packages/pydantic/fields.py\", line 293, in __init__\n    raise TypeError('cannot specify both default and default_factory')\nTypeError: cannot specify both default and default_factory",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.0.3"
+}

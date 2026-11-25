@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP Server for AlibabaCloud DMS",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "alibabacloud-dms-mcp-server==0.1.23"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "alibabacloud-dms-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-alibabacloud-dms-mcp-server-0-1-23",
+  "stderr_summary": "https://errors.pydantic.dev/2.14/v/l               \n                             iteral_error                                       \n                             CancelTaskRequest.params.taskId                    \n                               Field required [type=missing,                    \n                             input_value={'_meta':                              \n                             {'io.modelconte...lientCapabilities'               \n                             : {}}}, input_type=dict]                           \n                                 For further information visit                  \n                             https://errors.pydantic.dev/2.14/v/m               \n                             issing",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.23"
+}
