@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for loading and extracting text from PDF files with chunked pagination and interactive viewer",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@modelcontextprotocol/server-pdf@2.0.4"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@modelcontextprotocol/server-pdf",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/modelcontextprotocol/ext-apps",
+  "slug": "npm-modelcontextprotocol-server-pdf-2-0-4",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "2.0.4"
+}

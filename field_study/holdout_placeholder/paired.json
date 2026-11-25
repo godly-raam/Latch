@@ -1,0 +1,2280 @@
+{
+  "changed": [
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@abhaybabbar/retellai-mcp-server",
+      "slug": "npm-abhaybabbar-retellai-mcp-server-1-0-4",
+      "transition": "missing_required_env -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.0.4"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@anyproto/anytype-mcp",
+      "slug": "npm-anyproto-anytype-mcp-2-0-3",
+      "transition": "startup_error -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.0.3"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@aventurevc/mcp-server",
+      "slug": "npm-aventurevc-mcp-server-0-8-498",
+      "transition": "missing_required_env -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.8.498"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@contextstream/mcp-server",
+      "slug": "npm-contextstream-mcp-server-1-0-99",
+      "transition": "timeout -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 2,
+      "version": "1.0.99"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@dbx-app/mcp-server",
+      "slug": "npm-dbx-app-mcp-server-0-4-145",
+      "transition": "timeout -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 3,
+      "version": "0.4.145"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@decodo/mcp-server",
+      "slug": "npm-decodo-mcp-server-1-9-0",
+      "transition": "missing_required_env -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.9.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 2,
+      "ecosystem": "npm",
+      "package": "@knip/mcp",
+      "slug": "npm-knip-mcp-0-0-39",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.0.39"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 15,
+      "ecosystem": "npm",
+      "package": "langsmith-mcp-server",
+      "slug": "npm-langsmith-mcp-server-0-1-7",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.1.7"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 4,
+      "ecosystem": "npm",
+      "package": "mcp-searxng",
+      "slug": "npm-mcp-searxng-2-12-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.12.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 2,
+      "ecosystem": "npm",
+      "package": "@openbnb/mcp-server-airbnb",
+      "slug": "npm-openbnb-mcp-server-airbnb-0-3-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.3.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "replicate-mcp",
+      "slug": "npm-replicate-mcp-0-9-0",
+      "transition": "startup_error -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 35,
+      "version": "0.9.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@shortcut/mcp",
+      "slug": "npm-shortcut-mcp-0-25-0",
+      "transition": "startup_error -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.25.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 1,
+      "ecosystem": "npm",
+      "package": "@tacitai/mcp-server",
+      "slug": "npm-tacitai-mcp-server-0-15-1",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.15.1"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@thirdstrandstudio/mcp-figma",
+      "slug": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "transition": "missing_required_env -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 31,
+      "version": "0.7.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-assessment",
+      "slug": "npm-transcend-io-mcp-server-assessment-2-1-18",
+      "transition": "startup_error -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.1.18"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 3,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-docs",
+      "slug": "npm-transcend-io-mcp-server-docs-0-6-1",
+      "transition": "harvested -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.6.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-policy",
+      "slug": "npm-transcend-io-mcp-server-policy-0-2-10",
+      "transition": "startup_error -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.2.10"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 13,
+      "ecosystem": "npm",
+      "package": "@vizejs/musea-mcp-server",
+      "slug": "npm-vizejs-musea-mcp-server-0-793-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.793.0"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@zereight/mcp-gitlab",
+      "slug": "npm-zereight-mcp-gitlab-3-0-0",
+      "transition": "missing_required_env -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 40,
+      "version": "3.0.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "adls2-mcp-server",
+      "slug": "pypi-adls2-mcp-server-0-1-4",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.4"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "ado-mcp-server",
+      "slug": "pypi-ado-mcp-server-0-1-0",
+      "transition": "timeout -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "age_mcp_server",
+      "slug": "pypi-age-mcp-server-0-3-0",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.3.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-mcp-server",
+      "slug": "pypi-agent-mcp-server-0-1-1",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentfactory-mcp-server",
+      "slug": "pypi-agentfactory-mcp-server-0-1-0",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentops-mcp-server",
+      "slug": "pypi-agentops-mcp-server-0-5-4",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.5.4"
+    }
+  ],
+  "detector_fingerprint_sha256": "d7c7ff0ce5adc621958074d0afa5bf886b33bedbae79b9a6e9c5fa933acc02a4",
+  "findings": [
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-replicate-mcp-0-9-0",
+      "tool": "npm-replicate-mcp-0-9-0:search_models"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-replicate-mcp-0-9-0",
+      "tool": "npm-replicate-mcp-0-9-0:search_models"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-replicate-mcp-0-9-0",
+      "tool": "npm-replicate-mcp-0-9-0:search_models"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-replicate-mcp-0-9-0",
+      "tool": "npm-replicate-mcp-0-9-0:search_models"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_comment_reactions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_comment_reactions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_comments"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_comments"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_webhook"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "CRITICAL",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_webhook"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_comment_reactions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_comment_reactions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_comments"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_comments"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tool": "npm-thirdstrandstudio-mcp-figma-0-7-0:figma_get_webhook"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:create_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:create_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:create_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:create_issue_note"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:create_issue_note"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:create_issue_note"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_merge_request_notes"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_merge_request_notes"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_merge_request_notes"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_merge_request_notes"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_repository_tree"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_repository_tree"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_repository_tree"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:get_repository_tree"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:help"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:help"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:help"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:help"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_branches"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_branches"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_branches"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_branches"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_commits"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_commits"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_commits"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_commits"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_issue_discussions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_issue_discussions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_issue_discussions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_issue_discussions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_issues"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_issues"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_issues"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_issues"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_labels"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_labels"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_labels"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_labels"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_merge_request_diffs"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_merge_request_diffs"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_merge_request_diffs"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_merge_request_diffs"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_merge_requests"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_merge_requests"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_merge_requests"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_merge_requests"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_project_members"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_project_members"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_project_members"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_project_members"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:list_projects"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:mr_discussions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:mr_discussions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:mr_discussions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:mr_discussions"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:my_issues"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:my_issues"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:my_issues"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:my_issues"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:search_repositories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:search_repositories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:search_repositories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:search_repositories"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_issue"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_issue_description_patch"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_issue_description_patch"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_issue_description_patch"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_merge_request"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_merge_request"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_merge_request"
+    },
+    {
+      "engine": "graph",
+      "rule_id": "LETHAL_TRIFECTA",
+      "severity": "HIGH",
+      "target": "npm-zereight-mcp-gitlab-3-0-0",
+      "tool": "npm-zereight-mcp-gitlab-3-0-0:update_merge_request"
+    }
+  ],
+  "findings_per_new_target": [
+    {
+      "findings": 0,
+      "rule_counts": {},
+      "severity_counts": {},
+      "slug": "npm-contextstream-mcp-server-1-0-99",
+      "tools": 2
+    },
+    {
+      "findings": 0,
+      "rule_counts": {},
+      "severity_counts": {},
+      "slug": "npm-dbx-app-mcp-server-0-4-145",
+      "tools": 3
+    },
+    {
+      "findings": 4,
+      "rule_counts": {
+        "LETHAL_TRIFECTA": 4
+      },
+      "severity_counts": {
+        "CRITICAL": 4
+      },
+      "slug": "npm-replicate-mcp-0-9-0",
+      "tools": 35
+    },
+    {
+      "findings": 11,
+      "rule_counts": {
+        "LETHAL_TRIFECTA": 11
+      },
+      "severity_counts": {
+        "CRITICAL": 6,
+        "HIGH": 5
+      },
+      "slug": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "tools": 31
+    },
+    {
+      "findings": 80,
+      "rule_counts": {
+        "LETHAL_TRIFECTA": 80
+      },
+      "severity_counts": {
+        "HIGH": 80
+      },
+      "slug": "npm-zereight-mcp-gitlab-3-0-0",
+      "tools": 40
+    }
+  ],
+  "harvested_counts": {
+    "none": 18,
+    "placeholder": 16
+  },
+  "net_yield_change": -2,
+  "newly_harvested": [
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@contextstream/mcp-server",
+      "slug": "npm-contextstream-mcp-server-1-0-99",
+      "transition": "timeout -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 2,
+      "version": "1.0.99"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@dbx-app/mcp-server",
+      "slug": "npm-dbx-app-mcp-server-0-4-145",
+      "transition": "timeout -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 3,
+      "version": "0.4.145"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "replicate-mcp",
+      "slug": "npm-replicate-mcp-0-9-0",
+      "transition": "startup_error -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 35,
+      "version": "0.9.0"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@thirdstrandstudio/mcp-figma",
+      "slug": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "transition": "missing_required_env -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 31,
+      "version": "0.7.0"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@zereight/mcp-gitlab",
+      "slug": "npm-zereight-mcp-gitlab-3-0-0",
+      "transition": "missing_required_env -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 40,
+      "version": "3.0.0"
+    }
+  ],
+  "newly_lost": [
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 2,
+      "ecosystem": "npm",
+      "package": "@knip/mcp",
+      "slug": "npm-knip-mcp-0-0-39",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.0.39"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 15,
+      "ecosystem": "npm",
+      "package": "langsmith-mcp-server",
+      "slug": "npm-langsmith-mcp-server-0-1-7",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.1.7"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 4,
+      "ecosystem": "npm",
+      "package": "mcp-searxng",
+      "slug": "npm-mcp-searxng-2-12-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.12.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 2,
+      "ecosystem": "npm",
+      "package": "@openbnb/mcp-server-airbnb",
+      "slug": "npm-openbnb-mcp-server-airbnb-0-3-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.3.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 1,
+      "ecosystem": "npm",
+      "package": "@tacitai/mcp-server",
+      "slug": "npm-tacitai-mcp-server-0-15-1",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.15.1"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 3,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-docs",
+      "slug": "npm-transcend-io-mcp-server-docs-0-6-1",
+      "transition": "harvested -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.6.1"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 13,
+      "ecosystem": "npm",
+      "package": "@vizejs/musea-mcp-server",
+      "slug": "npm-vizejs-musea-mcp-server-0-793-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.793.0"
+    }
+  ],
+  "rows": [
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@abhaybabbar/retellai-mcp-server",
+      "slug": "npm-abhaybabbar-retellai-mcp-server-1-0-4",
+      "transition": "missing_required_env -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.0.4"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "agentation-mcp",
+      "slug": "npm-agentation-mcp-1-3-2",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "1.3.2"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@amap/amap-maps-mcp-server",
+      "slug": "npm-amap-amap-maps-mcp-server-0-0-8",
+      "transition": "missing_required_env -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "0.0.8"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@anyproto/anytype-mcp",
+      "slug": "npm-anyproto-anytype-mcp-2-0-3",
+      "transition": "startup_error -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.0.3"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@arabold/docs-mcp-server",
+      "slug": "npm-arabold-docs-mcp-server-3-5-0",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "3.5.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "argocd-mcp",
+      "slug": "npm-argocd-mcp-0-9-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.9.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@auth0/auth0-mcp-server",
+      "slug": "npm-auth0-auth0-mcp-server-0-1-0-beta-19",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0-beta.19"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@aventurevc/mcp-server",
+      "slug": "npm-aventurevc-mcp-server-0-8-498",
+      "transition": "missing_required_env -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.8.498"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "aws-s3-mcp",
+      "slug": "npm-aws-s3-mcp-0-4-0",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.4.0"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@battlegrid/mcp-server",
+      "slug": "npm-battlegrid-mcp-server-32-0-115",
+      "transition": "missing_required_env -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "32.0.115"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@bit2me/mcp-server",
+      "slug": "npm-bit2me-mcp-server-4-5-2",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "4.5.2"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 1,
+      "ecosystem": "npm",
+      "package": "@browsermcp/mcp",
+      "slug": "npm-browsermcp-mcp-2-5-0",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 1,
+      "version": "2.5.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 32,
+      "ecosystem": "npm",
+      "package": "@clipform/mcp-server",
+      "slug": "npm-clipform-mcp-server-5-17-0",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 32,
+      "version": "5.17.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@cloudflare/mcp-server-cloudflare",
+      "slug": "npm-cloudflare-mcp-server-cloudflare-0-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.2.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@cnbcool/mcp-server",
+      "slug": "npm-cnbcool-mcp-server-0-6-7",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.6.7"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@contextstream/mcp-server",
+      "slug": "npm-contextstream-mcp-server-1-0-99",
+      "transition": "timeout -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 2,
+      "version": "1.0.99"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "datadog-mcp-server",
+      "slug": "npm-datadog-mcp-server-1-0-9",
+      "transition": "missing_required_env -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "1.0.9"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "dataforseo-mcp-server",
+      "slug": "npm-dataforseo-mcp-server-3-1-3",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "3.1.3"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@dbx-app/mcp-server",
+      "slug": "npm-dbx-app-mcp-server-0-4-145",
+      "transition": "timeout -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 3,
+      "version": "0.4.145"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@decodo/mcp-server",
+      "slug": "npm-decodo-mcp-server-1-9-0",
+      "transition": "missing_required_env -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.9.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@dopplerhq/mcp-server",
+      "slug": "npm-dopplerhq-mcp-server-1-0-5",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.0.5"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@esaio/esa-mcp-server",
+      "slug": "npm-esaio-esa-mcp-server-0-15-2",
+      "transition": "missing_required_env -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "0.15.2"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@gongrzhe/server-gmail-autoauth-mcp",
+      "slug": "npm-gongrzhe-server-gmail-autoauth-mcp-1-1-11",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.1.11"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "graphlit-mcp-server",
+      "slug": "npm-graphlit-mcp-server-1-0-20260112001",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.0.20260112001"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 3,
+      "ecosystem": "npm",
+      "package": "hourei-mcp-server",
+      "slug": "npm-hourei-mcp-server-1-0-6",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 3,
+      "version": "1.0.6"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 6,
+      "ecosystem": "npm",
+      "package": "@hugeicons/mcp-server",
+      "slug": "npm-hugeicons-mcp-server-0-4-1",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 6,
+      "version": "0.4.1"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@kintone/mcp-server",
+      "slug": "npm-kintone-mcp-server-1-11-4",
+      "transition": "missing_required_env -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "1.11.4"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 2,
+      "ecosystem": "npm",
+      "package": "@knip/mcp",
+      "slug": "npm-knip-mcp-0-0-39",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.0.39"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "kubernetes-mcp-server-linux-amd64",
+      "slug": "npm-kubernetes-mcp-server-linux-amd64-0-1-3",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.3"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 15,
+      "ecosystem": "npm",
+      "package": "langsmith-mcp-server",
+      "slug": "npm-langsmith-mcp-server-0-1-7",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.1.7"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@mastra/mcp-docs-server",
+      "slug": "npm-mastra-mcp-docs-server-1-3-15",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.3.15"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 4,
+      "ecosystem": "npm",
+      "package": "mcp-searxng",
+      "slug": "npm-mcp-searxng-2-12-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.12.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 1,
+      "ecosystem": "npm",
+      "package": "mcp-server-code-runner",
+      "slug": "npm-mcp-server-code-runner-0-1-8",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 1,
+      "version": "0.1.8"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@modelcontextprotocol/server-pdf",
+      "slug": "npm-modelcontextprotocol-server-pdf-2-0-4",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.0.4"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@mongodb-js/mcp-tools-atlas",
+      "slug": "npm-mongodb-js-mcp-tools-atlas-3-4-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "3.4.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "mongodb-mcp-server",
+      "slug": "npm-mongodb-mcp-server-3-4-0",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "3.4.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@near-mcp/aitp-mcp-server",
+      "slug": "npm-near-mcp-aitp-mcp-server-0-1-34",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.1.34"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@nexus2520/bitbucket-mcp-server",
+      "slug": "npm-nexus2520-bitbucket-mcp-server-4-0-0",
+      "transition": "missing_required_env -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "4.0.0"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@onozaty/redmine-mcp-server",
+      "slug": "npm-onozaty-redmine-mcp-server-1-4-0",
+      "transition": "missing_required_env -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "1.4.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 2,
+      "ecosystem": "npm",
+      "package": "@openbnb/mcp-server-airbnb",
+      "slug": "npm-openbnb-mcp-server-airbnb-0-3-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.3.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "replicate-mcp",
+      "slug": "npm-replicate-mcp-0-9-0",
+      "transition": "startup_error -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 35,
+      "version": "0.9.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@sap/mdk-mcp-server",
+      "slug": "npm-sap-mdk-mcp-server-0-4-4",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.4.4"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@shortcut/mcp",
+      "slug": "npm-shortcut-mcp-0-25-0",
+      "transition": "startup_error -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.25.0"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "slite-mcp-server",
+      "slug": "npm-slite-mcp-server-1-3-0",
+      "transition": "missing_required_env -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "1.3.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@smartbear/mcp",
+      "slug": "npm-smartbear-mcp-0-45-0",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.45.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 3,
+      "ecosystem": "npm",
+      "package": "square-mcp-server",
+      "slug": "npm-square-mcp-server-0-1-2",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 3,
+      "version": "0.1.2"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@storybook/mcp",
+      "slug": "npm-storybook-mcp-10-6-8",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "10.6.8"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@structured-world/gitlab-mcp",
+      "slug": "npm-structured-world-gitlab-mcp-13-5-0",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "13.5.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 1,
+      "ecosystem": "npm",
+      "package": "@tacitai/mcp-server",
+      "slug": "npm-tacitai-mcp-server-0-15-1",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.15.1"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 8,
+      "ecosystem": "npm",
+      "package": "tailwindcss-mcp-server",
+      "slug": "npm-tailwindcss-mcp-server-0-1-1",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 8,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 5,
+      "ecosystem": "npm",
+      "package": "@thesvg/mcp-server",
+      "slug": "npm-thesvg-mcp-server-0-9-2",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 5,
+      "version": "0.9.2"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@thirdstrandstudio/mcp-figma",
+      "slug": "npm-thirdstrandstudio-mcp-figma-0-7-0",
+      "transition": "missing_required_env -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 31,
+      "version": "0.7.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "tiny-stdio-mcp-server",
+      "slug": "npm-tiny-stdio-mcp-server-0-1-32",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.32"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-admin",
+      "slug": "npm-transcend-io-mcp-server-admin-2-1-0",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.1.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-assessment",
+      "slug": "npm-transcend-io-mcp-server-assessment-2-1-18",
+      "transition": "startup_error -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "2.1.18"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-base",
+      "slug": "npm-transcend-io-mcp-server-base-3-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "3.2.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-consent",
+      "slug": "npm-transcend-io-mcp-server-consent-1-6-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "1.6.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-custom-functions",
+      "slug": "npm-transcend-io-mcp-server-custom-functions-0-3-5",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.3.5"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-discovery",
+      "slug": "npm-transcend-io-mcp-server-discovery-1-1-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "1.1.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 3,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-docs",
+      "slug": "npm-transcend-io-mcp-server-docs-0-6-1",
+      "transition": "harvested -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.6.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-dsr",
+      "slug": "npm-transcend-io-mcp-server-dsr-2-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "2.2.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-inventory",
+      "slug": "npm-transcend-io-mcp-server-inventory-1-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "1.2.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-policy",
+      "slug": "npm-transcend-io-mcp-server-policy-0-2-10",
+      "transition": "startup_error -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.2.10"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-preferences",
+      "slug": "npm-transcend-io-mcp-server-preferences-0-9-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.9.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@transcend-io/mcp-server-workflows",
+      "slug": "npm-transcend-io-mcp-server-workflows-1-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "1.2.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 13,
+      "ecosystem": "npm",
+      "package": "@vizejs/musea-mcp-server",
+      "slug": "npm-vizejs-musea-mcp-server-0-793-0",
+      "transition": "harvested -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "0.793.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@voltagent/mcp-server",
+      "slug": "npm-voltagent-mcp-server-2-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "2.2.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@vouchington/mcp-server",
+      "slug": "npm-vouchington-mcp-server-0-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.2.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 2,
+      "ecosystem": "npm",
+      "package": "wikipedia-mcp",
+      "slug": "npm-wikipedia-mcp-1-0-3",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 2,
+      "version": "1.0.3"
+    },
+    {
+      "baseline_status": "missing_required_env",
+      "baseline_tools": 0,
+      "ecosystem": "npm",
+      "package": "@zereight/mcp-gitlab",
+      "slug": "npm-zereight-mcp-gitlab-3-0-0",
+      "transition": "missing_required_env -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 40,
+      "version": "3.0.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "adls2-mcp-server",
+      "slug": "pypi-adls2-mcp-server-0-1-4",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.4"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "ado-mcp-server",
+      "slug": "pypi-ado-mcp-server-0-1-0",
+      "transition": "timeout -> missing_required_env",
+      "treatment_status": "missing_required_env",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "adversary-mcp-server",
+      "slug": "pypi-adversary-mcp-server-1-11-1",
+      "transition": "timeout -> timeout",
+      "treatment_status": "timeout",
+      "treatment_tools": 0,
+      "version": "1.11.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "adx-mcp-server",
+      "slug": "pypi-adx-mcp-server-1-1-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "1.1.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "age_mcp_server",
+      "slug": "pypi-age-mcp-server-0-3-0",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.3.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-analytics-mcp-server",
+      "slug": "pypi-agent-analytics-mcp-server-0-1-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-commerce-mcp-server",
+      "slug": "pypi-agent-commerce-mcp-server-0-1-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-coordination-mcp-server",
+      "slug": "pypi-agent-coordination-mcp-server-0-1-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-cost-mcp-server",
+      "slug": "pypi-agent-cost-mcp-server-0-1-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-directory-mcp-server",
+      "slug": "pypi-agent-directory-mcp-server-0-1-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-feedback-mcp-server",
+      "slug": "pypi-agent-feedback-mcp-server-0-1-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-identity-mcp-server",
+      "slug": "pypi-agent-identity-mcp-server-0-1-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-insurance-mcp-server",
+      "slug": "pypi-agent-insurance-mcp-server-0-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.2.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-mcp-server",
+      "slug": "pypi-agent-mcp-server-0-1-1",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-memory-mcp-server",
+      "slug": "pypi-agent-memory-mcp-server-0-1-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-reputation-mcp-server",
+      "slug": "pypi-agent-reputation-mcp-server-0-1-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-staking-mcp-server",
+      "slug": "pypi-agent-staking-mcp-server-0-1-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 2,
+      "ecosystem": "pypi",
+      "package": "agent-tasker-mcp-server",
+      "slug": "pypi-agent-tasker-mcp-server-1-0-1",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 2,
+      "version": "1.0.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-toolkit-mcp-server",
+      "slug": "pypi-agent-toolkit-mcp-server-0-4-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.4.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-validator-mcp-server",
+      "slug": "pypi-agent-validator-mcp-server-0-1-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agent-workflow-mcp-server",
+      "slug": "pypi-agent-workflow-mcp-server-0-1-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentauth-mcp-server",
+      "slug": "pypi-agentauth-mcp-server-0-1-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentbridge-mcp-server",
+      "slug": "pypi-agentbridge-mcp-server-0-1-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentfactory-mcp-server",
+      "slug": "pypi-agentfactory-mcp-server-0-1-0",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.1.0"
+    },
+    {
+      "baseline_status": "harvested",
+      "baseline_tools": 9,
+      "ecosystem": "pypi",
+      "package": "agentic_mcp_server",
+      "slug": "pypi-agentic-mcp-server-0-1-1",
+      "transition": "harvested -> harvested",
+      "treatment_status": "harvested",
+      "treatment_tools": 9,
+      "version": "0.1.1"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentmesh-mcp-server",
+      "slug": "pypi-agentmesh-mcp-server-3-7-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "3.7.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentoath-mcp-server",
+      "slug": "pypi-agentoath-mcp-server-0-2-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.2.0"
+    },
+    {
+      "baseline_status": "timeout",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentops-mcp-server",
+      "slug": "pypi-agentops-mcp-server-0-5-4",
+      "transition": "timeout -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.5.4"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentskills-mcp-server",
+      "slug": "pypi-agentskills-mcp-server-0-7-0",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "0.7.0"
+    },
+    {
+      "baseline_status": "startup_error",
+      "baseline_tools": 0,
+      "ecosystem": "pypi",
+      "package": "agentsphere-mcp-server",
+      "slug": "pypi-agentsphere-mcp-server-1-9-1",
+      "transition": "startup_error -> startup_error",
+      "treatment_status": "startup_error",
+      "treatment_tools": 0,
+      "version": "1.9.1"
+    }
+  ],
+  "status_counts": {
+    "none": {
+      "harvested": 18,
+      "missing_required_env": 13,
+      "startup_error": 46,
+      "timeout": 23
+    },
+    "placeholder": {
+      "harvested": 16,
+      "missing_required_env": 9,
+      "startup_error": 47,
+      "timeout": 28
+    }
+  },
+  "transition_matrix": {
+    "harvested": {
+      "harvested": 11,
+      "missing_required_env": 0,
+      "startup_error": 1,
+      "timeout": 6
+    },
+    "missing_required_env": {
+      "harvested": 2,
+      "missing_required_env": 8,
+      "startup_error": 0,
+      "timeout": 3
+    },
+    "startup_error": {
+      "harvested": 1,
+      "missing_required_env": 0,
+      "startup_error": 41,
+      "timeout": 4
+    },
+    "timeout": {
+      "harvested": 2,
+      "missing_required_env": 1,
+      "startup_error": 5,
+      "timeout": 15
+    }
+  }
+}

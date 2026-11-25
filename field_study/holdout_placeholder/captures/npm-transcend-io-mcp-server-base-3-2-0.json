@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Shared infrastructure for Transcend MCP Server packages.",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@transcend-io/mcp-server-base@3.2.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@transcend-io/mcp-server-base",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/transcend-io/tools",
+  "slug": "npm-transcend-io-mcp-server-base-3-2-0",
+  "stderr_summary": "npm error could not determine executable to run\nnpm error A complete log of this run can be found in: <scratch>/npm-cache/_logs/2026-11-25T21_22_53_316Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "3.2.0"
+}

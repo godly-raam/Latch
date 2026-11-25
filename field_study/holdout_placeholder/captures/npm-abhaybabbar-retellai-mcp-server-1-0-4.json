@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "RetellAi MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@abhaybabbar/retellai-mcp-server@1.0.4"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@abhaybabbar/retellai-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/abhaybabbar/retellai-mcp-server",
+  "slug": "npm-abhaybabbar-retellai-mcp-server-1-0-4",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.0.4"
+}

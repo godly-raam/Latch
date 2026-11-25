@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for Airbnb search and listing details",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@openbnb/mcp-server-airbnb@0.3.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@openbnb/mcp-server-airbnb",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "npm-openbnb-mcp-server-airbnb-0-3-0",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.3.0"
+}

@@ -34,6 +34,7 @@ from field_study.run_field_study import (
     scratch_environment,
     write_results,
 )
+from field_study.paired_placeholder import build, render_paired
 from field_study.triage_compositions import sample_details
 from mcpprobe.graph import analyze_capability_graph
 from mcpprobe.models import ToolDefinition
@@ -997,3 +998,88 @@ def test_placeholder_mode_is_stated_in_the_report(tmp_path: Path) -> None:
     plain_report = render_report(analyze(plain_captures, tmp_path / "targets.json"))
     assert "Credential mode:" not in plain_report
     assert "--placeholder-credentials" not in plain_report
+
+
+def _paired_fixture(tmp_path: Path) -> tuple[Path, Path, Path]:
+    baseline = tmp_path / "none"
+    treatment = tmp_path / "placeholder"
+    baseline.mkdir()
+    treatment.mkdir()
+    duplicate = [
+        {"name": "dup", "description": "a", "inputSchema": {"type": "object"}},
+        {"name": "dup", "description": "b", "inputSchema": {"type": "object"}},
+    ]
+    plain = [{"name": "echo", "description": "Echo.", "inputSchema": {"type": "object"}}]
+    for slug, status, tools, mode in (
+        ("npm-alpha-1-0-0", "harvested", duplicate, "none"),
+        ("npm-beta-1-0-0", "missing_required_env", [], "none"),
+        ("npm-gamma-1-0-0", "harvested", plain, "none"),
+    ):
+        capture = _capture(slug, tools, status=status)
+        capture["credential_mode"] = mode
+        (baseline / f"{slug}.json").write_text(json.dumps(capture), encoding="utf-8")
+    for slug, status, tools in (
+        ("npm-alpha-1-0-0", "harvested", duplicate),
+        ("npm-beta-1-0-0", "harvested", duplicate),
+        ("npm-gamma-1-0-0", "timeout", []),
+    ):
+        capture = _capture(slug, tools, status=status)
+        capture["credential_mode"] = "placeholder"
+        (treatment / f"{slug}.json").write_text(json.dumps(capture), encoding="utf-8")
+    targets = tmp_path / "targets.json"
+    targets.write_text(
+        json.dumps(
+            {
+                "targets": [
+                    {
+                        "slug": slug,
+                        "ecosystem": "npm",
+                        "package": slug,
+                        "version": "1.0.0",
+                    }
+                    for slug in (
+                        "npm-alpha-1-0-0",
+                        "npm-beta-1-0-0",
+                        "npm-gamma-1-0-0",
+                    )
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    return baseline, treatment, targets
+
+
+def test_paired_placeholder_counts_transitions_and_only_new_findings(
+    tmp_path: Path,
+) -> None:
+    baseline, treatment, targets = _paired_fixture(tmp_path)
+
+    summary = build(baseline, treatment, targets)
+
+    assert summary["harvested_counts"] == {"none": 2, "placeholder": 2}
+    assert summary["net_yield_change"] == 0
+    assert [row["slug"] for row in summary["newly_harvested"]] == ["npm-beta-1-0-0"]
+    assert [row["slug"] for row in summary["newly_lost"]] == ["npm-gamma-1-0-0"]
+    assert summary["transition_matrix"]["missing_required_env"]["harvested"] == 1
+    assert summary["transition_matrix"]["harvested"]["timeout"] == 1
+    assert summary["transition_matrix"]["harvested"]["harvested"] == 1
+    # Only the newly harvested package is scanned; alpha was already a surface.
+    assert {finding["target"] for finding in summary["findings"]} == {"npm-beta-1-0-0"}
+    assert summary["findings_per_new_target"][0]["slug"] == "npm-beta-1-0-0"
+    assert summary["findings_per_new_target"][0]["findings"] == 1
+
+
+def test_paired_report_calls_the_third_sample_separate(tmp_path: Path) -> None:
+    baseline, treatment, targets = _paired_fixture(tmp_path)
+
+    report = render_paired(build(baseline, treatment, targets))
+
+    assert "The lever measured **in-sample**" in report
+    assert "**separate third sample**" in report
+    assert "not used as evidence for the lever" in report
+    assert "**Newly harvested:** 1" in report
+    assert "  - `npm-beta-1-0-0` (2 tools)" in report
+    assert "**Newly lost:** 1" in report
+    assert "  - `npm-gamma-1-0-0` (harvested -> timeout)" in report
+    assert "Findings from newly harvested packages only" in report

@@ -1,0 +1,226 @@
+{
+  "credential_mode": "placeholder",
+  "description": "A Model Context Protol(MCP) built for context exchange between LLM agents and external services.",
+  "ecosystem": "pypi",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "uvx",
+    "agentic_mcp_server==0.1.1"
+  ],
+  "manifest_sha256": "dfc8f4067730e420c18c52ec95e32c624b5553f0112d51f6ea7c0ac49b689b6b",
+  "package": "agentic_mcp_server",
+  "protocol_version": "2026-07-28",
+  "repository_url": null,
+  "slug": "pypi-agentic-mcp-server-0-1-1",
+  "stderr_summary": "│                            https://gofastmcp.com                             │\n│                                                                              │\n│                  🖥  Server:      FastMCP-94a5, 4.2.6                         │\n│                  🚀 Deploy free: https://horizon.prefect.io                  │\n│                                                                              │\n╰──────────────────────────────────────────────────────────────────────────────╯\n\n\n[11/25/26 21:29:11] INFO     Starting MCP server 'FastMCP-94a5' transport.py:241\n                             with transport 'stdio'",
+  "tool_count": 9,
+  "tools": [
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will execute a bash command and return the output. This function \nis useful for executing bash commands including creating files, directories, and other bash commands.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "command"
+        ],
+        "type": "object"
+      },
+      "name": "bash",
+      "title": "Bash"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will execute a python code and return the output.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "python_code",
+      "title": "Python Code"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will execute a python file and return the output.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "type": "object"
+      },
+      "name": "python_file",
+      "title": "Python File"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will return a list of files that match the given pattern. This function is useful for finding files in a directory.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "pattern": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pattern"
+        ],
+        "type": "object"
+      },
+      "name": "glob",
+      "title": "Glob"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will search for the given pattern in the specified file and return the matching lines.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "pattern": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pattern",
+          "file"
+        ],
+        "type": "object"
+      },
+      "name": "grep",
+      "title": "Grep"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will read the contents of a file and return it as a string.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "type": "object"
+      },
+      "name": "read_file",
+      "title": "Read File"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will write the given content to a file. If the file does not exist, it will be created.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "write_file",
+      "title": "Write File"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will create a folder with the given name. If the folder already exists, it will return a message indicating that the folder already exists.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "folder": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder"
+        ],
+        "type": "object"
+      },
+      "name": "create_folder",
+      "title": "Create Folder"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "description": "This function will delete a folder with the given name. If the folder does not exist, it will return a message indicating that the folder does not exist.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "folder": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder"
+        ],
+        "type": "object"
+      },
+      "name": "delete_folder",
+      "title": "Delete Folder"
+    }
+  ],
+  "version": "0.1.1"
+}

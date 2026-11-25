@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for building Vue.js design systems - component analysis, documentation, variant generation, and design tokens",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@vizejs/musea-mcp-server@0.793.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@vizejs/musea-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/ubugeeei-prod/vize",
+  "slug": "npm-vizejs-musea-mcp-server-0-793-0",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.793.0"
+}

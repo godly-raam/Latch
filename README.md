@@ -666,9 +666,12 @@ without supplying API credentials (`field_study/FIELD_STUDY_REPORT.md`):
   (`13` of the 100 asked for a token and never listed tools). Compositions on
   the same sample: `37` of `207` flag (again a stress test, not findings), with
   `675` of `1,401` `LETHAL_TRIFECTA` paths cross-server and `21` `shadow`
-  findings. Method, funnel and artifacts: `field_study/HOLDOUT.md`. A third
-  sample repeats the run with fixed dummy credentials so presence-only checks
-  pass, without using any real secret: `field_study/PLACEHOLDER_CREDENTIALS.md`.
+  findings. Method, funnel and artifacts: `field_study/HOLDOUT.md`. The same
+  holdout list is re-harvested with fixed dummy credentials so presence-only
+  checks pass (no real secret); the paired status table and transitions are in
+  `field_study/holdout_placeholder/PAIRED.md`, which is the only evidence for
+  the credential lever. A separate third sample of new packages is documented
+  in `field_study/PLACEHOLDER_CREDENTIALS.md`.
 
 ## GitHub Actions
 

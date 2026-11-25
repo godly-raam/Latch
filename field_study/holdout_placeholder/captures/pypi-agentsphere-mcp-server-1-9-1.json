@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "mcp server for agentsphere sandbox",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agentsphere-mcp-server==1.9.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agentsphere-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://www.agentsphere.run/home",
+  "slug": "pypi-agentsphere-mcp-server-1-9-1",
+  "stderr_summary": "For further information visit https://errors.pydantic.dev/2.14/v/missing\nListTasksRequest.method\n  Input should be 'tasks/list' [type=literal_error, input_value='server/discover', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nCancelTaskRequest.method\n  Input should be 'tasks/cancel' [type=literal_error, input_value='server/discover', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nCancelTaskRequest.params.taskId\n  Field required [type=missing, input_value={'_meta': {'io.modelconte...lientCapabilities': {}}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.9.1"
+}

@@ -1,0 +1,122 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for DBX — query databases from Claude Code, Cursor, and other AI agents",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@dbx-app/mcp-server@0.4.145"
+  ],
+  "manifest_sha256": "545456dd8c58dd84e5c3f5325e2a6641b24f247b69f40b69567dc47c6174049f",
+  "package": "@dbx-app/mcp-server",
+  "protocol_version": "2026-07-28",
+  "repository_url": "https://github.com/t8y2/dbx",
+  "slug": "npm-dbx-app-mcp-server-0-4-145",
+  "stderr_summary": "",
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Add a new database connection to DBX",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "database": {
+            "type": "string"
+          },
+          "db_type": {
+            "type": "string"
+          },
+          "driver_profile": {
+            "type": "string"
+          },
+          "external_config": {
+            "description": "Dialect-specific external configuration. Nacos: camelCase admin config\n(`implementation`, `versionMode`, `contextPath`, `serverAddr`,\n`namespace`, `auth`, …). Omitted Nacos fields are filled from\nhost/port/username/password/database with the desktop defaults\n(`implementation=nacos`, `versionMode=v2`, `contextPath=/nacos`)."
+          },
+          "host": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "default": "",
+            "type": "string"
+          },
+          "port": {
+            "format": "uint16",
+            "maximum": 65535,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "ssl": {
+            "default": false,
+            "type": "boolean"
+          },
+          "username": {
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "db_type",
+          "host"
+        ],
+        "type": "object"
+      },
+      "name": "dbx_add_connection"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Duplicate a DBX connection with its complete settings, credentials, tunnels, and sidebar group",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "connection_id": {
+            "description": "Unique ID of the DBX connection",
+            "type": "string"
+          },
+          "connection_name": {
+            "description": "Name of the DBX connection",
+            "type": "string"
+          },
+          "new_name": {
+            "description": "Name for the copied connection",
+            "type": "string"
+          }
+        },
+        "required": [
+          "new_name"
+        ],
+        "type": "object"
+      },
+      "name": "dbx_duplicate_connection"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List database connections configured in DBX. Returns connection IDs, names, group paths, database types, endpoints, selected databases, and saved connection notes.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "dbx_list_connections"
+    }
+  ],
+  "version": "0.4.145"
+}

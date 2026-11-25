@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for Azure Data Explorer integration",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "adx-mcp-server==1.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "adx-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-adx-mcp-server-1-1-0",
+  "stderr_summary": "Installed 79 packages in 51ms",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.1.0"
+}

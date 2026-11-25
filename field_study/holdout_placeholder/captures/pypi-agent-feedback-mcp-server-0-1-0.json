@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Quality signals for MCP tools — agents report results, building a community-driven quality database",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-feedback-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-feedback-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agent-feedback-mcp-server",
+  "slug": "pypi-agent-feedback-mcp-server-0-1-0",
+  "stderr_summary": "Installed 29 packages in 22ms\nAn executable named `agent-feedback-mcp-server` is not provided by package `agent-feedback-mcp-server`.\nThe following executables are available:\n- agent-feedback\n\nUse `uvx --from agent-feedback-mcp-server agent-feedback` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

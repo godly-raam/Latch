@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Lighthouse for AI agents — test if APIs and services are properly accessible to AI agents",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-validator-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-validator-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agent-validator-mcp-server",
+  "slug": "pypi-agent-validator-mcp-server-0-1-0",
+  "stderr_summary": "Installed 32 packages in 22ms\nAn executable named `agent-validator-mcp-server` is not provided by package `agent-validator-mcp-server`.\nThe following executables are available:\n- agent-validator\n\nUse `uvx --from agent-validator-mcp-server agent-validator` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

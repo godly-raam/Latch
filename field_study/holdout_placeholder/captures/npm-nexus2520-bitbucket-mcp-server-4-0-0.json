@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for Bitbucket API integration - supports both Cloud and Server",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@nexus2520/bitbucket-mcp-server@4.0.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@nexus2520/bitbucket-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/pdogra1299/bitbucket-mcp-server",
+  "slug": "npm-nexus2520-bitbucket-mcp-server-4-0-0",
+  "stderr_summary": "Error: BITBUCKET_USERNAME and either BITBUCKET_APP_PASSWORD (Cloud) or BITBUCKET_TOKEN (Server/DC) are required.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "4.0.0"
+}

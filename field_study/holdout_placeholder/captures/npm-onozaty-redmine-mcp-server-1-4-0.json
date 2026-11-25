@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for Redmine",
+  "ecosystem": "npm",
+  "harvest_status": "missing_required_env",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@onozaty/redmine-mcp-server@1.4.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@onozaty/redmine-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/onozaty/redmine-mcp-server",
+  "slug": "npm-onozaty-redmine-mcp-server-1-4-0",
+  "stderr_summary": "^\n\nError: REDMINE_URL environment variable is not set\n    at loadConfig (file://<scratch>/npm-cache/_npx/04d9484897d50e36/node_modules/@onozaty/redmine-mcp-server/dist/server.mjs:25:25)\n    at file://<scratch>/npm-cache/_npx/04d9484897d50e36/node_modules/@onozaty/redmine-mcp-server/dist/server.mjs:39:16\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\n\nNode.js v22.23.5",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.4.0"
+}

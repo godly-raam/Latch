@@ -1,0 +1,219 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for TailwindCSS utility classes, documentation, and project assistance",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "tailwindcss-mcp-server@0.1.1"
+  ],
+  "manifest_sha256": "9f29c8da281bed0d4fcf1f9110aef2bd39bb934f26eac4556dfc0c11bd065cbc",
+  "package": "tailwindcss-mcp-server",
+  "protocol_version": "2024-11-05",
+  "repository_url": "https://github.com/CarbonoDev/tailwindcss-mcp-server",
+  "slug": "npm-tailwindcss-mcp-server-0-1-1",
+  "stderr_summary": "npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation\nTailwindCSS MCP server running on stdio",
+  "tool_count": 8,
+  "tools": [
+    {
+      "description": "Get TailwindCSS utilities by category, property, or search term",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Filter by utility category (e.g., 'layout', 'typography', 'colors')",
+            "type": "string"
+          },
+          "property": {
+            "description": "Filter by CSS property (e.g., 'margin', 'color', 'font-size')",
+            "type": "string"
+          },
+          "search": {
+            "description": "Search term to find utilities",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_tailwind_utilities"
+    },
+    {
+      "description": "Get TailwindCSS color palette information",
+      "inputSchema": {
+        "properties": {
+          "colorName": {
+            "description": "Specific color name (e.g., 'blue', 'red')",
+            "type": "string"
+          },
+          "includeShades": {
+            "description": "Include all color shades (default: true)",
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_tailwind_colors"
+    },
+    {
+      "description": "Get TailwindCSS configuration guides for different frameworks",
+      "inputSchema": {
+        "properties": {
+          "framework": {
+            "description": "Target framework (e.g., 'react', 'vue', 'nextjs')",
+            "type": "string"
+          },
+          "topic": {
+            "description": "Configuration topic (e.g., 'installation', 'customization')",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_tailwind_config_guide"
+    },
+    {
+      "description": "Search TailwindCSS documentation",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Filter by documentation category",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Limit number of results (default: 10)",
+            "type": "number"
+          },
+          "query": {
+            "description": "Search query for TailwindCSS documentation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_tailwind_docs"
+    },
+    {
+      "description": "Generate installation commands and configuration files for TailwindCSS in different frameworks",
+      "inputSchema": {
+        "properties": {
+          "framework": {
+            "description": "Target framework (e.g., 'react', 'nextjs', 'vue', 'vite', 'laravel', 'angular', 'svelte')",
+            "type": "string"
+          },
+          "includeTypescript": {
+            "description": "Include TypeScript configuration (default: false)",
+            "type": "boolean"
+          },
+          "packageManager": {
+            "description": "Package manager to use (default: npm)",
+            "enum": [
+              "npm",
+              "yarn",
+              "pnpm",
+              "bun"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "framework"
+        ],
+        "type": "object"
+      },
+      "name": "install_tailwind"
+    },
+    {
+      "description": "Convert traditional CSS to TailwindCSS utility classes",
+      "inputSchema": {
+        "properties": {
+          "css": {
+            "description": "CSS code to convert to TailwindCSS utilities",
+            "type": "string"
+          },
+          "mode": {
+            "description": "Output format: 'classes' for space-separated utilities, 'inline' for class attribute, 'component' for @apply directive (default: classes)",
+            "enum": [
+              "inline",
+              "classes",
+              "component"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "css"
+        ],
+        "type": "object"
+      },
+      "name": "convert_css_to_tailwind"
+    },
+    {
+      "description": "Generate a custom color palette with multiple shades from a base color",
+      "inputSchema": {
+        "properties": {
+          "baseColor": {
+            "description": "Base color in hex, rgb, or hsl format (e.g., '#3B82F6', 'rgb(59, 130, 246)')",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name for the color palette (e.g., 'brand', 'accent')",
+            "type": "string"
+          },
+          "shades": {
+            "description": "Array of shade values to generate (default: [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950])",
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "baseColor",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "generate_color_palette"
+    },
+    {
+      "description": "Generate HTML component templates with TailwindCSS classes",
+      "inputSchema": {
+        "properties": {
+          "componentType": {
+            "description": "Type of component to generate (e.g., 'button', 'card', 'form', 'navbar', 'modal', 'alert', 'badge', 'breadcrumb')",
+            "type": "string"
+          },
+          "darkMode": {
+            "description": "Include dark mode support (default: false)",
+            "type": "boolean"
+          },
+          "responsive": {
+            "description": "Include responsive design classes (default: true)",
+            "type": "boolean"
+          },
+          "style": {
+            "description": "Visual style of the component (default: modern)",
+            "enum": [
+              "minimal",
+              "modern",
+              "playful"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "componentType"
+        ],
+        "type": "object"
+      },
+      "name": "generate_component_template"
+    }
+  ],
+  "version": "0.1.1"
+}

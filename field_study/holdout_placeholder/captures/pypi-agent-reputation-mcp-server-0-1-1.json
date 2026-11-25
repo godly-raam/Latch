@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Trust and reputation system for AI agents — rate, verify and build trust between agents",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-reputation-mcp-server==0.1.1"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-reputation-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agent-reputation-mcp-server",
+  "slug": "pypi-agent-reputation-mcp-server-0-1-1",
+  "stderr_summary": "Installed 29 packages in 19ms\nAn executable named `agent-reputation-mcp-server` is not provided by package `agent-reputation-mcp-server`.\nThe following executables are available:\n- agent-reputation-server\n\nUse `uvx --from agent-reputation-mcp-server agent-reputation-server` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.1"
+}

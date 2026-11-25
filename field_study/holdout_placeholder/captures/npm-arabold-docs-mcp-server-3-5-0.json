@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for fetching and searching documentation",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@arabold/docs-mcp-server@3.5.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@arabold/docs-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/arabold/docs-mcp-server",
+  "slug": "npm-arabold-docs-mcp-server-3-5-0",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "3.5.0"
+}

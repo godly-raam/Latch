@@ -118,8 +118,13 @@ and ordinary prose matched against a generic tool name such as `search`.
   surfaces that drove round 1's findings are under-represented.
 - **Not shown:** any rate for credentialed servers. The 13 packages that exited
   asking for a token never listed tools, and no real credential was supplied.
-  The placeholder-credential sample is the separate attempt to reach that
-  class; it is reported on its own and does not revise `0/18`.
+  The credential lever is measured in-sample on this same list: the 100
+  targets above were re-harvested with fixed dummy credentials, and
+  `field_study/holdout_placeholder/PAIRED.md` reports the per-package status
+  transitions. That paired table is the lever evidence; the separate
+  placeholder-credential sample of new packages
+  (`field_study/PLACEHOLDER_CREDENTIALS.md`) is reported on its own and does not
+  revise `0/18`.
 - **Still untested:** runtime behaviour (responses and handlers), `auth-audit`
   on remote HTTP/OAuth servers, and any target that needs credentials. See the
   Limitations section of `FIELD_STUDY_REPORT.md` for the boundary this study

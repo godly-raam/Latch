@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server for agent transaction insurance and escrow — protect AI agent-to-agent payments with smart escrow, dispute resolution, and risk scoring.",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-insurance-mcp-server==0.2.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-insurance-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/AiAgentKarl/agent-insurance-mcp-server",
+  "slug": "pypi-agent-insurance-mcp-server-0-2-0",
+  "stderr_summary": "Installed 32 packages in 23ms\nTraceback (most recent call last):\n  File \"<scratch>/uv-cache/archive-v0/A1zDoEhcrWqxndqP/bin/agent-insurance-mcp-server\", line 6, in <module>\n    from agent_insurance_mcp_server.server import main\n  File \"<scratch>/uv-cache/archive-v0/A1zDoEhcrWqxndqP/lib/python3.13/site-packages/agent_insurance_mcp_server/server.py\", line 4, in <module>\n    from mcp.server.fastmcp import FastMCP\n  File \"<scratch>/uv-cache/archive-v0/A1zDoEhcrWqxndqP/lib/python3.13/site-packages/mcp/server/fastmcp.py\", line 16, in <module>\n    raise ModuleNotFoundError(_MESSAGE, name=__name__)\nModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp<2' to keep running v1 code.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.2.0"
+}

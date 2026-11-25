@@ -1,0 +1,131 @@
+  /tmp/pip-build-env-8gpzilex/overlay/lib/python3.12/site-packages/setuptools/command/editable_wheel.py:354: BuildBackendWarning: Editable installation.
+  !!
+  
+          ********************************************************************************
+          Please be careful with folders in your working directory with the same
+          name as your package as they may take precedence during imports.
+          ********************************************************************************
+  
+  !!
+    with strategy, WheelFile(wheel_path, "w") as wheel_obj:
+  WARNING: The script idna is installed in '/home/pn/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The script httpx is installed in '/home/pn/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The scripts latch and mcpprobe are installed in '/home/pn/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x7f05370aad40>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/asyncio/base_subprocess.py", line 126, in __del__
+    self.close()
+  File "/usr/local/lib/python3.12/asyncio/base_subprocess.py", line 104, in close
+    proto.pipe.close()
+  File "/usr/local/lib/python3.12/asyncio/unix_events.py", line 568, in close
+    self._close(None)
+  File "/usr/local/lib/python3.12/asyncio/unix_events.py", line 592, in _close
+    self._loop.call_soon(self._call_connection_lost, exc)
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 799, in call_soon
+    self._check_closed()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+npm-abhaybabbar-retellai-mcp-server-1-0-4        timeout              timeout
+npm-amap-amap-maps-mcp-server-0-0-8              missing_required_env npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm-anyproto-anytype-mcp-2-0-3                   timeout              timeout
+npm-arabold-docs-mcp-server-3-5-0                timeout              timeout
+npm-auth0-auth0-mcp-server-0-1-0-beta-19         startup_error        at Module._compile (node:internal/modules/cjs/loader:1781:14)
+npm-aventurevc-mcp-server-0-8-498                timeout              npm warn EBADENGINE Unsupported engine {
+npm-battlegrid-mcp-server-32-0-115               missing_required_env Error: BATTLEGRID_API_KEY or BATTLEGRID_API_KEYS environment variable is required.
+npm-bit2me-mcp-server-4-5-2                      startup_error        npm error could not determine executable to run
+npm-browsermcp-mcp-2-5-0                         harvested            1 tools
+npm-clipform-mcp-server-5-17-0                   harvested            32 tools
+npm-cloudflare-mcp-server-cloudflare-0-2-0       startup_error        [DEBUG 2026-11-25T21:17:18.758Z] Uncaught exception: Error: Unknown command: undefined. Expected 'in
+npm-cnbcool-mcp-server-0-6-7                     startup_error        npm error could not determine executable to run
+npm-contextstream-mcp-server-1-0-99              harvested            2 tools
+npm-dbx-app-mcp-server-0-4-145                   harvested            3 tools
+npm-decodo-mcp-server-1-9-0                      timeout              timeout
+npm-dopplerhq-mcp-server-1-0-5                   timeout              timeout
+npm-esaio-esa-mcp-server-0-15-2                  missing_required_env npm warn EBADENGINE   package: '@esaio/esa-mcp-server@0.15.2',
+npm-gongrzhe-server-gmail-autoauth-mcp-1-1-11    timeout              timeout
+npm-hugeicons-mcp-server-0-4-1                   harvested            6 tools
+npm-kintone-mcp-server-1-11-4                    missing_required_env Error: Environment variables are missing or invalid:
+npm-knip-mcp-0-0-39                              timeout              timeout
+npm-mastra-mcp-docs-server-1-3-15                timeout              timeout
+npm-modelcontextprotocol-server-pdf-2-0-4        timeout              timeout
+npm-mongodb-js-mcp-tools-atlas-3-4-0             startup_error        npm error could not determine executable to run
+npm-near-mcp-aitp-mcp-server-0-1-34              timeout              timeout
+npm-nexus2520-bitbucket-mcp-server-4-0-0         missing_required_env Error: BITBUCKET_USERNAME and either BITBUCKET_APP_PASSWORD (Cloud) or BITBUCKET_TOKEN (Server/DC) a
+npm-onozaty-redmine-mcp-server-1-4-0             missing_required_env ^
+npm-openbnb-mcp-server-airbnb-0-3-0              timeout              timeout
+npm-sap-mdk-mcp-server-0-4-4                     timeout              timeout
+npm-shortcut-mcp-0-25-0                          timeout              timeout
+npm-smartbear-mcp-0-45-0                         timeout              timeout
+npm-storybook-mcp-10-6-8                         startup_error        npm error could not determine executable to run
+npm-structured-world-gitlab-mcp-13-5-0           timeout              timeout
+npm-tacitai-mcp-server-0-15-1                    timeout              timeout
+npm-thesvg-mcp-server-0-9-2                      harvested            5 tools
+npm-thirdstrandstudio-mcp-figma-0-7-0            harvested            31 tools
+npm-transcend-io-mcp-server-admin-2-1-0          timeout              timeout
+npm-transcend-io-mcp-server-assessment-2-1-18    timeout              timeout
+npm-transcend-io-mcp-server-base-3-2-0           startup_error        npm error could not determine executable to run
+npm-transcend-io-mcp-server-consent-1-6-0        startup_error        file://<scratch>/npm-cache/_npx/166c37be8cc27880/node_modules/@transcend-io/mcp-server-consent/dist/
+npm-transcend-io-mcp-server-custom-functions-0-3-5 startup_error        file://<scratch>/npm-cache/_npx/54f48c34ef7216cc/node_modules/@transcend-io/mcp-server-custom-functi
+npm-transcend-io-mcp-server-discovery-1-1-0      startup_error        file://<scratch>/npm-cache/_npx/87d185d883de2c78/node_modules/@transcend-io/mcp-server-base/dist/ind
+npm-transcend-io-mcp-server-docs-0-6-1           startup_error        file://<scratch>/npm-cache/_npx/c149e4fc14f57380/node_modules/@transcend-io/mcp-server-docs/dist/cat
+npm-transcend-io-mcp-server-dsr-2-2-0            startup_error        file://<scratch>/npm-cache/_npx/e547377081a45440/node_modules/@transcend-io/mcp-server-base/dist/ind
+npm-transcend-io-mcp-server-inventory-1-2-0      startup_error        file://<scratch>/npm-cache/_npx/3cf0a0719b30f815/node_modules/@transcend-io/mcp-server-inventory/dis
+npm-transcend-io-mcp-server-policy-0-2-10        timeout              timeout
+npm-transcend-io-mcp-server-preferences-0-9-0    startup_error        file://<scratch>/npm-cache/_npx/35878c3491f68291/node_modules/@transcend-io/mcp-server-base/dist/ind
+npm-transcend-io-mcp-server-workflows-1-2-0      startup_error        file://<scratch>/npm-cache/_npx/04cc58e6aefbaf10/node_modules/@transcend-io/mcp-server-base/dist/ind
+npm-vizejs-musea-mcp-server-0-793-0              timeout              timeout
+npm-voltagent-mcp-server-2-2-0                   startup_error        npm error could not determine executable to run
+npm-vouchington-mcp-server-0-2-0                 startup_error        npm error could not determine executable to run
+npm-zereight-mcp-gitlab-3-0-0                    harvested            40 tools
+npm-agentation-mcp-1-3-2                         startup_error        npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the r
+npm-argocd-mcp-0-9-0                             startup_error        Commands:
+npm-aws-s3-mcp-0-4-0                             timeout              timeout
+npm-datadog-mcp-server-1-0-9                     missing_required_env Error: DD_API_KEY is required.
+npm-dataforseo-mcp-server-3-1-3                  timeout              timeout
+npm-graphlit-mcp-server-1-0-20260112001          timeout              timeout
+npm-hourei-mcp-server-1-0-6                      harvested            3 tools
+npm-kubernetes-mcp-server-linux-amd64-0-1-3      startup_error        npm error could not determine executable to run
+npm-langsmith-mcp-server-0-1-7                   timeout              timeout
+npm-mcp-searxng-2-12-0                           timeout              timeout
+npm-mcp-server-code-runner-0-1-8                 harvested            1 tools
+npm-mongodb-mcp-server-3-4-0                     timeout              timeout
+npm-replicate-mcp-0-9-0                          harvested            35 tools
+npm-slite-mcp-server-1-3-0                       missing_required_env An error occurred: Slite API key not provided. Please either pass it as an argument --api-key=<redac
+npm-square-mcp-server-0-1-2                      harvested            3 tools
+npm-tailwindcss-mcp-server-0-1-1                 harvested            8 tools
+npm-tiny-stdio-mcp-server-0-1-32                 startup_error        npm error could not determine executable to run
+npm-wikipedia-mcp-1-0-3                          harvested            2 tools
+pypi-adls2-mcp-server-0-1-4                      startup_error        Downloaded cryptography
+pypi-ado-mcp-server-0-1-0                        missing_required_env Downloading pygments (1.2MiB)
+pypi-adversary-mcp-server-1-11-1                 timeout              Downloading sqlalchemy (4.5MiB)
+pypi-adx-mcp-server-1-1-0                        startup_error        Installed 79 packages in 51ms
+pypi-age-mcp-server-0-3-0                        startup_error        Downloaded numpy
+pypi-agent-analytics-mcp-server-0-1-1            startup_error        Installed 29 packages in 22ms
+pypi-agent-commerce-mcp-server-0-1-0             startup_error        Installed 33 packages in 22ms
+pypi-agent-coordination-mcp-server-0-1-0         startup_error        Installed 29 packages in 23ms
+pypi-agent-cost-mcp-server-0-1-1                 startup_error        https://errors.pydantic.dev/2.14/v/l               
+pypi-agent-directory-mcp-server-0-1-1            startup_error        Installed 29 packages in 27ms
+pypi-agent-feedback-mcp-server-0-1-0             startup_error        Installed 29 packages in 22ms
+pypi-agent-identity-mcp-server-0-1-0             startup_error        Installed 33 packages in 22ms
+pypi-agent-insurance-mcp-server-0-2-0            startup_error        Installed 32 packages in 23ms
+pypi-agent-mcp-server-0-1-1                      startup_error        Downloading uv (16.8MiB)
+pypi-agent-memory-mcp-server-0-1-1               startup_error        Installed 29 packages in 21ms
+pypi-agent-reputation-mcp-server-0-1-1           startup_error        Installed 29 packages in 19ms
+pypi-agent-staking-mcp-server-0-1-0              startup_error        Installed 40 packages in 27ms
+pypi-agent-tasker-mcp-server-1-0-1               harvested            2 tools
+pypi-agent-toolkit-mcp-server-0-4-0              startup_error        Installed 29 packages in 24ms
+pypi-agent-validator-mcp-server-0-1-0            startup_error        Installed 32 packages in 22ms
+pypi-agent-workflow-mcp-server-0-1-1             startup_error        Installed 29 packages in 12ms
+pypi-agentauth-mcp-server-0-1-1                  startup_error        Installed 40 packages in 29ms
+pypi-agentbridge-mcp-server-0-1-1                startup_error        Installed 34 packages in 14ms
+pypi-agentfactory-mcp-server-0-1-0               startup_error        Downloaded google-genai
+pypi-agentic-mcp-server-0-1-1                    harvested            9 tools
+pypi-agentmesh-mcp-server-3-7-0                  startup_error        Installed 30 packages in 14ms
+pypi-agentoath-mcp-server-0-2-0                  startup_error        Installed 13 packages in 14ms
+pypi-agentops-mcp-server-0-5-4                   startup_error        Downloading cpython-3.14.10-linux-x86_64-gnu (download) (35.1MiB)
+pypi-agentskills-mcp-server-0-7-0                startup_error        Downloading pydantic-core (2.2MiB)
+pypi-agentsphere-mcp-server-1-9-1                startup_error        For further information visit https://errors.pydantic.dev/2.14/v/missing

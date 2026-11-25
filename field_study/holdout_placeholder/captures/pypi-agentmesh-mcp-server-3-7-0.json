@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP Server for Claude Desktop - Agent OS kernel primitives including code safety verification, CMVK multi-model review, and IATP trust",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agentmesh-mcp-server==3.7.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agentmesh-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/microsoft/agent-governance-toolkit",
+  "slug": "pypi-agentmesh-mcp-server-3-7-0",
+  "stderr_summary": "Installed 30 packages in 14ms\nAn executable named `agentmesh-mcp-server` is not provided by package `agentmesh-mcp-server`.\nThe following executables are available:\n- mcp-kernel-server\n\nUse `uvx --from agentmesh-mcp-server mcp-kernel-server` instead.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "3.7.0"
+}

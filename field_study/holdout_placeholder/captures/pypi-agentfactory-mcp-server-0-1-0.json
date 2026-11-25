@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Agent Factory MCP Server",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agentfactory-mcp-server==0.1.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agentfactory-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": null,
+  "slug": "pypi-agentfactory-mcp-server-0-1-0",
+  "stderr_summary": "Downloaded google-genai\n Downloaded pip\n Downloaded pydantic-ai-slim\n Downloaded uvloop\n Downloaded logfire-cli\nInstalled 117 packages in 132ms\nTraceback (most recent call last):\n  File \"<scratch>/uv-cache/archive-v0/UxB75_ItLYyiL7qE/bin/agentfactory-mcp-server\", line 6, in <module>\n    from agentfactory_mcp_server.server import main\nModuleNotFoundError: No module named 'agentfactory_mcp_server.server'",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.1.0"
+}

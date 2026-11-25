@@ -1,0 +1,100 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP Server for Square API",
+  "ecosystem": "npm",
+  "harvest_status": "harvested",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "square-mcp-server@0.1.2"
+  ],
+  "manifest_sha256": "789bda45992d3f2da073e626ead17381942e73fcf5ebb5beae8005a502bf0044",
+  "package": "square-mcp-server",
+  "protocol_version": "2025-11-25",
+  "repository_url": null,
+  "slug": "npm-square-mcp-server-0-1-2",
+  "stderr_summary": "npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead",
+  "tool_count": 3,
+  "tools": [
+    {
+      "description": "Unified tool for all Square API operations. Be sure to get types before calling. Available services:\n  applepay, bankaccounts, bookingcustomattributes, bookings, cards, cashdrawers, catalog, checkout, customercustomattributes, customergroups, customersegments, customers, devices, disputes, events, giftcardactivities, giftcards, inventory, invoices, labor, locationcustomattributes, locations, loyalty, merchantcustomattributes, merchants, oauth, ordercustomattributes, orders, payments, payouts, refunds, sites, snippets, subscriptions, team, terminal, vendors, webhooksubscriptions.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "description": "The API method to call (e.g., 'list', 'create')",
+            "type": "string"
+          },
+          "request": {
+            "additionalProperties": true,
+            "description": "The request object for the API call.",
+            "properties": {},
+            "type": "object"
+          },
+          "service": {
+            "description": "The Square API service category (e.g., 'catalog', 'payments')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "method"
+        ],
+        "type": "object"
+      },
+      "name": "make_api_request"
+    },
+    {
+      "description": "Get type information for a Square API method. You must call this before calling the make_api_request tool.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "description": "The API method to call (e.g., 'list', 'create')",
+            "type": "string"
+          },
+          "service": {
+            "description": "The Square API service category (e.g., 'catalog', 'payments')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "method"
+        ],
+        "type": "object"
+      },
+      "name": "get_type_info"
+    },
+    {
+      "description": "Get information about a Square API service. Call me before trying to get type info",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "description": "The Square API service category (e.g., 'catalog', 'payments')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service"
+        ],
+        "type": "object"
+      },
+      "name": "get_service_info"
+    }
+  ],
+  "version": "0.1.2"
+}

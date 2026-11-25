@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Transcend MCP Server — Policy Engine tools.",
+  "ecosystem": "npm",
+  "harvest_status": "timeout",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@transcend-io/mcp-server-policy@0.2.10"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@transcend-io/mcp-server-policy",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/transcend-io/tools",
+  "slug": "npm-transcend-io-mcp-server-policy-0-2-10",
+  "stderr_summary": "",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.2.10"
+}

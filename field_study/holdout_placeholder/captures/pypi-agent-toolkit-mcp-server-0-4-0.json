@@ -1,0 +1,19 @@
+{
+  "credential_mode": "placeholder",
+  "description": "MCP server providing persistent notes, todos, timers, and a cross-project registry — capabilities that augment Claude Code's built-in harness.",
+  "ecosystem": "pypi",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "uvx",
+    "agent-toolkit-mcp-server==0.4.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "agent-toolkit-mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/PaperBackPear3/awesome-agent-toolkits",
+  "slug": "pypi-agent-toolkit-mcp-server-0-4-0",
+  "stderr_summary": "Installed 29 packages in 24ms\nTraceback (most recent call last):\n  File \"<scratch>/uv-cache/archive-v0/oBqUeNbAKWLEJSEp/bin/agent-toolkit-mcp-server\", line 6, in <module>\n    from server import main\n  File \"<scratch>/uv-cache/archive-v0/oBqUeNbAKWLEJSEp/lib/python3.13/site-packages/server.py\", line 12, in <module>\n    from mcp.server.fastmcp import FastMCP\n  File \"<scratch>/uv-cache/archive-v0/oBqUeNbAKWLEJSEp/lib/python3.13/site-packages/mcp/server/fastmcp.py\", line 16, in <module>\n    raise ModuleNotFoundError(_MESSAGE, name=__name__)\nModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp<2' to keep running v1 code.",
+  "tool_count": 0,
+  "tools": [],
+  "version": "0.4.0"
+}

@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Transcend MCP Server — Data Inventory tools.",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@transcend-io/mcp-server-inventory@1.2.0"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@transcend-io/mcp-server-inventory",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/transcend-io/tools",
+  "slug": "npm-transcend-io-mcp-server-inventory-1-2-0",
+  "stderr_summary": "file://<scratch>/npm-cache/_npx/3cf0a0719b30f815/node_modules/@transcend-io/mcp-server-inventory/dist/graphql-y7lWY0DC.mjs:1\nimport { EmptySchema, ErrorCode, OffsetPaginationSchema, ToolError, TranscendGraphQLBase, createListResult, createToolResult, defineTool, groupBy, z } from \"@transcend-io/mcp-server-base\";\n                      ^^^^^^^^^\nSyntaxError: The requested module '@transcend-io/mcp-server-base' does not provide an export named 'ErrorCode'\n    at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)\n    at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\n\nNode.js v22.23.5",
+  "tool_count": 0,
+  "tools": [],
+  "version": "1.2.0"
+}

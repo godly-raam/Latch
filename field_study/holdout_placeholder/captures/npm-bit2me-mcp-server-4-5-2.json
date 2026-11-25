@@ -1,0 +1,20 @@
+{
+  "credential_mode": "placeholder",
+  "description": "Bit2Me MCP Server",
+  "ecosystem": "npm",
+  "harvest_status": "startup_error",
+  "launch_argv": [
+    "npx",
+    "-y",
+    "@bit2me/mcp-server@4.5.2"
+  ],
+  "manifest_sha256": "fe2f3b4ef49492d81cb350fb689bf9f9dff6cfd1817d72d6ff9fe3350e3d5e6a",
+  "package": "@bit2me/mcp-server",
+  "protocol_version": "n/a",
+  "repository_url": "https://github.com/bit2me-devs/bit2me-mcp",
+  "slug": "npm-bit2me-mcp-server-4-5-2",
+  "stderr_summary": "npm error could not determine executable to run\nnpm error A complete log of this run can be found in: <scratch>/npm-cache/_logs/2026-11-25T21_16_57_992Z-debug-0.log",
+  "tool_count": 0,
+  "tools": [],
+  "version": "4.5.2"
+}
